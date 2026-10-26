@@ -7,7 +7,9 @@ on:
     paths: ['tools/update_facts.py', 'tools/facts.py', '.github/workflows/update-facts.yml']
 permissions:
   contents: write
-concurrency: { group: ${{ github.workflow }}, cancel-in-progress: false }
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
 jobs:
   run:
     runs-on: ubuntu-latest
