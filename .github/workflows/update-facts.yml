@@ -1,0 +1,24 @@
+name: update-facts
+on:
+  schedule:
+    - cron: '30 0 1 * *'       # 매월 1일 09:30 KST
+  workflow_dispatch:
+  push:
+    paths: ['tools/update_facts.py', 'tools/facts.py', '.github/workflows/update-facts.yml']
+permissions:
+  contents: write
+concurrency: { group: data-update, cancel-in-progress: false }
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.12' }
+      - run: pip install -q requests beautifulsoup4
+      - run: python tools/update_facts.py
+      - name: commit
+        run: |
+          git config user.name 'gonggo-bot'; git config user.email 'gonggo-bot@users.noreply.github.com'
+          git add data/fact.json data/raw.json
+          git diff --cached --quiet && echo 'no change' || (git commit -m "data: 단지 수치 갱신 $(date -u +%F)" && git pull --rebase origin gh-pages && git push)

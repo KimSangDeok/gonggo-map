@@ -1,0 +1,24 @@
+name: update-notices
+on:
+  schedule:
+    - cron: '0 0 * * *'        # 매일 09:00 KST
+  workflow_dispatch:
+  push:
+    paths: ['tools/sources.py', 'tools/update_notices.py', '.github/workflows/update-notices.yml']
+permissions:
+  contents: write
+concurrency: { group: data-update, cancel-in-progress: false }
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.12' }
+      - run: pip install -q requests beautifulsoup4
+      - run: python tools/update_notices.py
+      - name: commit
+        run: |
+          git config user.name 'gonggo-bot'; git config user.email 'gonggo-bot@users.noreply.github.com'
+          git add data/notices.json data/lh.json
+          git diff --cached --quiet && echo 'no change' || (git commit -m "data: 공고 갱신 $(date -u +%F)" && git pull --rebase origin gh-pages && git push)
