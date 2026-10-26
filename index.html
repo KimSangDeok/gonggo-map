@@ -191,6 +191,7 @@ footer{margin-top:48px;border-top:1px solid var(--line);padding-top:14px;color:v
 /* ---- app shell ---- */
 html,body{height:100%}
 body{display:flex;flex-direction:column;min-height:100%}
+header.appbar{margin:0;padding-block:0}
 .appbar{position:sticky;top:0;z-index:30;background:var(--surface);border-bottom:1px solid var(--line);display:flex;align-items:stretch;gap:6px;padding:0 max(12px,env(safe-area-inset-left,0px)) 0 max(16px,env(safe-area-inset-left,0px))}
 .brand{font-family:var(--font-display);font-weight:700;font-size:17px;display:flex;align-items:center;padding-right:10px;white-space:nowrap}
 .tabs{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;flex:1}
@@ -228,9 +229,15 @@ main section.view{margin-top:0}
 .lock label{display:flex;gap:6px;align-items:center;font-size:13px;margin-top:10px;color:var(--muted)}
 .lock .err{color:var(--bad);font-size:13px;min-height:1.2em;margin-top:8px}
 .me-frag .tiles{margin-bottom:8px}
+.handle{display:none}
 @media (max-width:760px){
-  #view-map.active{grid-template-columns:minmax(0,1fr);grid-template-rows:56dvh minmax(0,1fr)}
-  .side{border-left:0;border-top:1px solid var(--line)}
+  #view-map.active{display:block;position:relative;height:calc(100dvh - 49px)}
+  #nmap{position:absolute;inset:0;height:auto}
+  .side{position:absolute;left:0;right:0;bottom:0;height:var(--sheet,50%);max-height:calc(100% - 48px);border-left:0;border-top:1px solid var(--line);border-radius:16px 16px 0 0;box-shadow:0 -8px 24px rgba(0,0,0,.14);z-index:5;transition:height .22s ease}
+  .side.dragging{transition:none}
+  .handle{display:flex;flex-direction:column;align-items:center;padding:8px 0 4px;cursor:grab;touch-action:none;user-select:none}
+  .handle i{width:42px;height:5px;border-radius:3px;background:var(--line)}
+  .handle small{color:var(--muted);font-size:11px;margin-top:3px}
   .brand{font-size:15px;padding-right:6px}
   .tabs a{padding:0 10px;font-size:13.5px}
 }
@@ -246,7 +253,8 @@ main section.view{margin-top:0}
 <main>
   <section class="view" id="view-map">
     <div id="nmap"></div>
-    <aside class="side">
+    <aside class="side" id="side">
+      <div class="handle" id="sheet-handle"><i></i><small id="sheet-hint">끌어올리면 목록, 내리면 지도</small></div>
       <div class="nmbar">
         <label><input type="checkbox" data-cat="pri" checked> <span class="dot" style="background:#1d8a4e"></span> 우선 1순위</label>
         <label><input type="checkbox" data-cat="big" checked> <span class="dot" style="background:#1f5fbf"></span> 36㎡↑</label>
@@ -652,7 +660,9 @@ var NOTICES = {
   'K25':   { name: 'SH 2025년 1차 국민임대', short: '25년 국민임대', url: 'https://www.i-sh.co.kr/app/lay2/program/S1T294C295/www/brd/m_241/view.do?multi_itm_seqs=1%2C2%2C4%2C8%2C16%2C32%2C64%2C128%2C256&seq=292541',
     steps: [['공고','2025-08-20'],['접수','2025-09-02','2025-09-05'],['당첨자 발표','2026-02-15'],['입주','2026-03-01','2026-04-30']] }
 };
-PLACES.forEach(function(p){ p.nid = p.kind === '국민임대' ? 'K26' : (/2차/.test(p.notice || '') ? 'H26-2' : 'H26-1'); });
+var GEO = {"서울특별시 강남구 도곡로93길 23": [37.5016378, 127.0643183], "서울특별시 강동구 고덕로98길 101": [37.5536908, 127.1810099], "서울특별시 강동구 고덕로98길 160": [37.55109, 127.1808371], "서울특별시 강동구 아리수로 385": [37.563558, 127.1708598], "서울특별시 강서구 강서로47길 108": [37.554396, 126.8304907], "서울특별시 강서구 개화동로21길 22": [37.5715237, 126.8052649], "서울특별시 강서구 공항대로 103": [37.5620748, 126.8188663], "서울특별시 강서구 마곡동": [37.5738, 126.8304], "서울특별시 강서구 마곡서1로 131": [37.568223, 126.8185922], "서울특별시 구로구 금오로 882": [37.4765171, 126.8424795], "서울특별시 구로구 연동로 234": [37.4819908, 126.8222459], "서울특별시 구로구 오류로 30": [37.4865503, 126.8401816], "서울특별시 구로구 오류로 36-13": [37.4881679, 126.8413064], "서울특별시 구로구 오리로1102-13": [37.4846986, 126.8424192], "서울특별시 구로구 천왕로 21": [37.4793253, 126.8396029], "서울특별시 구로구 천왕로 91": [37.4861496, 126.8373501], "서울특별시 구로구 항동로 68": [37.4804044, 126.8261707], "서울특별시 동대문구": [37.574524, 127.03965], "서울특별시 동대문구 무학로 91": [37.5717, 127.0296134], "서울특별시 동대문구 이문로 120": [37.5984489, 127.0627196], "서울특별시 마포구 공덕동": [37.550192, 126.960025], "서울특별시 마포구 신촌로28길 50": [37.5557061, 126.9504721], "서울특별시 마포구 염리동": [37.547083, 126.94565], "서울특별시 마포구 월드컵북로 501": [37.5834737, 126.8788291], "서울특별시 서대문구 거북골로 100": [37.5760198, 126.9174905], "서울특별시 서대문구 북아현로1길 17": [37.5585018, 126.9553187], "서울특별시 서대문구 이화여대8길 123": [37.5620235, 126.9507477], "서울특별시 서대문구 통일로 395": [37.5850065, 126.9464416], "서울특별시 서대문구 홍은동": [37.598906, 126.947111], "서울특별시 성동구 하왕십리동": [37.564158, 127.02875], "서울특별시 성동구 행당동": [37.558567, 127.036188], "서울특별시 성북구 돌곶이로 220": [37.6193971, 127.0466285], "서울특별시 성북구 돌곶이로40길 46": [37.6186754, 127.0479889], "서울특별시 성북구 보문동": [37.580383, 127.0228], "서울특별시 성북구 삼선동2가 296": [37.5841217, 127.0102984], "서울특별시 성북구 숭인로 50": [37.6116278, 127.0271556], "서울특별시 성북구 장위동": [37.614124, 127.043713], "서울특별시 성북구 한천로 713": [37.6205164, 127.0521463], "서울특별시 송파구 거마로 56": [37.4958289, 127.1478303], "서울특별시 송파구 오금로 551": [37.4938203, 127.1501461], "서울특별시 양천구 남부순환로83길 18": [37.5156324, 126.8419542], "서울특별시 양천구 신정로7길 75": [37.5130488, 126.8340791], "서울특별시 양천구 신정이펜1로 99": [37.5148504, 126.827324], "서울특별시 영등포구 국회대로54길 10": [37.5238292, 126.9074456], "서울특별시 용산구 백범로 313": [37.5400414, 126.963526], "서울특별시 용산구 서빙고로 17": [37.5257664, 126.9678526], "서울특별시 은평구 수색동": [37.583519, 126.893666], "서울특별시 은평구 응암동": [37.600688, 126.926813], "서울특별시 은평구 통일로 630": [37.6039943, 126.936473], "서울특별시 은평구 통일로 972": [37.6297939, 126.9200535], "서울특별시 종로구 송월길 130": [37.571907, 126.963564], "서울특별시 중랑구 신내로 208": [37.6170001, 127.0931176], "서울특별시 중랑구 신내역로 160": [37.616706, 127.1119472], "서울특별시 중랑구 신내역로1길 142": [37.6176622, 127.110353]};  // 네이버 Geocoding 결과 (2026-10-26)
+PLACES.forEach(function(p){ p.nid = p.kind === '국민임대' ? 'K26' : (/2차/.test(p.notice || '') ? 'H26-2' : 'H26-1'); if (GEO[p.addr]) { p.ll = GEO[p.addr]; p.dong = !/\d/.test(p.addr); } });
+[HOME, WORK].forEach(function(h){ if (GEO[h.addr]) h.ll = GEO[h.addr]; });
 function fmtD(s){ return s.slice(5).replace('-', '.'); }
 function noticeStatus(n){
   var today = new Date(); today.setHours(0,0,0,0);
@@ -708,6 +718,30 @@ function dragScroll(el){
 }
 dragScroll(document.querySelector('.tabs'));
 
+// ===== 모바일 바닥 시트 (지도 위에 목록을 끌어올리는 표준 패턴) =====
+var sheet = (function(){
+  var side = document.getElementById('side'), handle = document.getElementById('sheet-handle'), hint = document.getElementById('sheet-hint');
+  function mobile(){ return window.matchMedia('(max-width:760px)').matches; }
+  function maxH(){ return side.parentNode.clientHeight - 48; }
+  function peekH(){ var bars = side.querySelectorAll('.nmbar'); var h = handle.offsetHeight + 6; bars.forEach(function(b){ h += b.offsetHeight; }); return h; }
+  function snaps(){ return [peekH(), Math.round(side.parentNode.clientHeight * 0.5), maxH()]; }
+  var state = 1; // 0 peek, 1 half, 2 full
+  function setH(px, noSnapState){ side.style.setProperty('--sheet', Math.max(peekH(), Math.min(maxH(), px)) + 'px'); }
+  function go(s){ state = Math.max(0, Math.min(2, s)); setH(snaps()[state]); hint.textContent = state === 2 ? '내리면 지도' : (state === 0 ? '올리면 목록' : '끌어올리면 목록, 내리면 지도'); }
+  if (handle) {
+    var st = { on: false, y: 0, h: 0, moved: false };
+    handle.addEventListener('pointerdown', function(e){ if (!mobile()) return; st.on = true; st.moved = false; st.y = e.clientY; st.h = side.getBoundingClientRect().height; side.classList.add('dragging'); try { handle.setPointerCapture(e.pointerId); } catch(x) {} });
+    handle.addEventListener('pointermove', function(e){ if (!st.on) return; var dy = st.y - e.clientY; if (Math.abs(dy) > 3) st.moved = true; setH(st.h + dy); });
+    function end(e){ if (!st.on) return; st.on = false; side.classList.remove('dragging'); try { handle.releasePointerCapture(e.pointerId); } catch(x) {}
+      if (!st.moved) { go(state === 2 ? 0 : state + 1); return; }
+      var h = side.getBoundingClientRect().height, sn = snaps(), best = 0; sn.forEach(function(v, i){ if (Math.abs(v - h) < Math.abs(sn[best] - h)) best = i; }); go(best); }
+    handle.addEventListener('pointerup', end); handle.addEventListener('pointercancel', end);
+    window.addEventListener('resize', function(){ if (mobile()) go(state); else side.style.removeProperty('--sheet'); });
+    setTimeout(function(){ if (mobile()) go(1); }, 0);
+  }
+  return { go: go, mobile: mobile, state: function(){ return state; } };
+})();
+
 // ===== 네이버지도 =====
 var nmMap, nmMarkers = [], nmInfo, nmByName = {}, nmCache = {};
 try { nmCache = JSON.parse(localStorage.getItem('geocache-v1') || '{}'); } catch(e) {}
@@ -742,12 +776,13 @@ function nmHtml(p, approx){
   var body = p.kind === '행복주택'
     ? '<div><span class="k">전용</span> ' + p.m2 + '㎡ (' + p.py + ') · <span class="k">공가</span> ' + p.vac + (p.wait ? ' · <span class="k">예비</span> ' + p.wait : '') + '</div><div><span class="k">보증금</span> ' + p.dep + ' · <span class="k">월</span> ' + p.rent + ' <span class="k">(청년 소득있음, ' + p.notice + ')</span></div>'
     : '<div>' + p.info + '</div>';
-  return '<div class="nm-iw"><b>' + p.name + '</b> <span class="k">' + p.kind + '</span><br>' + body + '<div><span class="k">내 순위</span> ' + p.rank + '</div><div><span class="k">공고</span> ' + (p.kind === '국민임대' ? noticeLine('K25') + '<br><span class="k">공고</span> ' + noticeLine('K26') : noticeLine(p.nid)) + '</div><div class="k" style="margin-top:4px">' + (p.addr || '') + (approx ? ' · <b style="color:#c23c3c">근사 위치</b>' : '') + '</div><div style="margin-top:6px"><a href="' + nav + '" target="_blank" rel="noopener">네이버지도 앱에서 열기 · 길찾기</a></div></div>';
+  return '<div class="nm-iw"><b>' + p.name + '</b> <span class="k">' + p.kind + '</span><br>' + body + '<div><span class="k">내 순위</span> ' + p.rank + '</div><div><span class="k">공고</span> ' + (p.kind === '국민임대' ? noticeLine('K25') + '<br><span class="k">공고</span> ' + noticeLine('K26') : noticeLine(p.nid)) + '</div><div class="k" style="margin-top:4px">' + (p.addr || '') + (approx ? ' · <b style="color:#c23c3c">동 중심 근사</b>' : '') + '</div><div style="margin-top:6px"><a href="' + nav + '" target="_blank" rel="noopener">네이버지도 앱에서 열기 · 길찾기</a></div></div>';
 }
 function keyOf(name){ return name.replace(/\s*\(.*?\)/g, '').replace(/\s+/g, ''); }
 function nmFocus(name){
   var mk = nmByName[keyOf(name)]; if (!mk) return false;
   nmMap.setZoom(15, true); nmMap.panTo(mk.getPosition()); nmInfo.setContent(nmHtml(mk.__p, mk.__approx)); nmInfo.open(nmMap, mk);
+  if (sheet.mobile()) sheet.go(0);
   document.querySelectorAll('.lst .it').forEach(function(it){ it.classList.toggle('on', it.getAttribute('data-key') === keyOf(name)); });
   return true;
 }
@@ -756,7 +791,7 @@ function nmInit(){
   nmMap = new naver.maps.Map('nmap', { center: new naver.maps.LatLng(37.565, 126.93), zoom: 11, zoomControl: true, zoomControlOptions: { position: naver.maps.Position.TOP_LEFT } });
   nmInfo = new naver.maps.InfoWindow({ borderWidth: 0, backgroundColor: 'transparent', disableAnchor: true, pixelOffset: new naver.maps.Point(0, -6) });
   var status = document.getElementById('nm-status'), list = document.getElementById('nm-list');
-  [HOME, WORK].forEach(function(h){ nmGeocode(h.addr, function(pt){ var p = pt || h.approx; new naver.maps.Marker({ map: nmMap, position: new naver.maps.LatLng(p[0], p[1]), zIndex: 50, icon: { content: '<div class="nm-home" title="' + h.label + '">' + (h.label === '집' ? '🏠' : '💼') + '</div>', anchor: new naver.maps.Point(11, 22) } }); }); });
+  [HOME, WORK].forEach(function(h){ (h.ll ? function(cb){ cb(h.ll); } : function(cb){ nmGeocode(h.addr, cb); })(function(pt){ var p = pt || h.approx; new naver.maps.Marker({ map: nmMap, position: new naver.maps.LatLng(p[0], p[1]), zIndex: 50, icon: { content: '<div class="nm-home" title="' + h.label + '">' + (h.label === '집' ? '🏠' : '💼') + '</div>', anchor: new naver.maps.Point(11, 22) } }); }); });
   var sel = document.getElementById('nm-notice');
   ['H26-1','H26-2','K26'].forEach(function(id){ var o = document.createElement('option'); o.value = id; o.textContent = NOTICES[id].name + ' — ' + noticeStatus(NOTICES[id]).text; sel.appendChild(o); });
   sel.addEventListener('change', function(){ applyFilter(); });
@@ -767,8 +802,8 @@ function nmInit(){
   function next(){
     if (i >= PLACES.length) { status.textContent = PLACES.length + '곳' + (approxN ? ' (' + approxN + '곳 근사)' : ''); applyFilter(); return; }
     var p = PLACES[i++];
-    nmGeocode(p.addr, function(pt){
-      var approx = !pt, pos = pt || p.approx;
+    (p.ll ? function(cb){ cb(p.ll); } : function(cb){ nmGeocode(p.addr, cb); })(function(pt){
+      var approx = !pt || !!p.dong, pos = pt || p.approx;
       if (pos) {
         if (approx) approxN++;
         var mk = new naver.maps.Marker({ map: nmMap, position: new naver.maps.LatLng(pos[0], pos[1]), icon: nmIcon(p, approx), zIndex: p.pick ? 20 : 10 });
@@ -782,7 +817,7 @@ function nmInit(){
         var g = groupEl[p.cat]; var ref = g.nextSibling; while (ref && ref.className === 'it') ref = ref.nextSibling; list.insertBefore(it, ref);
       }
       done++; status.textContent = done + ' / ' + PLACES.length + ' 좌표 변환 중…';
-      setTimeout(next, nmCache[p.addr] ? 0 : 80);
+      setTimeout(next, (p.ll || nmCache[p.addr]) ? 0 : 80);
     });
   }
   next();
@@ -804,7 +839,7 @@ function b64(s){ var bin = atob(s), a = new Uint8Array(bin.length); for (var i =
 async function meDecrypt(pw, d){
   var enc = new TextEncoder();
   var km = await crypto.subtle.importKey('raw', enc.encode(pw), 'PBKDF2', false, ['deriveKey']);
-  var key = await crypto.subtle.deriveKey({ name: 'PBKDF2', salt: b64(d.salt), iterations: 310000, hash: 'SHA-256' }, km, { name: 'AES-GCM', length: 256 }, false, ['decrypt']);
+  var key = await crypto.subtle.deriveKey({ name: 'PBKDF2', salt: b64(d.salt), iterations: d.iter || 310000, hash: 'SHA-256' }, km, { name: 'AES-GCM', length: 256 }, false, ['decrypt']);
   var pt = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: b64(d.iv) }, key, b64(d.ct));
   return new TextDecoder().decode(pt);
 }
