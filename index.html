@@ -284,7 +284,7 @@ main section.view{margin-top:0}
 @media (max-width:760px){
   #view-map.active{display:block;position:relative;height:calc(100dvh - 49px)}
   .mapbox{position:absolute;inset:0;height:auto}
-  .side{position:absolute;left:0;right:0;bottom:0;height:var(--sheet,50%);max-height:calc(100% - 48px);border-left:0;border-top:1px solid var(--line);border-radius:16px 16px 0 0;box-shadow:0 -8px 24px rgba(0,0,0,.14);z-index:5;transition:height .22s ease}
+  .side{position:absolute;left:0;right:0;bottom:0;height:var(--sheet,50%);max-height:calc(100% - 48px);border-left:0;border-top:1px solid var(--line);border-radius:16px 16px 0 0;box-shadow:0 -8px 24px rgba(0,0,0,.14);z-index:1000;transition:height .22s ease}
   .side.dragging{transition:none}
   .handle{display:flex;flex-direction:column;align-items:center;padding:8px 0 4px;cursor:grab;touch-action:none;user-select:none}
   .handle i{width:42px;height:5px;border-radius:3px;background:var(--line)}
@@ -944,7 +944,7 @@ function nmFocus(name, m2){
 }
 function nmInit(){
   if (!window.naver || !naver.maps) return;
-  nmMap = new naver.maps.Map('nmap', { center: new naver.maps.LatLng(37.565, 126.93), zoom: 11, zoomControl: true, zoomControlOptions: { position: naver.maps.Position.TOP_LEFT } });
+  nmMap = new naver.maps.Map('nmap', { center: new naver.maps.LatLng(37.565, 126.93), zoom: 11, zoomControl: !sheet.mobile(), zoomControlOptions: { position: naver.maps.Position.TOP_LEFT } });  // 폰은 손가락 확대, 줌 막대 없음
   nmInfo = new naver.maps.InfoWindow({ borderWidth: 0, backgroundColor: 'transparent', disableAnchor: true, pixelOffset: new naver.maps.Point(0, -6) });
   var status = document.getElementById('nm-status'), list = document.getElementById('nm-list');
   // 폰: 바닥 시트가 아래 절반을 덮으므로 보이는 위쪽 절반에 서울이 오도록 중심을 남쪽으로 내림
