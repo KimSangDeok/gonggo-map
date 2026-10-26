@@ -56,13 +56,23 @@ def _iso(y, m, d): return f'{int(y):04d}-{int(m):02d}-{int(d):02d}'
 
 def extract_steps(text):
     """공고 페이지 본문(텍스트)에서 일정 추출. 라벨 뒤 같은 항목(■/○ 글머리표 전까지) 안의 날짜를 읽는다."""
-    labels = [('공고', [r'모집\s*공고\s*일']), ('접수', [r'인터넷\s*접수', r'접수\s*기간', r'접수\s*일']),
+    labels = [('공고', [r'모집\s*공고\s*일', r'모집\s*공고\s*[(:：]', r'공고\s*일\s*[:：]']), ('접수', [r'인터넷\s*접수', r'접수\s*기간', r'접수\s*일']),
               ('서류심사대상자 발표', [r'서류\s*심사\s*대상자\s*발표']), ('서류 제출', [r'서류\s*제출\s*기간', r'서류\s*제출']),
               ('당첨자 발표', [r'당첨자\s*발표']), ('계약', [r'계약\s*체결\s*기간', r'계약\s*기간', r'계약\s*체결']), ('입주', [r'입주\s*예정\s*(시기|일)', r'입주\s*(시기|일)'])]
     steps = []
+    RANGE = re.compile(r'(\d{4})\s*\.\s*(\d{1,2})\s*\.\s*(\d{1,2})\.?\s*(?:\([^)]{1,3}\))?\s*(?:\d{1,2}:\d{2})?\s*[~∼]\s*(\d{4})\s*\.\s*(\d{1,2})\s*\.\s*(\d{1,2})')
+    def internet_range():
+        for m in RANGE.finditer(text):
+            ctx = text[max(0, m.start() - 60): m.start()] + ' ' + text[m.end(): m.end() + 90]
+            if '인터넷' in ctx and '방문' not in text[m.end(): m.end() + 40]:
+                return [_iso(*m.groups()[:3]), _iso(*m.groups()[3:])]
+        return None
     for name, pats in labels:
         got = None
-        for pat in pats:
+        if name == '접수':
+            ir = internet_range()
+            if ir: got = ['접수'] + ir
+        for pat in ([] if got else pats):
             for m in re.finditer(pat, text):
                 seg = text[m.end(): m.end() + 160]
                 seg = re.split(r'[■●◎○□▶※]|\n\s*\n', seg)[0]
@@ -84,7 +94,8 @@ def sh_view(seq):
     r = S.get(SH_VIEW.format(seq=seq), timeout=40); r.raise_for_status()
     soup = BeautifulSoup(r.text, 'html.parser')
     for s in soup(['script', 'style']): s.decompose()
-    text = soup.get_text('\n', strip=True)
+    cont = soup.select_one('td.cont') or soup.select_one('.bbs_view, .board_view, .view_cont') or soup.body
+    text = cont.get_text('\n', strip=True)
     files = re.findall(r'"oriFileNm"\s*:\s*"([^"]+)"', r.text)
     return {'steps': extract_steps(text), 'files': files, 'excerpt': text[:1200]}
 
