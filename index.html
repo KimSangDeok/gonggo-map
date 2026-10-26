@@ -286,9 +286,12 @@ main section.view{margin-top:0}
   .mapbox{position:absolute;inset:0;height:auto}
   .side{position:absolute;left:0;right:0;bottom:0;height:var(--sheet,50%);max-height:calc(100% - 48px);border-left:0;border-top:1px solid var(--line);border-radius:16px 16px 0 0;box-shadow:0 -8px 24px rgba(0,0,0,.14);z-index:1000;transition:height .22s ease}
   .side.dragging{transition:none}
-  .handle{display:flex;flex-direction:column;align-items:center;padding:8px 0 4px;cursor:grab;touch-action:none;user-select:none}
+  .handle{display:flex;flex-direction:column;align-items:center;padding:6px 0 2px;cursor:grab;touch-action:none;user-select:none}
   .handle i{width:42px;height:5px;border-radius:3px;background:var(--line)}
-  .handle small{color:var(--muted);font-size:11px;margin-top:3px}
+  #sheet-btn{margin-top:4px;min-height:36px;padding:0 16px;border:1px solid var(--line);border-radius:999px;background:var(--bg);color:var(--fg);font:inherit;font-size:13px;font-weight:600;cursor:pointer}
+  .side:not(.full){touch-action:none}
+  .side:not(.full) .lst,.side:not(.full) .detail{overflow:hidden}
+  .side.full .lst,.side.full .detail{overflow:auto}
   .brand{font-size:15px;padding-right:6px}
   .tabs a{padding:0 10px;font-size:13.5px}
 }
@@ -305,7 +308,7 @@ main section.view{margin-top:0}
   <section class="view" id="view-map">
     <div class="mapbox"><div id="nmap"></div></div>
     <aside class="side" id="side">
-      <div class="handle" id="sheet-handle"><i></i><small id="sheet-hint">끌어올리면 목록, 내리면 지도</small></div>
+      <div class="handle" id="sheet-handle"><i></i><button type="button" id="sheet-btn" aria-label="시트 펼치기/접기">목록 펼치기 ▲</button></div>
       <div class="nmbar">
         <label><input type="checkbox" data-cat="pri" checked> <span class="dot" style="--c:#D32F2F"></span> 우선 1순위</label>
         <label><input type="checkbox" data-cat="big" checked> <span class="dot hl" style="--c:#D32F2F"></span> 36㎡↑ 일반</label>
@@ -788,24 +791,45 @@ dragScroll(document.querySelector('.tabs'));
 
 // ===== 모바일 바닥 시트 (지도 위에 목록을 끌어올리는 표준 패턴) =====
 var sheet = (function(){
-  var side = document.getElementById('side'), handle = document.getElementById('sheet-handle'), hint = document.getElementById('sheet-hint');
+  var side = document.getElementById('side'), handle = document.getElementById('sheet-handle'), btn = document.getElementById('sheet-btn');
   function mobile(){ return window.matchMedia('(max-width:760px)').matches; }
   function maxH(){ return side.parentNode.clientHeight - 48; }
   function peekH(){ var bars = side.querySelectorAll('.nmbar'); var h = handle.offsetHeight + 6; bars.forEach(function(b){ h += b.offsetHeight; }); return h; }
   function snaps(){ return [peekH(), Math.round(side.parentNode.clientHeight * 0.5), maxH()]; }
-  var state = 1; // 0 peek, 1 half, 2 full
-  function setH(px, noSnapState){ side.style.setProperty('--sheet', Math.max(peekH(), Math.min(maxH(), px)) + 'px'); }
-  function go(s){ state = Math.max(0, Math.min(2, s)); setH(snaps()[state]); hint.textContent = state === 2 ? '내리면 지도' : (state === 0 ? '올리면 목록' : '끌어올리면 목록, 내리면 지도'); }
+  var state = 1; // 0 지도만(peek), 1 반, 2 전체
+  function setH(px){ side.style.setProperty('--sheet', Math.max(peekH(), Math.min(maxH(), px)) + 'px'); }
+  function label(){ if (!btn) return; btn.textContent = state === 2 ? '지도 보기 ▼' : (state === 0 ? '목록 펼치기 ▲' : '전체로 펼치기 ▲'); }
+  function go(s){ state = Math.max(0, Math.min(2, s)); setH(snaps()[state]); side.classList.toggle('full', state === 2); label(); }
   if (handle) {
-    var st = { on: false, y: 0, h: 0, moved: false };
-    handle.addEventListener('pointerdown', function(e){ if (!mobile()) return; st.on = true; st.moved = false; st.y = e.clientY; st.h = side.getBoundingClientRect().height; side.classList.add('dragging'); try { handle.setPointerCapture(e.pointerId); } catch(x) {} });
-    handle.addEventListener('pointermove', function(e){ if (!st.on) return; var dy = st.y - e.clientY; if (Math.abs(dy) > 3) st.moved = true; setH(st.h + dy); });
-    function end(e){ if (!st.on) return; st.on = false; side.classList.remove('dragging'); try { handle.releasePointerCapture(e.pointerId); } catch(x) {}
-      if (!st.moved) { go(state === 2 ? 0 : state + 1); return; }
-      var h = side.getBoundingClientRect().height, sn = snaps(), best = 0; sn.forEach(function(v, i){ if (Math.abs(v - h) < Math.abs(sn[best] - h)) best = i; }); go(best); }
-    handle.addEventListener('pointerup', end); handle.addEventListener('pointercancel', end);
-    window.addEventListener('resize', function(){ if (mobile()) go(state); else side.style.removeProperty('--sheet'); });
-    setTimeout(function(){ if (mobile()) go(1); }, 0);
+    // 1) 버튼: 접혀 있으면 전체로, 전체면 지도만 (탭 한 번)
+    btn.addEventListener('click', function(e){ e.stopPropagation(); go(state === 2 ? 0 : 2); });
+    // 2) 접힌 상태(지도만/반)에서는 시트 어디를 눌러도 전체로 펼침 (체크박스·선택상자·링크 제외)
+    side.addEventListener('click', function(e){ if (!mobile() || state === 2) return; if (e.target.closest('input,select,button,a,label,#detail-back')) return; go(2); });
+    // 3) 끌기: 접힌 상태에서는 시트 전체가 끌기 면, 전체 상태에서는 손잡이·필터 줄만(내용은 스크롤)
+    var st = { on: false, y: 0, h: 0, moved: false, id: null };
+    function dragStart(e){
+      if (!mobile() || e.pointerType === 'mouse' && e.button !== 0) return;
+      if (e.target.closest('select,input,button,a')) return;
+      if (state === 2 && !e.target.closest('.handle,.nmbar,.detail-bar')) return;
+      st.on = true; st.moved = false; st.y = e.clientY; st.h = side.getBoundingClientRect().height; st.id = e.pointerId;
+    }
+    function dragMove(e){
+      if (!st.on || e.pointerId !== st.id) return;
+      var dy = st.y - e.clientY;
+      if (!st.moved && Math.abs(dy) > 8) { st.moved = true; side.classList.add('dragging'); try { side.setPointerCapture(e.pointerId); } catch(x) {} }
+      if (st.moved) { setH(st.h + dy); e.preventDefault(); }
+    }
+    function dragEnd(e){
+      if (!st.on || e.pointerId !== st.id) return;
+      st.on = false; side.classList.remove('dragging'); try { side.releasePointerCapture(e.pointerId); } catch(x) {}
+      if (!st.moved) return;   // 탭은 click 쪽에서 처리
+      var h = side.getBoundingClientRect().height, sn = snaps(), best = 0; sn.forEach(function(v, i){ if (Math.abs(v - h) < Math.abs(sn[best] - h)) best = i; }); go(best);
+    }
+    side.addEventListener('pointerdown', dragStart); side.addEventListener('pointermove', dragMove);
+    side.addEventListener('pointerup', dragEnd); side.addEventListener('pointercancel', dragEnd);
+    side.addEventListener('click', function(e){ if (st.moved) { e.stopPropagation(); e.preventDefault(); st.moved = false; } }, true);
+    window.addEventListener('resize', function(){ if (mobile()) go(state); else { side.style.removeProperty('--sheet'); side.classList.add('full'); } });
+    setTimeout(function(){ if (mobile()) go(1); else side.classList.add('full'); }, 0);
   }
   return { go: go, mobile: mobile, state: function(){ return state; } };
 })();
