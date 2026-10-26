@@ -218,6 +218,12 @@ main section.view{margin-top:0}
 .lst .it b{overflow-wrap:anywhere}
 .side .nmbar{padding:10px 12px;margin:0;border-bottom:1px solid var(--line)}
 .side .lst{overflow:auto;flex:1}
+.side .detail{overflow:auto;flex:1;min-width:0;overscroll-behavior:contain}
+.detail-bar{position:sticky;top:0;z-index:1;display:flex;gap:10px;align-items:center;padding:8px 12px;background:var(--surface);border-bottom:1px solid var(--line)}
+.detail-bar b{font-size:14px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#detail-back{flex:none;border:1px solid var(--line);background:var(--bg);color:var(--fg);border-radius:8px;padding:5px 10px;font:inherit;font-size:13px;cursor:pointer}
+.side .nm-iw{max-height:none;max-width:none;min-width:0;border:0;box-shadow:none;border-radius:0;padding:6px 14px 20px}
+.side .nm-iw .iw-h{display:none}
 .lst .grp{position:sticky;top:0;background:color-mix(in srgb,var(--accent-soft) 70%,var(--surface));color:var(--accent-ink);font-size:12px;font-weight:600;padding:6px 12px;letter-spacing:.03em}
 .lst .it{padding:9px 12px;border-bottom:1px solid var(--line);cursor:pointer;font-size:13px;display:grid;grid-template-columns:14px 1fr auto;gap:8px;align-items:start}
 .lst .it:hover,.lst .it.on{background:var(--accent-soft)}
@@ -239,17 +245,19 @@ main section.view{margin-top:0}
 .iw-t{border-collapse:collapse;width:100%;font-size:13px;line-height:1.45}
 .iw-t th{color:#5f6b7a;font-weight:500;text-align:left;padding:3px 10px 3px 0;white-space:nowrap;vertical-align:top;width:50px}
 .iw-t td{padding:3px 0;vertical-align:top}
-.iw-k th,.iw-k td{border-bottom:1px solid #eef1f5;padding:5px 8px 5px 0;font-size:12.5px;line-height:1.4;vertical-align:top;white-space:nowrap}
+.iw-k th,.iw-k td{border-bottom:1px solid #eef1f5;padding:5px 8px 5px 0;font-size:12.5px;line-height:1.4;vertical-align:top}
 .iw-k th{width:34px;padding-right:6px}
 .iw-k tr:first-child th{color:#5f6b7a;font-weight:600;font-size:12px}
 .iw-k td small{color:#5f6b7a}
 .iw-t2{margin-top:7px}
 .iw-m{width:auto;margin:2px 0 6px}
-.iw-m th,.iw-m td{padding:3px 12px 3px 0;font-size:13px;white-space:nowrap}
+.iw-m th,.iw-m td{padding:3px 10px 3px 0;font-size:13px}
+.iw-m td{white-space:nowrap}
 .iw-m tr:first-child th{color:#5f6b7a;font-weight:600;font-size:12px}
 .iw-m th:first-child{width:auto;color:#1b2330;font-weight:500}
 .iw-m .tag{display:inline-block;font-size:10.5px;font-weight:700;color:#5f6b7a;border:1px solid #cfd6df;border-radius:4px;padding:0 4px;line-height:1.5;vertical-align:middle}
-.nm-iw{max-height:calc(100dvh - 150px);overflow:auto;overscroll-behavior:contain}
+.nm-iw{max-height:calc(100dvh - 150px);overflow:auto;overflow-x:hidden;overscroll-behavior:contain;word-break:keep-all}
+.nm-iw table{max-width:100%}
 .iw-sec{margin-top:10px;padding-top:8px;border-top:1px solid #e5e9ef}
 .iw-sh{font-weight:700;font-size:13px;margin-bottom:6px}.iw-sh small{font-weight:500;font-size:11px;margin-left:4px}
 .iw-ph{display:flex;gap:6px;margin:6px 0 8px}
@@ -308,6 +316,7 @@ main section.view{margin-top:0}
       <div class="nmbar" style="border-top:0;padding-top:0"><label style="gap:8px">공고 <select id="nm-notice" style="font:inherit;padding:4px 6px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--fg)"><option value="">전체 (2026년 공고 3건)</option></select></label></div>
       <div id="nm-msg" class="note warnbox" hidden style="margin:10px"></div>
       <div class="lst" id="nm-list"></div>
+      <div class="detail" id="nm-detail" hidden><div class="detail-bar"><button type="button" id="detail-back">← 목록</button><b id="detail-title"></b></div><div id="nm-detail-body"></div></div>
     </aside>
   </section>
 
@@ -903,15 +912,28 @@ function nmSelect(mk){
   nmSelected = mk;
   try { mk.setIcon({ content: '<div class="nm-sel' + nmCls(mk.__p) + '" style="--c:' + nmColor(mk.__p) + '"><b>' + mk.__p.name + '</b></div>', anchor: new naver.maps.Point(13, 13) }); mk.setZIndex(100); } catch(e) {}
 }
+function showDetail(p, approx){
+  var d = document.getElementById('nm-detail'), l = document.getElementById('nm-list'); if (!d) return;
+  document.getElementById('nm-detail-body').innerHTML = nmHtml(p, approx); document.getElementById('detail-title').innerHTML = p.name + ' <span class="pill info" style="font-size:11px;padding:0 7px;vertical-align:middle">' + p.kind + '</span>';
+  l.hidden = true; d.hidden = false; d.scrollTop = 0;
+}
+function hideDetail(){ var d = document.getElementById('nm-detail'), l = document.getElementById('nm-list'); if (d) { d.hidden = true; l.hidden = false; } }
+document.getElementById('detail-back').addEventListener('click', hideDetail);
 function nmFocusMarker(mk){
   nmSelect(mk);
   var pos = mk.getPosition();
+  document.querySelectorAll('.lst .it').forEach(function(it){ it.classList.toggle('on', it.__mk === mk); });
+  if (sheet.mobile()) {
+    // 폰: 팝업 대신 바닥 시트에 상세를 넣고(스크롤 하나), 마커는 시트 위 보이는 영역 가운데로
+    nmInfo.close(); showDetail(mk.__p, mk.__approx); sheet.go(1);
+    nmMap.setZoom(15, false); nmMap.setCenter(pos);
+    setTimeout(function(){ try { nmMap.panBy(new naver.maps.Point(0, Math.round(document.getElementById('side').getBoundingClientRect().height / 2))); } catch(e) {} }, 260);
+    return true;
+  }
   // 줌 애니메이션(setZoom(.., true)) 도중 panTo가 무시되는 문제가 있어 morph(중심+줌 동시) 사용, 끝나고 위치 검증
   try { nmMap.morph(pos, 15); } catch(e) { nmMap.setCenter(pos); nmMap.setZoom(15, false); }
   setTimeout(function(){ var c = nmMap.getCenter(); if (nmMap.getZoom() !== 15 || Math.abs(c.lat() - pos.lat()) > 0.002 || Math.abs(c.lng() - pos.lng()) > 0.002) { nmMap.setZoom(15, false); nmMap.setCenter(pos); } }, 900);
   nmInfo.setContent(nmHtml(mk.__p, mk.__approx)); nmInfo.open(nmMap, mk);
-  if (sheet.mobile()) sheet.go(0);
-  document.querySelectorAll('.lst .it').forEach(function(it){ it.classList.toggle('on', it.__mk === mk); });
   return true;
 }
 function nmFocus(name, m2){
