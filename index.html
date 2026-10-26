@@ -792,6 +792,8 @@ function nmInit(){
   nmMap = new naver.maps.Map('nmap', { center: new naver.maps.LatLng(37.565, 126.93), zoom: 11, zoomControl: true, zoomControlOptions: { position: naver.maps.Position.TOP_LEFT } });
   nmInfo = new naver.maps.InfoWindow({ borderWidth: 0, backgroundColor: 'transparent', disableAnchor: true, pixelOffset: new naver.maps.Point(0, -6) });
   var status = document.getElementById('nm-status'), list = document.getElementById('nm-list');
+  // 폰: 바닥 시트가 아래 절반을 덮으므로 보이는 위쪽 절반에 서울이 오도록 중심을 남쪽으로 내림
+  if (sheet.mobile()) { nmMap.setZoom(10); setTimeout(function(){ try { nmMap.panBy(new naver.maps.Point(0, Math.round(document.getElementById('side').getBoundingClientRect().height / 2))); } catch(e) {} }, 400); }
   [HOME, WORK].forEach(function(h){ (h.ll ? function(cb){ cb(h.ll); } : function(cb){ nmGeocode(h.addr, cb); })(function(pt){ var p = pt || h.approx; new naver.maps.Marker({ map: nmMap, position: new naver.maps.LatLng(p[0], p[1]), zIndex: 50, icon: { content: '<div class="nm-home" title="' + h.label + '">' + (h.label === '집' ? '🏠' : '💼') + '</div>', anchor: new naver.maps.Point(11, 22) } }); }); });
   var sel = document.getElementById('nm-notice');
   ['H26-1','H26-2','K26'].forEach(function(id){ var o = document.createElement('option'); o.value = id; o.textContent = NOTICES[id].name + ' — ' + noticeStatus(NOTICES[id]).text; sel.appendChild(o); });
