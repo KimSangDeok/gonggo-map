@@ -15,7 +15,11 @@ src.log('SH houseinfo:', len(SH), 'of', len(cds))
 facts.SH.update(SH)
 codes = set()
 for cds_, kapts in facts.MAP.values():
-    codes.update(facts.kapt_of(cds_, kapts) if kapts is None else kapts)
+    if kapts is not None: codes.update(kapts)
+    else:
+        for cd in cds_:
+            k = SH.get(cd, {}).get('kapt')
+            if k and k not in facts.BAD_KAPT: codes.add(k)
 K = {}
 try:
     src.kapt_init()
