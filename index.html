@@ -1,0 +1,947 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+</head>
+<body style="margin:0">
+<title>나만의 공고 지도</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=Noto+Serif+KR:wght@600;700&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: one reading column (max 980px). Document-style sections, numbers in mono, pass/warn pills by state. */
+:root{
+  --bg:#F3F5F8; --surface:#FFFFFF; --fg:#1B2330; --muted:#5E6A78; --line:#D8DEE6;
+  --accent:#1E5CA6; --accent-soft:#E4ECF8; --accent-ink:#163F72; --on-accent:#FFFFFF;
+  --ok:#1E7F4F; --ok-soft:#E1F2E8; --warn:#A46A14; --warn-soft:#FBF0DA; --bad:#B23A3A; --bad-soft:#F8E2E2;
+  --font-body:"Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  --font-display:"Noto Serif KR","Apple SD Gothic Neo",serif;
+  --font-mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#10141A; --surface:#181E26; --fg:#E6EAEF; --muted:#9AA5B2; --line:#2A333E;
+    --accent:#7FB0F0; --accent-soft:#1B2A40; --accent-ink:#BFD6F7; --on-accent:#0F1720;
+    --ok:#5FCB8E; --ok-soft:#14301F; --warn:#E3AC4F; --warn-soft:#3A2B10; --bad:#E57A7A; --bad-soft:#3D1C1C;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#10141A; --surface:#181E26; --fg:#E6EAEF; --muted:#9AA5B2; --line:#2A333E;
+  --accent:#7FB0F0; --accent-soft:#1B2A40; --accent-ink:#BFD6F7; --on-accent:#0F1720;
+  --ok:#5FCB8E; --ok-soft:#14301F; --warn:#E3AC4F; --warn-soft:#3A2B10; --bad:#E57A7A; --bad-soft:#3D1C1C;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--font-body);font-size:15px;line-height:1.65;-webkit-font-smoothing:antialiased}
+.wrap{container:page/inline-size;max-width:980px;margin:0 auto;padding-block:28px 64px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{font-family:var(--font-display);text-wrap:balance;margin:0;line-height:1.3}
+h1{font-size:30px;font-weight:700}
+h2{font-size:21px;font-weight:700;margin-bottom:14px;padding-top:8px}
+h3{font-size:16px;font-weight:600;margin:18px 0 8px}
+p{margin:0 0 10px;max-width:68ch}
+a{color:var(--accent)}
+.eyebrow{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:500;margin-bottom:6px}
+.lead{color:var(--muted);max-width:70ch}
+header{border-bottom:1px solid var(--line);padding-bottom:18px;margin-bottom:22px}
+.meta{display:flex;flex-wrap:wrap;gap:8px 18px;color:var(--muted);font-size:13px;margin-top:10px}
+.meta b{color:var(--fg);font-weight:500}
+section{margin-top:40px}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-top:4px}
+.tile{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.tile .k{font-size:12px;color:var(--muted);letter-spacing:.04em}
+.tile .v{font-family:var(--font-mono);font-size:22px;font-weight:600;font-variant-numeric:tabular-nums;margin:4px 0 2px}
+.tile .s{font-size:12px;color:var(--muted)}
+.pill{display:inline-block;font-size:12px;font-weight:500;padding:2px 9px;border-radius:999px;line-height:1.6;white-space:nowrap}
+.ok{background:var(--ok-soft);color:var(--ok)}
+.warn{background:var(--warn-soft);color:var(--warn)}
+.bad{background:var(--bad-soft);color:var(--bad)}
+.info{background:var(--accent-soft);color:var(--accent-ink)}
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;min-width:640px;font-size:14px}
+th,td{text-align:left;vertical-align:top;padding:10px 12px;border-bottom:1px solid var(--line)}
+th{font-weight:500;color:var(--muted);font-size:12.5px;letter-spacing:.03em;background:color-mix(in srgb,var(--bg) 60%,var(--surface))}
+tr:last-child td{border-bottom:0}
+td.num,th.num{font-family:var(--font-mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+td small,p small,li small{color:var(--muted);font-size:12.5px}
+.src{font-size:12.5px;color:var(--muted)}
+.src a{color:var(--muted);text-decoration-color:var(--line)}
+.src a:hover{color:var(--accent)}
+.note{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:8px;padding:12px 16px;margin:14px 0;max-width:none}
+.note.warnbox{border-left-color:var(--warn)}
+.note p{max-width:none}
+ul,ol{margin:0 0 10px;padding-left:20px}
+li{margin-bottom:4px}
+li::marker{color:var(--muted)}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px;min-width:0}
+.card h3{margin-top:0}
+/* checklist */
+.check{list-style:none;padding:0;margin:0;display:grid;gap:8px}
+.check > li{display:grid;grid-template-columns:24px 1fr;gap:10px;align-items:start;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin:0}
+.check input{width:18px;height:18px;margin-top:3px;accent-color:var(--accent)}
+.check label{cursor:pointer;display:block}
+.check .t{font-weight:500}
+.check .d{font-size:13px;color:var(--muted);margin-top:2px}
+.check > li.done .t{text-decoration:line-through;color:var(--muted)}
+.progress{display:inline-flex;flex-wrap:wrap;gap:6px 14px;align-items:baseline;font-size:13px}
+.sec>summary{list-style:none;cursor:pointer;display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 16px;padding:10px 0;border-bottom:1px solid var(--line);margin-bottom:12px}
+.sec>summary::-webkit-details-marker{display:none}
+.sec>summary h2{margin:0;padding:0}
+.sec>summary::after{content:"펼치기";margin-left:auto;font-size:12.5px;color:var(--accent);font-weight:500}
+.sec[open]>summary::after{content:"접기"}
+.sec>summary h2::before{content:"▸ ";color:var(--muted)}
+.sec[open]>summary h2::before{content:"▾ "}
+.progress #p-count{font-family:var(--font-mono);font-weight:600;font-variant-numeric:tabular-nums}
+.check .how{margin-top:8px;border-top:1px dashed var(--line);padding-top:6px}
+.check .how summary{cursor:pointer;font-size:13px;color:var(--accent);font-weight:500;list-style:none;display:inline-flex;align-items:center;gap:6px}
+.check .how summary::-webkit-details-marker{display:none}
+.check .how summary::before{content:"";width:0;height:0;border-left:5px solid var(--accent);border-top:4px solid transparent;border-bottom:4px solid transparent;transition:transform .15s}
+.check .how[open] summary::before{transform:rotate(90deg)}
+.check .how .body{margin-top:8px;font-size:13.5px}
+.check .how .body ol,.check .how .body ul{padding-left:18px;margin-bottom:6px}
+.check .how .body li{display:list-item;margin-bottom:3px}
+.check .how .body .kv{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;margin:6px 0}
+.check .how .body .kv b{font-weight:500;color:var(--muted);white-space:nowrap}
+.check .how .body .src{margin-top:6px}
+/* calculator */
+.calc{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.calc label{display:block;font-size:13px;color:var(--muted);margin-bottom:4px}
+.calc input{width:100%;font:600 16px var(--font-mono);padding:9px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--fg)}
+.calc input:focus{outline:2px solid var(--accent);outline-offset:1px}
+.result{margin-top:14px;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.result .tile .v{font-size:20px}
+.bar{height:8px;border-radius:999px;background:var(--line);overflow:hidden;margin-top:8px}
+.bar i{display:block;height:100%;background:var(--accent);width:0%}
+.cal td:first-child{white-space:nowrap}
+
+/* jump nav (sticky) */
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+.jump{position:sticky;top:env(safe-area-inset-top,0px);z-index:9;background:var(--bg);display:flex;gap:8px;overflow-x:auto;padding:10px 0;margin:0 0 6px;border-bottom:1px solid var(--line);scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.jump::-webkit-scrollbar{display:none}
+@media (hover:hover) and (pointer:fine){ .jump,.smapwrap{cursor:grab} .jump.dragging,.smapwrap.dragging{cursor:grabbing;user-select:none} }
+.jump button{flex:0 0 auto;white-space:nowrap;padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--fg);font-family:inherit;font-size:13px;line-height:1.4;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.jump button.active{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+section,#summary{scroll-margin-top:calc(64px + env(safe-area-inset-top,0px))}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+.totop{position:fixed;right:max(16px,env(safe-area-inset-right,0px));bottom:max(16px,env(safe-area-inset-bottom,0px));z-index:9;width:42px;height:42px;padding:0;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--fg);font-family:inherit;font-size:18px;line-height:40px;text-align:center;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.12)}
+.totop[hidden]{display:none}
+/* 모바일 보기 toggle: narrows the column to phone width so the same rules kick in on a desktop */
+html.m body{background:color-mix(in srgb,var(--bg) 88%,var(--muted))}
+html.m .wrap{max-width:430px;background:var(--bg);box-shadow:0 0 0 1px var(--line),0 18px 50px rgba(0,0,0,.16);min-height:100vh}
+html.m .jump{top:0}
+.viewtoggle{position:fixed;left:max(16px,env(safe-area-inset-left,0px));bottom:max(16px,env(safe-area-inset-bottom,0px));z-index:9;padding:8px 14px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--fg);font:500 13px var(--font-body);box-shadow:0 2px 8px rgba(0,0,0,.12);cursor:pointer}
+.viewtoggle:hover{border-color:var(--accent);color:var(--accent)}
+@media (max-width:640px){ .viewtoggle{display:none} } /* a real phone is already narrow; nothing to toggle */
+/* narrow column (real phone, narrow window, or the 모바일 보기 toggle): stacked rows for wide tables */
+@container page (max-width:640px){
+  .tbl table.stack{min-width:0}
+  table.stack thead{display:none}
+  table.stack,table.stack tbody,table.stack tr,table.stack td{display:block;width:100%}
+  table.stack tr{padding:10px 12px;border-bottom:1px solid var(--line)}
+  table.stack tr:last-child{border-bottom:0}
+  table.stack td{border:0;padding:3px 0}
+  table.stack td.num{white-space:normal}
+  table.stack td::before{content:attr(data-label);display:block;font-size:11.5px;letter-spacing:.04em;color:var(--muted);margin-top:4px}
+  table.stack td:first-child::before{margin-top:0}
+  table.stack td.rank{display:inline-block;width:auto;font-weight:600;color:var(--accent);margin-right:6px}
+  table.stack td.rank::before{display:none}
+  table.stack td.rank+td{display:inline-block;width:calc(100% - 40px);vertical-align:top}
+  table.stack td.rank+td::before{display:none}
+  .meta{font-size:12.5px}
+}
+.map{font-size:11.5px;font-weight:500;color:var(--accent);text-decoration:none;border:1px solid var(--line);border-radius:999px;padding:0 7px;margin-left:4px;white-space:nowrap;vertical-align:1px}
+.map:hover{border-color:var(--accent)}
+.map::before{content:"\1F4CD";font-size:10px;margin-right:2px}
+.smapwrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.smap{width:100%;height:auto;display:block;font-family:var(--font-body)}
+@container page (max-width:640px){ .smap{min-width:720px} }
+.smap text{paint-order:stroke;stroke:var(--surface);stroke-width:3px;stroke-linejoin:round}
+tr.grp td{background:color-mix(in srgb,var(--accent-soft) 70%,var(--surface));font-weight:600;font-size:13px;color:var(--accent-ink)}
+.more summary{cursor:pointer;color:var(--accent);font-size:13.5px;font-weight:500;list-style:none}
+.more summary::-webkit-details-marker{display:none}
+.more summary::before{content:"▸ "}
+.more[open] summary::before{content:"▾ "}
+.more .body{margin-top:8px;font-size:13.5px}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:6px 12px;margin:8px 0;font-size:13.5px}
+.kv b{font-weight:600;white-space:nowrap}
+@container page (max-width:640px){ table.stack tr.grp td{padding:8px 12px} table.stack tr.grp td::before{display:none} }
+footer{margin-top:48px;border-top:1px solid var(--line);padding-top:14px;color:var(--muted);font-size:12.5px}
+.srclist{columns:2;column-gap:28px;font-size:13px}
+.srclist li{break-inside:avoid}
+@container page (max-width:640px){ .srclist{columns:1} h1{font-size:26px} }
+@media (prefers-reduced-motion:no-preference){ .bar i{transition:width .3s ease} }
+/* embedded naver map */
+.nmbar{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;font-size:13px;margin:0 2px 10px}
+.nmbar label{display:inline-flex;align-items:center;gap:5px;cursor:pointer;white-space:nowrap}
+.dot{display:inline-block;width:12px;height:12px;border-radius:50%;border:2px solid var(--surface);box-shadow:0 0 0 1px rgba(0,0,0,.25)}
+.dot.sq{border-radius:2px}
+.nm-iw{font:13px/1.55 var(--font-body);color:#1b2330;background:#fff;border:1px solid #dde3ea;border-radius:10px;box-shadow:0 4px 14px rgba(0,0,0,.18);padding:10px 12px;min-width:230px;max-width:300px}
+.nm-iw b{font-size:14px}.nm-iw .k{color:#5f6b7a}.nm-iw a{color:#1f5fbf}
+.nm-mk{width:16px;height:16px;border-radius:50%;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.4)}
+.nm-mk.sm{width:11px;height:11px}.nm-mk.sq{border-radius:2px}.nm-mk.ap{opacity:.75;border-style:dashed}
+.nm-home{font-size:22px;line-height:1;filter:drop-shadow(0 1px 2px rgba(0,0,0,.4))}
+.map2{font-size:11.5px;font-weight:600;color:var(--accent);text-decoration:none;border:1px solid var(--line);border-radius:999px;padding:0 7px;margin-left:3px;cursor:pointer;background:var(--surface)}
+.map2:hover{border-color:var(--accent)}
+
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+</style>
+<script>try{if(localStorage.getItem('public-rental-view')==='m')document.documentElement.classList.add('m')}catch(e){}</script>
+
+<div class="wrap">
+<header>
+  <div class="eyebrow">개인 점검용 · 2026년 적용 기준 · 작성 2026-10-26</div>
+  <h1>나만의 공고 지도</h1>
+  <p class="lead">서울 공공임대(SH 행복주택·국민임대, 보편형 전세임대) 후보 단지를 지도 위에 올리고, 2026년 공고문 기준 금액·공급 호수·내 순위, 2027년 공고 일정까지 한 장에 모았습니다. 최종 기준은 항상 해당 공고문입니다.</p>
+  <div class="meta"><span>공고 자료 <b>SH 2026 1·2차 행복주택 · 2025·2026 국민임대 공고문</b></span><span>소득 기준표 <b>2026년 도시근로자·기준 중위소득</b></span></div>
+</header>
+
+<nav class="jump" aria-label="섹션 이동" id="jump">
+  <button type="button" data-target="navermap">지도</button><button type="button" data-target="options">우선순위·금액</button><button type="button" data-target="where">어느 단지</button><button type="button" data-target="calendar">공고 달력</button><button type="button" data-target="money">보증금·대출</button><button type="button" data-target="caution">주의</button><button type="button" data-target="sources">근거</button>
+</nav>
+
+<section id="navermap">
+  <div class="eyebrow">지도</div>
+  <h2>나만의 공고 지도</h2>
+  <p>2026년 SH 공고문에 나온 후보 단지 전부(행복주택 48 + 국민임대 8지구)와 집·회사. 점을 누르면 전용·공가·보증금·월세·내 순위가 뜨고, 네이버지도 앱으로 길찾기가 열립니다. 아래 표의 📍지도는 네이버지도 새 창, <b>↑</b>는 이 지도에서 그 단지로 이동.</p>
+  <div class="card" style="padding:10px">
+    <div class="nmbar">
+      <label><input type="checkbox" data-cat="pri" checked> <span class="dot" style="background:var(--ok)"></span> 우선 1순위 가능</label>
+      <label><input type="checkbox" data-cat="big" checked> <span class="dot" style="background:var(--accent)"></span> 36㎡↑ 추첨</label>
+      <label><input type="checkbox" data-cat="small"> <span class="dot" style="background:var(--muted)"></span> 27~35㎡</label>
+      <label><input type="checkbox" data-cat="kook" checked> <span class="dot sq" style="background:var(--warn)"></span> 국민임대 지구</label>
+      <span id="nm-status" class="src"></span>
+    </div>
+    <div id="nm-msg" class="note warnbox" hidden></div>
+    <div id="nmap" style="height:72vh;min-height:420px;border-radius:8px;overflow:hidden;background:var(--line)"></div>
+    <p class="src" style="margin:8px 4px 0">위치는 공고문 주소를 네이버 Geocoding으로 변환한 좌표(동 이름만 있는 몇 곳은 근사, 점선 테두리). 집·회사는 동 단위 근사 — 파일 위 HOME/WORK 주소를 바꾸면 정확히 찍힘.</p>
+  </div>
+</section>
+
+<section id="options">
+  <div class="eyebrow">4</div>
+  <h2>원룸 제외 우선순위와 금액</h2>
+  <p>서울 공고 기준입니다. 가구원 수별 면적 기준은 2024년 폐지돼 1인 가구도 36㎡ 이상을 신청할 수 있습니다. 전용 8평(26㎡) 이하 원룸만 나오는 유형(청년매입임대·청년안심주택 청년형·행복주택 16~26㎡형)은 뺐고, 서울 공고가 드문 LH 통합공공임대는 서울 밖 선택지로 맨 아래에 따로 뒀습니다. 금액은 각 공고에 적힌 실제 숫자이며, 추정치는 따로 표시했습니다.</p>
+
+  <h3>면적 읽는 법 — 공고의 ㎡는 전용면적, 내가 실제 쓰는 공간</h3>
+  <div class="grid2">
+    <div class="card">
+      <ul>
+        <li><b>전용면적</b>: 현관 안쪽부터 세대가 혼자 쓰는 공간(방·거실·주방·욕실). 공공임대 공고의 형(型) 숫자(16A·26A·36A·49B 등)가 바로 이 값이고, 공고문도 주거전용면적은 주거 용도로만 쓰이는 면적, 주거공용면적은 계단·복도·주현관 등 지상층 공용면적, 그 밖의 공용면적은 관리사무소·경비초소·지하층 등으로 정의합니다.</li>
+        <li><b>공급면적</b> = 전용 + 주거공용(계단·엘리베이터·복도). <b>계약면적</b> = 공급 + 기타공용(주차장·관리사무소). 아파트 전용률 약 75%, 오피스텔 약 60%라 같은 '평'이라도 오피스텔은 실제 공간이 작습니다. 오피스텔 계약면적에는 주차장까지 들어가 숫자가 커 보입니다.</li>
+        <li><b>발코니</b>: 아파트는 서비스면적이라 전용에 안 들어가고, 확장하면 체감이 더 넓어집니다. 오피스텔은 발코니 설치가 제한되고 있어도 전용면적에 포함됩니다.</li>
+        <li><b>환산</b>: 1평 = 3.3058㎡. 전용면적 ÷ 3.3058이 흔히 말하는 '실평수'. 민간 중개 광고의 평수는 공급·계약 기준인 경우가 많아, 공고의 전용 ㎡와 바로 비교하면 공고 쪽이 작아 보입니다.</li>
+      </ul>
+      <p class="src"><a href="https://mobile.newsis.com/view/NISX20200131_0000904510">뉴시스 – 전용·공급·계약면적, 전용률</a> · <a href="https://www.best.or.kr/flexer/html/residence_notice/20250425195349600_80099.files/Sections1.html">LH 공고 면적 정의</a> · <a href="https://news.bizwatch.co.kr/article/real_estate/2024/06/10/0027">비즈워치 평 환산</a> · <a href="https://pressian.com/pages/articles/2024043011093266249">프레시안 26㎡·36㎡ 구조</a></p>
+    </div>
+    <div class="card">
+      <div class="tbl" style="border:0;background:transparent"><table style="min-width:0">
+        <thead><tr><th>전용 ㎡</th><th class="num">평</th><th>보통 구조 (단지 평면도로 확인)</th></tr></thead>
+        <tbody>
+          <tr><td class="num">16</td><td class="num">4.8</td><td>원룸(대학생·청년형)</td></tr>
+          <tr><td class="num">21</td><td class="num">6.4</td><td>원룸</td></tr>
+          <tr><td class="num">26</td><td class="num">7.9</td><td>원룸. 침대 하나 놓으면 여유 없음</td></tr>
+          <tr><td class="num">29</td><td class="num">8.8</td><td>넓은 원룸 또는 1.5룸</td></tr>
+          <tr><td class="num">36</td><td class="num">10.9</td><td>거실과 방이 분리된 유형(1.5룸~투룸). '넓은 원룸'도 이 구간</td></tr>
+          <tr><td class="num">39</td><td class="num">11.8</td><td>1.5룸~투룸</td></tr>
+          <tr><td class="num">44~49</td><td class="num">13.3~14.8</td><td>보통 방 2개</td></tr>
+          <tr><td class="num">59</td><td class="num">17.8</td><td>방 2~3개(국민주택 규모)</td></tr>
+          <tr><td class="num">85</td><td class="num">25.7</td><td>전세임대·통합공공임대 상한</td></tr>
+        </tbody>
+      </table></div>
+      <p class="src">1평 = 3.3058㎡로 환산. 구조 열은 일반적인 경우이며 같은 36㎡도 단지마다 원룸형·분리형이 갈리니 공고 첨부 평면도에서 방 개수를 확인.</p>
+    </div>
+  </div>
+
+  <div class="tbl" style="margin-top:14px"><table class="stack">
+    <thead><tr><th>순위</th><th>유형</th><th>평형 (전용)</th><th>보증금 · 월세 (공고 기준)</th><th>임대료율 · 거주</th><th>내 자격</th><th>근거</th></tr></thead>
+    <tbody>
+      <tr>
+        <td class="num rank">1</td>
+        <td><b>청년 보편형 전세임대</b> (2027 신설) <span class="pill info">서울 포함, 집은 내가 고름</span><br><small>기존 청년 전세임대는 1순위 수시모집만 운영, 2·3순위 단독 모집 없음 → 본인은 보편형이 실질 카드</small></td>
+        <td>전용 85㎡(25.7평) 이하 전세·보증부월세 주택을 직접 구함</td>
+        <td class="num">한도 2.4억(수도권)<br>기존 1.2억: 본인부담 100만 + 월 12~22만<br>2.4억이면 같은 구조 시 월 24~44만 <span class="pill warn">추정</span></td>
+        <td>지원금의 연 1.2~2.2% 이자<br>최장 10년</td>
+        <td><span class="pill ok">소득 140%·추첨·원가구 제외</span></td>
+        <td class="src"><a href="https://www.edaily.co.kr/News/Read?mediaCodeNo=257&newsId=04742886645546992">8·13 대책</a> · <a href="https://www.cku.ac.kr/bbs/cku_kr/1202/150819/download.do">2026 공고문</a> · <a href="https://jupsunow.com/guide/lh-jeonse-rental/">2·3순위 모집 이력</a> · <a href="https://r114.com/trends/wiki/policy/3cf4a6fa-284b-803a-95f8-ddad32fc52b6">2027 청년정책</a></td>
+      </tr>
+      <tr>
+        <td class="num rank">2</td>
+        <td><b>SH 행복주택 청년(소득有) 36~40㎡형</b> <span class="pill info">서울</span><br><small>2026년 1·2차에 36㎡ 이상 청년형이 나온 단지 22곳 — 강서구엔 없음(29㎡ 방화스카이포레만). 단지 목록은 5번 표</small></td>
+        <td>36~40㎡ (10.9~12.3평). 29~34㎡(8.8~10.4평)도 원룸보다 큼</td>
+        <td class="num">실제(청년 소득있음): 천왕이펜하우스8 36㎡ 6,552만 · 24.6만 / 신내 글로리움 36㎡ 7,056만 · 25.3만 / 목동센트럴아이파크위브 34㎡ 9,851만 · 32.0만 / 래미안베라힐즈 38㎡ 1억 3,248만 · 53.0만 / 방화스카이포레 29㎡ 7,272만 · 26.6만</td>
+        <td>청년 시세 72%<br>최대 10년</td>
+        <td><span class="pill ok">소득 100%(1인 120%)</span><br>본인자산 2억 5,100만<br>우선 1순위는 강서(거주)·동대문(소득근거지) 단지만, 배점 6점 만점. 나머지는 일반 1순위 추첨</td>
+        <td class="src"><a href="https://gobang.kr/contents/7908">SH 2026 1차</a> · <a href="https://jugeo.co.kr/blog/guide/haengbok-jutaek">행복주택 가이드</a> · <a href="https://bizhankook.com/articles/6968.html">계층별 임대료율</a></td>
+      </tr>
+      <tr>
+        <td class="num rank">3</td>
+        <td><b>SH 국민임대 49㎡ (강서·연접 1순위) / 59㎡ (청약 1순위)</b> <span class="pill info">서울</span><br><small>2026 공고(8.20) 접수 종료 → 2027년 8월 공고 대비. 단지는 5번 표</small></td>
+        <td>마곡엠밸리 49㎡(14.8평) · 마곡수명산파크 49㎡(15.1평)·59㎡(18.1평) · 신정이펜하우스·상암월드컵파크 49㎡</td>
+        <td class="num">실제: 마곡수명산파크 49㎡ 3,674~3,900만 · 26.2~28.7만, 59㎡ 4,002~4,323만 · 29.3~32.2만 / 마곡엠밸리 49㎡ 5,564만 · 38.0만 / 신정이펜하우스 49㎡ 4,007만 · 30.4만 (2025·2026 공고)</td>
+        <td>시세 60~80%<br>최장 30년</td>
+        <td><span class="pill ok">49㎡ 선순위(1인 70%) + 1순위(강서·양천·마포 상암)</span><br>59㎡는 청약 1순위지만 배점 6점으로 가족 가구에 밀림</td>
+        <td class="src"><a href="https://www.newspim.com/news/view/20260820001218">뉴스핌</a> · <a href="https://protip777.kr/2026%EB%85%84-%EA%B5%AD%EB%AF%BC%EC%9E%84%EB%8C%80%EC%A3%BC%ED%83%9D-%EC%9E%85%EC%A3%BC%EC%9E%90-%EB%AA%A8%EC%A7%91sh-%EC%84%9C%EC%9A%B8%C2%B7%EA%B2%BD%EA%B8%B0/">공고 정리</a></td>
+      </tr>
+      <tr>
+        <td class="num rank">4</td>
+        <td><b>든든전세주택</b> (LH·HUG) <span class="pill info">서울 103호 + 경기·인천</span></td>
+        <td>다세대·연립·오피스텔·아파트. 3~4인 중산층용이라 넓은 편(방 2개 이상)</td>
+        <td class="num">시세 90% 전세. 2.5억 가정 시 80% 대출·연 3.5% → 월 이자 약 58만</td>
+        <td>시세 90%<br>최장 8년</td>
+        <td><span class="pill warn">소득·자산 무관이지만 배점 불리, 서울 315:1</span></td>
+        <td class="src"><a href="https://www.youthdaily.co.kr/mobile/article.html?no=218955">청년일보</a> · <a href="https://homedubu.com/10226/">자금 예시</a></td>
+      </tr>
+      <tr>
+        <td class="num rank">5</td>
+        <td><b>LH 통합공공임대 36·46㎡</b> <span class="pill warn">서울 밖 — 서울 공고 드묾, 부천대장·고양창릉 등 경기</span></td>
+        <td>전용 85㎡(25.7평) 이하. 1인도 36㎡(10.9평)·46㎡(13.9평) 신청 가능</td>
+        <td class="num">서울 외곽 59㎡ 시세 월세 100만 가정 시 중위 50% 거주자 약 50만<br>36~46㎡: 보증금 3,000~6,000만 · 월 25~40만 <span class="pill warn">추정</span></td>
+        <td>시세 50% (내 구간)<br>최장 30년, 2년 단위</td>
+        <td><span class="pill ok">우선공급 충족</span></td>
+        <td class="src"><a href="https://jugeo.co.kr/blog/guide/tonghap-gonggong-imdae">통합공공임대 가이드</a> · <a href="https://housing.gg.go.kr/html/24110.do">공급면적</a> · <a href="https://m.news.nate.com/view/20260311n22686">2026 LH 물량</a></td>
+      </tr>
+    </tbody>
+  </table></div>
+  <div class="note warnbox"><p><b>미혼 요건.</b> 행복주택 청년·청년 전세임대는 혼인 중이 아닐 것. 결혼 계획이 생기면 신혼부부 트랙(행복주택 14년 등)으로 다시 짜야 합니다.</p></div>
+</section>
+
+<section id="where">
+  <div class="eyebrow">5</div>
+  <h2>어느 단지인가</h2>
+  <p>2026년 SH 공고문 단지표에서 <b>청년 신청 가능 + 8평 초과</b>만 추렸습니다. 금액은 청년 소득있음 기준 보증금 · 월세. <b>공가</b>는 지금 빈집(당첨되면 바로 계약), <b>예비</b>는 대기 번호만 받는 것. 단지 이름 옆 <a class="map" href="https://map.naver.com/p/search/%EB%A7%88%EA%B3%A1%EC%88%98%EB%AA%85%EC%82%B0%ED%8C%8C%ED%81%AC">지도</a>를 누르면 네이버지도에서 그 단지가 열립니다(폰이면 앱으로).</p>
+
+  <div class="note"><p><b>결론.</b> 강서구 청년형은 2026년에 <b>방화스카이포레 29㎡</b> 하나뿐이라, 36㎡ 이상은 다른 구 단지를 <b>일반공급 추첨</b>으로 넣어야 합니다. 우선공급 1순위(배점 6점 만점)는 강서구(거주)와 동대문구(일하는 곳) 단지에서만 생깁니다. 국민임대는 <b>마곡엠밸리·마곡수명산파크 49㎡</b>가 나오는 해가 기회(강서 거주 1순위).</p></div>
+
+  <h3>약도 — 집·회사 기준 어디쯤인가</h3>
+  <div class="card" style="padding:10px"><div class="smapwrap"><svg class="smap" viewBox="0 0 760 500" role="img" aria-label="후보 단지 약도">
+<rect x="0" y="0" width="760" height="500" rx="12" fill="var(--surface)" stroke="var(--line)"/>
+<polyline points="751,273 642,318 588,359 516,352 443,357 380,336 317,318 271,330 226,289 190,261 145,243 100,211 45,182 9,170" fill="none" stroke="var(--accent)" stroke-opacity=".35" stroke-width="9" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="36" y="289" font-size="11" fill="var(--muted)" text-anchor="middle" opacity=".9">강서</text>
+<text x="186" y="391" font-size="11" fill="var(--muted)" text-anchor="middle" opacity=".9">양천</text>
+<text x="235" y="405" font-size="11" fill="var(--muted)" text-anchor="middle" opacity=".9">구로</text>
+<text x="262" y="352" font-size="11" fill="var(--muted)" text-anchor="middle" opacity=".9">영등포</text>
+<text x="244" y="266" font-size="11" fill="var(--muted)" text-anchor="middle" opacity=".9">마포</text>
+<text x="299" y="220" font-size="11" fill="var(--muted)" text-anchor="middle" opacity=".9">서대문</text>
+<text x="262" y="125" font-size="11" fill="var(--muted)" text-anchor="middle" opacity=".9">은평</text>
+<text x="371" y="216" font-size="11" fill="var(--muted)" text-anchor="middle" opacity=".9">종로</text>
+<text x="407" y="175" font-size="11" fill="var(--muted)" text-anchor="middle" opacity=".9">성북</text>
+<text x="530" y="245" font-size="11" fill="var(--muted)" text-anchor="middle" opacity=".9">동대문</text>
+<text x="615" y="170" font-size="11" fill="var(--muted)" text-anchor="middle" opacity=".9">중랑</text>
+<text x="480" y="284" font-size="11" fill="var(--muted)" text-anchor="middle" opacity=".9">성동</text>
+<text x="353" y="318" font-size="11" fill="var(--muted)" text-anchor="middle" opacity=".9">용산</text>
+<text x="498" y="398" font-size="11" fill="var(--muted)" text-anchor="middle" opacity=".9">강남</text>
+<text x="606" y="386" font-size="11" fill="var(--muted)" text-anchor="middle" opacity=".9">송파</text>
+<text x="679" y="334" font-size="11" fill="var(--muted)" text-anchor="middle" opacity=".9">강동</text>
+<text x="489" y="45" font-size="11" fill="var(--muted)" text-anchor="middle" opacity=".9">노원</text>
+<text x="317" y="455" font-size="11" fill="var(--muted)" text-anchor="middle" opacity=".9">관악</text>
+<text x="317" y="398" font-size="11" fill="var(--muted)" text-anchor="middle" opacity=".9">동작</text>
+<text x="570" y="295" font-size="11" fill="var(--muted)" text-anchor="middle" opacity=".9">광진</text>
+<rect x="113" y="231" width="10" height="10" fill="var(--warn)" stroke="var(--bg)" stroke-width="1.5"/>
+<text x="126" y="230" font-size="11" font-weight="600" fill="var(--warn)" text-anchor="start">마곡엠밸리</text>
+<rect x="107" y="277" width="10" height="10" fill="var(--warn)" stroke="var(--bg)" stroke-width="1.5"/>
+<text x="120" y="294" font-size="11" font-weight="600" fill="var(--warn)" text-anchor="start">마곡수명산파크</text>
+<rect x="122" y="361" width="10" height="10" fill="var(--warn)" stroke="var(--bg)" stroke-width="1.5"/>
+<text x="135" y="378" font-size="11" font-weight="600" fill="var(--warn)" text-anchor="start">신정이펜하우스</text>
+<rect x="203" y="211" width="10" height="10" fill="var(--warn)" stroke="var(--bg)" stroke-width="1.5"/>
+<text x="216" y="210" font-size="11" font-weight="600" fill="var(--warn)" text-anchor="start">상암월드컵파크</text>
+<rect x="96" y="436" width="10" height="10" fill="var(--warn)" stroke="var(--bg)" stroke-width="1.5"/>
+<text x="93" y="457" font-size="11" font-weight="600" fill="var(--warn)" text-anchor="end">천왕·항동</text>
+<circle cx="67" cy="220" r="6" fill="var(--ok)" stroke="var(--bg)" stroke-width="1.5"><title>방화스카이포레 29㎡ · 7,272만 · 월 26.6만</title></circle>
+<text x="75" y="214" font-size="11.5" font-weight="600" fill="var(--fg)" text-anchor="start">방화스카이포레</text>
+<circle cx="516" cy="170" r="6" fill="var(--ok)" stroke="var(--bg)" stroke-width="1.5"><title>이문 아이파크 자이 34㎡ · 8,208만 · 월 32.1만</title></circle>
+<text x="524" y="186" font-size="11.5" font-weight="600" fill="var(--fg)" text-anchor="start">이문 아이파크 자이</text>
+<circle cx="461" cy="223" r="6" fill="var(--ok)" stroke="var(--bg)" stroke-width="1.5"><title>e편한세상 청계센트럴포레 40㎡ · 1억 1,460만 · 월 41.0만</title></circle>
+<text x="453" y="239" font-size="11.5" font-weight="600" fill="var(--fg)" text-anchor="end">e편한세상 청계센트럴포레</text>
+<circle cx="118" cy="350" r="6" fill="var(--muted)" stroke="var(--bg)" stroke-width="1.5"><title>목동센트럴아이파크위브 34㎡ · 9,851만 · 월 32.0만</title></circle>
+<text x="126" y="344" font-size="11.5" font-weight="600" fill="var(--fg)" text-anchor="start">목동센트럴아이파크위브</text>
+<circle cx="141" cy="355" r="4" fill="var(--muted)" stroke="var(--bg)" stroke-width="1.5"><title>이든채(서울리츠) 31㎡ · 5,940만 · 월 23.3만</title></circle>
+<circle cx="242" cy="355" r="4" fill="var(--muted)" stroke="var(--bg)" stroke-width="1.5"><title>아크로타워스퀘어 27㎡ · 8,964만 · 월 35.9만</title></circle>
+<circle cx="114" cy="436" r="6" fill="var(--accent)" stroke="var(--bg)" stroke-width="1.5"><title>천왕이펜하우스8단지 37㎡ · 6,552만 · 월 24.6만</title></circle>
+<text x="122" y="434" font-size="11.5" font-weight="600" fill="var(--fg)" text-anchor="start">천왕이펜하우스8단지</text>
+<circle cx="89" cy="443" r="4" fill="var(--muted)" stroke="var(--bg)" stroke-width="1.5"><title>항동 하버라인 30㎡ · 5,760만 · 월 21.6만</title></circle>
+<circle cx="121" cy="430" r="4" fill="var(--muted)" stroke="var(--bg)" stroke-width="1.5"><title>천왕이펜하우스7 30㎡ · 4,536만 · 월 17.0만</title></circle>
+<circle cx="114" cy="436" r="4" fill="var(--muted)" stroke="var(--bg)" stroke-width="1.5"><title>천왕이펜하우스8단지 29㎡ · 5,256만 · 월 19.7만</title></circle>
+<circle cx="110" cy="423" r="4" fill="var(--muted)" stroke="var(--bg)" stroke-width="1.5"><title>천왕연지마을1 32㎡ · 5,040만 · 월 21.5만</title></circle>
+<circle cx="107" cy="425" r="4" fill="var(--muted)" stroke="var(--bg)" stroke-width="1.5"><title>천왕연지마을2 31㎡ · 4,824만 · 월 20.5만</title></circle>
+<circle cx="326" cy="270" r="4" fill="var(--muted)" stroke="var(--bg)" stroke-width="1.5"><title>마포더클래시 33㎡ · 9,216만 · 월 36.2만</title></circle>
+<circle cx="320" cy="295" r="4" fill="var(--accent)" stroke="var(--bg)" stroke-width="1.5"><title>공덕동 크로시티 37㎡ · 1억 3,464만 · 월 52.7만</title></circle>
+<circle cx="309" cy="286" r="4" fill="var(--muted)" stroke="var(--bg)" stroke-width="1.5"><title>마포자이더센트리지 35㎡ · 1억 4,202만 · 월 49.6만</title></circle>
+<circle cx="326" cy="264" r="4" fill="var(--muted)" stroke="var(--bg)" stroke-width="1.5"><title>e편한세상신촌 33㎡ · 1억 1,271만 · 월 44.1만</title></circle>
+<circle cx="302" cy="202" r="4" fill="var(--muted)" stroke="var(--bg)" stroke-width="1.5"><title>홍제센트럴아이파크 35㎡ · 1억 546만 · 월 40.0만</title></circle>
+<circle cx="259" cy="223" r="4" fill="var(--muted)" stroke="var(--bg)" stroke-width="1.5"><title>래미안루센티아 34㎡ · 1억 1,151만 · 월 39.5만</title></circle>
+<circle cx="322" cy="255" r="4" fill="var(--accent)" stroke="var(--bg)" stroke-width="1.5"><title>힐스테이트신촌 38㎡ · 1억 3,454만 · 월 51.6만</title></circle>
+<circle cx="293" cy="186" r="4" fill="var(--muted)" stroke="var(--bg)" stroke-width="1.5"><title>북한산두산위브 33㎡ · 1억 1,664만 · 월 43.9만</title></circle>
+<circle cx="516" cy="398" r="4" fill="var(--muted)" stroke="var(--bg)" stroke-width="1.5"><title>대치르엘 36㎡ · 1억 2,168만 · 월 48.6만</title></circle>
+<circle cx="706" cy="261" r="4" fill="var(--muted)" stroke="var(--bg)" stroke-width="1.5"><title>고덕온빛채 29㎡ · 8,568만 · 월 34.3만</title></circle>
+<circle cx="706" cy="261" r="6" fill="var(--accent)" stroke="var(--bg)" stroke-width="1.5"><title>고덕온빛채 37㎡ · 1억 584만 · 월 42.3만</title></circle>
+<text x="698" y="255" font-size="11.5" font-weight="600" fill="var(--fg)" text-anchor="end">고덕온빛채</text>
+<circle cx="718" cy="273" r="6" fill="var(--accent)" stroke="var(--bg)" stroke-width="1.5"><title>강동리엔파크14단지 37㎡ · 1억 440만 · 월 41.8만</title></circle>
+<text x="710" y="287" font-size="11.5" font-weight="600" fill="var(--fg)" text-anchor="end">강동리엔파크14단지</text>
+<circle cx="711" cy="270" r="4" fill="var(--muted)" stroke="var(--bg)" stroke-width="1.5"><title>강동리엔파크11단지 30㎡ · 8,496만 · 월 34.0만</title></circle>
+<circle cx="461" cy="252" r="4" fill="var(--accent)" stroke="var(--bg)" stroke-width="1.5"><title>왕십리자이 38㎡ · 1억 4,436만 · 월 59.6만</title></circle>
+<circle cx="476" cy="270" r="4" fill="var(--accent)" stroke="var(--bg)" stroke-width="1.5"><title>서울숲리버뷰자이 36㎡ · 1억 4,553만 · 월 58.2만</title></circle>
+<circle cx="492" cy="136" r="4" fill="var(--muted)" stroke="var(--bg)" stroke-width="1.5"><title>꿈의숲코오롱하늘채 32㎡ · 9,540만 · 월 37.4만</title></circle>
+<circle cx="449" cy="159" r="4" fill="var(--muted)" stroke="var(--bg)" stroke-width="1.5"><title>래미안길음센터피스 33㎡ · 1억 1,808만 · 월 45.1만</title></circle>
+<circle cx="501" cy="134" r="4" fill="var(--accent)" stroke="var(--bg)" stroke-width="1.5"><title>꿈의숲아이파크 39㎡ · 1억 2,348만 · 월 47.0만</title></circle>
+<circle cx="443" cy="202" r="4" fill="var(--muted)" stroke="var(--bg)" stroke-width="1.5"><title>보문파크뷰자이 30㎡ · 1억 1,664만 · 월 43.3만</title></circle>
+<circle cx="512" cy="141" r="6" fill="var(--accent)" stroke="var(--bg)" stroke-width="1.5"><title>래미안장위퍼스트하이 36㎡ · 9,936만 · 월 39.0만</title></circle>
+<text x="504" y="157" font-size="11.5" font-weight="600" fill="var(--fg)" text-anchor="end">래미안장위퍼스트하이</text>
+<circle cx="489" cy="132" r="6" fill="var(--accent)" stroke="var(--bg)" stroke-width="1.5"><title>장위자이레디언트 40㎡ · 1억 962만 · 월 42.0만</title></circle>
+<text x="481" y="126" font-size="11.5" font-weight="600" fill="var(--fg)" text-anchor="end">장위자이레디언트</text>
+<circle cx="422" cy="198" r="6" fill="var(--accent)" stroke="var(--bg)" stroke-width="1.5"><title>창경궁롯데캐슬시그니처 (신규, 입주 27.5↑) 39㎡ · 1억 2,096만 · 월 46.3만</title></circle>
+<text x="414" y="202" font-size="11.5" font-weight="600" fill="var(--fg)" text-anchor="end">창경궁롯데캐슬시그니처</text>
+<circle cx="670" cy="409" r="4" fill="var(--accent)" stroke="var(--bg)" stroke-width="1.5"><title>송파시그니처롯데캐슬 40㎡ · 1억 2,168만 · 월 44.5만</title></circle>
+<circle cx="660" cy="405" r="4" fill="var(--muted)" stroke="var(--bg)" stroke-width="1.5"><title>e편한세상송파파크센트럴 35㎡ · 1억 2,564만 · 월 44.3만</title></circle>
+<circle cx="338" cy="293" r="4" fill="var(--accent)" stroke="var(--bg)" stroke-width="1.5"><title>용산롯데캐슬센터포레 38㎡ · 1억 6,471만 · 월 61.6만</title></circle>
+<circle cx="338" cy="336" r="4" fill="var(--accent)" stroke="var(--bg)" stroke-width="1.5"><title>용산센트럴파크 헤링턴스퀘어 41㎡ · 1억 7,784만 · 월 75.6만</title></circle>
+<circle cx="338" cy="236" r="4" fill="var(--accent)" stroke="var(--bg)" stroke-width="1.5"><title>경희궁자이 39㎡ · 1억 3,910만 · 월 54.5만</title></circle>
+<circle cx="588" cy="148" r="6" fill="var(--accent)" stroke="var(--bg)" stroke-width="1.5"><title>신내 글로리움 36㎡ · 7,056만 · 월 25.3만</title></circle>
+<text x="596" y="140" font-size="11.5" font-weight="600" fill="var(--fg)" text-anchor="start">신내 글로리움</text>
+<circle cx="594" cy="139" r="4" fill="var(--muted)" stroke="var(--bg)" stroke-width="1.5"><title>신내3-3 도시형생활주택 30㎡ · 5,976만 · 월 25.9만</title></circle>
+<circle cx="597" cy="136" r="4" fill="var(--muted)" stroke="var(--bg)" stroke-width="1.5"><title>신내3-4 도시형생활주택 32㎡ · 5,832만 · 월 24.3만</title></circle>
+<circle cx="280" cy="164" r="4" fill="var(--accent)" stroke="var(--bg)" stroke-width="1.5"><title>래미안베라힐즈 38㎡ · 1억 3,248만 · 월 53.0만</title></circle>
+<circle cx="266" cy="80" r="6" fill="var(--accent)" stroke="var(--bg)" stroke-width="1.5"><title>은뜨락(서울리츠) 39㎡ · 9,720만 · 월 38.9만</title></circle>
+<text x="274" y="84" font-size="11.5" font-weight="600" fill="var(--fg)" text-anchor="start">은뜨락</text>
+<circle cx="270" cy="166" r="6" fill="var(--accent)" stroke="var(--bg)" stroke-width="1.5"><title>힐스테이트녹번역 39㎡ · 1억 1,652만 · 월 40.6만</title></circle>
+<text x="262" y="178" font-size="11.5" font-weight="600" fill="var(--fg)" text-anchor="end">힐스테이트녹번역</text>
+<circle cx="259" cy="175" r="4" fill="var(--accent)" stroke="var(--bg)" stroke-width="1.5"><title>백련산해모로 39㎡ · 1억 836만 · 월 43.1만</title></circle>
+<circle cx="217" cy="205" r="4" fill="var(--accent)" stroke="var(--bg)" stroke-width="1.5"><title>DMCSK뷰 39㎡ · 8,751만 · 월 32.0만</title></circle>
+<path d="M100,252 l6,6 v9 h-12 v-9 z" fill="var(--bad)" stroke="var(--bg)" stroke-width="1.5"/><text x="110" y="265" font-size="12" font-weight="700" fill="var(--bad)">집(마곡)</text>
+<circle cx="480" cy="230" r="7" fill="none" stroke="var(--bad)" stroke-width="2.5"/><text x="490" y="222" font-size="12" font-weight="700" fill="var(--bad)">회사(동대문구)</text>
+<rect x="518" y="14" width="235" height="64" rx="8" fill="var(--bg)" stroke="var(--line)"/>
+<circle cx="530" cy="28" r="6" fill="var(--ok)"/><text x="542" y="32" font-size="11.5" fill="var(--fg)">행복주택 · 우선 1순위 가능</text>
+<circle cx="530" cy="45" r="6" fill="var(--accent)"/><text x="542" y="49" font-size="11.5" fill="var(--fg)">행복주택 36㎡↑ · 일반 추첨 (큰 점 = 13곳)</text>
+<circle cx="530" cy="62" r="4" fill="var(--muted)"/><text x="542" y="66" font-size="11.5" fill="var(--fg)">행복주택 27~35㎡</text>
+<rect x="525" y="74" width="10" height="10" fill="var(--warn)"/><text x="542" y="83" font-size="11.5" fill="var(--fg)">국민임대 지구 (49·59㎡)</text>
+</svg></div>
+  <p class="src" style="margin:8px 4px 0">약도입니다. 점 위치는 공고문 주소의 동(洞) 단위 근사이고 한강선도 대략 그린 것. 정확한 위치·대중교통 시간은 각 단지의 '지도' 링크(네이버지도)로 확인. 폰에서는 옆으로 밀어서 보고, PC에서는 점에 마우스를 올리면 단지·금액이 뜹니다.</p></div>
+
+  <h3 style="margin-top:22px">행복주택 — 넣을 만한 13곳</h3>
+  <p class="src" style="margin-bottom:8px">고른 기준: 우선 1순위가 되는 3곳 + 36㎡ 이상이면서 공가가 있고 월세 42만 이하인 곳 + 가까운 양천 34㎡. 전체 48곳은 아래 접힌 표.</p>
+  <div class="tbl"><table class="stack">
+    <thead><tr><th>단지</th><th>전용</th><th>호수</th><th>보증금 · 월세</th><th>내 순위</th></tr></thead>
+    <tbody>
+      <tr data-m2="29.09"><td><b>방화스카이포레</b> <a class="map" href="https://map.naver.com/p/search/%EB%B0%A9%ED%99%94%EC%8A%A4%EC%B9%B4%EC%9D%B4%ED%8F%AC%EB%A0%88">지도</a><br><small>강서 방화동 개화동로21길 22 · 2026 2차</small></td><td class="num">29㎡ 8.8평</td><td>공가 <b>4</b> · 예비 8</td><td class="num">7,272만<br>월 26.6만</td><td><span class="pill ok">우선 1순위</span></td></tr>
+      <tr data-m2="33.54"><td><b>이문 아이파크 자이</b> <a class="map" href="https://map.naver.com/p/search/%EC%9D%B4%EB%AC%B8%EC%95%84%EC%9D%B4%ED%8C%8C%ED%81%AC%EC%9E%90%EC%9D%B4">지도</a><br><small>동대문 이문로 120 · 2026 1차</small></td><td class="num">34㎡ 10.1평</td><td>공가 <b>5</b> · 예비 7</td><td class="num">8,208만<br>월 32.1만</td><td><span class="pill ok">우선 1순위</span><br><small>소득근거지 증빙 필요</small></td></tr>
+      <tr data-m2="39.92"><td><b>e편한세상 청계센트럴포레</b> <a class="map" href="https://map.naver.com/p/search/e%ED%8E%B8%ED%95%9C%EC%84%B8%EC%83%81%20%EC%B2%AD%EA%B3%84%EC%84%BC%ED%8A%B8%EB%9F%B4%ED%8F%AC%EB%A0%88">지도</a><br><small>동대문 용두동 무학로 91 · 2026 2차</small></td><td class="num">40㎡ 12.1평 <span class="pill ok">36↑</span></td><td>공가 <b>1</b> · 예비 4</td><td class="num">1억 1,460만<br>월 41.0만</td><td><span class="pill info">일반 추첨</span></td></tr>
+      <tr data-m2="34.24"><td><b>목동센트럴아이파크위브</b> <a class="map" href="https://map.naver.com/p/search/%EB%AA%A9%EB%8F%99%EC%84%BC%ED%8A%B8%EB%9F%B4%EC%95%84%EC%9D%B4%ED%8C%8C%ED%81%AC%EC%9C%84%EB%B8%8C%202%EB%8B%A8%EC%A7%80">지도</a><br><small>양천 신월동 남부순환로83길 18 · 2026 1차</small></td><td class="num">34㎡ 10.4평</td><td>공가 <b>18</b> · 예비 34</td><td class="num">9,851만<br>월 32.0만</td><td><span class="pill info">일반 추첨</span></td></tr>
+      <tr data-m2="36.87"><td><b>천왕이펜하우스8단지</b> <a class="map" href="https://map.naver.com/p/search/%EC%B2%9C%EC%99%95%EC%9D%B4%ED%8E%9C%ED%95%98%EC%9A%B0%EC%8A%A48%EB%8B%A8%EC%A7%80">지도</a><br><small>구로 천왕동 금오로 882 · 2026 2차</small></td><td class="num">37㎡ 11.2평 <span class="pill ok">36↑</span></td><td>공가 <b>11</b> · 예비 21</td><td class="num">6,552만<br>월 24.6만</td><td><span class="pill info">일반 추첨</span></td></tr>
+      <tr data-m2="36.62"><td><b>고덕온빛채</b> <a class="map" href="https://map.naver.com/p/search/%EA%B3%A0%EB%8D%95%EC%98%A8%EB%B9%9B%EC%B1%84">지도</a><br><small>강동 고덕동 아리수로 385 · 2026 2차</small></td><td class="num">37㎡ 11.1평 <span class="pill ok">36↑</span></td><td>공가 <b>7</b> · 예비 14</td><td class="num">1억 584만<br>월 42.3만</td><td><span class="pill info">일반 추첨</span></td></tr>
+      <tr data-m2="36.87"><td><b>강동리엔파크14단지</b> <a class="map" href="https://map.naver.com/p/search/%EA%B0%95%EB%8F%99%EB%A6%AC%EC%97%94%ED%8C%8C%ED%81%AC14%EB%8B%A8%EC%A7%80">지도</a><br><small>강동 상일동 고덕로98길 160 · 2026 2차</small></td><td class="num">37㎡ 11.2평 <span class="pill ok">36↑</span></td><td>공가 <b>3</b> · 예비 9</td><td class="num">1억 440만<br>월 41.8만</td><td><span class="pill info">일반 추첨</span></td></tr>
+      <tr data-m2="36.14"><td><b>래미안장위퍼스트하이</b> <a class="map" href="https://map.naver.com/p/search/%EB%9E%98%EB%AF%B8%EC%95%88%EC%9E%A5%EC%9C%84%ED%8D%BC%EC%8A%A4%ED%8A%B8%ED%95%98%EC%9D%B4">지도</a><br><small>성북 한천로 713 · 2026 2차</small></td><td class="num">36㎡ 10.9평 <span class="pill ok">36↑</span></td><td>공가 <b>7</b> · 예비 13</td><td class="num">9,936만<br>월 39.0만</td><td><span class="pill info">일반 추첨</span></td></tr>
+      <tr data-m2="39.91"><td><b>장위자이레디언트</b> <a class="map" href="https://map.naver.com/p/search/%EC%9E%A5%EC%9C%84%EC%9E%90%EC%9D%B4%EB%A0%88%EB%94%94%EC%96%B8%ED%8A%B8">지도</a><br><small>성북 장위동 · 2026 2차</small></td><td class="num">40㎡ 12.1평 <span class="pill ok">36↑</span></td><td>공가 <b>5</b> · 예비 14</td><td class="num">1억 962만<br>월 42.0만</td><td><span class="pill info">일반 추첨</span></td></tr>
+      <tr data-m2="39.39"><td><b>창경궁롯데캐슬시그니처 (신규, 입주 27.5↑)</b> <a class="map" href="https://map.naver.com/p/search/%EC%B0%BD%EA%B2%BD%EA%B6%81%EB%A1%AF%EB%8D%B0%EC%BA%90%EC%8A%AC%EC%8B%9C%EA%B7%B8%EB%8B%88%EC%B2%98">지도</a><br><small>성북 삼선동2가 296 · 2026 2차</small></td><td class="num">39㎡ 11.9평 <span class="pill ok">36↑</span></td><td>공가 <b>30</b></td><td class="num">1억 2,096만<br>월 46.3만</td><td><span class="pill info">일반 추첨</span></td></tr>
+      <tr data-m2="36.36"><td><b>신내 글로리움</b> <a class="map" href="https://map.naver.com/p/search/%EC%8B%A0%EB%82%B4%EA%B8%80%EB%A1%9C%EB%A6%AC%EC%9B%80">지도</a><br><small>중랑 신내동 신내로 208 · 2026 1차</small></td><td class="num">36㎡ 11.0평 <span class="pill ok">36↑</span></td><td>공가 0 · 예비 28</td><td class="num">7,056만<br>월 25.3만</td><td><span class="pill warn">예비만</span></td></tr>
+      <tr data-m2="39.49"><td><b>은뜨락(서울리츠)</b> <a class="map" href="https://map.naver.com/p/search/%EC%9D%80%ED%8F%89%EA%B5%AC%20%ED%86%B5%EC%9D%BC%EB%A1%9C%20972">지도</a><br><small>은평 진관동 통일로 972 · 2026 2차</small></td><td class="num">39㎡ 11.9평 <span class="pill ok">36↑</span></td><td>공가 <b>25</b> · 예비 41</td><td class="num">9,720만<br>월 38.9만</td><td><span class="pill info">일반 추첨</span></td></tr>
+      <tr data-m2="39.12"><td><b>힐스테이트녹번역</b> <a class="map" href="https://map.naver.com/p/search/%ED%9E%90%EC%8A%A4%ED%85%8C%EC%9D%B4%ED%8A%B8%EB%85%B9%EB%B2%88%EC%97%AD">지도</a><br><small>은평 응암동 · 2026 2차</small></td><td class="num">39㎡ 11.8평 <span class="pill ok">36↑</span></td><td>공가 <b>6</b> · 예비 10</td><td class="num">1억 1,652만<br>월 40.6만</td><td><span class="pill info">일반 추첨</span></td></tr>
+    </tbody>
+  </table></div>
+
+  <details class="more" style="margin-top:10px"><summary>전체 48곳 보기 (2026 1차·2차, 청년 신청 가능 27㎡ 초과 전부)</summary>
+  <div class="body">
+    <p class="src" style="margin:8px 0"><label style="color:var(--fg);cursor:pointer"><input type="checkbox" id="only36"> 36㎡ 이상만</label></p>
+    <div class="tbl"><table class="stack" id="happy-table">
+      <thead><tr><th>단지</th><th>전용</th><th>호수</th><th>보증금 · 월세</th><th>내 순위</th></tr></thead>
+      <tbody>
+      <tr class="grp"><td colspan="5">강서·동대문 — 우선공급 1순위 가능</td></tr>
+      <tr data-m2="29.09"><td><b>방화스카이포레</b> <a class="map" href="https://map.naver.com/p/search/%EB%B0%A9%ED%99%94%EC%8A%A4%EC%B9%B4%EC%9D%B4%ED%8F%AC%EB%A0%88">지도</a><br><small>강서 방화동 개화동로21길 22 · 2026 2차</small></td><td class="num">29㎡ 8.8평</td><td>공가 <b>4</b> · 예비 8</td><td class="num">7,272만<br>월 26.6만</td><td><span class="pill ok">우선 1순위</span></td></tr>
+      <tr data-m2="33.54"><td><b>이문 아이파크 자이</b> <a class="map" href="https://map.naver.com/p/search/%EC%9D%B4%EB%AC%B8%EC%95%84%EC%9D%B4%ED%8C%8C%ED%81%AC%EC%9E%90%EC%9D%B4">지도</a><br><small>동대문 이문로 120 · 2026 1차</small></td><td class="num">34㎡ 10.1평</td><td>공가 <b>5</b> · 예비 7</td><td class="num">8,208만<br>월 32.1만</td><td><span class="pill ok">우선 1순위</span><br><small>소득근거지 증빙 필요</small></td></tr>
+      <tr data-m2="39.92"><td><b>e편한세상 청계센트럴포레</b> <a class="map" href="https://map.naver.com/p/search/e%ED%8E%B8%ED%95%9C%EC%84%B8%EC%83%81%20%EC%B2%AD%EA%B3%84%EC%84%BC%ED%8A%B8%EB%9F%B4%ED%8F%AC%EB%A0%88">지도</a><br><small>동대문 용두동 무학로 91 · 2026 2차</small></td><td class="num">40㎡ 12.1평 <span class="pill ok">36↑</span></td><td>공가 <b>1</b> · 예비 4</td><td class="num">1억 1,460만<br>월 41.0만</td><td><span class="pill info">일반 추첨</span></td></tr>
+      <tr class="grp"><td colspan="5">양천·구로·영등포·마포·서대문 — 집에서 가까운 쪽</td></tr>
+      <tr data-m2="34.24"><td><b>목동센트럴아이파크위브</b> <a class="map" href="https://map.naver.com/p/search/%EB%AA%A9%EB%8F%99%EC%84%BC%ED%8A%B8%EB%9F%B4%EC%95%84%EC%9D%B4%ED%8C%8C%ED%81%AC%EC%9C%84%EB%B8%8C%202%EB%8B%A8%EC%A7%80">지도</a><br><small>양천 신월동 남부순환로83길 18 · 2026 1차</small></td><td class="num">34㎡ 10.4평</td><td>공가 <b>18</b> · 예비 34</td><td class="num">9,851만<br>월 32.0만</td><td><span class="pill info">일반 추첨</span></td></tr>
+      <tr data-m2="31.31"><td><b>이든채(서울리츠)</b> <a class="map" href="https://map.naver.com/p/search/%EC%96%91%EC%B2%9C%EA%B5%AC%20%EC%8B%A0%EC%A0%95%EB%A1%9C7%EA%B8%B8%2075">지도</a><br><small>양천 신정동 신정로7길 75 · 2026 1차</small></td><td class="num">31㎡ 9.5평</td><td>공가 <b>5</b> · 예비 8</td><td class="num">5,940만<br>월 23.3만</td><td><span class="pill info">일반 추첨</span></td></tr>
+      <tr data-m2="26.78"><td><b>아크로타워스퀘어</b> <a class="map" href="https://map.naver.com/p/search/%EC%95%84%ED%81%AC%EB%A1%9C%ED%83%80%EC%9B%8C%EC%8A%A4%ED%80%98%EC%96%B4">지도</a><br><small>영등포 영등포동 국회대로54길 10 · 2026 1차</small></td><td class="num">27㎡ 8.1평</td><td>공가 0 · 예비 10</td><td class="num">8,964만<br>월 35.9만</td><td><span class="pill warn">예비만</span></td></tr>
+      <tr data-m2="36.87"><td><b>천왕이펜하우스8단지</b> <a class="map" href="https://map.naver.com/p/search/%EC%B2%9C%EC%99%95%EC%9D%B4%ED%8E%9C%ED%95%98%EC%9A%B0%EC%8A%A48%EB%8B%A8%EC%A7%80">지도</a><br><small>구로 천왕동 금오로 882 · 2026 2차</small></td><td class="num">37㎡ 11.2평 <span class="pill ok">36↑</span></td><td>공가 <b>11</b> · 예비 21</td><td class="num">6,552만<br>월 24.6만</td><td><span class="pill info">일반 추첨</span></td></tr>
+      <tr data-m2="29.69"><td><b>항동 하버라인</b> <a class="map" href="https://map.naver.com/p/search/%ED%95%AD%EB%8F%99%ED%95%98%EB%B2%84%EB%9D%BC%EC%9D%B8%209%EB%8B%A8%EC%A7%80">지도</a><br><small>구로 항동 항동로 68 · 2026 2차</small></td><td class="num">30㎡ 9.0평</td><td>공가 <b>25</b> · 예비 93</td><td class="num">5,760만<br>월 21.6만</td><td><span class="pill info">일반 추첨</span></td></tr>
+      <tr data-m2="29.96"><td><b>천왕이펜하우스7</b> <a class="map" href="https://map.naver.com/p/search/%EC%B2%9C%EC%99%95%EC%9D%B4%ED%8E%9C%ED%95%98%EC%9A%B0%EC%8A%A47%EB%8B%A8%EC%A7%80">지도</a><br><small>구로 천왕동 천왕로 21 · 2026 1차</small></td><td class="num">30㎡ 9.1평</td><td>공가 <b>10</b> · 예비 54</td><td class="num">4,536만<br>월 17.0만</td><td><span class="pill info">일반 추첨</span></td></tr>
+      <tr data-m2="29.38"><td><b>천왕이펜하우스8단지</b> <a class="map" href="https://map.naver.com/p/search/%EC%B2%9C%EC%99%95%EC%9D%B4%ED%8E%9C%ED%95%98%EC%9A%B0%EC%8A%A48%EB%8B%A8%EC%A7%80">지도</a><br><small>구로 천왕동 금오로 882 · 2026 1차</small></td><td class="num">29㎡ 8.9평</td><td>공가 <b>8</b> · 예비 27</td><td class="num">5,256만<br>월 19.7만</td><td><span class="pill info">일반 추첨</span></td></tr>
+      <tr data-m2="32.31"><td><b>천왕연지마을1</b> <a class="map" href="https://map.naver.com/p/search/%EC%B2%9C%EC%99%95%EC%97%B0%EC%A7%80%EB%A7%88%EC%9D%841%EB%8B%A8%EC%A7%80">지도</a><br><small>구로 천왕동 오류로 36-13 · 2026 1차</small></td><td class="num">32㎡ 9.8평</td><td>공가 0 · 예비 11</td><td class="num">5,040만<br>월 21.5만</td><td><span class="pill warn">예비만</span></td></tr>
+      <tr data-m2="31.06"><td><b>천왕연지마을2</b> <a class="map" href="https://map.naver.com/p/search/%EC%B2%9C%EC%99%95%EC%97%B0%EC%A7%80%EB%A7%88%EC%9D%842%EB%8B%A8%EC%A7%80">지도</a><br><small>구로 천왕동 오리로1102-13 · 2026 1차</small></td><td class="num">31㎡ 9.4평</td><td>공가 0 · 예비 6</td><td class="num">4,824만<br>월 20.5만</td><td><span class="pill warn">예비만</span></td></tr>
+      <tr data-m2="32.89"><td><b>마포더클래시</b> <a class="map" href="https://map.naver.com/p/search/%EB%A7%88%ED%8F%AC%EB%8D%94%ED%81%B4%EB%9E%98%EC%8B%9C">지도</a><br><small>마포 아현동 신촌로28길 50 · 2026 1차</small></td><td class="num">33㎡ 9.9평</td><td>공가 0 · 예비 2</td><td class="num">9,216만<br>월 36.2만</td><td><span class="pill warn">예비만</span></td></tr>
+      <tr data-m2="36.67"><td><b>공덕동 크로시티</b> <a class="map" href="https://map.naver.com/p/search/%EA%B3%B5%EB%8D%95%EB%8F%99%20%ED%81%AC%EB%A1%9C%EC%8B%9C%ED%8B%B0">지도</a><br><small>마포 공덕동 · 2026 2차</small></td><td class="num">37㎡ 11.1평 <span class="pill ok">36↑</span></td><td>공가 0 · 예비 10</td><td class="num">1억 3,464만<br>월 52.7만</td><td><span class="pill warn">예비만</span></td></tr>
+      <tr data-m2="34.8"><td><b>마포자이더센트리지</b> <a class="map" href="https://map.naver.com/p/search/%EB%A7%88%ED%8F%AC%EC%9E%90%EC%9D%B4%EB%8D%94%EC%84%BC%ED%8A%B8%EB%A6%AC%EC%A7%80">지도</a><br><small>마포 염리동 · 2026 2차</small></td><td class="num">35㎡ 10.5평</td><td>공가 <b>1</b> · 예비 3</td><td class="num">1억 4,202만<br>월 49.6만</td><td><span class="pill info">일반 추첨</span></td></tr>
+      <tr data-m2="32.74"><td><b>e편한세상신촌</b> <a class="map" href="https://map.naver.com/p/search/e%ED%8E%B8%ED%95%9C%EC%84%B8%EC%83%81%EC%8B%A0%EC%B4%8C">지도</a><br><small>서대문 북아현로1길 17 · 2026 1차</small></td><td class="num">33㎡ 9.9평</td><td>공가 <b>11</b> · 예비 43</td><td class="num">1억 1,271만<br>월 44.1만</td><td><span class="pill info">일반 추첨</span></td></tr>
+      <tr data-m2="34.89"><td><b>홍제센트럴아이파크</b> <a class="map" href="https://map.naver.com/p/search/%ED%99%8D%EC%A0%9C%EC%84%BC%ED%8A%B8%EB%9F%B4%EC%95%84%EC%9D%B4%ED%8C%8C%ED%81%AC">지도</a><br><small>서대문 통일로 395 · 2026 1차</small></td><td class="num">35㎡ 10.6평</td><td>공가 <b>5</b> · 예비 11</td><td class="num">1억 546만<br>월 40.0만</td><td><span class="pill info">일반 추첨</span></td></tr>
+      <tr data-m2="34.12"><td><b>래미안루센티아</b> <a class="map" href="https://map.naver.com/p/search/%EB%9E%98%EB%AF%B8%EC%95%88%EB%A3%A8%EC%84%BC%ED%8B%B0%EC%95%84">지도</a><br><small>서대문 거북골로 100 · 2026 1차</small></td><td class="num">34㎡ 10.3평</td><td>공가 <b>4</b> · 예비 14</td><td class="num">1억 1,151만<br>월 39.5만</td><td><span class="pill info">일반 추첨</span></td></tr>
+      <tr data-m2="37.97"><td><b>힐스테이트신촌</b> <a class="map" href="https://map.naver.com/p/search/%ED%9E%90%EC%8A%A4%ED%85%8C%EC%9D%B4%ED%8A%B8%EC%8B%A0%EC%B4%8C">지도</a><br><small>서대문 이화여대8길 123 · 2026 1차</small></td><td class="num">38㎡ 11.5평 <span class="pill ok">36↑</span></td><td>공가 <b>3</b> · 예비 5</td><td class="num">1억 3,454만<br>월 51.6만</td><td><span class="pill info">일반 추첨</span></td></tr>
+      <tr data-m2="33.05"><td><b>북한산두산위브</b> <a class="map" href="https://map.naver.com/p/search/%EB%B6%81%ED%95%9C%EC%82%B0%EB%91%90%EC%82%B0%EC%9C%84%EB%B8%8C">지도</a><br><small>서대문 홍은동 · 2026 2차</small></td><td class="num">33㎡ 10.0평</td><td>공가 <b>2</b> · 예비 5</td><td class="num">1억 1,664만<br>월 43.9만</td><td><span class="pill info">일반 추첨</span></td></tr>
+      <tr class="grp"><td colspan="5">그 외 서울</td></tr>
+      <tr data-m2="35.96"><td><b>대치르엘</b> <a class="map" href="https://map.naver.com/p/search/%EB%8C%80%EC%B9%98%EB%A5%B4%EC%97%98">지도</a><br><small>강남 대치동 도곡로93길 23 · 2026 1차</small></td><td class="num">36㎡ 10.9평</td><td>공가 0 · 예비 4</td><td class="num">1억 2,168만<br>월 48.6만</td><td><span class="pill warn">예비만</span></td></tr>
+      <tr data-m2="29.46"><td><b>고덕온빛채</b> <a class="map" href="https://map.naver.com/p/search/%EA%B3%A0%EB%8D%95%EC%98%A8%EB%B9%9B%EC%B1%84">지도</a><br><small>강동 고덕동 아리수로 385 · 2026 1차</small></td><td class="num">29㎡ 8.9평</td><td>공가 0 · 예비 12</td><td class="num">8,568만<br>월 34.3만</td><td><span class="pill warn">예비만</span></td></tr>
+      <tr data-m2="36.62"><td><b>고덕온빛채</b> <a class="map" href="https://map.naver.com/p/search/%EA%B3%A0%EB%8D%95%EC%98%A8%EB%B9%9B%EC%B1%84">지도</a><br><small>강동 고덕동 아리수로 385 · 2026 2차</small></td><td class="num">37㎡ 11.1평 <span class="pill ok">36↑</span></td><td>공가 <b>7</b> · 예비 14</td><td class="num">1억 584만<br>월 42.3만</td><td><span class="pill info">일반 추첨</span></td></tr>
+      <tr data-m2="36.87"><td><b>강동리엔파크14단지</b> <a class="map" href="https://map.naver.com/p/search/%EA%B0%95%EB%8F%99%EB%A6%AC%EC%97%94%ED%8C%8C%ED%81%AC14%EB%8B%A8%EC%A7%80">지도</a><br><small>강동 상일동 고덕로98길 160 · 2026 2차</small></td><td class="num">37㎡ 11.2평 <span class="pill ok">36↑</span></td><td>공가 <b>3</b> · 예비 9</td><td class="num">1억 440만<br>월 41.8만</td><td><span class="pill info">일반 추첨</span></td></tr>
+      <tr data-m2="29.99"><td><b>강동리엔파크11단지</b> <a class="map" href="https://map.naver.com/p/search/%EA%B0%95%EB%8F%99%EB%A6%AC%EC%97%94%ED%8C%8C%ED%81%AC11%EB%8B%A8%EC%A7%80">지도</a><br><small>강동 상일동 고덕로98길 101 · 2026 2차</small></td><td class="num">30㎡ 9.1평</td><td>공가 0 · 예비 6</td><td class="num">8,496만<br>월 34.0만</td><td><span class="pill warn">예비만</span></td></tr>
+      <tr data-m2="28.14"><td><b>푸르내(서울리츠)</b> <a class="map" href="https://map.naver.com/p/search/%ED%91%B8%EB%A5%B4%EB%82%B4%20%ED%96%89%EB%B3%B5%EC%A3%BC%ED%83%9D%20%EA%B0%95%EB%8F%99%EA%B5%AC">지도</a><br><small>강동 · 2026 1차</small></td><td class="num">28㎡ 8.5평</td><td>공가 0 · 예비 8</td><td class="num">8,001만<br>월 26.0만</td><td><span class="pill warn">예비만</span></td></tr>
+      <tr data-m2="38.19"><td><b>왕십리자이</b> <a class="map" href="https://map.naver.com/p/search/%EC%99%95%EC%8B%AD%EB%A6%AC%EC%9E%90%EC%9D%B4">지도</a><br><small>성동 하왕십리동 · 2026 2차</small></td><td class="num">38㎡ 11.6평 <span class="pill ok">36↑</span></td><td>공가 <b>3</b> · 예비 11</td><td class="num">1억 4,436만<br>월 59.6만</td><td><span class="pill info">일반 추첨</span></td></tr>
+      <tr data-m2="36.06"><td><b>서울숲리버뷰자이</b> <a class="map" href="https://map.naver.com/p/search/%EC%84%9C%EC%9A%B8%EC%88%B2%EB%A6%AC%EB%B2%84%EB%B7%B0%EC%9E%90%EC%9D%B4">지도</a><br><small>성동 행당동 · 2026 2차</small></td><td class="num">36㎡ 10.9평 <span class="pill ok">36↑</span></td><td>공가 <b>2</b> · 예비 5</td><td class="num">1억 4,553만<br>월 58.2만</td><td><span class="pill info">일반 추첨</span></td></tr>
+      <tr data-m2="32.22"><td><b>꿈의숲코오롱하늘채</b> <a class="map" href="https://map.naver.com/p/search/%EA%BF%88%EC%9D%98%EC%88%B2%EC%BD%94%EC%98%A4%EB%A1%B1%ED%95%98%EB%8A%98%EC%B1%84">지도</a><br><small>성북 장위동 돌곶이로 220 · 2026 1차</small></td><td class="num">32㎡ 9.7평</td><td>공가 <b>4</b> · 예비 10</td><td class="num">9,540만<br>월 37.4만</td><td><span class="pill info">일반 추첨</span></td></tr>
+      <tr data-m2="33.46"><td><b>래미안길음센터피스</b> <a class="map" href="https://map.naver.com/p/search/%EB%9E%98%EB%AF%B8%EC%95%88%EA%B8%B8%EC%9D%8C%EC%84%BC%ED%84%B0%ED%94%BC%EC%8A%A4">지도</a><br><small>성북 숭인로 50 · 2026 1차</small></td><td class="num">33㎡ 10.1평</td><td>공가 0 · 예비 8</td><td class="num">1억 1,808만<br>월 45.1만</td><td><span class="pill warn">예비만</span></td></tr>
+      <tr data-m2="39.0"><td><b>꿈의숲아이파크</b> <a class="map" href="https://map.naver.com/p/search/%EA%BF%88%EC%9D%98%EC%88%B2%EC%95%84%EC%9D%B4%ED%8C%8C%ED%81%AC">지도</a><br><small>성북 장위동 돌곶이로40길 46 · 2026 1차</small></td><td class="num">39㎡ 11.8평 <span class="pill ok">36↑</span></td><td>공가 <b>6</b> · 예비 38</td><td class="num">1억 2,348만<br>월 47.0만</td><td><span class="pill info">일반 추첨</span></td></tr>
+      <tr data-m2="29.96"><td><b>보문파크뷰자이</b> <a class="map" href="https://map.naver.com/p/search/%EB%B3%B4%EB%AC%B8%ED%8C%8C%ED%81%AC%EB%B7%B0%EC%9E%90%EC%9D%B4">지도</a><br><small>성북 보문동 · 2026 2차</small></td><td class="num">30㎡ 9.1평</td><td>공가 <b>3</b> · 예비 15</td><td class="num">1억 1,664만<br>월 43.3만</td><td><span class="pill info">일반 추첨</span></td></tr>
+      <tr data-m2="36.14"><td><b>래미안장위퍼스트하이</b> <a class="map" href="https://map.naver.com/p/search/%EB%9E%98%EB%AF%B8%EC%95%88%EC%9E%A5%EC%9C%84%ED%8D%BC%EC%8A%A4%ED%8A%B8%ED%95%98%EC%9D%B4">지도</a><br><small>성북 한천로 713 · 2026 2차</small></td><td class="num">36㎡ 10.9평 <span class="pill ok">36↑</span></td><td>공가 <b>7</b> · 예비 13</td><td class="num">9,936만<br>월 39.0만</td><td><span class="pill info">일반 추첨</span></td></tr>
+      <tr data-m2="39.91"><td><b>장위자이레디언트</b> <a class="map" href="https://map.naver.com/p/search/%EC%9E%A5%EC%9C%84%EC%9E%90%EC%9D%B4%EB%A0%88%EB%94%94%EC%96%B8%ED%8A%B8">지도</a><br><small>성북 장위동 · 2026 2차</small></td><td class="num">40㎡ 12.1평 <span class="pill ok">36↑</span></td><td>공가 <b>5</b> · 예비 14</td><td class="num">1억 962만<br>월 42.0만</td><td><span class="pill info">일반 추첨</span></td></tr>
+      <tr data-m2="39.39"><td><b>창경궁롯데캐슬시그니처 (신규, 입주 27.5↑)</b> <a class="map" href="https://map.naver.com/p/search/%EC%B0%BD%EA%B2%BD%EA%B6%81%EB%A1%AF%EB%8D%B0%EC%BA%90%EC%8A%AC%EC%8B%9C%EA%B7%B8%EB%8B%88%EC%B2%98">지도</a><br><small>성북 삼선동2가 296 · 2026 2차</small></td><td class="num">39㎡ 11.9평 <span class="pill ok">36↑</span></td><td>공가 <b>30</b></td><td class="num">1억 2,096만<br>월 46.3만</td><td><span class="pill info">일반 추첨</span></td></tr>
+      <tr data-m2="39.9"><td><b>송파시그니처롯데캐슬</b> <a class="map" href="https://map.naver.com/p/search/%EC%86%A1%ED%8C%8C%EC%8B%9C%EA%B7%B8%EB%8B%88%EC%B2%98%EB%A1%AF%EB%8D%B0%EC%BA%90%EC%8A%AC">지도</a><br><small>송파 거여동 거마로 56 · 2026 1차</small></td><td class="num">40㎡ 12.1평 <span class="pill ok">36↑</span></td><td>공가 0 · 예비 2</td><td class="num">1억 2,168만<br>월 44.5만</td><td><span class="pill warn">예비만</span></td></tr>
+      <tr data-m2="34.93"><td><b>e편한세상송파파크센트럴</b> <a class="map" href="https://map.naver.com/p/search/e%ED%8E%B8%ED%95%9C%EC%84%B8%EC%83%81%EC%86%A1%ED%8C%8C%ED%8C%8C%ED%81%AC%EC%84%BC%ED%8A%B8%EB%9F%B4">지도</a><br><small>송파 거여동 오금로 551 · 2026 1차</small></td><td class="num">35㎡ 10.6평</td><td>공가 <b>3</b> · 예비 9</td><td class="num">1억 2,564만<br>월 44.3만</td><td><span class="pill info">일반 추첨</span></td></tr>
+      <tr data-m2="38.17"><td><b>용산롯데캐슬센터포레</b> <a class="map" href="https://map.naver.com/p/search/%EC%9A%A9%EC%82%B0%EB%A1%AF%EB%8D%B0%EC%BA%90%EC%8A%AC%EC%84%BC%ED%84%B0%ED%8F%AC%EB%A0%88">지도</a><br><small>용산 백범로 313 · 2026 1차</small></td><td class="num">38㎡ 11.5평 <span class="pill ok">36↑</span></td><td>공가 0 · 예비 7</td><td class="num">1억 6,471만<br>월 61.6만</td><td><span class="pill warn">예비만</span></td></tr>
+      <tr data-m2="40.67"><td><b>용산센트럴파크 헤링턴스퀘어</b> <a class="map" href="https://map.naver.com/p/search/%EC%9A%A9%EC%82%B0%EC%84%BC%ED%8A%B8%EB%9F%B4%ED%8C%8C%ED%81%AC%20%ED%97%A4%EB%A7%81%ED%84%B4%EC%8A%A4%ED%80%98%EC%96%B4">지도</a><br><small>용산 한강로3가 서빙고로 17 · 2026 1차</small></td><td class="num">41㎡ 12.3평 <span class="pill ok">36↑</span></td><td>공가 <b>2</b> · 예비 23</td><td class="num">1억 7,784만<br>월 75.6만</td><td><span class="pill info">일반 추첨</span></td></tr>
+      <tr data-m2="39.06"><td><b>경희궁자이</b> <a class="map" href="https://map.naver.com/p/search/%EA%B2%BD%ED%9D%AC%EA%B6%81%EC%9E%90%EC%9D%B4">지도</a><br><small>종로 행촌동 송월길 130 · 2026 1차</small></td><td class="num">39㎡ 11.8평 <span class="pill ok">36↑</span></td><td>공가 <b>4</b> · 예비 21</td><td class="num">1억 3,910만<br>월 54.5만</td><td><span class="pill info">일반 추첨</span></td></tr>
+      <tr data-m2="36.36"><td><b>신내 글로리움</b> <a class="map" href="https://map.naver.com/p/search/%EC%8B%A0%EB%82%B4%EA%B8%80%EB%A1%9C%EB%A6%AC%EC%9B%80">지도</a><br><small>중랑 신내동 신내로 208 · 2026 1차</small></td><td class="num">36㎡ 11.0평 <span class="pill ok">36↑</span></td><td>공가 0 · 예비 28</td><td class="num">7,056만<br>월 25.3만</td><td><span class="pill warn">예비만</span></td></tr>
+      <tr data-m2="29.84"><td><b>신내3-3 도시형생활주택</b> <a class="map" href="https://map.naver.com/p/search/%EC%8B%A0%EB%82%B4%EC%9A%B0%EB%94%94%EC%95%883%EB%8B%A8%EC%A7%80">지도</a><br><small>중랑 신내동 신내역로1길 142 · 2026 1차</small></td><td class="num">30㎡ 9.0평</td><td>공가 0 · 예비 12</td><td class="num">5,976만<br>월 25.9만</td><td><span class="pill warn">예비만</span></td></tr>
+      <tr data-m2="31.85"><td><b>신내3-4 도시형생활주택</b> <a class="map" href="https://map.naver.com/p/search/%EC%8B%A0%EB%82%B4%EC%9A%B0%EB%94%94%EC%95%884%EB%8B%A8%EC%A7%80">지도</a><br><small>중랑 신내동 신내역로 160 · 2026 1차</small></td><td class="num">32㎡ 9.6평</td><td>공가 0 · 예비 30</td><td class="num">5,832만<br>월 24.3만</td><td><span class="pill warn">예비만</span></td></tr>
+      <tr data-m2="38.28"><td><b>래미안베라힐즈</b> <a class="map" href="https://map.naver.com/p/search/%EB%9E%98%EB%AF%B8%EC%95%88%EB%B2%A0%EB%9D%BC%ED%9E%90%EC%A6%88">지도</a><br><small>은평 통일로 630 · 2026 2차</small></td><td class="num">38㎡ 11.6평 <span class="pill ok">36↑</span></td><td>공가 <b>27</b> · 예비 38</td><td class="num">1억 3,248만<br>월 53.0만</td><td><span class="pill info">일반 추첨</span></td></tr>
+      <tr data-m2="39.49"><td><b>은뜨락(서울리츠)</b> <a class="map" href="https://map.naver.com/p/search/%EC%9D%80%ED%8F%89%EA%B5%AC%20%ED%86%B5%EC%9D%BC%EB%A1%9C%20972">지도</a><br><small>은평 진관동 통일로 972 · 2026 2차</small></td><td class="num">39㎡ 11.9평 <span class="pill ok">36↑</span></td><td>공가 <b>25</b> · 예비 41</td><td class="num">9,720만<br>월 38.9만</td><td><span class="pill info">일반 추첨</span></td></tr>
+      <tr data-m2="39.12"><td><b>힐스테이트녹번역</b> <a class="map" href="https://map.naver.com/p/search/%ED%9E%90%EC%8A%A4%ED%85%8C%EC%9D%B4%ED%8A%B8%EB%85%B9%EB%B2%88%EC%97%AD">지도</a><br><small>은평 응암동 · 2026 2차</small></td><td class="num">39㎡ 11.8평 <span class="pill ok">36↑</span></td><td>공가 <b>6</b> · 예비 10</td><td class="num">1억 1,652만<br>월 40.6만</td><td><span class="pill info">일반 추첨</span></td></tr>
+      <tr data-m2="39.1"><td><b>백련산해모로</b> <a class="map" href="https://map.naver.com/p/search/%EB%B0%B1%EB%A0%A8%EC%82%B0%ED%95%B4%EB%AA%A8%EB%A1%9C">지도</a><br><small>은평 응암동 · 2026 2차</small></td><td class="num">39㎡ 11.8평 <span class="pill ok">36↑</span></td><td>공가 <b>3</b> · 예비 5</td><td class="num">1억 836만<br>월 43.1만</td><td><span class="pill info">일반 추첨</span></td></tr>
+      <tr data-m2="38.74"><td><b>DMCSK뷰</b> <a class="map" href="https://map.naver.com/p/search/DMC%20SK%EB%B7%B0">지도</a><br><small>은평 수색동 · 2026 2차</small></td><td class="num">39㎡ 11.7평 <span class="pill ok">36↑</span></td><td>공가 <b>1</b> · 예비 3</td><td class="num">8,751만<br>월 32.0만</td><td><span class="pill info">일반 추첨</span></td></tr>
+      </tbody>
+    </table></div>
+  </div></details>
+  <p class="src">출처: <a href="https://www.i-sh.co.kr/app/lay2/program/S1T294C295/www/brd/m_241/view.do?multi_itm_seqs=1%2C2%2C4%2C8%2C16%2C32%2C64%2C128%2C256&seq=304864">SH 2026 1차 행복주택 공고문</a> 11~16·54~56쪽 · <a href="https://www.i-sh.co.kr/app/lay2/program/S1T294C295/www/brd/m_241/view.do?multi_itm_seqs=1%2C2%2C4%2C8%2C16%2C32%2C64%2C128%2C256&seq=309337">2026 2차 공고문</a> 11~15·51~52쪽. 보증금은 월세로 돌릴 수 있음(SH·서울시 소유 단지 50%까지, 서울리츠 20%까지, 연 2.5%). 예: 천왕이펜하우스8 36㎡ 6,552만 → 3,276만 + 월 31.4만.</p>
+
+  <h3 style="margin-top:22px">국민임대 — 강서구와 '강서 거주 = 1순위'인 지구</h3>
+  <p class="src" style="margin-bottom:8px">2025 → 2026 공고에 실제로 나온 일반공급 물량. 49㎡는 해당구·연접구 거주가 1순위, 59㎡는 청약 24회 이상이 1순위(거주지 무관).</p>
+  <div class="grid2">
+    <div class="card"><h3>마곡엠밸리 1~15단지 <span class="pill ok">강서 1순위</span> <a class="map" href="https://map.naver.com/p/search/%EB%A7%88%EA%B3%A1%EC%97%A0%EB%B0%B8%EB%A6%AC">지도</a></h3><p class="src">강서구 마곡동 (마곡서1로·마곡중앙로·공항대로)</p>
+      <div class="kv"><b>49㎡</b><span>2025: 29호(공가 5·예비 24) · 5,564만 · 월 38.0만<br>2026: 일반 없음(주거약자 6호)</span><b>59㎡</b><span>2025: 40호(예비) · 5,770만 · 월 37.6만<br>2026: 없음</span><b>9단지</b><span>49㎡ 2025: 4호(예비) · 5,799만 · 월 31.9만</span></div></div>
+    <div class="card"><h3>마곡수명산파크 1~7단지 <span class="pill ok">강서 1순위</span> <a class="map" href="https://map.naver.com/p/search/%EB%A7%88%EA%B3%A1%EC%88%98%EB%AA%85%EC%82%B0%ED%8C%8C%ED%81%AC">지도</a></h3><p class="src">강서구 내발산동 (강서로47길·수명로)</p>
+      <div class="kv"><b>39㎡</b><span>2025: 18호(예비) · 2,451만 · 월 22.2만<br>2026: 없음</span><b>49㎡</b><span>2025: 22호(공가 4·예비 18) · 3,674~3,900만 · 월 26.2~28.7만<br>2026: 없음</span><b>59㎡</b><span>2025: 27호(공가 11) · 4,002~4,323만 · 월 29.3~32.2만<br>2026: <b>40호(공가 40)</b> · 같은 금액</span></div></div>
+    <div class="card"><h3>신정이펜하우스 1~5단지 <span class="pill ok">연접 1순위</span> <a class="map" href="https://map.naver.com/p/search/%EC%8B%A0%EC%A0%95%EC%9D%B4%ED%8E%9C%ED%95%98%EC%9A%B0%EC%8A%A4">지도</a></h3><p class="src">양천구 신정동 (신정이펜1로·2로)</p>
+      <div class="kv"><b>49㎡</b><span>2025: 12호(예비) · 4,007만 · 월 30.4만<br>2026: 주거약자만</span><b>59㎡</b><span>2025: 50호(공가 5) · 4,715만 · 월 34.4만<br>2026: 58호(공가 14) · 4,715~5,864만 · 월 34.4~39.4만</span></div></div>
+    <div class="card"><h3>상암월드컵파크 9~12단지 <span class="pill ok">연접 1순위</span> <a class="map" href="https://map.naver.com/p/search/%EC%83%81%EC%95%94%EC%9B%94%EB%93%9C%EC%BB%B5%ED%8C%8C%ED%81%AC">지도</a></h3><p class="src">마포구 상암동 (월드컵북로 501~502)</p>
+      <div class="kv"><b>49㎡</b><span>2025: 18호(예비) · 4,740만 · 월 32.8만<br>2026: 주거약자만</span><b>59㎡</b><span>2025: 29호(공가 5) · 5,702만 · 월 37.8만<br>2026: 15호(예비) · 5,702~6,509만</span></div></div>
+    <div class="card"><h3>천왕·항동 (구로) <span class="pill warn">강서는 2순위</span> <a class="map" href="https://map.naver.com/p/search/%EC%B2%9C%EC%99%95%EC%9D%B4%ED%8E%9C%ED%95%98%EC%9A%B0%EC%8A%A4">지도</a></h3><p class="src">천왕이펜하우스 1~6 · 천왕연지타운 1,2 · 항동하버라인 2,3,4,8</p>
+      <div class="kv"><b>49㎡</b><span>2026: 천왕 48호(공가 8) · 4,371~4,912만 · 월 32.5~35.0만 / 항동 14호(예비) / 천왕2 24호(예비)</span><b>59㎡</b><span>2026: 천왕 62호(공가 22) · 5,190~5,993만 / 항동 41호(공가 6) · 5,974~6,644만 / 천왕2 36호(공가 2)</span></div></div>
+    <div class="card"><h3>내 배점 (동일순위 경쟁 시)</h3>
+      <div class="kv"><b>나이</b><span>30~40세 1점</span><b>서울 거주</b><span>3~5년 2점 (2028년 공고부터 3점)</span><b>청약</b><span>60회 이상 3점</span><b>합계</b><span><b>6점</b> → 2028년 7점. 부양가족·자녀 점수가 없어 가족 가구(최대 18점)보다 낮음. 서류심사대상자는 배점순 200%라 59㎡보다 <b>49㎡ 1순위</b>가 현실적</span></div></div>
+  </div>
+  <p class="src">출처: <a href="https://www.i-sh.co.kr/app/lay2/program/S1T294C295/www/brd/m_241/view.do?multi_itm_seqs=1%2C2%2C4%2C8%2C16%2C32%2C64%2C128%2C256&seq=308340">SH 2026 국민임대 공고문</a> 11~15쪽(단지표)·27~33쪽(순위·배점)·49~50쪽(주소) · <a href="https://www.i-sh.co.kr/app/lay2/program/S1T294C295/www/brd/m_241/view.do?multi_itm_seqs=1%2C2%2C4%2C8%2C16%2C32%2C64%2C128%2C256&seq=292541">2025 국민임대 공고문</a> 12~13쪽. 입주는 당첨 이듬해 3월. 46㎡는 2026년 서초 2호뿐이라 뺐음.</p>
+
+  <details class="more" style="margin-top:14px"><summary>순위 규칙 근거 (공고문 쪽수)</summary><div class="body">
+    <ul>
+      <li><b>행복주택 우선공급 1순위</b>: 단지가 있는 자치구가 거주지 <u>또는 소득근거지</u>인 사람 (2026 1차 공고문 27쪽). 소득근거지는 사업자등록증으로 확인, 없으면 재직증명서·근로계약서 등 추가 증빙으로 인정 가능 → 동대문구 거래처와의 용역계약서 준비.</li>
+      <li><b>행복주택 우선공급 배점</b>: 서울 3년 이상 거주 3점(서울 최종전입 2023.5.28 이전) + 청약 24회 이상 3점 = 6점 만점. 동점은 추첨 (27쪽).</li>
+      <li><b>행복주택 일반공급</b>: 서울·연접지역 거주가 1순위, 순위 안에서 추첨. 배점 없음 (26쪽). 우선공급 탈락자는 자동으로 일반공급으로.</li>
+      <li><b>국민임대 49㎡ 이하</b>: 선순위 = 소득 50%(1인 70% = 2,669,354원) → 1순위 = 해당구·연접구 거주 (2026 공고문 26~27쪽). 연접구 표: 마곡지구 [강서] 마포·양천·영등포 / 신정3·4지구 [양천] 강서·구로·영등포 / 상암2지구 [마포] 강서·서대문·영등포·용산·은평·중구 / 천왕·항동지구 [구로] 관악·금천·동작·양천·영등포 (30쪽).</li>
+      <li><b>국민임대 59㎡</b>: 소득 70%(1인 90% = 3,432,027원) → 1순위 청약 24회 이상 → 동일순위는 배점 → 추첨 (28·31쪽). 가점표: 나이·부양가족·서울 연속거주·노부모·미성년 자녀·청약 회차·중소제조업·건설근로·사회취약 (33쪽). 서류심사대상자는 가점 높은 순 200% (34쪽).</li>
+      <li>1인 가구 면적 제한: 신청자격(22~36쪽)에 없음.</li>
+    </ul>
+  </div></details>
+</section>
+
+<section id="calendar">
+  <div class="eyebrow">6</div>
+  <h2>서울 공고 달력 — 2025·2026 실제, 2027 추정</h2>
+  <p><span class="pill ok">실제</span> 는 공고문에 적힌 날짜, <span class="pill warn">추정</span> 은 지난 2년 패턴으로 잡은 시기입니다. 추정은 공고가 뜨면 그 날짜로 바꿉니다. 보편형 전세임대는 신설 유형이라 가장 불확실합니다.</p>
+
+  <h3>2027년 월별 (추정)</h3>
+  <div class="tbl"><table class="cal stack">
+    <thead><tr><th>2027</th><th>무엇</th><th>근거</th></tr></thead>
+    <tbody>
+      <tr><td>2~3월 <span class="pill warn">추정</span></td><td>청년 보편형 전세임대 첫 공고 → 뜨면 바로 신청</td><td class="src">기존 청년 전세임대 연간 공고가 2025.2.7, 2026.2.24에 나왔고, 보편형은 2026.12 지침 개정 → 2027.1 예산(융자 9,000억) 집행 순서. 신설이라 늦어질 수 있음</td></tr>
+      <tr><td>4월 말~6월 초 <span class="pill warn">추정</span></td><td>SH 행복주택 1차 공고 → 36~38㎡ 청년(소득有)형만 신청. 접수는 공고 2~3주 뒤 3일간</td><td class="src">1차 공고일 2024.6.28, 2025.4.25, 2026.5.28 (SH 공고 목록)</td></tr>
+      <tr><td>5월 · 10월 <span class="pill warn">추정</span></td><td>LH 서울 든든전세 (1인은 배점 불리, 후순위)</td><td class="src">2026.5.12 수도권 1,253호(서울 103호) 발표, 2026.10.6 26-2차 공고</td></tr>
+      <tr><td>8~10월 <span class="pill warn">추정</span></td><td>SH 행복주택 1차 당첨 발표 → 11~12월 입주</td><td class="src">당첨 2025.8.29, 2026.10.30; 2026년은 12월 입주</td></tr>
+      <tr><td>8월 20일 전후 <span class="pill warn">추정</span></td><td>SH 국민임대 공고 → 마곡엠밸리·마곡수명산파크·신정이펜하우스·상암월드컵파크 49㎡ 선순위(1순위) + 59㎡(청약 1순위). 당첨 2028.2, 입주 2028.3 이후</td><td class="src">공고일 2024.9.26, 2025.8.20, 2026.8.20 (2026년은 당첨 2027.2.15, 입주 2027.3 이후)</td></tr>
+      <tr><td>6월 말~8월 말 <span class="pill warn">추정</span></td><td>SH 행복주택 2차 공고 (재공급·예비 위주, 2026년엔 방화스카이포레 29㎡ 청년 12호 포함)</td><td class="src">2차 공고일 2025.6.27, 2026.8.28 (접수 9.9~11, 당첨 2027.1.29)</td></tr>
+      <tr><td>12월 말 <span class="pill warn">추정</span></td><td>SH 행복주택 연말 공고 (접수는 이듬해 1월)</td><td class="src">2024.12.27(2차), 2025.12.31(3차) 공고 → 2026.1.16~20 접수, 당첨 5.29, 입주 7월 이후</td></tr>
+            <tr><td>12월 말 <span class="pill ok">확정</span></td><td>현재 월세 만기 → 이 시점에 맞춰 갈아타기</td><td class="src">임대차 연장 합의 기준</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>근거가 된 실제 일정 (공고문 날짜)</h3>
+  <div class="tbl"><table class="cal stack">
+    <thead><tr><th>공고</th><th>2025 실제</th><th>2026 실제</th><th>읽는 법</th><th>출처</th></tr></thead>
+    <tbody>
+      <tr><td>LH 청년 전세임대 1순위 수시</td><td>공고 2.7 → 접수 2.7~12.31</td><td>공고 2.24 → 접수 2.24~12.31</td><td>연초 공고·연중 접수. 본인은 1순위가 아니라 해당 없음, 보편형 시점 가늠용</td><td class="src"><a href="https://gobang.kr/notices/17488">2025 공고</a> · <a href="https://m.myhome.go.kr/hws/portal/sch/selectRsdtRcritNtcDetailView.do?pblancId=19631">2026 공고</a></td></tr>
+      <tr><td>SH 행복주택 1차</td><td>공고 4.25 → 접수 5.7~9 → 당첨 8.29</td><td>공고 5.28 → 접수 6.15~17 → 서류 6.26 → 당첨 10.30 → 계약 11.11~17 → 입주 12월</td><td>공고→접수 2~3주, 접수→당첨 4~5개월, 당첨→입주 1~2개월</td><td class="src"><a href="https://gobang.kr/notices/18071">2025 1차</a> · <a href="https://gobang.kr/contents/7908">2026 1차</a> · <a href="https://www.fnnews.com/news/202605281725191236">파이낸셜뉴스</a></td></tr>
+      <tr><td>SH 행복주택 2차·3차</td><td>2차 공고 6.27 / 3차 공고 12.31 → 접수 2026.1.16~20 → 당첨 5.29 → 입주 7월 이후</td><td>2차 공고 8.28 → 접수 9.9~11 → 서류심사 대상자 9.21 → 서류 9.28~30 → 당첨 2027.1.29 → 계약 2.10~16</td><td>연 2~3회(상반기·여름~초가을·연말). 2024년은 6.28·12.27 두 번</td><td class="src"><a href="https://www.i-sh.co.kr/app/lay2/program/S1T294C295/www/brd/m_241/view.do?multi_itm_seqs=1%2C2%2C4%2C8%2C16%2C32%2C64%2C128%2C256&seq=309337">SH 2026 2차 공고문</a> · <a href="https://gobang.kr/contents/7530">2025 3차</a> · SH 공고 목록(2025 2차 6.27, 2024 1·2차)</td></tr>
+      <tr><td>SH 국민임대</td><td>공고 8.20 → 접수 9.2~5 (2024년은 공고 9.26)</td><td>공고 8.20 → 접수 8.31~9.3(후순위 9.16) → 서류 10.12 → 당첨 2027.2.15 → 계약 3.3~5 → 입주 3월 이후</td><td>연 1회, 8월 20일 전후 공고, 입주까지 6~7개월</td><td class="src"><a href="https://opcl.s3.amazonaws.com/data/policy/files/20241001_2024%EB%85%84%20%EC%A0%9C1%EC%B0%A8%20%EA%B5%AD%EB%AF%BC%EC%9E%84%EB%8C%80%EC%A3%BC%ED%83%9D%20%EC%9E%85%EC%A3%BC%EC%9E%90%EB%AA%A8%EC%A7%91%20%EA%B3%B5%EA%B3%A0%EB%AC%B8(20240926).pdf">2024 공고문</a> · <a href="https://www.i-sh.co.kr/app/lay2/program/S1T294C295/www/brd/m_241/view.do?multi_itm_seqs=1%2C2%2C4%2C8%2C16%2C32%2C64%2C128%2C256&seq=292541">2025 공고문</a> · <a href="https://www.i-sh.co.kr/app/lay2/program/S1T294C295/www/brd/m_241/view.do?multi_itm_seqs=1%2C2%2C4%2C8%2C16%2C32%2C64%2C128%2C256&seq=308340">2026 공고문</a></td></tr>
+      <tr><td>LH 서울 든든전세</td><td>—</td><td>5.12 수도권 1,253호 발표(서울 103호) · 10.6 26-2차 공고</td><td>수시, 연 2회 안팎</td><td class="src"><a href="https://www.fnnews.com/news/202605120923228370">파이낸셜뉴스</a> · <a href="http://gbhouse.or.kr/pages/page_62.php?sn=822">26-2차</a></td></tr>
+      <tr><td>청년 보편형 전세임대 (신설)</td><td>—</td><td>8.13 대책 발표 → 12월 업무지침 개정 예정 · 2027 예산 융자 9,000억</td><td>첫 공고 시점은 정부가 못 박지 않음</td><td class="src"><a href="https://www.edaily.co.kr/News/Read?mediaCodeNo=257&newsId=04742886645546992">8·13 대책</a> · <a href="https://www.newspim.com/news/view/20260901000891">2027 예산안</a> · <a href="https://property.story1000.com/%EC%B2%AD%EB%85%84-%EC%A3%BC%EA%B1%B0%EC%A7%80%EC%9B%90/">12월 지침 개정</a></td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="grid2" style="margin-top:14px">
+    <div class="card"><h3>2027년 실행 순서</h3><ol>
+      <li><b>2~3월(추정)</b> 보편형 청년 전세임대 공고 확인(LH청약플러스 알림·콜센터 1600-1004). 뜨면 1순위로 신청.</li>
+      <li><b>4월 말~6월 초(추정)</b> SH 행복주택 1차 — 강서(거주)·동대문(소득근거지) 단지는 우선공급 1순위(서울 3년↑ 3점 + 청약 3점 = 만점), 그 외 서울 36㎡↑ 청년형은 일반공급 1순위 추첨. 2026년 기준 후보: 방화스카이포레 29㎡, 이문 아이파크 자이 33㎡, 청계센트럴포레 39㎡, 천왕이펜하우스8 36㎡, 신내 글로리움 36㎡, 목동센트럴아이파크위브 34㎡ 등(5번 표). 당첨 8~10월 → 입주 11~12월.</li>
+      <li><b>8월 20일 전후(추정)</b> SH 국민임대 — 마곡엠밸리·마곡수명산파크 49㎡(강서 1순위), 신정이펜하우스·상암월드컵파크 49㎡(연접 1순위)에 선순위로. 59㎡(마곡수명산파크 등)는 청약 1순위지만 배점 6점이라 기대는 낮게. 서울 연속거주 5년(3점)은 2028년 공고부터. 당첨 시 2028년 3월 입주라 만기 1년 연장 또는 전세임대로 1년 버티기.</li>
+      <li><b>6~8월·12월 말(추정)</b> SH 행복주택 2차·연말 공고에도 같은 기준으로 신청(2026년 2차엔 방화스카이포레 29㎡·천왕이펜하우스8 36㎡·래미안베라힐즈 38㎡ 등이 나옴).</li>
+      <li>(서울 밖도 괜찮다면) LH 통합공공임대 경기 공고(부천대장 등, 36·46㎡)가 뜨면 우선공급으로. 서울 거주자도 부천 연접지역이라 1순위.</li>
+    </ol></div>
+    <div class="card"><h3>서울 통합공공임대는?</h3><p>서울 안 통합공공임대 공고는 아직 드뭅니다. 2026년 LH 건설임대(영구 600·국민 1,500·행복 6,800·통합 2,800호, 수도권 57%)는 과천지식정보타운·고양창릉 등 경기 단지 중심이라, 통합공공임대는 LH 수도권 공고로 봐야 합니다.</p><p class="src"><a href="https://m.news.nate.com/view/20260311n22686">LH 2026 물량</a> · <a href="https://thewedd.com/2026%EB%85%84-lh-%EC%9E%84%EB%8C%80%EC%A3%BC%ED%83%9D-3%EB%A7%8C-7%EC%B2%9C%ED%98%B8-%EA%B3%B5%EA%B8%89-%EC%A7%80%EC%97%AD-%EB%B0%8F-%EC%8B%A0%EC%B2%AD-%EC%9E%90%EA%B2%A9-%EC%A1%B0%EA%B1%B4%EA%B3%BC-%EC%9D%BC%EC%A0%95-%EC%95%8C%EC%95%84%EB%B3%B4%EA%B8%B0/">공급 지역</a></p></div>
+  </div>
+</section>
+
+<section id="money">
+  <div class="eyebrow">7</div>
+  <h2>보증금과 대출</h2>
+  <div class="grid2">
+    <div class="card"><h3>청년 버팀목 전세자금대출</h3>
+      <ul>
+        <li>대상 만 19~34세(군복무 시 최대 39세) 무주택 세대주, 부부합산 연소득 5천만 이하, 순자산 3.45억 이하.</li>
+        <li>한도 최대 2억(25세 미만 단독세대주 1.5억), 보증금의 80% 이내, 대상 보증금 3억·85㎡ 이하.</li>
+        <li>금리 청년형 연 1.0~3.1% (일반형 2.5~3.5%).</li>
+        <li><b>프리랜서·무소득자도 가능.</b> 소득 '상한'만 있고 하한 없음. 소득금액증명(없으면 신고사실없음 사실증명)으로 신청. 거절 사유는 소득이 아니라 연체 등 신용정보.</li>
+        <li>공공임대 보증금도 기금 대출과 연계되며, LH 공고에 기금 취급은행(우리·KB·NH·신한·IBK) 상담 안내.</li>
+      </ul>
+      <p class="src"><a href="https://kbthink.com/loan-guide/beotimok-youth.html?gf=false">KB 가이드</a> · <a href="https://wikidocs.net/blog/@Insight_Lab/25614/">프리랜서·무소득자 전세대출</a> · <a href="https://tilnote.io/pages/6ac521041bc5b55a94affe04">한도·80%</a> · <a href="https://tilnote.io/pages/6ab69edf0d78002f3fcc21f2">신용 요건</a></p>
+    </div>
+    <div class="card"><h3>대출 없이 줄이는 법 · 2027 월세지원</h3>
+      <ul>
+        <li><b>보증금↔월세 전환</b>: LH 월세→보증금 연 7.0%, 보증금→월세 연 3.5%. SH 보증금 증액 6.0%, 감액 2.5%, SH 단지 50%·서울리츠 20%까지. 보증금 1,000만 줄이면 월 2~3만 오르는 수준.</li>
+        <li><b>전세임대</b>는 LH가 집주인과 계약하므로 본인 대출 없음. 본인부담 100~200만.</li>
+        <li><b>2027 청년월세 지원</b>: 소득 요건 중위소득 60% → 100%로 완화, 월 20만·최대 24개월. 중위소득 100% 이하면 2027 기준에 들어옴. 단 공공임대 거주자는 제외 → 보편형 기다리는 동안 월세집에서만.</li>
+      </ul>
+      <p class="src"><a href="https://www.best.or.kr/flexer/html/residence_notice/20250425195349600_80099.files/Sections1.html">LH 전환이율</a> · <a href="https://gobang.kr/contents/7908">SH 전환</a> · <a href="https://m.news.nate.com/view/20260901n30563">청년월세 완화</a> · <a href="https://wikidocs.net/blog/@knarchive/20535/">공공임대 거주자 제외</a></p>
+    </div>
+  </div>
+</section>
+
+<section id="caution">
+  <div class="eyebrow">8</div>
+  <h2>주의할 점</h2>
+  <ul>
+    <li><b>입주 후 재심사.</b> 2년마다 소득·자산 재조사. 통합공공임대는 거주 중 소득이 늘면 재계약 시점에 임대료 조정, 자격 초과 시 5년 유예+할증. 국민임대는 기준 초과 시 1회에 한해 재계약. 주식이 크게 불어 한도를 넘으면 그때가 문제. <span class="src"><a href="https://jugeo.co.kr/blog/guide/tonghap-gonggong-imdae">통합공공임대</a> · <a href="https://newstomato.com/ReadNews.aspx?no=675552">국민임대 재계약</a></span></li>
+    <li><b>시점 차이.</b> 주택·소득·부동산·자동차는 공고일 기준, 금융자산·부채는 조사기준일 기준. 차를 처분하려면 공고일 전 명의이전 완료. <span class="src"><a href="https://mcheam.com/national-rental-housing-2026/">근거</a></span></li>
+    <li><b>면적.</b> 1인 35㎡ 상한은 2024년 폐지. 단 넓은 형은 다인 가구와 가점 경쟁이라 체감상 소형이 남음. <span class="src"><a href="https://mobile.newsis.com/view/NISX20240729_0002829876">뉴시스</a> · <a href="https://jab-guyver.co.kr/m/4226">2026 현황</a></span></li>
+    <li><b>행복주택 청년 자산</b>은 세대가 아니라 본인 기준 2억 5,100만(SH 2026 1차). 자료마다 2억 5,400만으로도 나오니 공고 숫자로 확정.</li>
+    <li><b>통합공공임대 우선공급</b> 12개 그룹에 '청년'이 들어가는지와 배점표는 해당 공고에서 확인.</li>
+    <li><b>보편형 전세임대</b>는 12월 업무지침 개정 후 소득 140%·원가구 제외·추첨 방식이 확정됨. 그 전 숫자는 발표안 기준.</li>
+  </ul>
+</section>
+
+<section id="sources">
+  <div class="eyebrow">9</div>
+  <h2>근거 링크</h2>
+  <h3>법령·제도</h3>
+  <ul class="srclist">
+    <li><a href="https://www.i-sh.co.kr/app/lay2/program/S1T294C295/www/brd/m_241/view.do?multi_itm_seqs=1%2C2%2C4%2C8%2C16%2C32%2C64%2C128%2C256&seq=304864">SH 2026년 1차 행복주택 입주자 모집공고문 (2026.5.28) — 단지표 11~16쪽, 청년 자격·순위 26~27쪽, 주소 54~56쪽</a></li>
+    <li><a href="https://www.i-sh.co.kr/app/lay2/program/S1T294C295/www/brd/m_241/view.do?multi_itm_seqs=1%2C2%2C4%2C8%2C16%2C32%2C64%2C128%2C256&seq=309337">SH 2026년 2차 행복주택 입주자 모집공고문 (2026.8.28) — 단지표 11~15쪽, 주소 51~52쪽</a></li>
+    <li><a href="https://www.i-sh.co.kr/app/lay2/program/S1T294C295/www/brd/m_241/view.do?multi_itm_seqs=1%2C2%2C4%2C8%2C16%2C32%2C64%2C128%2C256&seq=308340">SH 2026년 국민임대주택 입주자 모집공고문 (2026.8.20) — 단지표 11~15쪽, 소득·순위 24~31쪽, 배점 33쪽, 주소 49~50쪽</a></li>
+    <li><a href="https://www.i-sh.co.kr/app/lay2/program/S1T294C295/www/brd/m_241/view.do?multi_itm_seqs=1%2C2%2C4%2C8%2C16%2C32%2C64%2C128%2C256&seq=292541">SH 2025년 1차 국민임대주택 입주자 모집공고문 (2025.8.20)</a></li>
+    <li><a href="http://www.yeslaw.com/lims/front/page/fulltext.html?pAct=view&pLawId=3630">공공주택 특별법 전문</a></li>
+    <li><a href="https://www.law.go.kr/LSW//admRulInfoP.do?admRulSeq=2100000265934&chrClsCd=010201">공공주택 입주자 보유 자산 관련 업무처리기준 (제2025-560호)</a></li>
+    <li><a href="https://zibble.kr/content/75">국토부 2024 주택청약 FAQ – 공공주택 소득산정(별표 15)</a></li>
+    <li><a href="https://www.best.or.kr/flexer/html/residence_notice/20250425195349600_80099.files/Sections1.html">LH 부천원종 행복주택 공고 – 소득·자산 산정방법·자료 출처</a></li>
+    <li><a href="https://apply.lh.or.kr/lhapply/cm/cntnts/cntntsView.do?mi=1144&cntntsId=1023">LH 임대가이드 – 자산기준</a></li>
+    <li><a href="https://apply.lh.or.kr/lhapply/cm/cntnts/cntntsView.do?cntntsId=1201391&mi=1201663">LH 임대가이드 – 2026 소득기준표</a></li>
+    <li><a href="https://housing.gg.go.kr/html/24104.do">경기주거복지포털 – 국민임대 2026 기준</a></li>
+    <li><a href="https://housing.gg.go.kr/html/24110.do">경기주거복지포털 – 통합공공임대</a></li>
+    <li><a href="https://www.kohom.or.kr/web/mainComm/HM002004.do?mode=view&docType=0&schCon=0&page=8&seqNo=7814">주택관리공단 – 조회 시점 소득 적용</a></li>
+    <li><a href="https://medigatenews.com/stand/36884">통합공공임대 임대료 소득 구간별 (국토부 발표)</a></li>
+    <li><a href="https://bizhankook.com/articles/6968.html">행복주택 계층별 임대료율</a></li>
+    <li><a href="https://www.khan.co.kr/article/202410271100001">행복주택 거주기간 6→10년</a></li>
+    <li><a href="https://magazine.hankyung.com/business/article/202410271629b">공공임대 면적기준 폐지 개정안</a></li>
+    <li><a href="https://www.edaily.co.kr/News/Read?mediaCodeNo=257&newsId=04742886645546992">8·13 주택 신속공급 방안 – 보편형 전세임대·공공임대</a></li>
+    <li><a href="https://www.newspim.com/news/view/20260901000891">2027 예산안 – 보편형 전세임대 융자 9,000억</a></li>
+    <li><a href="https://r114.com/trends/wiki/policy/3cf4a6fa-284b-803a-95f8-ddad32fc52b6">2027년 청년정책 총정리 (소득 140%)</a></li>
+  </ul>
+  <h3>공고·금액</h3>
+  <ul class="srclist">
+    <li><a href="https://www.newspim.com/news/view/20260820001218">SH 2026 국민임대 1,973세대 (보증금·임대료 평균)</a></li>
+    <li><a href="https://protip777.kr/2026%EB%85%84-%EA%B5%AD%EB%AF%BC%EC%9E%84%EB%8C%80%EC%A3%BC%ED%83%9D-%EC%9E%85%EC%A3%BC%EC%9E%90-%EB%AA%A8%EC%A7%91sh-%EC%84%9C%EC%9A%B8%C2%B7%EA%B2%BD%EA%B8%B0/">SH 2026 국민임대 공고 정리 (선순위·배점)</a></li>
+    <li><a href="https://gobang.kr/contents/7908">SH 2026 1차 행복주택 1,884호 (임대료 범위·전환·자산)</a></li>
+    <li><a href="https://gobang.kr/contents/8129">SH 2026 2차 행복주택 1,484호</a></li>
+    <li><a href="https://gobang.kr/notices/18071">SH 2025 1차 행복주택 (공고 4.25·접수 5.7~9·당첨 8.29)</a></li>
+    <li><a href="https://gobang.kr/contents/7530">SH 2025 3차 행복주택 (공고 12.31·접수 1.16~20·당첨 5.29)</a></li>
+    <li><a href="https://gobang.kr/notices/17488">LH 2025 청년 전세임대 1순위 수시 (공고 2.7)</a></li>
+    <li><a href="https://opcl.s3.amazonaws.com/data/policy/files/20241001_2024%EB%85%84%20%EC%A0%9C1%EC%B0%A8%20%EA%B5%AD%EB%AF%BC%EC%9E%84%EB%8C%80%EC%A3%BC%ED%83%9D%20%EC%9E%85%EC%A3%BC%EC%9E%90%EB%AA%A8%EC%A7%91%20%EA%B3%B5%EA%B3%A0%EB%AC%B8(20240926).pdf">SH 2024 1차 국민임대 공고문 (공고 9.26)</a></li>
+    <li><a href="https://www.fnnews.com/news/202605281725191236">SH 2026 1차 행복주택 일정</a></li>
+    <li><a href="https://jugeo.co.kr/announcements/d11f30b0-29c4-4ab7-a727-f2315b515579">SH 2026 2차 청년안심주택(공공임대)</a></li>
+    <li><a href="https://jugeo.co.kr/announcements/c8cb48dc-1bda-4412-b3f3-46cc5d1597a8">LH 서울 26-3차 청년매입임대</a></li>
+    <li><a href="http://gbhouse.or.kr/pages/page_62.php?sn=822">LH 서울 26-2차 청년매입임대</a></li>
+    <li><a href="https://woogook.kr/%EA%B2%BD%EA%B8%B0%EB%82%A8%EB%B6%80-%EC%B2%AD%EB%85%84-%EB%A7%A4%EC%9E%85%EC%9E%84%EB%8C%80%EC%A3%BC%ED%83%9D-2026-2015122300020240/">LH 경기남부 26-2차 청년매입 (투룸형 금액)</a></li>
+    <li><a href="https://www.cku.ac.kr/bbs/cku_kr/1202/150819/download.do">2026 청년 전세임대 1순위 수시모집 공고문 (한도·금리)</a></li>
+    <li><a href="https://m.myhome.go.kr/hws/portal/sch/selectRsdtRcritNtcDetailView.do?pblancId=19631">마이홈 – 2026 청년 전세임대 일정</a></li>
+    <li><a href="https://jupsunow.com/guide/lh-jeonse-rental/">LH 전세임대 유형별 한도·2·3순위 모집 이력</a></li>
+    <li><a href="https://www.youthdaily.co.kr/mobile/article.html?no=218955">LH 수도권 든든전세 1,253호</a></li>
+    <li><a href="https://homedubu.com/10226/">든든전세 자금 시나리오</a></li>
+    <li><a href="https://jugeo.co.kr/blog/guide/tonghap-gonggong-imdae">통합공공임대 2026 가이드 (임대료 예시)</a></li>
+    <li><a href="https://jugeo.co.kr/blog/guide/haengbok-jutaek">행복주택 2026 가이드 (평형별 임대료 범위)</a></li>
+    <li><a href="https://m.news.nate.com/view/20260311n22686">LH 2026 임대주택 3만7천호 유형별 물량</a></li>
+    <li><a href="https://mobile.newsis.com/view/NISX20200131_0000904510">뉴시스 – 전용·공급·계약면적과 전용률(아파트 75%·오피스텔 60%)</a></li>
+    <li><a href="https://news.bizwatch.co.kr/article/real_estate/2024/06/10/0027">비즈워치 – 공공임대 면적 제한(35㎡=10.6평 등 환산)</a></li>
+    <li><a href="https://pressian.com/pages/articles/2024043011093266249">프레시안 – 26㎡ 원룸형·36㎡ 분리형 구조</a></li>
+  </ul>
+  <h3>대출·자산 조회</h3>
+  <ul class="srclist">
+    <li><a href="https://kbthink.com/loan-guide/beotimok-youth.html?gf=false">청년 버팀목 조건·한도·서류</a></li>
+    <li><a href="https://wikidocs.net/blog/@Insight_Lab/25614/">프리랜서·무소득자 전세대출 4가지 길</a></li>
+    <li><a href="https://tilnote.io/pages/6ab69edf0d78002f3fcc21f2">청년버팀목 소득·자산·신용 요건</a></li>
+    <li><a href="https://tilnote.io/pages/6ac521041bc5b55a94affe04">청년버팀목 한도 2억·80%</a></li>
+    <li><a href="https://glasswallet.com/blog/account-info-service-guide">어카운트인포 이용 가이드</a></li>
+    <li><a href="https://news.mtn.co.kr/news-detail/2025061813464782624">마이데이터 2.0 시행</a></li>
+    <li><a href="https://mcheam.com/national-rental-housing-2026/">금융자산·부채는 조사기준일 기준</a></li>
+    <li><a href="https://m.news.nate.com/view/20260901n30563">2027 청년월세 소득요건 완화</a></li>
+    <li><a href="https://wikidocs.net/blog/@knarchive/20535/">청년월세 – 공공임대 거주자 제외</a></li>
+  </ul>
+</section>
+
+<footer>
+  소득·자산 기준 금액은 2026년 적용 기준이며 매년 2~3월 갱신됩니다. 공고별 숫자는 해당 공고문이 우선합니다. 추정으로 표시한 금액은 공고 수치가 아닙니다.
+</footer>
+</div>
+
+<button class="totop" id="totop" type="button" aria-label="맨 위로" hidden>↑</button>
+<button class="viewtoggle" id="viewtoggle" type="button" aria-pressed="false">모바일 보기</button>
+
+<script>
+(function(){
+  var LIMIT_A = 34500, LIMIT_B = 25100;
+  function n(id){ var el = document.getElementById(id); var v = el ? parseFloat(el.value) : NaN; return isNaN(v) ? 0 : v; }
+  function fmt(man){
+    var sign = man < 0 ? '-' : ''; man = Math.abs(Math.round(man));
+    var eok = Math.floor(man / 10000), rest = man % 10000;
+    if (eok > 0) return sign + eok + '억 ' + (rest ? rest.toLocaleString('ko-KR') + '만' : '');
+    return sign + rest.toLocaleString('ko-KR') + '만';
+  }
+  function calc(){
+    var total = n('c-dep') + n('c-stk') + n('c-etc') + n('c-car') + n('c-rent') - n('c-debt');
+    document.getElementById('r-total').textContent = fmt(total) + '원';
+    show('a', total, LIMIT_A); show('b', total, LIMIT_B);
+  }
+  function show(k, total, limit){
+    var gap = limit - total, r = document.getElementById('r-' + k), s = document.getElementById('s-' + k), b = document.getElementById('b-' + k);
+    var pct = Math.max(0, Math.min(100, total / limit * 100));
+    b.style.width = pct + '%';
+    b.style.background = gap < 0 ? 'var(--bad)' : (pct > 85 ? 'var(--warn)' : 'var(--ok)');
+    if (gap >= 0){ r.textContent = '여유 ' + fmt(gap); s.textContent = '한도의 ' + Math.round(pct) + '% 사용'; }
+    else { r.textContent = '초과 ' + fmt(-gap); s.textContent = '기준 초과'; }
+  }
+  if (document.getElementById('c-dep')) { ['c-dep','c-stk','c-etc','c-car','c-rent','c-debt'].forEach(function(id){ document.getElementById(id).addEventListener('input', calc); }); calc(); }
+
+  // Checklist: confirmed items are marked in the markup (data-done); the viewer's own toggles
+  // are kept per key in this browser and override the markup only for keys they touched.
+  var KEY = 'public-rental-check-v2';
+  var items = Array.prototype.slice.call(document.querySelectorAll('#checklist > li[data-key]'));
+  var countEl = document.getElementById('p-count');
+  var overrides = {};
+  try { var v = JSON.parse(localStorage.getItem(KEY) || '{}'); if (v && typeof v === 'object') overrides = v; } catch(e) {}
+  function current(li){
+    var k = li.getAttribute('data-key');
+    return (k in overrides) ? !!overrides[k] : li.getAttribute('data-done') === '1';
+  }
+  function paint(){
+    var done = 0;
+    items.forEach(function(li){
+      var on = current(li), box = li.querySelector('input[type=checkbox]');
+      box.checked = on; li.classList.toggle('done', on); if (on) done++;
+    });
+    if (countEl) countEl.textContent = done + ' / ' + items.length + ' 완료';
+  }
+  items.forEach(function(li){
+    var box = li.querySelector('input[type=checkbox]'), k = li.getAttribute('data-key');
+    box.addEventListener('change', function(){
+      if (box.checked === (li.getAttribute('data-done') === '1')) delete overrides[k]; else overrides[k] = box.checked;
+      try { localStorage.setItem(KEY, JSON.stringify(overrides)); } catch(e) {}
+      paint();
+    });
+  });
+  paint();
+
+  // phone layout helpers: cell labels for stacked tables, active jump chip, back-to-top
+  document.querySelectorAll('table.stack').forEach(function(t){
+    var heads = Array.prototype.map.call(t.querySelectorAll('thead th'), function(th){ return th.textContent.trim(); });
+    t.querySelectorAll('tbody tr').forEach(function(tr){
+      Array.prototype.forEach.call(tr.children, function(td, i){ if (heads[i]) td.setAttribute('data-label', heads[i]); });
+    });
+  });
+  // Section jump: buttons + window.scrollTo instead of fragment links. Inside the artifact viewer a link
+  // click is handed to the host (links open outside the artifact), so fragment links don't scroll the page there.
+  var nav = document.getElementById('jump');
+  var chips = Array.prototype.slice.call(nav.querySelectorAll('button[data-target]'));
+  var targets = chips.map(function(b){ return document.getElementById(b.getAttribute('data-target')); }).filter(Boolean);
+  var reduce = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  var pinned = null; // chip chosen by tap stays active until the viewer scrolls by hand
+  function setActive(id){
+    chips.forEach(function(b){
+      var on = b.getAttribute('data-target') === id;
+      b.classList.toggle('active', on);
+      if (on) b.setAttribute('aria-current', 'true'); else b.removeAttribute('aria-current');
+      if (on) { var left = b.offsetLeft - (nav.clientWidth - b.offsetWidth) / 2; try { nav.scrollTo({ left: left, behavior: reduce ? 'instant' : 'smooth' }); } catch(e) { nav.scrollLeft = left; } }
+    });
+  }
+  function navOffset(){ return nav.offsetHeight + (parseFloat(getComputedStyle(nav).top) || 0) + 8; }
+  function goTo(id, instant){
+    var el = document.getElementById(id); if (!el) return;
+    pinned = id; setActive(id);
+    var top = Math.max(0, el.getBoundingClientRect().top + window.pageYOffset - navOffset());
+    try { window.scrollTo({ top: top, behavior: (instant || reduce) ? 'instant' : 'smooth' }); } /* 'auto' would defer to the CSS scroll-behavior:smooth */ catch(e) { window.scrollTo(0, top); }
+  }
+  chips.forEach(function(b){ b.addEventListener('click', function(ev){ ev.preventDefault(); goTo(b.getAttribute('data-target')); }); });
+  // Mouse drag scrolls horizontal strips (the chip bar, the map); touch already scrolls them natively.
+  function dragScroll(el){
+    if (!el || !window.PointerEvent) return;
+    var st = { on: false, x: 0, left: 0, moved: false };
+    el.addEventListener('pointerdown', function(e){
+      if (e.pointerType !== 'mouse' || e.button !== 0) return;
+      st.on = true; st.moved = false; st.x = e.clientX; st.left = el.scrollLeft;
+    });
+    el.addEventListener('pointermove', function(e){
+      if (!st.on) return;
+      var dx = e.clientX - st.x;
+      // capture only once it is really a drag, so an ordinary click still reaches the chip
+      if (!st.moved && Math.abs(dx) > 4) { st.moved = true; el.classList.add('dragging'); try { el.setPointerCapture(e.pointerId); } catch(err) {} }
+      if (st.moved) { el.scrollLeft = st.left - dx; e.preventDefault(); }
+    });
+    function stop(e){ if (!st.on) return; st.on = false; el.classList.remove('dragging'); try { el.releasePointerCapture(e.pointerId); } catch(err) {} }
+    el.addEventListener('pointerup', stop); el.addEventListener('pointercancel', stop);
+    // a drag must not count as a tap on the chip underneath
+    el.addEventListener('click', function(e){ if (st.moved) { st.moved = false; e.preventDefault(); e.stopPropagation(); } }, true);
+    el.addEventListener('dragstart', function(e){ e.preventDefault(); });
+  }
+  dragScroll(nav);
+  dragScroll(document.querySelector('.smapwrap'));
+  ['wheel', 'touchstart', 'keydown'].forEach(function(t){ window.addEventListener(t, function(){ pinned = null; }, { passive: true }); });
+  if ('IntersectionObserver' in window) {
+    var visible = {};
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){ visible[e.target.id] = e.isIntersecting ? e.boundingClientRect.top : null; });
+      if (pinned) return;
+      var best = null, bestTop = Infinity;
+      Object.keys(visible).forEach(function(id){ var t = visible[id]; if (t !== null && Math.abs(t) < bestTop) { bestTop = Math.abs(t); best = id; } });
+      if (best) setActive(best);
+    }, { rootMargin: '-25% 0px -60% 0px', threshold: [0, 0.1] });
+    targets.forEach(function(t){ io.observe(t); });
+  }
+  var totop = document.getElementById('totop');
+  totop.addEventListener('click', function(){ pinned = 'summary'; setActive('summary'); try { window.scrollTo({ top: 0, behavior: reduce ? 'instant' : 'smooth' }); } catch(e) { window.scrollTo(0, 0); } });
+  function onScroll(){ totop.hidden = (window.pageYOffset || document.documentElement.scrollTop) < 600; }
+  window.addEventListener('scroll', onScroll, { passive: true }); onScroll();
+  // a plain #section in the artifact's own link (e.g. ...#calendar) opens that section
+  function openHash(instant){
+    var hash = (location.hash || '').replace(/^#/, '');
+    if (hash && chips.some(function(b){ return b.getAttribute('data-target') === hash; })) goTo(hash, instant);
+  }
+  setTimeout(function(){ openHash(true); }, 50);
+  window.addEventListener('hashchange', function(){ openHash(false); });
+
+  // '36㎡ 이상만 보기' filter on the 행복주택 단지 table
+  var only36 = document.getElementById('only36');
+  if (only36) only36.addEventListener('change', function(){
+    document.querySelectorAll('#happy-table tbody tr[data-m2]').forEach(function(tr){ tr.hidden = only36.checked && parseFloat(tr.getAttribute('data-m2')) < 36; });
+  });
+
+  // 모바일 보기 toggle (desktop only): html.m narrows .wrap to 430px, and the @container rules do the rest
+  var root = document.documentElement, vt = document.getElementById('viewtoggle'), VKEY = 'public-rental-view';
+  function paintView(){ var m = root.classList.contains('m'); vt.textContent = m ? '\uD83D\uDDA5 PC 화면으로' : '\uD83D\uDCF1 모바일 보기'; vt.setAttribute('aria-pressed', m ? 'true' : 'false'); }
+  vt.addEventListener('click', function(){
+    root.classList.toggle('m');
+    try { if (root.classList.contains('m')) localStorage.setItem(VKEY, 'm'); else localStorage.removeItem(VKEY); } catch(e) {}
+    paintView();
+  });
+  paintView();
+})();
+</script>
+
+<script>
+// ===== 네이버지도 =====
+var NCP_KEY_ID = '7lizv5y6f1';
+var HOME = { label: '집', addr: '서울특별시 강서구 마곡동', approx: [37.560, 126.830] };   // 도로명주소로 바꾸면 정확히 찍힘
+var WORK = { label: '회사', addr: '서울특별시 동대문구', approx: [37.574, 127.040] };
+var PLACES = [{"kind": "행복주택", "cat": "pri", "name": "방화스카이포레", "gu": "강서", "addr": "서울특별시 강서구 개화동로21길 22", "approx": [37.578, 126.812], "m2": 29.09, "py": "8.8평", "vac": 4, "wait": 8, "dep": "7,272만", "rent": "26.6만", "notice": "2026 2차", "rank": "우선 1순위", "q": "방화스카이포레", "pick": true}, {"kind": "행복주택", "cat": "pri", "name": "이문 아이파크 자이", "gu": "동대문", "addr": "서울특별시 동대문구 이문로 120", "approx": [37.6, 127.06], "m2": 33.54, "py": "10.1평", "vac": 5, "wait": 7, "dep": "8,208만", "rent": "32.1만", "notice": "2026 1차", "rank": "우선 1순위", "q": "이문아이파크자이", "pick": true}, {"kind": "행복주택", "cat": "pri", "name": "e편한세상 청계센트럴포레", "gu": "동대문", "addr": "서울특별시 동대문구 무학로 91", "approx": [37.577, 127.03], "m2": 39.92, "py": "12.1평", "vac": 1, "wait": 4, "dep": "1억 1,460만", "rent": "41.0만", "notice": "2026 2차", "rank": "일반 추첨", "q": "e편한세상 청계센트럴포레", "pick": true}, {"kind": "행복주택", "cat": "small", "name": "목동센트럴아이파크위브", "gu": "양천", "addr": "서울특별시 양천구 남부순환로83길 18", "approx": [37.521, 126.84], "m2": 34.24, "py": "10.4평", "vac": 18, "wait": 34, "dep": "9,851만", "rent": "32.0만", "notice": "2026 1차", "rank": "일반 추첨", "q": "목동센트럴아이파크위브 2단지", "pick": true}, {"kind": "행복주택", "cat": "small", "name": "이든채", "gu": "양천", "addr": "서울특별시 양천구 신정로7길 75", "approx": [37.519, 126.853], "m2": 31.31, "py": "9.5평", "vac": 5, "wait": 8, "dep": "5,940만", "rent": "23.3만", "notice": "2026 1차", "rank": "일반 추첨", "q": "양천구 신정로7길 75", "pick": false}, {"kind": "행복주택", "cat": "small", "name": "아크로타워스퀘어", "gu": "영등포", "addr": "서울특별시 영등포구 국회대로54길 10", "approx": [37.519, 126.909], "m2": 26.78, "py": "8.1평", "vac": 0, "wait": 10, "dep": "8,964만", "rent": "35.9만", "notice": "2026 1차", "rank": "예비만", "q": "아크로타워스퀘어", "pick": false}, {"kind": "행복주택", "cat": "big", "name": "천왕이펜하우스8단지", "gu": "구로", "addr": "서울특별시 구로구 금오로 882", "approx": [37.483, 126.838], "m2": 36.87, "py": "11.2평", "vac": 11, "wait": 21, "dep": "6,552만", "rent": "24.6만", "notice": "2026 2차", "rank": "일반 추첨", "q": "천왕이펜하우스8단지", "pick": true}, {"kind": "행복주택", "cat": "small", "name": "항동 하버라인", "gu": "구로", "addr": "서울특별시 구로구 항동로 68", "approx": [37.48, 126.824], "m2": 29.69, "py": "9.0평", "vac": 25, "wait": 93, "dep": "5,760만", "rent": "21.6만", "notice": "2026 2차", "rank": "일반 추첨", "q": "항동하버라인 9단지", "pick": false}, {"kind": "행복주택", "cat": "small", "name": "천왕이펜하우스7", "gu": "구로", "addr": "서울특별시 구로구 천왕로 21", "approx": [37.486, 126.842], "m2": 29.96, "py": "9.1평", "vac": 10, "wait": 54, "dep": "4,536만", "rent": "17.0만", "notice": "2026 1차", "rank": "일반 추첨", "q": "천왕이펜하우스7단지", "pick": false}, {"kind": "행복주택", "cat": "small", "name": "천왕이펜하우스8단지", "gu": "구로", "addr": "서울특별시 구로구 금오로 882", "approx": [37.483, 126.838], "m2": 29.38, "py": "8.9평", "vac": 8, "wait": 27, "dep": "5,256만", "rent": "19.7만", "notice": "2026 1차", "rank": "일반 추첨", "q": "천왕이펜하우스8단지", "pick": false}, {"kind": "행복주택", "cat": "small", "name": "천왕연지마을1", "gu": "구로", "addr": "서울특별시 구로구 오류로 36-13", "approx": [37.489, 126.836], "m2": 32.31, "py": "9.8평", "vac": 0, "wait": 11, "dep": "5,040만", "rent": "21.5만", "notice": "2026 1차", "rank": "예비만", "q": "천왕연지마을1단지", "pick": false}, {"kind": "행복주택", "cat": "small", "name": "천왕연지마을2", "gu": "구로", "addr": "서울특별시 구로구 오리로1102-13", "approx": [37.488, 126.834], "m2": 31.06, "py": "9.4평", "vac": 0, "wait": 6, "dep": "4,824만", "rent": "20.5만", "notice": "2026 1차", "rank": "예비만", "q": "천왕연지마을2단지", "pick": false}, {"kind": "행복주택", "cat": "small", "name": "마포더클래시", "gu": "마포", "addr": "서울특별시 마포구 신촌로28길 50", "approx": [37.556, 126.955], "m2": 32.89, "py": "9.9평", "vac": 0, "wait": 2, "dep": "9,216만", "rent": "36.2만", "notice": "2026 1차", "rank": "예비만", "q": "마포더클래시", "pick": false}, {"kind": "행복주택", "cat": "big", "name": "공덕동 크로시티", "gu": "마포", "addr": "서울특별시 마포구 공덕동", "approx": [37.545, 126.952], "m2": 36.67, "py": "11.1평", "vac": 0, "wait": 10, "dep": "1억 3,464만", "rent": "52.7만", "notice": "2026 2차", "rank": "예비만", "q": "공덕동 크로시티", "pick": false}, {"kind": "행복주택", "cat": "small", "name": "마포자이더센트리지", "gu": "마포", "addr": "서울특별시 마포구 염리동", "approx": [37.549, 126.946], "m2": 34.8, "py": "10.5평", "vac": 1, "wait": 3, "dep": "1억 4,202만", "rent": "49.6만", "notice": "2026 2차", "rank": "일반 추첨", "q": "마포자이더센트리지", "pick": false}, {"kind": "행복주택", "cat": "small", "name": "e편한세상신촌", "gu": "서대문", "addr": "서울특별시 서대문구 북아현로1길 17", "approx": [37.559, 126.955], "m2": 32.74, "py": "9.9평", "vac": 11, "wait": 43, "dep": "1억 1,271만", "rent": "44.1만", "notice": "2026 1차", "rank": "일반 추첨", "q": "e편한세상신촌", "pick": false}, {"kind": "행복주택", "cat": "small", "name": "홍제센트럴아이파크", "gu": "서대문", "addr": "서울특별시 서대문구 통일로 395", "approx": [37.586, 126.942], "m2": 34.89, "py": "10.6평", "vac": 5, "wait": 11, "dep": "1억 546만", "rent": "40.0만", "notice": "2026 1차", "rank": "일반 추첨", "q": "홍제센트럴아이파크", "pick": false}, {"kind": "행복주택", "cat": "small", "name": "래미안루센티아", "gu": "서대문", "addr": "서울특별시 서대문구 거북골로 100", "approx": [37.577, 126.918], "m2": 34.12, "py": "10.3평", "vac": 4, "wait": 14, "dep": "1억 1,151만", "rent": "39.5만", "notice": "2026 1차", "rank": "일반 추첨", "q": "래미안루센티아", "pick": false}, {"kind": "행복주택", "cat": "big", "name": "힐스테이트신촌", "gu": "서대문", "addr": "서울특별시 서대문구 이화여대8길 123", "approx": [37.563, 126.953], "m2": 37.97, "py": "11.5평", "vac": 3, "wait": 5, "dep": "1억 3,454만", "rent": "51.6만", "notice": "2026 1차", "rank": "일반 추첨", "q": "힐스테이트신촌", "pick": false}, {"kind": "행복주택", "cat": "small", "name": "북한산두산위브", "gu": "서대문", "addr": "서울특별시 서대문구 홍은동", "approx": [37.593, 126.937], "m2": 33.05, "py": "10.0평", "vac": 2, "wait": 5, "dep": "1억 1,664만", "rent": "43.9만", "notice": "2026 2차", "rank": "일반 추첨", "q": "북한산두산위브", "pick": false}, {"kind": "행복주택", "cat": "small", "name": "대치르엘", "gu": "강남", "addr": "서울특별시 강남구 도곡로93길 23", "approx": [37.5, 127.06], "m2": 35.96, "py": "10.9평", "vac": 0, "wait": 4, "dep": "1억 2,168만", "rent": "48.6만", "notice": "2026 1차", "rank": "예비만", "q": "대치르엘", "pick": false}, {"kind": "행복주택", "cat": "small", "name": "고덕온빛채", "gu": "강동", "addr": "서울특별시 강동구 아리수로 385", "approx": [37.56, 127.165], "m2": 29.46, "py": "8.9평", "vac": 0, "wait": 12, "dep": "8,568만", "rent": "34.3만", "notice": "2026 1차", "rank": "예비만", "q": "고덕온빛채", "pick": false}, {"kind": "행복주택", "cat": "big", "name": "고덕온빛채", "gu": "강동", "addr": "서울특별시 강동구 아리수로 385", "approx": [37.56, 127.165], "m2": 36.62, "py": "11.1평", "vac": 7, "wait": 14, "dep": "1억 584만", "rent": "42.3만", "notice": "2026 2차", "rank": "일반 추첨", "q": "고덕온빛채", "pick": true}, {"kind": "행복주택", "cat": "big", "name": "강동리엔파크14단지", "gu": "강동", "addr": "서울특별시 강동구 고덕로98길 160", "approx": [37.555, 127.172], "m2": 36.87, "py": "11.2평", "vac": 3, "wait": 9, "dep": "1억 440만", "rent": "41.8만", "notice": "2026 2차", "rank": "일반 추첨", "q": "강동리엔파크14단지", "pick": true}, {"kind": "행복주택", "cat": "small", "name": "강동리엔파크11단지", "gu": "강동", "addr": "서울특별시 강동구 고덕로98길 101", "approx": [37.556, 127.168], "m2": 29.99, "py": "9.1평", "vac": 0, "wait": 6, "dep": "8,496만", "rent": "34.0만", "notice": "2026 2차", "rank": "예비만", "q": "강동리엔파크11단지", "pick": false}, {"kind": "행복주택", "cat": "small", "name": "푸르내", "gu": "강동", "addr": "", "approx": null, "m2": 28.14, "py": "8.5평", "vac": 0, "wait": 8, "dep": "8,001만", "rent": "26.0만", "notice": "2026 1차", "rank": "예비만", "q": "푸르내 행복주택 강동구", "pick": false}, {"kind": "행복주택", "cat": "big", "name": "왕십리자이", "gu": "성동", "addr": "서울특별시 성동구 하왕십리동", "approx": [37.564, 127.03], "m2": 38.19, "py": "11.6평", "vac": 3, "wait": 11, "dep": "1억 4,436만", "rent": "59.6만", "notice": "2026 2차", "rank": "일반 추첨", "q": "왕십리자이", "pick": false}, {"kind": "행복주택", "cat": "big", "name": "서울숲리버뷰자이", "gu": "성동", "addr": "서울특별시 성동구 행당동", "approx": [37.556, 127.038], "m2": 36.06, "py": "10.9평", "vac": 2, "wait": 5, "dep": "1억 4,553만", "rent": "58.2만", "notice": "2026 2차", "rank": "일반 추첨", "q": "서울숲리버뷰자이", "pick": false}, {"kind": "행복주택", "cat": "small", "name": "꿈의숲코오롱하늘채", "gu": "성북", "addr": "서울특별시 성북구 돌곶이로 220", "approx": [37.615, 127.047], "m2": 32.22, "py": "9.7평", "vac": 4, "wait": 10, "dep": "9,540만", "rent": "37.4만", "notice": "2026 1차", "rank": "일반 추첨", "q": "꿈의숲코오롱하늘채", "pick": false}, {"kind": "행복주택", "cat": "small", "name": "래미안길음센터피스", "gu": "성북", "addr": "서울특별시 성북구 숭인로 50", "approx": [37.605, 127.023], "m2": 33.46, "py": "10.1평", "vac": 0, "wait": 8, "dep": "1억 1,808만", "rent": "45.1만", "notice": "2026 1차", "rank": "예비만", "q": "래미안길음센터피스", "pick": false}, {"kind": "행복주택", "cat": "big", "name": "꿈의숲아이파크", "gu": "성북", "addr": "서울특별시 성북구 돌곶이로40길 46", "approx": [37.616, 127.052], "m2": 39.0, "py": "11.8평", "vac": 6, "wait": 38, "dep": "1억 2,348만", "rent": "47.0만", "notice": "2026 1차", "rank": "일반 추첨", "q": "꿈의숲아이파크", "pick": false}, {"kind": "행복주택", "cat": "small", "name": "보문파크뷰자이", "gu": "성북", "addr": "서울특별시 성북구 보문동", "approx": [37.586, 127.02], "m2": 29.96, "py": "9.1평", "vac": 3, "wait": 15, "dep": "1억 1,664만", "rent": "43.3만", "notice": "2026 2차", "rank": "일반 추첨", "q": "보문파크뷰자이", "pick": false}, {"kind": "행복주택", "cat": "big", "name": "래미안장위퍼스트하이", "gu": "성북", "addr": "서울특별시 성북구 한천로 713", "approx": [37.613, 127.058], "m2": 36.14, "py": "10.9평", "vac": 7, "wait": 13, "dep": "9,936만", "rent": "39.0만", "notice": "2026 2차", "rank": "일반 추첨", "q": "래미안장위퍼스트하이", "pick": true}, {"kind": "행복주택", "cat": "big", "name": "장위자이레디언트", "gu": "성북", "addr": "서울특별시 성북구 장위동", "approx": [37.617, 127.045], "m2": 39.91, "py": "12.1평", "vac": 5, "wait": 14, "dep": "1억 962만", "rent": "42.0만", "notice": "2026 2차", "rank": "일반 추첨", "q": "장위자이레디언트", "pick": true}, {"kind": "행복주택", "cat": "big", "name": "창경궁롯데캐슬시그니처", "gu": "성북", "addr": "서울특별시 성북구 삼선동2가 296", "approx": [37.588, 127.008], "m2": 39.39, "py": "11.9평", "vac": 30, "wait": 0, "dep": "1억 2,096만", "rent": "46.3만", "notice": "2026 2차", "rank": "일반 추첨", "q": "창경궁롯데캐슬시그니처", "pick": true}, {"kind": "행복주택", "cat": "big", "name": "송파시그니처롯데캐슬", "gu": "송파", "addr": "서울특별시 송파구 거마로 56", "approx": [37.495, 127.145], "m2": 39.9, "py": "12.1평", "vac": 0, "wait": 2, "dep": "1억 2,168만", "rent": "44.5만", "notice": "2026 1차", "rank": "예비만", "q": "송파시그니처롯데캐슬", "pick": false}, {"kind": "행복주택", "cat": "small", "name": "e편한세상송파파크센트럴", "gu": "송파", "addr": "서울특별시 송파구 오금로 551", "approx": [37.497, 127.14], "m2": 34.93, "py": "10.6평", "vac": 3, "wait": 9, "dep": "1억 2,564만", "rent": "44.3만", "notice": "2026 1차", "rank": "일반 추첨", "q": "e편한세상송파파크센트럴", "pick": false}, {"kind": "행복주택", "cat": "big", "name": "용산롯데캐슬센터포레", "gu": "용산", "addr": "서울특별시 용산구 백범로 313", "approx": [37.546, 126.962], "m2": 38.17, "py": "11.5평", "vac": 0, "wait": 7, "dep": "1억 6,471만", "rent": "61.6만", "notice": "2026 1차", "rank": "예비만", "q": "용산롯데캐슬센터포레", "pick": false}, {"kind": "행복주택", "cat": "big", "name": "용산센트럴파크 헤링턴스퀘어", "gu": "용산", "addr": "서울특별시 용산구 서빙고로 17", "approx": [37.527, 126.962], "m2": 40.67, "py": "12.3평", "vac": 2, "wait": 23, "dep": "1억 7,784만", "rent": "75.6만", "notice": "2026 1차", "rank": "일반 추첨", "q": "용산센트럴파크 헤링턴스퀘어", "pick": false}, {"kind": "행복주택", "cat": "big", "name": "경희궁자이", "gu": "종로", "addr": "서울특별시 종로구 송월길 130", "approx": [37.571, 126.962], "m2": 39.06, "py": "11.8평", "vac": 4, "wait": 21, "dep": "1억 3,910만", "rent": "54.5만", "notice": "2026 1차", "rank": "일반 추첨", "q": "경희궁자이", "pick": false}, {"kind": "행복주택", "cat": "big", "name": "신내 글로리움", "gu": "중랑", "addr": "서울특별시 중랑구 신내로 208", "approx": [37.61, 127.1], "m2": 36.36, "py": "11.0평", "vac": 0, "wait": 28, "dep": "7,056만", "rent": "25.3만", "notice": "2026 1차", "rank": "예비만", "q": "신내글로리움", "pick": true}, {"kind": "행복주택", "cat": "small", "name": "신내3-3 도시형생활주택", "gu": "중랑", "addr": "서울특별시 중랑구 신내역로1길 142", "approx": [37.614, 127.103], "m2": 29.84, "py": "9.0평", "vac": 0, "wait": 12, "dep": "5,976만", "rent": "25.9만", "notice": "2026 1차", "rank": "예비만", "q": "신내우디안3단지", "pick": false}, {"kind": "행복주택", "cat": "small", "name": "신내3-4 도시형생활주택", "gu": "중랑", "addr": "서울특별시 중랑구 신내역로 160", "approx": [37.615, 127.105], "m2": 31.85, "py": "9.6평", "vac": 0, "wait": 30, "dep": "5,832만", "rent": "24.3만", "notice": "2026 1차", "rank": "예비만", "q": "신내우디안4단지", "pick": false}, {"kind": "행복주택", "cat": "big", "name": "래미안베라힐즈", "gu": "은평", "addr": "서울특별시 은평구 통일로 630", "approx": [37.603, 126.93], "m2": 38.28, "py": "11.6평", "vac": 27, "wait": 38, "dep": "1억 3,248만", "rent": "53.0만", "notice": "2026 2차", "rank": "일반 추첨", "q": "래미안베라힐즈", "pick": false}, {"kind": "행복주택", "cat": "big", "name": "은뜨락", "gu": "은평", "addr": "서울특별시 은평구 통일로 972", "approx": [37.64, 126.922], "m2": 39.49, "py": "11.9평", "vac": 25, "wait": 41, "dep": "9,720만", "rent": "38.9만", "notice": "2026 2차", "rank": "일반 추첨", "q": "은평구 통일로 972", "pick": true}, {"kind": "행복주택", "cat": "big", "name": "힐스테이트녹번역", "gu": "은평", "addr": "서울특별시 은평구 응암동", "approx": [37.602, 126.924], "m2": 39.12, "py": "11.8평", "vac": 6, "wait": 10, "dep": "1억 1,652만", "rent": "40.6만", "notice": "2026 2차", "rank": "일반 추첨", "q": "힐스테이트녹번역", "pick": true}, {"kind": "행복주택", "cat": "big", "name": "백련산해모로", "gu": "은평", "addr": "서울특별시 은평구 응암동", "approx": [37.598, 126.918], "m2": 39.1, "py": "11.8평", "vac": 3, "wait": 5, "dep": "1억 836만", "rent": "43.1만", "notice": "2026 2차", "rank": "일반 추첨", "q": "백련산해모로", "pick": false}, {"kind": "행복주택", "cat": "big", "name": "DMCSK뷰", "gu": "은평", "addr": "서울특별시 은평구 수색동", "approx": [37.585, 126.895], "m2": 38.74, "py": "11.7평", "vac": 1, "wait": 3, "dep": "8,751만", "rent": "32.0만", "notice": "2026 2차", "rank": "일반 추첨", "q": "DMC SK뷰", "pick": false}, {"kind": "국민임대", "cat": "kook", "name": "마곡엠밸리 1~15단지", "gu": "강서", "addr": "서울특별시 강서구 마곡서1로 131", "approx": [37.571, 126.84], "info": "49㎡ 2025: 29호(공가 5·예비 24) 5,564만·38.0만 / 2026: 일반 없음 · 59㎡ 2025: 40호(예비) 5,770만·37.6만", "rank": "강서 거주 1순위 (49㎡)", "q": "마곡엠밸리", "pick": true}, {"kind": "국민임대", "cat": "kook", "name": "마곡지구 9단지", "gu": "강서", "addr": "서울특별시 강서구 공항대로 103", "approx": [37.566, 126.826], "info": "49㎡ 2025: 4호(예비) 5,799만·31.9만 / 2026: 주거약자만", "rank": "강서 거주 1순위 (49㎡)", "q": "마곡엠밸리9단지", "pick": true}, {"kind": "국민임대", "cat": "kook", "name": "마곡수명산파크 1~7단지", "gu": "강서", "addr": "서울특별시 강서구 강서로47길 108", "approx": [37.551, 126.837], "info": "39㎡ 2025: 18호(예비) 2,451만·22.2만 · 49㎡ 2025: 22호(공가 4) 3,674~3,900만·26.2~28.7만 · 59㎡ 2025: 27호(공가 11) / 2026: 40호(공가 40) 4,002~4,323만·29.3~32.2만", "rank": "강서 거주 1순위 (49㎡) · 59㎡는 청약 1순위", "q": "마곡수명산파크", "pick": true}, {"kind": "국민임대", "cat": "kook", "name": "신정이펜하우스 1~5단지", "gu": "양천", "addr": "서울특별시 양천구 신정이펜1로 99", "approx": [37.514, 126.845], "info": "49㎡ 2025: 12호(예비) 4,007만·30.4만 / 2026: 주거약자만 · 59㎡ 2025: 50호(공가 5) 4,715만·34.4만 / 2026: 58호(공가 14) 4,715~5,864만", "rank": "연접구(강서) 1순위 (49㎡)", "q": "신정이펜하우스", "pick": true}, {"kind": "국민임대", "cat": "kook", "name": "상암월드컵파크 9~12단지", "gu": "마포", "addr": "서울특별시 마포구 월드컵북로 501", "approx": [37.58, 126.89], "info": "49㎡ 2025: 18호(예비) 4,740만·32.8만 / 2026: 주거약자만 · 59㎡ 2025: 29호(공가 5) 5,702만·37.8만 / 2026: 15호(예비)", "rank": "연접구(강서) 1순위 (49㎡)", "q": "상암월드컵파크", "pick": true}, {"kind": "국민임대", "cat": "kook", "name": "천왕이펜하우스 1~6단지", "gu": "구로", "addr": "서울특별시 구로구 천왕로 91", "approx": [37.485, 126.839], "info": "49㎡ 2026: 48호(공가 8) 4,371~4,912만·32.5~35.0만 · 59㎡ 2026: 62호(공가 22) 5,190~5,993만", "rank": "강서는 2순위 (49㎡) · 59㎡는 청약 1순위", "q": "천왕이펜하우스", "pick": true}, {"kind": "국민임대", "cat": "kook", "name": "천왕연지타운 1,2단지", "gu": "구로", "addr": "서울특별시 구로구 오류로 30", "approx": [37.489, 126.836], "info": "49㎡ 2026: 24호(예비) 5,439~6,190만 · 59㎡ 2026: 36호(공가 2) 6,514~7,645만", "rank": "강서는 2순위 (49㎡)", "q": "천왕연지타운", "pick": true}, {"kind": "국민임대", "cat": "kook", "name": "항동하버라인 2·3·4·8단지", "gu": "구로", "addr": "서울특별시 구로구 연동로 234", "approx": [37.48, 126.824], "info": "49㎡ 2026: 14호(예비) 5,165~5,837만·32.3~35.2만 · 59㎡ 2026: 41호(공가 6) 5,974~6,644만", "rank": "강서는 2순위 (49㎡)", "q": "항동하버라인", "pick": true}];
+(function(){
+  var s = document.createElement('script');
+  s.src = 'https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=' + encodeURIComponent(NCP_KEY_ID) + '&submodules=geocoder';
+  // geocoder 서브모듈은 maps.js 뒤에 비동기로 붙으므로 Service가 준비된 뒤에 시작
+  s.onload = function(){
+    var started = false, start = function(){ if (started) return; started = true; nmInit(); };
+    if (window.naver && naver.maps) { if (naver.maps.Service) return start(); naver.maps.onJSContentLoaded = start; }
+    var tries = 0, t = setInterval(function(){ if (window.naver && naver.maps && naver.maps.Service) { clearInterval(t); start(); } else if (++tries > 100) { clearInterval(t); nmFail('Geocoding 모듈을 못 불러왔습니다. 콘솔에서 Application에 Geocoding이 체크돼 있는지 확인.'); } }, 100);
+  };
+  s.onerror = function(){ nmFail('지도 스크립트를 못 불러왔습니다. 인터넷 연결과 ncpKeyId 값을 확인하세요.'); };
+  document.head.appendChild(s);
+})();
+function nmFail(html){ var m = document.getElementById('nm-msg'); m.innerHTML = '<p>' + html + '</p>'; m.hidden = false; }
+window.navermap_authFailure = function(){
+  nmFail('<b>네이버지도 인증 실패.</b> 네이버 클라우드 콘솔 → Maps → Application → 인증 정보 → 서비스 환경의 Web 서비스 URL에 <code>' + location.protocol + '//' + location.hostname + '</code> 이 (포트·경로 없이) 등록돼 있는지, Dynamic Map이 체크돼 있는지 확인. 등록 직후엔 몇 분 걸릴 수 있음.');
+};
+var nmMap, nmMarkers = [], nmInfo, nmByName = {}, nmCache = {};
+try { nmCache = JSON.parse(localStorage.getItem('geocache-v1') || '{}'); } catch(e) {}
+function nmGeocode(addr, cb){
+  if (!addr) return cb(null);
+  if (nmCache[addr]) return cb(nmCache[addr]);
+  naver.maps.Service.geocode({ query: addr }, function(status, response){
+    if (status !== naver.maps.Service.Status.OK) return cb(null);
+    var a = response.v2 && response.v2.addresses; if (!a || !a.length) return cb(null);
+    var pt = [parseFloat(a[0].y), parseFloat(a[0].x)]; nmCache[addr] = pt;
+    try { localStorage.setItem('geocache-v1', JSON.stringify(nmCache)); } catch(e) {}
+    cb(pt);
+  });
+}
+function nmColor(p){ return p.cat === 'pri' ? '#1d8a4e' : p.cat === 'big' ? '#1f5fbf' : p.cat === 'kook' ? '#c97a00' : '#8a94a3'; }
+function nmIcon(p, approx){
+  var size = p.cat === 'small' ? 11 : 16;
+  return { content: '<div class="nm-mk' + (p.cat === 'small' ? ' sm' : '') + (p.cat === 'kook' ? ' sq' : '') + (approx ? ' ap' : '') + '" style="background:' + nmColor(p) + '" title="' + p.name + '"></div>', anchor: new naver.maps.Point(size/2, size/2) };
+}
+function nmHtml(p, approx){
+  var nav = 'https://map.naver.com/p/search/' + encodeURIComponent(p.q || p.name);
+  var body = p.kind === '행복주택'
+    ? '<div><span class="k">전용</span> ' + p.m2 + '㎡ (' + p.py + ') · <span class="k">공가</span> ' + p.vac + (p.wait ? ' · <span class="k">예비</span> ' + p.wait : '') + '</div><div><span class="k">보증금</span> ' + p.dep + ' · <span class="k">월</span> ' + p.rent + ' <span class="k">(청년 소득있음, ' + p.notice + ')</span></div>'
+    : '<div>' + p.info + '</div>';
+  return '<div class="nm-iw"><b>' + p.name + '</b> <span class="k">' + p.kind + '</span><br>' + body + '<div><span class="k">내 순위</span> ' + p.rank + '</div><div class="k" style="margin-top:4px">' + (p.addr || '') + (approx ? ' · <b style="color:#c23c3c">근사 위치</b>' : '') + '</div><div style="margin-top:6px"><a href="' + nav + '" target="_blank" rel="noopener">네이버지도 앱에서 열기 · 길찾기</a></div></div>';
+}
+function nmFocus(name){
+  var key = name.replace(/\s*\(.*?\)/g, '').replace(/\s+/g, '');
+  var mk = nmByName[key]; if (!mk) return false;
+  document.getElementById('navermap').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  setTimeout(function(){ nmMap.setZoom(15, true); nmMap.panTo(mk.getPosition()); nmInfo.setContent(nmHtml(mk.__p, mk.__approx)); nmInfo.open(nmMap, mk); }, 350);
+  return true;
+}
+function nmInit(){
+  if (!window.naver || !naver.maps) return;
+  nmMap = new naver.maps.Map('nmap', { center: new naver.maps.LatLng(37.565, 126.93), zoom: 11, zoomControl: true, zoomControlOptions: { position: naver.maps.Position.TOP_LEFT } });
+  nmInfo = new naver.maps.InfoWindow({ borderWidth: 0, backgroundColor: 'transparent', disableAnchor: true, pixelOffset: new naver.maps.Point(0, -6) });
+  var status = document.getElementById('nm-status');
+  [HOME, WORK].forEach(function(h){
+    nmGeocode(h.addr, function(pt){ var p = pt || h.approx;
+      new naver.maps.Marker({ map: nmMap, position: new naver.maps.LatLng(p[0], p[1]), zIndex: 50, icon: { content: '<div class="nm-home" title="' + h.label + '">' + (h.label === '집' ? '🏠' : '💼') + '</div>', anchor: new naver.maps.Point(11, 22) } });
+    });
+  });
+  var i = 0, done = 0, approxN = 0;
+  function next(){
+    if (i >= PLACES.length) { status.textContent = PLACES.length + '곳 표시' + (approxN ? ' (' + approxN + '곳 근사)' : ''); applyFilter(); return; }
+    var p = PLACES[i++];
+    nmGeocode(p.addr, function(pt){
+      var approx = !pt, pos = pt || p.approx;
+      if (pos) {
+        if (approx) approxN++;
+        var mk = new naver.maps.Marker({ map: nmMap, position: new naver.maps.LatLng(pos[0], pos[1]), icon: nmIcon(p, approx), zIndex: p.pick ? 20 : 10 });
+        mk.__p = p; mk.__approx = approx; nmMarkers.push(mk);
+        nmByName[p.name.replace(/\s+/g, '')] = nmByName[p.name.replace(/\s+/g, '')] || mk;
+        naver.maps.Event.addListener(mk, 'click', function(){ nmInfo.setContent(nmHtml(p, approx)); nmInfo.open(nmMap, mk); });
+      }
+      done++; status.textContent = done + ' / ' + PLACES.length + ' 좌표 변환 중…';
+      setTimeout(next, nmCache[p.addr] ? 0 : 80);
+    });
+  }
+  next();
+  function applyFilter(){
+    var on = {}; document.querySelectorAll('.nmbar input[data-cat]').forEach(function(c){ on[c.dataset.cat] = c.checked; });
+    nmMarkers.forEach(function(mk){ mk.setMap(on[mk.__p.cat] ? nmMap : null); });
+  }
+  document.querySelectorAll('.nmbar input[data-cat]').forEach(function(c){ c.addEventListener('change', applyFilter); });
+  naver.maps.Event.addListener(nmMap, 'click', function(){ nmInfo.close(); });
+  // 표·카드의 단지 이름 옆에 ↑ (이 지도에서 보기)
+  document.querySelectorAll('#where a.map').forEach(function(a){
+    var holder = a.parentNode; if (holder.tagName === 'P') return;
+    var nameEl = holder.querySelector('b') || holder;
+    var name = (nameEl === holder ? holder.textContent : nameEl.textContent).replace(/지도/g, '').trim();
+    if (holder.tagName === 'H3') name = holder.childNodes[0].textContent.trim();
+    var b = document.createElement('a'); b.className = 'map2'; b.textContent = '↑'; b.title = '이 지도에서 보기';
+    b.addEventListener('click', function(ev){ ev.preventDefault(); if (!nmFocus(name)) alert('지도에 아직 표시되지 않은 단지입니다.'); });
+    a.after(b);
+  });
+}
+</script>
+
+
+</body>
+</html>
