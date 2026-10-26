@@ -224,14 +224,35 @@ main section.view{margin-top:0}
 .lst .it b{display:block;font-weight:600}
 .lst .it small{color:var(--muted)}
 .lst .it .num{font-family:var(--font-mono);font-size:12px;white-space:nowrap;text-align:right}
-.nm-mk{width:20px;height:20px;border:2.5px solid #fff;box-shadow:0 0 0 1.5px rgba(0,0,0,.35),0 2px 6px rgba(0,0,0,.45)}
+.nm-mk{width:20px;height:20px;background:var(--c);border:2.5px solid #fff;box-shadow:0 0 0 1.5px rgba(0,0,0,.35),0 2px 6px rgba(0,0,0,.45)}
 .nm-mk.sm{width:14px;height:14px}
 .nm-mk.sq{border-radius:4px}
+.nm-mk.hl{background:#fff;box-shadow:inset 0 0 0 4.5px var(--c),0 0 0 1.5px rgba(0,0,0,.35),0 2px 6px rgba(0,0,0,.45)}
+.dot{background:var(--c)}.dot.sm{width:10px;height:10px}
+.dot.hl{background:#fff;box-shadow:inset 0 0 0 3px var(--c),0 0 0 1px rgba(0,0,0,.25)}
 .nm-home{font-size:26px}
-.nm-sel{position:relative;width:26px;height:26px;border-radius:50%;background:#c23c3c;border:3px solid #fff;box-shadow:0 0 0 3px #c23c3c,0 4px 12px rgba(0,0,0,.45)}
-.nm-sel::after{content:"";position:absolute;inset:-14px;border-radius:50%;border:3px solid #c23c3c;animation:nmpulse 1.4s ease-out infinite}
+.nm-iw{min-width:270px;max-width:min(372px,calc(100vw - 24px));padding:12px 14px 12px}
+.nm-iw table{min-width:0;width:100%;font-size:inherit;border-collapse:collapse;display:table}
+.nm-iw th,.nm-iw td{border:0;padding:0;background:none;letter-spacing:0;font-size:inherit;color:inherit}
+.iw-h{display:flex;gap:8px;align-items:center;margin-bottom:8px;padding-right:22px;position:relative}
+.iw-h b{font-size:15px;line-height:1.3}
+.iw-x{position:absolute;right:-6px;top:-4px;width:26px;height:26px;border:0;background:transparent;color:#5f6b7a;font-size:20px;line-height:1;cursor:pointer}
+.iw-t{border-collapse:collapse;width:100%;font-size:13px;line-height:1.45}
+.iw-t th{color:#5f6b7a;font-weight:500;text-align:left;padding:3px 10px 3px 0;white-space:nowrap;vertical-align:top;width:50px}
+.iw-t td{padding:3px 0;vertical-align:top}
+.iw-k th,.iw-k td{border-bottom:1px solid #eef1f5;padding:5px 8px 5px 0;font-size:12.5px;line-height:1.4;vertical-align:top;white-space:nowrap}
+.iw-k th{width:34px;padding-right:6px}
+.iw-k tr:first-child th{color:#5f6b7a;font-weight:600;font-size:12px}
+.iw-k td small{color:#5f6b7a}
+.iw-t2{margin-top:7px}
+.iw-f{margin-top:10px;display:flex;flex-direction:column;gap:7px}
+.iw-btn{display:block;background:#1f5fbf;color:#fff !important;text-decoration:none;padding:8px 10px;border-radius:8px;font-weight:600;font-size:13px;text-align:center}
+.nm-sel{--c:#D32F2F;position:relative;width:26px;height:26px;border-radius:50%;background:var(--c);border:3px solid #fff;box-shadow:0 0 0 3px var(--c),0 4px 12px rgba(0,0,0,.45)}
+.nm-sel.sq{border-radius:7px}
+.nm-sel.hl{background:#fff;box-shadow:inset 0 0 0 5px var(--c),0 0 0 3px var(--c),0 4px 12px rgba(0,0,0,.45)}
+.nm-sel::after{content:"";position:absolute;inset:-14px;border-radius:50%;border:3px solid var(--c);animation:nmpulse 1.4s ease-out infinite}
 @keyframes nmpulse{from{transform:scale(.55);opacity:.9}to{transform:scale(1.5);opacity:0}}
-.nm-sel b{position:absolute;left:34px;top:0;white-space:nowrap;background:#fff;color:#1b2330;padding:3px 9px;border-radius:7px;font-size:13px;font-weight:700;box-shadow:0 1px 5px rgba(0,0,0,.35);border:1px solid #c23c3c}
+.nm-sel b{position:absolute;left:34px;top:0;white-space:nowrap;background:#fff;color:#1b2330;padding:3px 9px;border-radius:7px;font-size:13px;font-weight:700;box-shadow:0 1px 5px rgba(0,0,0,.35);border:1px solid var(--c)}
 @media (prefers-reduced-motion:reduce){.nm-sel::after{animation:none}}
 .lock{max-width:420px;margin:40px auto;padding:22px 22px;border:1px solid var(--line);border-radius:14px;background:var(--surface)}
 .lock input[type=password]{width:100%;font-size:16px;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--fg)}
@@ -266,10 +287,10 @@ main section.view{margin-top:0}
     <aside class="side" id="side">
       <div class="handle" id="sheet-handle"><i></i><small id="sheet-hint">끌어올리면 목록, 내리면 지도</small></div>
       <div class="nmbar">
-        <label><input type="checkbox" data-cat="pri" checked> <span class="dot" style="background:#1d8a4e"></span> 우선 1순위</label>
-        <label><input type="checkbox" data-cat="big" checked> <span class="dot" style="background:#1f5fbf"></span> 36㎡↑</label>
-        <label><input type="checkbox" data-cat="small"> <span class="dot" style="background:#8a94a3"></span> 27~35㎡</label>
-        <label><input type="checkbox" data-cat="kook" checked> <span class="dot sq" style="background:#c97a00"></span> 국민임대</label>
+        <label><input type="checkbox" data-cat="pri" checked> <span class="dot" style="--c:#D32F2F"></span> 우선 1순위</label>
+        <label><input type="checkbox" data-cat="big" checked> <span class="dot hl" style="--c:#D32F2F"></span> 36㎡↑ 일반</label>
+        <label><input type="checkbox" data-cat="small"> <span class="dot sm" style="--c:#8a94a3"></span> 27~35㎡</label>
+        <label><input type="checkbox" data-cat="kook" checked> <span class="dot sq" style="--c:#6A1B9A"></span> 국민임대</label>
         <span id="nm-status" class="src"></span>
       </div>
       <div class="nmbar" style="border-top:0;padding-top:0"><label style="gap:8px">공고 <select id="nm-notice" style="font:inherit;padding:4px 6px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--fg)"><option value="">전체 (2026년 공고 3건)</option></select></label></div>
@@ -673,6 +694,17 @@ var NOTICES = {
 var GEO = {"서울특별시 강남구 도곡로93길 23": [37.5016378, 127.0643183], "서울특별시 강동구 고덕로98길 101": [37.5536908, 127.1810099], "서울특별시 강동구 고덕로98길 160": [37.55109, 127.1808371], "서울특별시 강동구 아리수로 385": [37.563558, 127.1708598], "서울특별시 강서구 강서로47길 108": [37.554396, 126.8304907], "서울특별시 강서구 개화동로21길 22": [37.5715237, 126.8052649], "서울특별시 강서구 공항대로 103": [37.5620748, 126.8188663], "서울특별시 강서구 마곡동": [37.5738, 126.8304], "서울특별시 강서구 마곡서1로 131": [37.568223, 126.8185922], "서울특별시 구로구 금오로 882": [37.4765171, 126.8424795], "서울특별시 구로구 연동로 234": [37.4819908, 126.8222459], "서울특별시 구로구 오류로 30": [37.4865503, 126.8401816], "서울특별시 구로구 오류로 36-13": [37.4881679, 126.8413064], "서울특별시 구로구 오리로1102-13": [37.4846986, 126.8424192], "서울특별시 구로구 천왕로 21": [37.4793253, 126.8396029], "서울특별시 구로구 천왕로 91": [37.4861496, 126.8373501], "서울특별시 구로구 항동로 68": [37.4804044, 126.8261707], "서울특별시 동대문구": [37.574524, 127.03965], "서울특별시 동대문구 무학로 91": [37.5717, 127.0296134], "서울특별시 동대문구 이문로 120": [37.5984489, 127.0627196], "서울특별시 마포구 공덕동": [37.550192, 126.960025], "서울특별시 마포구 신촌로28길 50": [37.5557061, 126.9504721], "서울특별시 마포구 염리동": [37.547083, 126.94565], "서울특별시 마포구 월드컵북로 501": [37.5834737, 126.8788291], "서울특별시 서대문구 거북골로 100": [37.5760198, 126.9174905], "서울특별시 서대문구 북아현로1길 17": [37.5585018, 126.9553187], "서울특별시 서대문구 이화여대8길 123": [37.5620235, 126.9507477], "서울특별시 서대문구 통일로 395": [37.5850065, 126.9464416], "서울특별시 서대문구 홍은동": [37.598906, 126.947111], "서울특별시 성동구 하왕십리동": [37.564158, 127.02875], "서울특별시 성동구 행당동": [37.558567, 127.036188], "서울특별시 성북구 돌곶이로 220": [37.6193971, 127.0466285], "서울특별시 성북구 돌곶이로40길 46": [37.6186754, 127.0479889], "서울특별시 성북구 보문동": [37.580383, 127.0228], "서울특별시 성북구 삼선동2가 296": [37.5841217, 127.0102984], "서울특별시 성북구 숭인로 50": [37.6116278, 127.0271556], "서울특별시 성북구 장위동": [37.614124, 127.043713], "서울특별시 성북구 한천로 713": [37.6205164, 127.0521463], "서울특별시 송파구 거마로 56": [37.4958289, 127.1478303], "서울특별시 송파구 오금로 551": [37.4938203, 127.1501461], "서울특별시 양천구 남부순환로83길 18": [37.5156324, 126.8419542], "서울특별시 양천구 신정로7길 75": [37.5130488, 126.8340791], "서울특별시 양천구 신정이펜1로 99": [37.5148504, 126.827324], "서울특별시 영등포구 국회대로54길 10": [37.5238292, 126.9074456], "서울특별시 용산구 백범로 313": [37.5400414, 126.963526], "서울특별시 용산구 서빙고로 17": [37.5257664, 126.9678526], "서울특별시 은평구 수색동": [37.583519, 126.893666], "서울특별시 은평구 응암동": [37.600688, 126.926813], "서울특별시 은평구 통일로 630": [37.6039943, 126.936473], "서울특별시 은평구 통일로 972": [37.6297939, 126.9200535], "서울특별시 종로구 송월길 130": [37.571907, 126.963564], "서울특별시 중랑구 신내로 208": [37.6170001, 127.0931176], "서울특별시 중랑구 신내역로 160": [37.616706, 127.1119472], "서울특별시 중랑구 신내역로1길 142": [37.6176622, 127.110353]};  // 네이버 Geocoding 결과 (2026-10-26)
 PLACES.forEach(function(p){ p.nid = p.kind === '국민임대' ? 'K26' : (/2차/.test(p.notice || '') ? 'H26-2' : 'H26-1'); if (GEO[p.addr]) { p.ll = GEO[p.addr]; p.dong = !/\d/.test(p.addr); } });
 [HOME, WORK].forEach(function(h){ if (GEO[h.addr]) h.ll = GEO[h.addr]; });
+var KOOK_ROWS = {
+  '마곡엠밸리 1~15단지': [['49㎡','29호 · 공가 5 · 예비 24<br>5,564만<br>월 38.0만','일반 없음<br><small>주거약자 6호만</small>'],['59㎡','40호 · 예비<br>5,770만<br>월 37.6만','없음']],
+  '마곡지구 9단지': [['49㎡','4호 · 예비<br>5,799만<br>월 31.9만','일반 없음<br><small>주거약자만</small>']],
+  '마곡수명산파크 1~7단지': [['39㎡','18호 · 예비<br>2,451만<br>월 22.2만','없음'],['49㎡','22호 · 공가 4 · 예비 18<br>3,674~3,900만<br>월 26.2~28.7만','없음'],['59㎡','27호 · 공가 11<br>4,002~4,323만<br>월 29.3~32.2만','<b>40호 · 공가 40</b><br>4,002~4,323만<br>월 29.3~32.2만']],
+  '신정이펜하우스 1~5단지': [['49㎡','12호 · 예비<br>4,007만<br>월 30.4만','일반 없음<br><small>주거약자만</small>'],['59㎡','50호 · 공가 5<br>4,715만<br>월 34.4만','58호 · 공가 14<br>4,715~5,864만<br>월 34.4~39.4만']],
+  '상암월드컵파크 9~12단지': [['49㎡','18호 · 예비<br>4,740만<br>월 32.8만','일반 없음<br><small>주거약자만</small>'],['59㎡','29호 · 공가 5<br>5,702만<br>월 37.8만','15호 · 예비<br>5,702~6,509만']],
+  '천왕이펜하우스 1~6단지': [['49㎡','<small>정리 안 함</small>','48호 · 공가 8<br>4,371~4,912만<br>월 32.5~35.0만'],['59㎡','<small>정리 안 함</small>','62호 · 공가 22<br>5,190~5,993만']],
+  '천왕연지타운 1,2단지': [['49㎡','<small>정리 안 함</small>','24호 · 예비<br>5,439~6,190만'],['59㎡','<small>정리 안 함</small>','36호 · 공가 2<br>6,514~7,645만']],
+  '항동하버라인 2·3·4·8단지': [['49㎡','<small>정리 안 함</small>','14호 · 예비<br>5,165~5,837만<br>월 32.3~35.2만'],['59㎡','<small>정리 안 함</small>','41호 · 공가 6<br>5,974~6,644만']]
+};
+function rankPill(r){ var cls = /우선 1순위|거주 1순위|연접구/.test(r) ? 'ok' : (/2순위|예비만/.test(r) ? 'warn' : 'info'); return '<span class="pill ' + cls + '">' + r + '</span>'; }
 function fmtD(s){ return s.slice(5).replace('-', '.'); }
 function noticeStatus(n){
   var today = new Date(); today.setHours(0,0,0,0);
@@ -781,21 +813,41 @@ function nmGeocode(addr, cb){
     cb(pt);
   });
 }
-function nmColor(p){ return p.cat === 'pri' ? '#1d8a4e' : p.cat === 'big' ? '#1f5fbf' : p.cat === 'kook' ? '#c97a00' : '#8a94a3'; }
-function nmIcon(p, approx){ var size = p.cat === 'small' ? 14 : 20; return { content: '<div class="nm-mk' + (p.cat === 'small' ? ' sm' : '') + (p.cat === 'kook' ? ' sq' : '') + (approx ? ' ap' : '') + '" style="background:' + nmColor(p) + '" title="' + p.name + '"></div>', anchor: new naver.maps.Point(size/2, size/2) }; }
+function nmColor(p){ return p.cat === 'kook' ? '#6A1B9A' : p.cat === 'small' ? '#8a94a3' : '#D32F2F'; }
+function nmCls(p){ return (p.cat === 'small' ? ' sm' : '') + (p.cat === 'kook' ? ' sq' : '') + (p.cat === 'big' ? ' hl' : ''); }
+function nmIcon(p, approx){ var size = p.cat === 'small' ? 14 : 20; return { content: '<div class="nm-mk' + nmCls(p) + (approx ? ' ap' : '') + '" style="--c:' + nmColor(p) + '" title="' + p.name + '"></div>', anchor: new naver.maps.Point(size/2, size/2) }; }
 function nmHtml(p, approx){
   var nav = 'https://map.naver.com/p/search/' + encodeURIComponent(p.q || p.name);
-  var body = p.kind === '행복주택'
-    ? '<div><span class="k">전용</span> ' + p.m2 + '㎡ (' + p.py + ') · <span class="k">공가</span> ' + p.vac + (p.wait ? ' · <span class="k">예비</span> ' + p.wait : '') + '</div><div><span class="k">보증금</span> ' + p.dep + ' · <span class="k">월</span> ' + p.rent + ' <span class="k">(청년 소득있음, ' + p.notice + ')</span></div>'
-    : '<div>' + p.info + '</div>';
-  return '<div class="nm-iw"><b>' + p.name + '</b> <span class="k">' + p.kind + '</span><br>' + body + '<div><span class="k">내 순위</span> ' + p.rank + '</div><div><span class="k">공고</span> ' + (p.kind === '국민임대' ? noticeLine('K25') + '<br><span class="k">공고</span> ' + noticeLine('K26') : noticeLine(p.nid)) + '</div><div class="k" style="margin-top:4px">' + (p.addr || '') + (approx ? ' · <b style="color:#c23c3c">동 중심 근사</b>' : '') + '</div><div style="margin-top:6px"><a href="' + nav + '" target="_blank" rel="noopener">네이버지도 앱에서 열기 · 길찾기</a></div></div>';
+  var head = '<div class="iw-h"><b>' + p.name + '</b><span class="pill info">' + p.kind + '</span><button type="button" class="iw-x" onclick="nmInfo.close()" aria-label="닫기">×</button></div>';
+  var body;
+  if (p.kind === '행복주택') {
+    var n = NOTICES[p.nid], s = noticeStatus(n);
+    body = '<table class="iw-t">' +
+      '<tr><th>전용</th><td>' + p.m2 + '㎡ · ' + p.py + '</td></tr>' +
+      '<tr><th>호수</th><td>' + (p.vac ? '공가 <b>' + p.vac + '</b>' : '공가 0') + (p.wait ? ' · 예비 ' + p.wait : '') + '</td></tr>' +
+      '<tr><th>보증금</th><td><b>' + p.dep + '</b></td></tr>' +
+      '<tr><th>월세</th><td><b>' + p.rent + '</b> <small>청년 소득있음 기준</small></td></tr>' +
+      '<tr><th>내 순위</th><td>' + rankPill(p.rank) + '</td></tr>' +
+      '<tr><th>공고</th><td><a href="' + n.url + '" target="_blank" rel="noopener">' + n.name + '</a><br><small>' + s.text + '</small></td></tr>' +
+      '</table>';
+  } else {
+    var rows = KOOK_ROWS[p.name] || [], s25 = noticeStatus(NOTICES.K25), s26 = noticeStatus(NOTICES.K26);
+    body = '<table class="iw-t iw-k"><tr><th></th><th>2025 공고</th><th>2026 공고</th></tr>' +
+      rows.map(function(r){ return '<tr><th>' + r[0] + '</th><td>' + r[1] + '</td><td>' + r[2] + '</td></tr>'; }).join('') + '</table>' +
+      '<table class="iw-t iw-t2">' +
+      '<tr><th>내 순위</th><td>' + rankPill(p.rank) + '</td></tr>' +
+      '<tr><th>공고</th><td><a href="' + NOTICES.K25.url + '" target="_blank" rel="noopener">2025 국민임대</a> · ' + s25.text + '<br><a href="' + NOTICES.K26.url + '" target="_blank" rel="noopener">2026 국민임대</a> · ' + s26.text + '</td></tr>' +
+      '</table>';
+  }
+  var foot = '<div class="iw-f"><small class="k">' + (p.addr || '') + (approx ? ' · 동 중심 근사' : '') + '</small><a class="iw-btn" href="' + nav + '" target="_blank" rel="noopener">네이버지도 앱에서 열기 · 길찾기</a></div>';
+  return '<div class="nm-iw">' + head + body + foot + '</div>';
 }
 function keyOf(name){ return name.replace(/\s*\(.*?\)/g, '').replace(/\s+/g, ''); }
 var nmSelected = null;
 function nmSelect(mk){
   if (nmSelected && nmSelected !== mk) { try { nmSelected.setIcon(nmIcon(nmSelected.__p, nmSelected.__approx)); nmSelected.setZIndex(nmSelected.__p.pick ? 20 : 10); } catch(e) {} }
   nmSelected = mk;
-  try { mk.setIcon({ content: '<div class="nm-sel"><b>' + mk.__p.name + '</b></div>', anchor: new naver.maps.Point(13, 13) }); mk.setZIndex(100); } catch(e) {}
+  try { mk.setIcon({ content: '<div class="nm-sel' + nmCls(mk.__p) + '" style="--c:' + nmColor(mk.__p) + '"><b>' + mk.__p.name + '</b></div>', anchor: new naver.maps.Point(13, 13) }); mk.setZIndex(100); } catch(e) {}
 }
 function nmFocusMarker(mk){
   nmSelect(mk);
@@ -842,7 +894,7 @@ function nmInit(){
         naver.maps.Event.addListener(mk, 'click', function(){ nmFocusMarker(mk); });
         var it = document.createElement('div'); it.className = 'it'; it.dataset.cat = p.cat; it.setAttribute('data-key', k);
         it.setAttribute('data-nid', p.nid);
-        it.innerHTML = '<span class="dot' + (p.cat === 'kook' ? ' sq' : '') + '" style="background:' + nmColor(p) + ';margin-top:3px"></span><div><b>' + p.name + ' <span class="pill info" style="font-size:11px;padding:0 7px">' + (p.kind === '국민임대' ? '25·26년 국민임대' : NOTICES[p.nid].short) + '</span></b><small>' + (p.kind === '행복주택' ? p.m2 + '㎡ ' + p.py + ' · 공가 ' + p.vac + (p.wait ? ' · 예비 ' + p.wait : '') + ' · ' + p.rank : p.rank) + '</small></div><div class="num">' + (p.kind === '행복주택' ? p.dep + '<br>월 ' + p.rent : '') + '</div>';
+        it.innerHTML = '<span class="dot' + nmCls(p) + '" style="--c:' + nmColor(p) + ';margin-top:3px"></span><div><b>' + p.name + ' <span class="pill info" style="font-size:11px;padding:0 7px">' + (p.kind === '국민임대' ? '25·26년 국민임대' : NOTICES[p.nid].short) + '</span></b><small>' + (p.kind === '행복주택' ? p.m2 + '㎡ ' + p.py + ' · 공가 ' + p.vac + (p.wait ? ' · 예비 ' + p.wait : '') + ' · ' + p.rank : p.rank) + '</small></div><div class="num">' + (p.kind === '행복주택' ? p.dep + '<br>월 ' + p.rent : '') + '</div>';
         it.__mk = mk;
         it.addEventListener('click', function(){ nmFocusMarker(mk); });
         var g = groupEl[p.cat]; var ref = g.nextSibling; while (ref && ref.className === 'it') ref = ref.nextSibling; list.insertBefore(it, ref);
