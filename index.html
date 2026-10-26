@@ -702,8 +702,10 @@ document.querySelectorAll('#view-list a.map').forEach(function(a){
   var holder = a.parentNode; if (holder.tagName === 'P') return;
   var nameEl = holder.querySelector('b') || holder;
   var name = (holder.tagName === 'H3') ? holder.childNodes[0].textContent.trim() : nameEl.textContent.replace(/지도/g, '').trim();
+  var tr = a.closest('tr'), m2 = null;
+  if (tr && tr.getAttribute('data-m2')) m2 = parseFloat(tr.getAttribute('data-m2'));
   var b = document.createElement('a'); b.className = 'map2'; b.textContent = '↑'; b.title = '지도 화면에서 보기'; b.href = '#map';
-  b.addEventListener('click', function(ev){ ev.preventDefault(); location.hash = 'map'; setTimeout(function(){ nmFocus(name); }, 60); });
+  b.addEventListener('click', function(ev){ ev.preventDefault(); location.hash = 'map'; setTimeout(function(){ nmFocus(name, m2); }, 60); });
   a.after(b);
 });
 // 가로 스크롤 영역 마우스 드래그
@@ -744,7 +746,7 @@ var sheet = (function(){
 })();
 
 // ===== 네이버지도 =====
-var nmMap, nmMarkers = [], nmInfo, nmByName = {}, nmCache = {};
+var nmMap, nmMarkers = [], nmInfo, nmIndex = {}, nmCache = {};
 try { nmCache = JSON.parse(localStorage.getItem('geocache-v1') || '{}'); } catch(e) {}
 (function(){
   var s = document.createElement('script');
@@ -780,12 +782,21 @@ function nmHtml(p, approx){
   return '<div class="nm-iw"><b>' + p.name + '</b> <span class="k">' + p.kind + '</span><br>' + body + '<div><span class="k">내 순위</span> ' + p.rank + '</div><div><span class="k">공고</span> ' + (p.kind === '국민임대' ? noticeLine('K25') + '<br><span class="k">공고</span> ' + noticeLine('K26') : noticeLine(p.nid)) + '</div><div class="k" style="margin-top:4px">' + (p.addr || '') + (approx ? ' · <b style="color:#c23c3c">동 중심 근사</b>' : '') + '</div><div style="margin-top:6px"><a href="' + nav + '" target="_blank" rel="noopener">네이버지도 앱에서 열기 · 길찾기</a></div></div>';
 }
 function keyOf(name){ return name.replace(/\s*\(.*?\)/g, '').replace(/\s+/g, ''); }
-function nmFocus(name){
-  var mk = nmByName[keyOf(name)]; if (!mk) return false;
-  nmMap.setZoom(15, true); nmMap.panTo(mk.getPosition()); nmInfo.setContent(nmHtml(mk.__p, mk.__approx)); nmInfo.open(nmMap, mk);
+function nmFocusMarker(mk){
+  var pos = mk.getPosition();
+  // 줌 애니메이션(setZoom(.., true)) 도중 panTo가 무시되는 문제가 있어 morph(중심+줌 동시) 사용, 끝나고 위치 검증
+  try { nmMap.morph(pos, 15); } catch(e) { nmMap.setCenter(pos); nmMap.setZoom(15, false); }
+  setTimeout(function(){ var c = nmMap.getCenter(); if (nmMap.getZoom() !== 15 || Math.abs(c.lat() - pos.lat()) > 0.002 || Math.abs(c.lng() - pos.lng()) > 0.002) { nmMap.setZoom(15, false); nmMap.setCenter(pos); } }, 900);
+  nmInfo.setContent(nmHtml(mk.__p, mk.__approx)); nmInfo.open(nmMap, mk);
   if (sheet.mobile()) sheet.go(0);
-  document.querySelectorAll('.lst .it').forEach(function(it){ it.classList.toggle('on', it.getAttribute('data-key') === keyOf(name)); });
+  document.querySelectorAll('.lst .it').forEach(function(it){ it.classList.toggle('on', it.__mk === mk); });
   return true;
+}
+function nmFocus(name, m2){
+  var arr = nmIndex[keyOf(name)]; if (!arr || !arr.length) return false;
+  var mk = arr[0];
+  if (m2) { for (var i = 0; i < arr.length; i++) { if (Math.abs((arr[i].__p.m2 || 0) - m2) < 0.6) { mk = arr[i]; break; } } }
+  return nmFocusMarker(mk);
 }
 function nmInit(){
   if (!window.naver || !naver.maps) return;
@@ -811,12 +822,13 @@ function nmInit(){
         if (approx) approxN++;
         var mk = new naver.maps.Marker({ map: nmMap, position: new naver.maps.LatLng(pos[0], pos[1]), icon: nmIcon(p, approx), zIndex: p.pick ? 20 : 10 });
         mk.__p = p; mk.__approx = approx; nmMarkers.push(mk);
-        var k = keyOf(p.name); nmByName[k] = nmByName[k] || mk;
-        naver.maps.Event.addListener(mk, 'click', function(){ nmFocus(p.name); });
+        var k = keyOf(p.name); (nmIndex[k] = nmIndex[k] || []).push(mk);
+        naver.maps.Event.addListener(mk, 'click', function(){ nmFocusMarker(mk); });
         var it = document.createElement('div'); it.className = 'it'; it.dataset.cat = p.cat; it.setAttribute('data-key', k);
         it.setAttribute('data-nid', p.nid);
         it.innerHTML = '<span class="dot' + (p.cat === 'kook' ? ' sq' : '') + '" style="background:' + nmColor(p) + ';margin-top:3px"></span><div><b>' + p.name + ' <span class="pill info" style="font-size:11px;padding:0 7px">' + (p.kind === '국민임대' ? '25·26년 국민임대' : NOTICES[p.nid].short) + '</span></b><small>' + (p.kind === '행복주택' ? p.m2 + '㎡ ' + p.py + ' · 공가 ' + p.vac + (p.wait ? ' · 예비 ' + p.wait : '') + ' · ' + p.rank : p.rank) + '</small></div><div class="num">' + (p.kind === '행복주택' ? p.dep + '<br>월 ' + p.rent : '') + '</div>';
-        it.addEventListener('click', function(){ nmFocus(p.name); });
+        it.__mk = mk;
+        it.addEventListener('click', function(){ nmFocusMarker(mk); });
         var g = groupEl[p.cat]; var ref = g.nextSibling; while (ref && ref.className === 'it') ref = ref.nextSibling; list.insertBefore(it, ref);
       }
       done++; status.textContent = done + ' / ' + PLACES.length + ' 좌표 변환 중…';
