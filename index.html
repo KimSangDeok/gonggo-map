@@ -224,6 +224,11 @@ main section.view{margin-top:0}
 .lst .it b{display:block;font-weight:600}
 .lst .it small{color:var(--muted)}
 .lst .it .num{font-family:var(--font-mono);font-size:12px;white-space:nowrap;text-align:right}
+.nm-sel{position:relative;width:26px;height:26px;border-radius:50%;background:#c23c3c;border:3px solid #fff;box-shadow:0 0 0 3px #c23c3c,0 4px 12px rgba(0,0,0,.45)}
+.nm-sel::after{content:"";position:absolute;inset:-14px;border-radius:50%;border:3px solid #c23c3c;animation:nmpulse 1.4s ease-out infinite}
+@keyframes nmpulse{from{transform:scale(.55);opacity:.9}to{transform:scale(1.5);opacity:0}}
+.nm-sel b{position:absolute;left:34px;top:0;white-space:nowrap;background:#fff;color:#1b2330;padding:3px 9px;border-radius:7px;font-size:13px;font-weight:700;box-shadow:0 1px 5px rgba(0,0,0,.35);border:1px solid #c23c3c}
+@media (prefers-reduced-motion:reduce){.nm-sel::after{animation:none}}
 .lock{max-width:420px;margin:40px auto;padding:22px 22px;border:1px solid var(--line);border-radius:14px;background:var(--surface)}
 .lock input[type=password]{width:100%;font-size:16px;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--fg)}
 .lock button{margin-top:10px;width:100%;padding:10px;border:0;border-radius:8px;background:var(--accent);color:var(--on-accent);font-size:15px;font-weight:600;cursor:pointer}
@@ -782,7 +787,14 @@ function nmHtml(p, approx){
   return '<div class="nm-iw"><b>' + p.name + '</b> <span class="k">' + p.kind + '</span><br>' + body + '<div><span class="k">내 순위</span> ' + p.rank + '</div><div><span class="k">공고</span> ' + (p.kind === '국민임대' ? noticeLine('K25') + '<br><span class="k">공고</span> ' + noticeLine('K26') : noticeLine(p.nid)) + '</div><div class="k" style="margin-top:4px">' + (p.addr || '') + (approx ? ' · <b style="color:#c23c3c">동 중심 근사</b>' : '') + '</div><div style="margin-top:6px"><a href="' + nav + '" target="_blank" rel="noopener">네이버지도 앱에서 열기 · 길찾기</a></div></div>';
 }
 function keyOf(name){ return name.replace(/\s*\(.*?\)/g, '').replace(/\s+/g, ''); }
+var nmSelected = null;
+function nmSelect(mk){
+  if (nmSelected && nmSelected !== mk) { try { nmSelected.setIcon(nmIcon(nmSelected.__p, nmSelected.__approx)); nmSelected.setZIndex(nmSelected.__p.pick ? 20 : 10); } catch(e) {} }
+  nmSelected = mk;
+  try { mk.setIcon({ content: '<div class="nm-sel"><b>' + mk.__p.name + '</b></div>', anchor: new naver.maps.Point(13, 13) }); mk.setZIndex(100); } catch(e) {}
+}
 function nmFocusMarker(mk){
+  nmSelect(mk);
   var pos = mk.getPosition();
   // 줌 애니메이션(setZoom(.., true)) 도중 panTo가 무시되는 문제가 있어 morph(중심+줌 동시) 사용, 끝나고 위치 검증
   try { nmMap.morph(pos, 15); } catch(e) { nmMap.setCenter(pos); nmMap.setZoom(15, false); }
