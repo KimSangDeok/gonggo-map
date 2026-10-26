@@ -847,6 +847,14 @@ function factHtml(p){
   h += '<table class="iw-t">' + rows.map(function(r){ return '<tr><th>' + r[0] + '</th><td>' + r[1] + '</td></tr>'; }).join('') + '</table></div>';
   return h;
 }
+function manwon(s){ var m = String(s).match(/(\d+)\s*억/); var eok = m ? +m[1] : 0; var rest = String(s).replace(/^.*억\s*/, '').replace(/[^\d]/g, ''); return eok * 10000 + (rest ? +rest : 0); }
+function fmtMan(n){ n = Math.round(n); return n >= 10000 ? Math.floor(n / 10000) + '억' + (n % 10000 ? ' ' + (n % 10000).toLocaleString() + '만' : '') : n.toLocaleString() + '만'; }
+var REITS = { '이든채': 1, '창경궁롯데캐슬시그니처': 1 };   // 서울리츠 단지: 전환 한도 20% (그 외 SH·서울시 소유 50%)
+function convRows(p){
+  var dep = manwon(p.dep), rent = parseFloat(p.rent); if (!dep || isNaN(rent)) return '';
+  var pct = REITS[p.name] ? 20 : 50, cut = dep * pct / 100, rentMax = rent + cut * 0.025 / 12;
+  return '<tr><th>전환 시</th><td>보증금 <b>' + fmtMan(dep - cut) + '</b>까지 낮추면 월세 <b>' + (Math.round(rentMax * 10) / 10) + '만</b><br><small class="k">보증금의 ' + pct + '%까지 월세로 전환, 연 2.5% (공고문 임대조건)</small></td></tr>';
+}
 function nmHtml(p, approx){
   var nav = 'https://map.naver.com/p/search/' + encodeURIComponent(p.q || p.name);
   var head = '<div class="iw-h"><b>' + p.name + '</b><span class="pill info">' + p.kind + '</span><button type="button" class="iw-x" onclick="nmInfo.close()" aria-label="닫기">×</button></div>';
@@ -856,8 +864,9 @@ function nmHtml(p, approx){
     body = '<table class="iw-t">' +
       '<tr><th>전용</th><td>' + p.m2 + '㎡ · ' + p.py + '</td></tr>' +
       '<tr><th>호수</th><td>' + (p.vac ? '공가 <b>' + p.vac + '</b>' : '공가 0') + (p.wait ? ' · 예비 ' + p.wait : '') + '</td></tr>' +
-      '<tr><th>보증금</th><td><b>' + p.dep + '</b></td></tr>' +
-      '<tr><th>월세</th><td><b>' + p.rent + '</b> <small>청년 소득있음 기준</small></td></tr>' +
+      '<tr><th>보증금</th><td><b>' + p.dep + '</b> <small class="k">기본값 = 최대</small></td></tr>' +
+      '<tr><th>월세</th><td><b>' + p.rent + '</b> <small class="k">기본값 = 최소 · 청년(소득 있음) 조건</small></td></tr>' +
+      convRows(p) +
       '<tr><th>내 순위</th><td>' + rankPill(p.rank) + '</td></tr>' +
       '<tr><th>공고</th><td><a href="' + n.url + '" target="_blank" rel="noopener">' + n.name + '</a><br><small>' + s.text + '</small></td></tr>' +
       '</table>';
@@ -865,6 +874,7 @@ function nmHtml(p, approx){
     var rows = KOOK_ROWS[p.name] || [], s25 = noticeStatus(NOTICES.K25), s26 = noticeStatus(NOTICES.K26);
     body = '<table class="iw-t iw-k"><tr><th></th><th>2025 공고</th><th>2026 공고</th></tr>' +
       rows.map(function(r){ return '<tr><th>' + r[0] + '</th><td>' + r[1] + '</td><td>' + r[2] + '</td></tr>'; }).join('') + '</table>' +
+      '<small class="k" style="display:block;margin-top:4px">금액 범위(예: 4,002~4,323만)는 공고 표의 최저~최고 · 월세는 1인 가구 기준</small>' +
       '<table class="iw-t iw-t2">' +
       '<tr><th>내 순위</th><td>' + rankPill(p.rank) + '</td></tr>' +
       '<tr><th>공고</th><td><a href="' + NOTICES.K25.url + '" target="_blank" rel="noopener">2025 국민임대</a> · ' + s25.text + '<br><a href="' + NOTICES.K26.url + '" target="_blank" rel="noopener">2026 국민임대</a> · ' + s26.text + '</td></tr>' +
