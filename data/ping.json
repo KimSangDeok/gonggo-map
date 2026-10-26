@@ -1,0 +1,8 @@
+{
+"sh_board": {"code": "200", "bytes": 151197, "kr": 1},
+"sh_houseinfo": {"code": "200", "bytes": 56226, "kr": 1},
+"kapt_main": {"code": "200", "bytes": 213769, "kr": 1},
+"lh_list": {"code": "200", "bytes": 191907, "kr": 1},
+"gh_main": {"code": "200", "bytes": 411, "kr": 0},
+"at": "2026-10-26T08:09:26Z", "runner_ip_country": "US"
+}
