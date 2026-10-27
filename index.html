@@ -281,7 +281,10 @@ main section.view{margin-top:0}
 .iw-ph a{flex:1;min-width:0;height:74px;border-radius:8px;overflow:hidden;background:#eef1f5;position:relative;display:block}
 .iw-ph img{width:100%;height:100%;object-fit:cover;display:block}
 .iw-ph .iw-plan img{object-fit:contain;background:#fff}
-.iw-ph .iw-plan span{position:absolute;left:0;right:0;bottom:0;font-size:11px;font-weight:600;color:#fff;background:rgba(0,0,0,.55);padding:2px 6px;text-align:center}
+.iw-ph a span{position:absolute;left:0;right:0;bottom:0;font-size:11px;font-weight:600;color:#fff;background:rgba(0,0,0,.55);padding:2px 6px;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.iw-rooms a{height:84px}
+.iw-phn{display:block;margin:-4px 0 8px}
+.iw-nophoto{margin:4px 0 8px;padding:7px 9px;border:1px dashed #cfd6df;border-radius:8px;color:#5f6b7a;font-size:12px;line-height:1.4}
 .iw-f{margin-top:10px;display:flex;flex-direction:column;gap:7px}
 .iw-btn{display:block;background:#1f5fbf;color:#fff !important;text-decoration:none;padding:8px 10px;border-radius:8px;font-weight:600;font-size:13px;text-align:center}
 .nm-sel{--c:#D32F2F;position:relative;width:26px;height:26px;border-radius:50%;background:var(--c);border:3px solid #fff;box-shadow:0 0 0 3px var(--c),0 4px 12px rgba(0,0,0,.45)}
@@ -891,10 +894,23 @@ function factHtml(p){
   var f = factOf(p);
   if (!f || (!f.k && !f.type && !f.types)) return '<div class="iw-sec"><div class="iw-sh">단지 정보</div><small class="k">SH 주택정보·K-apt에 등록된 단지 정보 없음</small></div>';
   var h = '<div class="iw-sec"><div class="iw-sh">단지 정보 <small class="k">' + f.src.join(' · ') + (window.FACT_UPDATED ? ' · 갱신 ' + window.FACT_UPDATED.slice(0, 10) : '') + '</small></div>';
+  // 사진: 실내 각 방(SH 사진유형 07) → 전경 → 평면도. 없으면 없다고 쓴다.
+  var ph = '';
+  if (f.rooms && f.rooms.length) {
+    ph += '<div class="iw-ph iw-rooms">' + f.rooms.slice(0, 4).map(function(r){ return '<a href="' + r.u + '" target="_blank" rel="noopener" title="' + r.t + '"><img src="' + r.u + '" alt="' + r.t + '" loading="lazy" onerror="this.parentNode.style.display=\'none\'"><span>' + r.t + '</span></a>'; }).join('') + '</div>';
+    var rk = f.rooms_k || f.rooms.length, rn = f.rooms_n || rk;
+    ph += '<small class="k iw-phn">' + (f.rooms_mine ? '이 형 실내 사진 ' + rk + '장' + (rn > rk ? ' (단지 전체 ' + rn + '장)' : '') : (f.rooms_mine === false ? '실내 사진 ' + rk + '장 <b>— 이 형 사진은 없음, 다른 형·공용부</b>' : '실내 사진 ' + rn + '장')) + (rk > 4 ? ' · <a href="' + f.rooms[4].u + '" target="_blank" rel="noopener">더 보기</a>' : '') + ' — SH 주택정보 "실내 각 방"' + (f.cyber && f.cyber.length ? ' · <a href="' + f.cyber[0][1] + '" target="_blank" rel="noopener">사이버 모델하우스' + (f.cyber[0][0] ? ' ' + f.cyber[0][0] + '형' : '') + '</a>' : '') + '</small>';
+  }
   if (f.photos || f.plan) {
-    h += '<div class="iw-ph">' + (f.photos || []).slice(0, 2).map(function(u){ return '<a href="' + u + '" target="_blank" rel="noopener"><img src="' + u + '" alt="단지 전경" loading="lazy" onerror="this.parentNode.style.display=\'none\'"></a>'; }).join('') +
+    ph += '<div class="iw-ph">' + (f.photos || []).slice(0, 2).map(function(u){ return '<a href="' + u + '" target="_blank" rel="noopener"><img src="' + u + '" alt="단지 전경" loading="lazy" onerror="this.parentNode.style.display=\'none\'"><span>전경</span></a>'; }).join('') +
          (f.plan ? '<a class="iw-plan" href="' + f.plan + '" target="_blank" rel="noopener"><img src="' + f.plan + '" alt="평면도" loading="lazy" onerror="this.parentNode.style.display=\'none\'"><span>' + (f.type ? f.type.sp + '형 ' : '') + '평면도</span></a>' : '') + '</div>';
   }
+  if (!(f.rooms && f.rooms.length)) {
+    var when = window.FACT_UPDATED ? ' (' + window.FACT_UPDATED.slice(0, 10) + ' 확인)' : '';
+    if (f.nophoto) ph += '<div class="iw-nophoto"><b>사진 없음</b> — SH 주택정보에 이 단지의 사진(전경·실내)도 평면도도 등록돼 있지 않음' + when + '</div>';
+    else if (f.phototypes) ph += '<div class="iw-nophoto"><b>실내(방) 사진 없음</b> — SH 주택정보에 올라온 사진 유형: ' + (f.phototypes.length ? f.phototypes.join('·') : '없음') + (f.phototypes.indexOf('실내 각 방') >= 0 ? ' (실내 유형은 있으나 이미지 0장)' : '') + (f.plan ? ' · 평면도는 있음(위)' : '') + when + '</div>';
+  }
+  h += ph;
   var rows = [];
   var k = f.k;
   if (k) {
@@ -1062,25 +1078,44 @@ function showDetail(p, approx){
 }
 function hideDetail(){ var d = document.getElementById('nm-detail'), l = document.getElementById('nm-list'); if (d) { d.hidden = true; l.hidden = false; } }
 document.getElementById('detail-back').addEventListener('click', hideDetail);
+// 화면 픽셀 → 위도 변환(웹 메르카토르, 타일 256px). dyPx>0 이면 남쪽(화면 아래). 지도 중심을 마커보다 아래에 두어 팝업이 위로 다 보이게 하는 데 씀
+function latPlusPx(lat, dyPx, zoom){
+  var scale = 256 * Math.pow(2, zoom), rad = lat * Math.PI / 180;
+  var y = (0.5 - Math.log((1 + Math.sin(rad)) / (1 - Math.sin(rad))) / (4 * Math.PI)) * scale + dyPx;
+  var n = Math.PI - 2 * Math.PI * y / scale;
+  return 180 / Math.PI * Math.atan(0.5 * (Math.exp(n) - Math.exp(-n)));
+}
+function nmMeasure(html){   // 팝업 HTML을 화면 밖에서 그려 높이만 잰다(.nm-iw 폭 고정이라 정확)
+  var probe = document.createElement('div'); probe.style.cssText = 'position:absolute;left:-9999px;top:0;visibility:hidden;pointer-events:none';
+  probe.innerHTML = html; document.body.appendChild(probe); var h = probe.firstChild ? probe.firstChild.offsetHeight : 0; probe.remove(); return h;
+}
 function nmFocusMarker(mk){
   nmSelect(mk);
-  var pos = mk.getPosition();
+  var pos = mk.getPosition(), Z = 15;
   document.querySelectorAll('.lst .it').forEach(function(it){ it.classList.toggle('on', it.__mk === mk); });
+  var mapH = document.getElementById('nmap').getBoundingClientRect().height || 600;
   if (sheet.mobile()) {
-    // 폰: 팝업 대신 바닥 시트에 상세를 넣고(스크롤 하나), 마커는 시트 위 보이는 영역 가운데로
+    // 폰: 팝업 대신 바닥 시트에 상세를 넣고(스크롤 하나), 마커는 시트 위 보이는 영역 가운데로 — 이동은 한 번(중심을 미리 계산)
     nmInfo.close(); showDetail(mk.__p, mk.__approx); sheet.go(1);
-    nmMap.setZoom(15, false); nmMap.setCenter(pos);
-    setTimeout(function(){ try { nmMap.panBy(new naver.maps.Point(0, Math.round(document.getElementById('side').getBoundingClientRect().height / 2))); } catch(e) {} }, 260);
+    var sideH = Math.round(document.getElementById('side').getBoundingClientRect().height);
+    var c0 = new naver.maps.LatLng(latPlusPx(pos.lat(), Math.round(sideH / 2), Z), pos.lng());
+    nmMap.setZoom(Z, false); nmMap.setCenter(c0);
     return true;
   }
-  // 줌 애니메이션(setZoom(.., true)) 도중 panTo가 무시되는 문제가 있어 morph(중심+줌 동시) 사용, 끝나고 위치 검증
-  try { nmMap.morph(pos, 15); } catch(e) { nmMap.setCenter(pos); nmMap.setZoom(15, false); }
-  setTimeout(function(){ var c = nmMap.getCenter(); if (nmMap.getZoom() !== 15 || Math.abs(c.lat() - pos.lat()) > 0.002 || Math.abs(c.lng() - pos.lng()) > 0.002) { nmMap.setZoom(15, false); nmMap.setCenter(pos); } }, 900);
-  nmInfo.setContent(nmHtml(mk.__p, mk.__approx)); nmInfo.open(nmMap, mk);
-  // 줌이 바뀌는 morph 도중에 열면 InfoWindow가 내용 크기를 0으로 재서(래퍼 width:0px) 창이 좁게·치우쳐 뜸 → 지도가 멈춘(idle) 뒤 같은 내용으로 한 번 더 열어 크기·위치 재계산
-  var reopen = function(){ try { if (nmInfo.getMap() && nmSelected === mk) nmInfo.open(nmMap, mk); } catch(e) {} };
-  try { if (naver.maps.Event.once) naver.maps.Event.once(nmMap, 'idle', reopen); } catch(e) {}
-  setTimeout(reopen, 1000);
+  // PC: 팝업을 먼저 열고(지도가 멈춰 있을 때 열어야 크기를 제대로 잼), 팝업 높이에 맞춰 마커가 아래쪽에 오도록 중심을 계산해 morph 한 번만 — autoPan 은 꺼 둠(두 번 흔들림 방지)
+  var html = nmHtml(mk.__p, mk.__approx), h = nmMeasure(html);
+  nmInfo.setContent(html); nmInfo.open(nmMap, mk);
+  var markerY = Math.min(mapH - 30, Math.max(mapH / 2, h + 24));          // 팝업이 짧으면 가운데, 길면 마커를 아래로
+  var center = new naver.maps.LatLng(latPlusPx(pos.lat(), Math.round(markerY - mapH / 2), Z), pos.lng());
+  try { nmMap.morph(center, Z); } catch(e) { nmMap.setCenter(center); nmMap.setZoom(Z, false); }
+  // morph 가 끝난 뒤: 줌 애니메이션 중 열려 크기가 0으로 잡힌 경우만 같은 내용으로 다시 열어 크기 보정(이동 없음), 위치 검증
+  var fix = function(){
+    if (nmSelected !== mk) return;
+    try { var el = document.querySelector('.nm-iw'); if (el && nmInfo.getMap() && (!el.parentElement.style.width || el.parentElement.style.width === '0px')) nmInfo.open(nmMap, mk); } catch(e) {}
+    try { var c = nmMap.getCenter(); if (nmMap.getZoom() !== Z || Math.abs(c.lat() - center.lat()) > 0.002 || Math.abs(c.lng() - center.lng()) > 0.002) { nmMap.setZoom(Z, false); nmMap.setCenter(center); } } catch(e) {}
+  };
+  try { if (naver.maps.Event.once) naver.maps.Event.once(nmMap, 'idle', fix); } catch(e) {}
+  setTimeout(fix, 1100);
   return true;
 }
 function nmFocus(name, m2){
@@ -1092,7 +1127,7 @@ function nmFocus(name, m2){
 function nmInit(){
   if (!window.naver || !naver.maps) return;
   nmMap = new naver.maps.Map('nmap', { center: new naver.maps.LatLng(37.565, 126.93), zoom: 11, zoomControl: !sheet.mobile(), zoomControlOptions: { position: naver.maps.Position.TOP_LEFT } });  // 폰은 손가락 확대, 줌 막대 없음
-  nmInfo = new naver.maps.InfoWindow({ borderWidth: 0, backgroundColor: 'transparent', disableAnchor: true, pixelOffset: new naver.maps.Point(0, -6) });
+  nmInfo = new naver.maps.InfoWindow({ borderWidth: 0, backgroundColor: 'transparent', disableAnchor: true, disableAutoPan: true, pixelOffset: new naver.maps.Point(0, -6) });  // autoPan 끔: 이동은 nmFocusMarker 가 한 번만
   var status = document.getElementById('nm-status'), list = document.getElementById('nm-list');
   // 폰: 바닥 시트가 아래 절반을 덮으므로 보이는 위쪽 절반에 서울이 오도록 중심을 남쪽으로 내림
   if (sheet.mobile()) { nmMap.setZoom(10); setTimeout(function(){ try { nmMap.panBy(new naver.maps.Point(0, Math.round(document.getElementById('side').getBoundingClientRect().height / 2))); } catch(e) {} }, 400); }

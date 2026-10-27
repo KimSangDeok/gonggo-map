@@ -230,7 +230,20 @@ def hi_fetch(cd):
             if il: o['plans'][sp] = il[0]['imgPath'] + il[0]['imgNewFileNm']
     cost = hi_post('/map/selectManaCostInfo.do', {'biznsCd': cd}); cl = cost if isinstance(cost, list) else (cost.get('result') or [])
     if cl: o['kapt'] = cl[0].get('kaptCode'); o['costYm'] = cl[0].get('searchDate'); o['cost'] = [[c.get('prvuseAr'), c.get('manageCost')] for c in cl]
-    img = hi_post('/map/selectImgList.do', {'biznsCd': cd, 'imgTy': '01'}); o['imgs'] = [i['imgPath'] + i['imgNewFileNm'] for i in (img.get('result') or [])[:2]]
+    # 사진 유형 목록(공통코드 SH0175: 01 전경·02 정문·03 배치도·04 단지·05 주차장·06 편의시설·07 실내 각 방·08 기타) — 단지별로 등록된 유형만 돌아옴
+    codes = hi_post('/map/selectCmmCdList.do', {'biznsCd': cd, 'cateId': 'SH0175'}); cl2 = codes.get('result') or []
+    o['phototypes'] = [c.get('cdNm') for c in cl2 if c.get('cdNm')]
+    have = {c.get('cd') for c in cl2}
+    o['imgs'] = []
+    for ty in ('01', '04', '02'):   # 전경 → 단지 → 정문 순으로 바깥 사진
+        if ty not in have and have: continue
+        img = hi_post('/map/selectImgList.do', {'biznsCd': cd, 'imgTy': ty}); o['imgs'] = [i['imgPath'] + i['imgNewFileNm'] for i in (img.get('result') or [])[:3]]
+        if o['imgs']: break
+    if any(c.get('cd') == '07' for c in cl2):
+        rm = hi_post('/map/selectImgList.do', {'biznsCd': cd, 'imgTy': '07'})
+        o['rooms'] = [[(i.get('imgNm') or '').strip(), i['imgPath'] + i['imgNewFileNm']] for i in (rm.get('result') or [])[:40]]
+    mh = hi_post('/map/selectCyberMhInfo.do', {'biznsCd': cd, 'hsCl': ''}); ml = mh.get('result') or []
+    if ml: o['cyber'] = [[m.get('splyTy'), m.get('cyberModelhouseUrl')] for m in ml if m.get('cyberModelhouseUrl')]
     f = hi_post('/map/selectHouseFcltDetail.do', {'biznsCd': cd}); o['subway'] = [x['ctgrNm'] + ' ' + x['distance'] for x in (f.get('result') or []) if x.get('ctgrCd') == '1'][:2]
     return o
 

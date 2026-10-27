@@ -92,6 +92,45 @@ def facts_for(name, m2=None, kind='행복주택'):
     if kcodes: o['src'].append('K-apt')
     photos = [img(p) for s in shs for p in s.get('imgs', [])][:3]
     if photos: o['photos'] = photos
+    # 실내 각 방 사진(SH 주택정보 사진유형 07). 캡션(imgNm)이 없으면 파일명에서 라벨을 만들고, 캡션/파일명에 형 숫자가 있으면(예: '39A 안방', '36형거실', '(49B)', '거실-44') 이 형 것만 우선
+    import re as _re
+    def _clean(cap, path):
+        if cap and cap.strip(): return cap.strip()
+        fn = path.rsplit('/', 1)[-1]
+        fn = _re.sub(r'^\d{14,20}_\d+_', '', fn); fn = _re.sub(r'\.[A-Za-z]+$', '', fn)
+        fn = _re.sub(r'\[(크기변환|꾸미기)\]|사본\s*-|포맷변환_|KakaoTalk_\d+_\d+(_\d+)?|Resized_\d+|temp_[\d.]+|일괄편집_', ' ', fn)
+        fn = _re.sub(r'\d{3}-\d{3,4}\(([^)]*)\)\d{6,}', r'(\1)', fn)   # 202-1104(39A)221017039 → (39A)
+        fn = _re.sub(r'\d{6,}', ' ', fn); fn = _re.sub(r'\[[^\]]*\]', ' ', fn)
+        fn = _re.sub(r'\s+', ' ', fn).strip(' _-')
+        if _re.fullmatch(r'\d{2}', fn): fn += '형'
+        return fn or '실내'
+    def _ty(cap):
+        for pat in (r'(\d{2})\s*형', r'(\d{2})\s*타입', r'\((\d{2})[A-Z]?\'?-?\d?\)', r'(?:^|\s)(\d{2})[A-Z]?\d?(?=\s|$)', r'-\s*(\d{2})(?=\s|$)'):
+            m = _re.search(pat, cap or '')
+            if m and 15 <= int(m.group(1)) <= 90: return m.group(1)
+        return None
+    want = str(int(m2)) if m2 else None
+    rooms_all = []
+    for s in shs:
+        for cap, path in s.get('rooms', []) or []:
+            lab = _clean(cap, path); ty = _ty(lab) or _ty(path.rsplit('/', 1)[-1])
+            if _re.fullmatch(r'\d{2}', lab): lab += '형'
+            if lab == '실내' and ty: lab = ty + '형 실내'
+            rooms_all.append({'t': lab, 'u': img(path), 'ty': ty})
+    if rooms_all:
+        typed = [r for r in rooms_all if r['ty']]
+        if want and typed:
+            mine = [r for r in typed if r['ty'] == want]
+            pick = mine or [r for r in rooms_all if not r['ty']] or rooms_all
+            o['rooms_mine'] = bool(mine)
+        else:
+            pick = rooms_all
+        o['rooms'] = [{'t': r['t'], 'u': r['u']} for r in pick[:8]]
+        o['rooms_n'] = len(rooms_all); o['rooms_k'] = len(pick)
+    pts = sorted({t for s in shs for t in (s.get('phototypes') or [])})
+    if pts: o['phototypes'] = pts
+    cyber = [c for s in shs for c in (s.get('cyber') or [])]
+    if cyber: o['cyber'] = cyber[:4]
     subs = next((s['subway'] for s in shs if s.get('subway')), None)
     if subs: o['subway'] = subs[:2]
     ks = kapt_summary(kcodes)
@@ -128,5 +167,7 @@ def facts_for(name, m2=None, kind='행복주택'):
             if d['cost']: d['cost'] = [min(d['cost']), max(d['cost'])]
             else: d.pop('cost')
         if T: o['types'] = T
+    if shs and all(s.get('phototypes') is not None and not s.get('phototypes') for s in shs) and not (o.get('photos') or o.get('rooms') or o.get('plan') or any(d.get('plan') for d in (o.get('types') or {}).values())):
+        o['nophoto'] = True   # SH 주택정보에 사진 유형이 하나도 없고 평면도도 없는 단지 (사진유형 목록까지 조회한 데이터에서만 판단)
     return o
 
