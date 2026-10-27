@@ -329,12 +329,23 @@ def ya_detail(code):
                         if dep is not None and 0 < dep < 100000: dep *= 10000
                         if rent is not None and 0 < rent < 10000: rent *= 10000
                         rows[cur].append({'room': td[0], 'ty': td[1], 'who': td[2], 'n': _won(td[3]), 'dep': dep, 'rent': rent, 'mc': _won(td[6]) if len(td) > 6 else None, 'unit_fixed': bool((dep or 0) and _won(td[4]) != dep)})
+    # 사진: 상세 페이지 이미지(같은 atchFileId 의 fileSn 1..N) — 상세소개(대표)·평면도(#detail4)·투시도. 평면도가 형별 도면이라 가장 쓸모 있음
+    photos, seen = [], set()
+    for im in soup.find_all('img'):
+        src = im.get('src') or ''
+        if 'fileDown.do' not in src or 'atchFileId' not in src: continue
+        u = src if src.startswith('http') else 'https://soco.seoul.go.kr' + src
+        if u in seen: continue
+        seen.add(u)
+        alt = (im.get('alt') or '').strip(); sec = im.find_parent('article'); sid = sec.get('id') if sec else ''
+        kind = 'plan' if ('평면도' in alt or sid == 'detail4') else ('persp' if re.search(r'투시도|조감도', alt) else 'main')
+        photos.append({'u': u, 't': alt, 'k': kind})
     homepage = ''
     hp = soup.find('strong', string=re.compile(r'홈페이지'))
     if hp and hp.find('a'): homepage = hp.find('a').get('href', '')
     elif info.get('홈페이지'): homepage = info['홈페이지']
     return {'addr': info.get('주소', ''), 'station': info.get('지하철역', ''), 'scale': scale, 'builder': info.get('시행사', ''), 'first_notice': info.get('최초모집공고일', ''),
-            'movein': info.get('입주(예정)일', ''), 'phone': info.get('대표전화', ''), 'homepage': homepage, 'status': status, 'rows': rows}
+            'movein': info.get('입주(예정)일', ''), 'phone': info.get('대표전화', ''), 'homepage': homepage, 'status': status, 'rows': rows, 'photos': photos}
 def ya_complexes(details=True):
     """단지 목록(99곳 안팎) + 구별 지도목록으로 좌표 + 상세 페이지(규모·입주현황 표)"""
     j = ya_post('/yoHomeListJson.json', {'pageNum': 1, 'rowCount': 500, 'searchPresale': '', 'searchTheme': '', 'searchMovinHoman': '', 'searchHouseType': '', 'searchHouseForm': '', 'searchAdresGu': '', 'searchSil': '', 'searchWrd': ''})
