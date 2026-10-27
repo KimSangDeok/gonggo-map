@@ -1,18 +1,18 @@
 [
  {
-  "url": "https://www.i-sh.co.kr/app/com/file/innoFD.do?brdId=GS0401&fileTp=A&fileSeq=1&seq=309337",
+  "url": "https://soco.seoul.go.kr/youth/pgm/home/yohome/view.do?menuNo=400002&homeCode=20000567",
   "post": "",
   "status": 200,
-  "type": "application/octet-stream;charset=UTF-8",
-  "bytes": 1935716,
-  "file": "www_i_sh_co_kr_app_com_file_innoFD_do_brdId_GS0401_fileTp_A_fileSeq_1_seq_309337_8f40d3.pdf"
+  "type": "text/html;charset=utf-8",
+  "bytes": 61486,
+  "file": "soco_seoul_go_kr_youth_pgm_home_yohome_view_do_menuNo_400002_homeCode_20000567_34ddac.html"
  },
  {
-  "url": "https://www.i-sh.co.kr/app/com/file/innoFD.do?brdId=GS0401&fileTp=A&fileSeq=1&seq=304864",
+  "url": "https://soco.seoul.go.kr/youth/pgm/home/yohome/view.do?menuNo=400002&homeCode=20000520",
   "post": "",
   "status": 200,
-  "type": "application/octet-stream;charset=UTF-8",
-  "bytes": 2264206,
-  "file": "www_i_sh_co_kr_app_com_file_innoFD_do_brdId_GS0401_fileTp_A_fileSeq_1_seq_304864_2e286d.pdf"
+  "type": "text/html;charset=utf-8",
+  "bytes": 58807,
+  "file": "soco_seoul_go_kr_youth_pgm_home_yohome_view_do_menuNo_400002_homeCode_20000520_009620.html"
  }
 ]
