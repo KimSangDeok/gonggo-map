@@ -166,6 +166,12 @@ def main():
             except Exception as e:
                 log('pamphlet fail', name, seq, repr(e)); errors.append({'name': name, 'seq': seq, 'err': repr(e)[:300]})
         if ent: items[name] = ent
+    # 더 이상 안 쓰는 렌더 파일 정리(쪽 선택 규칙이 바뀌면 생김)
+    if rendered:
+        for fn in os.listdir(OUTD):
+            if fn.endswith('.jpg') and fn[:-4] not in rendered:
+                try: os.remove(os.path.join(OUTD, fn)); log('removed stale', fn)
+                except Exception: pass
     now = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9))).strftime('%Y-%m-%d %H:%M KST')
     # 새 행복주택/국민임대 팸플릿(최근 400일) 중 PAM에 없는 것 — 사람이 보고 PAM에 추가하라고 로그·JSON에 남김
     known = {s for lst in PAM.values() for s, _ in lst}
