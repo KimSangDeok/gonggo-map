@@ -13,11 +13,12 @@ for p in PLACES:
     if nm in facts.MAP: continue
     key = _norm(re.sub(r'\d+(?:~\d+)?단지|\d+(?:,\d+)*단지|지구', '', nm))
     found = []
-    for kw in [key, key[:6], key[:4]]:
+    addr_kw = _norm(re.sub(r'^서울특별시\s*\S+구\s*', '', p.get('addr') or ''))   # '신정로 110' 처럼 주소로도 찾아짐(주택정보 이름이 '신정4지구 보금자리주택'인 경우)
+    for kw in [key, key[:6], key[:4], addr_kw]:
         if len(kw) < 3: continue
         try: res = src.hi_search(kw)
         except Exception as e: src.log('hi_search fail', kw, repr(e)); res = []
-        found = [x for x in res if kw in _norm(x['nm'])]
+        found = [x for x in res if kw in _norm(x['nm'])] or ([x for x in res] if kw == addr_kw else [])
         if found: break
         time.sleep(0.3)
     if found:
