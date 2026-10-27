@@ -83,20 +83,25 @@ def catalog(pages=60):
         lst = json.loads(m.group(1)) if m else []
         titles = re.findall(r'<td class="txtL"[^>]*>[\s\S]*?onclick="existFile\(\'(\d+)\'\)[^>]*>\s*([^<]+?)\s*</a>', r.text)
         tmap = {int(i): t.strip() for i, t in titles}
-        for i, f in enumerate(lst): out.append({'seq': f.get('seq'), 'file': f.get('oriFileNm'), 'title': tmap.get(i, '')})
+        for i, f in enumerate(lst): out.append({'seq': f.get('seq'), 'file': f.get('oriFileNm'), 'title': tmap.get(i, ''), 'fileSeq': f.get('fileSeq') or '1', 'brdId': f.get('brdId') or 'JI1901'})
         if not lst: break
         time.sleep(0.3)
     return out
 
-def download(seq):
+def download(seq, file_seq='1', brd='JI1901'):
+    """게시물마다 fileSeq가 1·2·3으로 다르다(목록 downList 값). 모르면 1→2→3 순으로 시도."""
     last = None
-    for attempt in range(2):
-        try:
-            r = S.get(DL, params={'brdId': 'JI1901', 'seq': seq, 'fileTp': '', 'fileSeq': '1'}, timeout=300, headers={'Referer': LIST}); r.raise_for_status()
-            if not r.content.startswith(b'%PDF'): raise RuntimeError(f'not pdf: {r.content[:40]!r}')
-            return r.content
-        except Exception as e:
-            last = e; time.sleep(3)
+    tries = [file_seq] + [x for x in ('1', '2', '3') if x != file_seq]
+    for fs in tries:
+        for attempt in range(2):
+            try:
+                r = S.get(DL, params={'brdId': brd, 'seq': seq, 'fileTp': '', 'fileSeq': fs}, timeout=300, headers={'Referer': LIST})
+                if r.status_code == 500: last = RuntimeError(f'500 fileSeq={fs}'); break
+                r.raise_for_status()
+                if not r.content.startswith(b'%PDF'): raise RuntimeError(f'not pdf: {r.content[:40]!r}')
+                return r.content, fs
+            except Exception as e:
+                last = e; time.sleep(3)
     raise last
 
 def pick_pages(pdf, kw):
@@ -132,14 +137,15 @@ def main():
     pdfs = {}
     def get(seq):
         if seq not in pdfs:
-            pdfs[seq] = download(seq); time.sleep(0.5); log('downloaded', seq, len(pdfs[seq]))
+            m = meta.get(seq, {})
+            data, fs = download(seq, m.get('fileSeq') or '1', m.get('brdId') or 'JI1901'); pdfs[seq] = (data, fs); time.sleep(0.5); log('downloaded', seq, 'fileSeq', fs, len(data))
         return pdfs[seq]
     items, rendered, errors = {}, {}, []
     for name, lst in PAM.items():
         ent = []
         for seq, kw in lst:
             try:
-                data = get(seq)
+                data, fs = get(seq)
                 with pdfplumber.open(io.BytesIO(data)) as pdf:
                     sel, hits = pick_pages(pdf, kw)
                     pages = []
@@ -153,7 +159,7 @@ def main():
                             rendered[key] = {'img': 'data/pamphlets/' + key + '.jpg', 'w': im.width, 'h': im.height}
                         pages.append(dict(n=i + 1, **rendered[key]))
                     ent.append({'seq': seq, 'title': meta.get(seq, {}).get('title') or (old.get('items', {}).get(name, [{}])[0].get('title') if old else '') or '', 'file': meta.get(seq, {}).get('file', ''),
-                                'pdf': f'{DL}?brdId=JI1901&seq={seq}&fileTp=&fileSeq=1', 'total': len(pdf.pages), 'kw': kw, 'hits': hits, 'pages': pages})
+                                'pdf': f'{DL}?brdId=JI1901&seq={seq}&fileTp=&fileSeq={fs}', 'total': len(pdf.pages), 'kw': kw, 'hits': hits, 'pages': pages})
             except Exception as e:
                 log('pamphlet fail', name, seq, repr(e)); errors.append({'name': name, 'seq': seq, 'err': repr(e)[:300]})
         if ent: items[name] = ent
