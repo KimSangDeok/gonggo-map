@@ -143,9 +143,15 @@ def pick_pages(pdf, kw, others=()):
         late = [i for i in hit if i >= 3]
         use = late or hit
         if not use: return [], hits
-        start = min(use); end = n
-        for j in range(start + 1, n):
-            if theirs[j] > mine[j] and j > max(use): end = j; break
+        # 구간 = 첫 히트부터 히트가 이어지는 동안(한 쪽 건너뛰기까지 허용) + 다음 2쪽. 떨어진 히트(목차·바닥글)는 버림
+        start = min(use); last = start; useset = set(use)
+        j = start
+        while j + 1 < n and (j + 1 in useset or j + 2 in useset):
+            j += 1
+            if j in useset: last = j
+        end = min(n, last + 3)
+        for k2 in range(start + 1, end):
+            if theirs[k2] > mine[k2]: end = k2; break
         section = [i for i in range(start, end) if not (theirs[i] > mine[i])]
     cands = [{'i': i, 'kind': _kind(texts[i]), 'tys': _tys(texts[i])} for i in section]
     plans = [c for c in cands if c['kind'] == 'plan']; sites = [c for c in cands if c['kind'] == 'site']; others = [c for c in cands if c['kind'] == 'other']
