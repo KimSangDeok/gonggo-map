@@ -37,7 +37,7 @@ PAM = {
   '래미안루센티아': [('211674', None)],
   '힐스테이트신촌': [('221031', None)],
   '북한산두산위브': [('211671', None)],
-  '대치르엘': [('236503', '르엘')],                              # 2021년 1차 신규(르엘대치 …)
+  '대치르엘': [('236503', '르엘|대치')],                           # 2021년 1차 신규(르엘대치 …)
   '고덕온빛채': [('275456', '고덕강일')],                        # 2024년 1차 신규(고덕강일 2BL = 고덕온빛채)
   '강동리엔파크14단지': [('217510', '14단지')],                  # 2020년 1차 공사건설형
   '강동리엔파크11단지': [('217510', '11단지')],
@@ -105,17 +105,20 @@ def download(seq, file_seq='1', brd='JI1901'):
     raise last
 
 def pick_pages(pdf, kw):
-    """키워드 없는 단일 단지 팸플릿: 앞에서부터 MAX_PAGES 쪽. 묶음 팸플릿: 키워드가 글자로 들어 있는 쪽(+다음 2쪽).
-    앞 3쪽(표지·목차)에도 키워드가 있기 마련이라 뒤쪽에 다른 히트가 있으면 앞 3쪽은 뺀다. 반환: (선택 쪽 인덱스, 히트 쪽 번호)"""
+    """키워드 없는 단일 단지 팸플릿: 앞에서부터 MAX_PAGES 쪽. 묶음 팸플릿: 키워드('a|b' 로 대안 가능)가 글자로 들어 있는 쪽(+다음 2쪽).
+    키워드가 모든 쪽 바닥글에 찍히는 팸플릿(2017년 1차 등)이 있어, 쪽 머리(앞 120자)에 키워드가 있는 쪽이 있으면 그것만 쓴다.
+    앞 3쪽(표지·목차)은 뒤쪽에 다른 히트가 있으면 뺀다. 반환: (선택 쪽 인덱스, 히트 쪽 번호)"""
     n = len(pdf.pages)
     if not kw: return list(range(min(n, MAX_PAGES))), []
-    k = kw.replace(' ', '')
-    hit = []
-    for i, pg in enumerate(pdf.pages):
-        try: t = (pg.extract_text() or '').replace(' ', '')
-        except Exception: t = ''
-        if k in t: hit.append(i)
+    keys = [k.replace(' ', '') for k in kw.split('|') if k.strip()]
+    texts = []
+    for pg in pdf.pages:
+        try: texts.append((pg.extract_text() or '').replace(' ', ''))
+        except Exception: texts.append('')
+    hit = [i for i, t in enumerate(texts) if any(k in t for k in keys)]
     if not hit: return list(range(min(n, 3))), []
+    head = [i for i, t in enumerate(texts) if any(k in t[:120] for k in keys)]
+    if len(hit) > n * 0.6 and head: hit = head          # 바닥글에 전부 찍히는 경우 → 머리글 기준
     late = [i for i in hit if i >= 3]
     use = late or hit
     sel = []
