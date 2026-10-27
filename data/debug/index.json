@@ -1,18 +1,18 @@
 [
  {
-  "url": "https://www.i-sh.co.kr/houseinfo/main/mainPage.do",
+  "url": "https://www.i-sh.co.kr/houseinfo/js/map/map.search.js?ver=20260317",
   "post": "",
   "status": 200,
-  "type": "text/html; charset=UTF-8",
-  "bytes": 56226,
-  "file": "www_i_sh_co_kr_houseinfo_main_mainPage_do_7acf73.html"
+  "type": "text/javascript;charset=UTF-8",
+  "bytes": 8782,
+  "file": "www_i_sh_co_kr_houseinfo_js_map_map_search_js_ver_20260317_352c0a.html"
  },
  {
-  "url": "https://www.i-sh.co.kr/houseinfo/map/mapPage.do",
+  "url": "https://www.i-sh.co.kr/houseinfo/js/map/map.house.js?ver=20260807",
   "post": "",
-  "status": 404,
-  "type": "text/html; charset=UTF-8",
-  "bytes": 806,
-  "file": "www_i_sh_co_kr_houseinfo_map_mapPage_do_65b291.html"
+  "status": 200,
+  "type": "text/javascript;charset=UTF-8",
+  "bytes": 50070,
+  "file": "www_i_sh_co_kr_houseinfo_js_map_map_house_js_ver_20260807_719c3f.html"
  }
 ]
