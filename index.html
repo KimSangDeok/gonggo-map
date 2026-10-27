@@ -63,6 +63,7 @@ th,td{text-align:left;vertical-align:top;padding:10px 12px;border-bottom:1px sol
 th{font-weight:500;color:var(--muted);font-size:12.5px;letter-spacing:.03em;background:color-mix(in srgb,var(--bg) 60%,var(--surface))}
 tr:last-child td{border-bottom:0}
 td.num,th.num{font-family:var(--font-mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+td.money{font-variant-numeric:tabular-nums;min-width:220px}
 .nw,td.nw,th.nw{white-space:nowrap}
 table.wide{min-width:960px}
 td small,p small,li small{color:var(--muted);font-size:12.5px}
@@ -129,6 +130,26 @@ html{scroll-behavior:smooth}
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
 .totop{position:fixed;right:max(16px,env(safe-area-inset-right,0px));bottom:max(16px,env(safe-area-inset-bottom,0px));z-index:9;width:42px;height:42px;padding:0;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--fg);font-family:inherit;font-size:18px;line-height:40px;text-align:center;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.12)}
 .totop[hidden]{display:none}
+
+/* 넓은 화면에서도 칸이 좁아 세로로 길어지는 표(순위표): 한 행을 가로 격자 카드로 — 1행 유형, 2행 평형·금액·거주, 3행 내 자격·근거 */
+table td .pill{white-space:normal}
+@container page (min-width:641px){
+  .tbl table.cards{min-width:0}
+  table.cards thead{display:none}
+  table.cards,table.cards tbody{display:block}
+  table.cards tr{display:grid;grid-template-columns:44px repeat(3,minmax(0,1fr));gap:2px 20px;padding:12px 14px 14px;border-bottom:1px solid var(--line);align-items:start}
+  table.cards tr:last-child{border-bottom:0}
+  table.cards td{display:block;border:0;padding:2px 0}
+  table.cards td:nth-child(1){grid-column:1;grid-row:1 / span 3;font-size:22px;line-height:1.2;padding-top:4px}
+  table.cards td:nth-child(2){grid-column:2 / span 3}
+  table.cards td:nth-child(3){grid-column:2;grid-row:2}
+  table.cards td:nth-child(4){grid-column:3;grid-row:2}
+  table.cards td:nth-child(5){grid-column:4;grid-row:2}
+  table.cards td:nth-child(6){grid-column:2 / span 2;grid-row:3}
+  table.cards td:nth-child(7){grid-column:4;grid-row:3}
+  table.cards td.money{min-width:0}
+  table.cards td:nth-child(n+3)::before{content:attr(data-label);display:block;font-size:11.5px;letter-spacing:.04em;color:var(--muted);margin-top:8px;margin-bottom:2px}
+}
 /* 모바일 보기 toggle: narrows the column to phone width so the same rules kick in on a desktop */
 html.m body{background:color-mix(in srgb,var(--bg) 88%,var(--muted))}
 html.m .wrap{max-width:430px;background:var(--bg);box-shadow:0 0 0 1px var(--line),0 18px 50px rgba(0,0,0,.16);min-height:100vh}
@@ -628,14 +649,14 @@ table.stack tr.dim td{color:#8a94a3}
     </div>
   </div>
 
-  <div class="tbl" style="margin-top:14px"><table class="stack">
+  <div class="tbl" style="margin-top:14px"><table class="stack cards">
     <thead><tr><th>순위</th><th>유형</th><th>평형 (전용)</th><th>보증금 · 월세 (공고 기준)</th><th>임대료율 · 거주</th><th>내 자격</th><th>근거</th></tr></thead>
     <tbody>
       <tr>
         <td class="num rank">1</td>
         <td><b>청년 보편형 전세임대</b> (2027 신설) <span class="pill info">서울 포함, 집은 내가 고름</span><br><small>기존 청년 전세임대는 1순위 수시모집만 운영, 2·3순위 단독 모집 없음 → 본인은 보편형이 실질 카드</small></td>
         <td>전용 85㎡(25.7평) 이하 전세·보증부월세 주택을 직접 구함</td>
-        <td class="num">한도 2.4억(수도권)<br>기존 1.2억: 본인부담 100만 + 월 12~22만<br>2.4억이면 같은 구조 시 월 24~44만 <span class="pill warn">추정</span></td>
+        <td class="money">한도 2.4억(수도권)<br>기존 1.2억: 본인부담 100만 + 월 12~22만<br>2.4억이면 같은 구조 시 월 24~44만 <span class="pill warn">추정</span></td>
         <td>지원금의 연 1.2~2.2% 이자<br>최장 10년</td>
         <td><span class="pill ok">소득 140%·추첨·원가구 제외</span></td>
         <td class="src"><a href="https://www.edaily.co.kr/News/Read?mediaCodeNo=257&newsId=04742886645546992">8·13 대책</a> · <a href="https://www.cku.ac.kr/bbs/cku_kr/1202/150819/download.do">2026 공고문</a> · <a href="https://jupsunow.com/guide/lh-jeonse-rental/">2·3순위 모집 이력</a> · <a href="https://r114.com/trends/wiki/policy/3cf4a6fa-284b-803a-95f8-ddad32fc52b6">2027 청년정책</a></td>
@@ -644,7 +665,7 @@ table.stack tr.dim td{color:#8a94a3}
         <td class="num rank">2</td>
         <td><b>SH 행복주택 청년(소득有) 36~40㎡(10.9평~12.1평)형</b> <span class="pill info">서울</span><br><small>2026년 1·2차에 36㎡(10.9평) 이상 청년형이 나온 단지 22곳 — 강서구엔 없음(29㎡(8.8평) 방화스카이포레만). 단지 목록은 5번 표</small></td>
         <td>36~40㎡ (10.9~12.3평). 29~34㎡(8.8~10.4평)도 원룸보다 큼</td>
-        <td class="num">실제(청년 소득있음): 천왕이펜하우스8 36㎡(10.9평) 6,552만 · 24.6만 / 신내 글로리움 36㎡(10.9평) 7,056만 · 25.3만 / 목동센트럴아이파크위브 34㎡(10.3평) 9,851만 · 32.0만 / 래미안베라힐즈 38㎡(11.5평) 1억 3,248만 · 53.0만 / 방화스카이포레 29㎡(8.8평) 7,272만 · 26.6만</td>
+        <td class="money">실제(청년 소득있음): 천왕이펜하우스8 36㎡(10.9평) 6,552만 · 24.6만<br>신내 글로리움 36㎡(10.9평) 7,056만 · 25.3만<br>목동센트럴아이파크위브 34㎡(10.3평) 9,851만 · 32.0만<br>래미안베라힐즈 38㎡(11.5평) 1억 3,248만 · 53.0만<br>방화스카이포레 29㎡(8.8평) 7,272만 · 26.6만</td>
         <td>청년 시세 72%<br>최대 10년</td>
         <td><span class="pill ok">소득 100%(1인 120%)</span><br>본인자산 2억 5,100만<br>우선 1순위는 강서(거주)·동대문(소득근거지) 단지만, 배점 6점 만점. 나머지는 일반 1순위 추첨</td>
         <td class="src"><a href="https://gobang.kr/contents/7908">SH 2026 1차</a> · <a href="https://jugeo.co.kr/blog/guide/haengbok-jutaek">행복주택 가이드</a> · <a href="https://bizhankook.com/articles/6968.html">계층별 임대료율</a></td>
@@ -653,7 +674,7 @@ table.stack tr.dim td{color:#8a94a3}
         <td class="num rank">3</td>
         <td><b>SH 국민임대 49㎡(14.8평) (강서·연접 1순위) / 59㎡(17.8평) (청약 1순위)</b> <span class="pill info">서울</span><br><small>2026 공고(8.20) 접수 종료 → 2027년 8월 공고 대비. 단지는 5번 표</small></td>
         <td>마곡엠밸리 49㎡(14.8평) · 마곡수명산파크 49㎡(15.1평)·59㎡(18.1평) · 신정이펜하우스·상암월드컵파크 49㎡(14.8평)</td>
-        <td class="num">실제: 마곡수명산파크 49㎡(14.8평) 3,674~3,900만 · 26.2~28.7만, 59㎡(17.8평) 4,002~4,323만 · 29.3~32.2만 / 마곡엠밸리 49㎡(14.8평) 5,564만 · 38.0만 / 신정이펜하우스 49㎡(14.8평) 4,007만 · 30.4만 (2025·2026 공고)</td>
+        <td class="money">실제: 마곡수명산파크 49㎡(14.8평) 3,674~3,900만 · 26.2~28.7만, 59㎡(17.8평) 4,002~4,323만 · 29.3~32.2만<br>마곡엠밸리 49㎡(14.8평) 5,564만 · 38.0만<br>신정이펜하우스 49㎡(14.8평) 4,007만 · 30.4만 (2025·2026 공고)</td>
         <td>시세 60~80%<br>최장 30년</td>
         <td><span class="pill ok">49㎡(14.8평) 선순위(1인 70%) + 1순위(강서·양천·마포 상암)</span><br>59㎡(17.8평)는 청약 1순위지만 배점 6점으로 가족 가구에 밀림</td>
         <td class="src"><a href="https://www.newspim.com/news/view/20260820001218">뉴스핌</a> · <a href="https://protip777.kr/2026%EB%85%84-%EA%B5%AD%EB%AF%BC%EC%9E%84%EB%8C%80%EC%A3%BC%ED%83%9D-%EC%9E%85%EC%A3%BC%EC%9E%90-%EB%AA%A8%EC%A7%91sh-%EC%84%9C%EC%9A%B8%C2%B7%EA%B2%BD%EA%B8%B0/">공고 정리</a></td>
@@ -662,7 +683,7 @@ table.stack tr.dim td{color:#8a94a3}
         <td class="num rank">4</td>
         <td><b>든든전세주택</b> (LH·HUG) <span class="pill info">서울 103호 + 경기·인천</span></td>
         <td>다세대·연립·오피스텔·아파트. 3~4인 중산층용이라 넓은 편(방 2개 이상)</td>
-        <td class="num">시세 90% 전세. 2.5억 가정 시 80% 대출·연 3.5% → 월 이자 약 58만</td>
+        <td class="money">시세 90% 전세. 2.5억 가정 시 80% 대출·연 3.5% → 월 이자 약 58만</td>
         <td>시세 90%<br>최장 8년</td>
         <td><span class="pill warn">소득·자산 무관이지만 배점 불리, 서울 315:1</span></td>
         <td class="src"><a href="https://www.youthdaily.co.kr/mobile/article.html?no=218955">청년일보</a> · <a href="https://homedubu.com/10226/">자금 예시</a></td>
@@ -671,7 +692,7 @@ table.stack tr.dim td{color:#8a94a3}
         <td class="num rank">5</td>
         <td><b>LH 통합공공임대 36·46㎡(13.9평)</b> <span class="pill warn">서울 밖 — 서울 공고 드묾, 부천대장·고양창릉 등 경기</span></td>
         <td>전용 85㎡(25.7평) 이하. 1인도 36㎡(10.9평)·46㎡(13.9평) 신청 가능</td>
-        <td class="num">서울 외곽 59㎡(17.8평) 시세 월세 100만 가정 시 중위 50% 거주자 약 50만<br>36~46㎡(10.9평~13.9평): 보증금 3,000~6,000만 · 월 25~40만 <span class="pill warn">추정</span></td>
+        <td class="money">서울 외곽 59㎡(17.8평) 시세 월세 100만 가정 시 중위 50% 거주자 약 50만<br>36~46㎡(10.9평~13.9평): 보증금 3,000~6,000만 · 월 25~40만 <span class="pill warn">추정</span></td>
         <td>시세 50% (내 구간)<br>최장 30년, 2년 단위</td>
         <td><span class="pill ok">우선공급 충족</span></td>
         <td class="src"><a href="https://jugeo.co.kr/blog/guide/tonghap-gonggong-imdae">통합공공임대 가이드</a> · <a href="https://housing.gg.go.kr/html/24110.do">공급면적</a> · <a href="https://m.news.nate.com/view/20260311n22686">2026 LH 물량</a></td>
@@ -680,7 +701,7 @@ table.stack tr.dim td{color:#8a94a3}
         <td class="num rank">6</td>
         <td><b>청년안심주택 공공임대</b> (옛 역세권청년주택, SH 접수) <span class="pill info">서울 · 연 2회</span><br><small>2026년 1차 3/31 공고 573세대(접수 4/10~14, 당첨 8/12) · 2차 7/31 공고 581세대(입주 2027-02). 둘 다 접수 끝 → 2027년 1차(3월 말 예상) 대비. 단지는 지도의 '청년안심' 마커(공공임대 세대수 표시)</small></td>
         <td>공고문 단지표를 읽은 결과(공고 일정 탭 표): <b>8평(26.45㎡) 이상 청년형은 2026 1차 8호(5단지) · 2차 31호(12단지)뿐</b>이고 전부 재공급(빈집 재모집). 신규공급 청년형은 두 회차 모두 8평 미만 원룸만(1차 411호·2차 364호가 8평 미만) · 신혼부부형 36~49㎡(10.9평~14.8평)는 미혼 제외</td>
-        <td class="num">8평 이상 청년형 A구간(소득 50%↓, 시세 30%): 보증금 4,005만~7,106만 · 월 16.2만~24.8만 (예: 에드가 상계 33.7㎡(10.2평) 4,110만 · 18.2만, 와이엔타워 30.33㎡(9.2평) 5,155만 · 22.7만, 한화포레나 당산 33.1㎡(10평) 4,788만 · 21.1만)</td>
+        <td class="money">8평 이상 청년형 A구간(소득 50%↓, 시세 30%): 보증금 4,005만~7,106만 · 월 16.2만~24.8만 (예: 에드가 상계 33.7㎡(10.2평) 4,110만 · 18.2만, 와이엔타워 30.33㎡(9.2평) 5,155만 · 22.7만, 한화포레나 당산 33.1㎡(10평) 4,788만 · 21.1만)</td>
         <td>주변 시세 <b>30~50%</b> (소득 구간별)<br>최장 10년</td>
         <td><span class="pill ok">19~39세·미혼·무주택 · 소득 100% 이하(1인 가구 가산) · 자산 2억 5,100만 · 자동차 4,542만</span><br><small>순위: 1순위 = 수급자·보호대상 한부모·차상위만, 2순위 = 본인+부모 소득 100%·자산 3억 4,500만, 3순위 = 본인 소득 100%·자산 2억 5,100만(2차 공고문 32~33쪽). <b>2026 2차 결과: 8평 이상 청년형 31호 전부 1순위 신청자만으로 마감</b>(예: 에드가 상계 33㎡(10평) 10호에 1순위 80명) → 2·3순위는 0호</small></td>
         <td class="src"><a href="https://soco.seoul.go.kr/youth/pgm/home/yohome/supportYouth1.do?menuNo=400039">서울시 입주자격(2026 기준)</a> · <a href="https://www.i-sh.co.kr/app/lay2/program/S1T294C295/www/brd/m_241/view.do?multi_itm_seqs=1%2C2%2C4%2C8%2C16%2C32%2C64%2C128%2C256&seq=302646">SH 2026 1차 공고문</a> · <a href="https://www.i-sh.co.kr/app/lay2/program/S1T294C295/www/brd/m_241/view.do?multi_itm_seqs=1%2C2%2C4%2C8%2C16%2C32%2C64%2C128%2C256&seq=309925">2차 공고문</a> · <a href="https://www.i-sh.co.kr/app/lay2/program/S1T294C295/www/brd/m_241/view.do?multi_itm_seqs=1%2C2%2C4%2C8%2C16%2C32%2C64%2C128%2C256&seq=308650">2차 최종 경쟁률</a> · <a href="https://mediahub.seoul.go.kr/archives/2009425">시세 30~50%·10년(서울시)</a> · <a href="https://news.mtn.co.kr/news-detail/2023040407122246568">1인 최소 23㎡(7평)(2023 개편)</a></td>
@@ -689,7 +710,7 @@ table.stack tr.dim td{color:#8a94a3}
         <td class="num rank">7</td>
         <td><b>청년 매입임대 (SH·LH)</b> <span class="pill info">서울 · SH 연 2회</span><br><small>SH 2026년 1차 6/26 공고 849호(신규 490·재공급 359), 접수 7/13~15, 당첨 11/20. 2차는 12월 말 예상. 다가구·원룸 위주, 집은 공고 목록에서 고름</small></td>
         <td>주택목록(849호)을 호별로 읽은 결과 <b>전용 8평(26.45㎡) 이상이 496호(58%)</b> — 원룸만은 아님(강서 레인트리 31.8~50.3㎡(9.6평~15.2평) 분리형 원룸·투룸 15호, 동대문 서도휴파크 29.98㎡(9.1평) 19호 등). 주택형 코드(31C 등)는 전용면적이 아니라서 전용면적 열로 판정 · 9평 이상 204호 · 10평 이상 115호 (공고 일정 탭 표)</td>
-        <td class="num">8평 이상 집 2·3순위(시세 50%): 보증금 2,274만~8,231만 · 월 23.7만~84.8만 / 1순위(시세 30%): 1,364만~4,938만 · 월 14.2만~50.9만. 예: 강서 레인트리 34A 31.8㎡(9.6평) 2·3순위 3,435만 · 35.4만, 동대문 서도휴파크 29.98㎡(9.1평) 3,675만 · 37.9만. 보증금↔월세 전환 가능(신규 80%·재공급 60%)</td>
+        <td class="money">8평 이상 집 2·3순위(시세 50%): 보증금 2,274만~8,231만 · 월 23.7만~84.8만<br>1순위(시세 30%): 1,364만~4,938만 · 월 14.2만~50.9만. 예: 강서 레인트리 34A 31.8㎡(9.6평) 2·3순위 3,435만 · 35.4만, 동대문 서도휴파크 29.98㎡(9.1평) 3,675만 · 37.9만. 보증금↔월세 전환 가능(신규 80%·재공급 60%)</td>
         <td>시세 <b>40~50%</b> (1순위 30%, 2·3순위 50%)<br>2년×재계약 4회 = 10년</td>
         <td><span class="pill ok">3순위: 본인 소득 100%(4,576,036원) · 총자산 2억 5,100만 · 자동차 4,542만</span><br><small>2순위는 본인+부모 소득 100%·자산 3억 4,500만 — 부모 소득 확인 필요. <b>2026 1차 결과(경쟁률 PDF): 8평 이상 496호 중 395호는 1순위(수급자·차상위·한부모) 신청자만으로 마감, 2순위까지 내려온 45호도 2순위에서 전부 마감 → 3순위 0호.</b> 강서 레인트리·동대문 서도휴파크도 1순위 마감</small></td>
         <td class="src"><a href="https://www.i-sh.co.kr/app/lay2/program/S1T294C295/www/brd/m_241/view.do?multi_itm_seqs=1%2C2%2C4%2C8%2C16%2C32%2C64%2C128%2C256&seq=306214">SH 2026 1차 공고·주택목록</a> · <a href="https://www.i-sh.co.kr/app/lay2/program/S1T294C295/www/brd/m_241/view.do?multi_itm_seqs=1%2C2%2C4%2C8%2C16%2C32%2C64%2C128%2C256&seq=307073">최종 경쟁률</a> · <a href="https://gobang.kr/contents/7973">요약 기사</a> · <a href="https://apply.lh.or.kr/lhapply/apply/wt/wrtanc/selectWrtancList.do?mi=1026">LH 청약플러스(서울 청년매입)</a></td>
@@ -698,7 +719,7 @@ table.stack tr.dim td{color:#8a94a3}
         <td class="num rank">8</td>
         <td><b>청년안심주택 민간임대</b> (공공지원민간임대, 사업자 접수) <span class="pill warn">서울 · 수시</span><br><small>서울시 게시판에 사업자별 공고가 수시로 올라옴(최근 30건 중 민간 대부분). 지도의 청년안심 마커를 누르면 단지별 입주현황(형·보증금·월세)</small></td>
         <td>원룸 17~25㎡(5.1평~7.6평) 위주 → <b>청년 자격 형이 8평(26.45㎡) 이상인 단지 44곳만</b>(서울시 단지정보 99곳 중, 2026-10-27 기준 · 53곳은 원룸뿐, 2곳은 형별 표 없음) · 셰어형(방 하나만 전용)은 제외</td>
-        <td class="num">8평 이상 사례(서울시 단지정보 표): 화곡역 보눔하우스 화곡 원룸 28.45㎡(8.6평) 일반 6,500만 · 37만 / 발산역 엘크루 1.5룸 30.79㎡(9.3평) 일반 9,600만 · 53만 / 우장산역 해링턴타워 2룸 43㎡대(13평) 특별 8,320만 · 55만 — 공공임대보다 훨씬 비쌈</td>
+        <td class="money">8평 이상 사례(서울시 단지정보 표): 화곡역 보눔하우스 화곡 원룸 28.45㎡(8.6평) 일반 6,500만 · 37만<br>발산역 엘크루 1.5룸 30.79㎡(9.3평) 일반 9,600만 · 53만<br>우장산역 해링턴타워 2룸 43㎡대(13평) 특별 8,320만 · 55만 — 공공임대보다 훨씬 비쌈</td>
         <td>시세 <b>75~85%</b>(2023 개편)<br>최장 10년 · 보증금 무이자 지원 별도</td>
         <td><span class="pill ok">특별공급: 소득 120% · 자산 2억 5,100만 · 자동차 4,542만</span> <span class="pill info">일반공급: 소득·자산 무관</span></td>
         <td class="src"><a href="https://soco.seoul.go.kr/youth/pgm/home/yohome/supportYouth1.do?menuNo=400039">입주자격</a> · <a href="https://soco.seoul.go.kr/youth/bbs/BMSR00015/list.do?menuNo=400008">서울시 모집공고 게시판</a> · <a href="https://news.mtn.co.kr/news-detail/2023040407122246568">임대료 75~85%</a></td>
