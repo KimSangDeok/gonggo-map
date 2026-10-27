@@ -262,3 +262,97 @@ def kapt_fetch(code):
     d = r.json(); k = d.get('resultMap_kapt') or {}; car = d.get('getKaptdfCarInfo') or {}
     return {'nm': k.get('kaptName'), 'use': k.get('kaptUsedate'), 'dong': k.get('kaptDongCnt'), 'hh': k.get('kaptdaTCnt'), 'heat': k.get('codeHeat'), 'hall': k.get('codeHall'), 'str': k.get('codeStr'),
             'pg': k.get('kaptdPcnt'), 'pu': k.get('kaptdPcntu'), 'cars': car.get('carTot'), 'ev': car.get('carTotEl'), 'elev': k.get('kaptdEcntTotal'), 'cctv': k.get('kaptdCccnt'), 'sale': k.get('codeSale'), 'apt': k.get('codeApt'), 'ctl': k.get('codeCtl')}
+
+# ---------------- 서울시 청년안심주택 (soco.seoul.go.kr/youth) ----------------
+# 목록·지도·게시판이 전부 AJAX JSON. 단지 상세(view.do)는 서버 렌더 HTML(규모·입주일·입주현황 표).
+YA = 'https://soco.seoul.go.kr/youth'
+YA_GUS = ['강남구','강동구','강북구','강서구','관악구','광진구','구로구','금천구','노원구','도봉구','동대문구','동작구','마포구','서대문구','서초구','성동구','성북구','송파구','양천구','영등포구','용산구','은평구','종로구','중구','중랑구']
+def ya_post(path, data):
+    r = S.post(YA + '/pgm/home/yohome' + path, data=data, timeout=60, headers={'X-Requested-With': 'XMLHttpRequest', 'Referer': YA + '/pgm/home/yohome/list.do?menuNo=400002'})
+    r.raise_for_status(); return r.json()
+def _txt(html):
+    t = re.sub(r'<br\s*/?>', ' ', html or ''); t = re.sub(r'<[^>]+>', ' ', t); t = re.sub(r'&nbsp;|&#160;', ' ', t)
+    return ' '.join(t.split())
+def ya_notices(pages=3):
+    """모집공고 게시판(BMSR00015): [공공임대]/[민간임대] 공고. optn1 게시일, optn4 청약신청일, optn3 담당부서/사업자, optn2 1공공 2민간, optn5 1최초 2추가"""
+    out = []
+    for p in range(1, pages + 1):
+        j = ya_post('/bbsListJson.json', {'bbsId': 'BMSR00015', 'pageIndex': p, 'searchAdresGu': '', 'searchCondition': '', 'searchKeyword': '', 'optn2': '', 'optn5': ''})
+        rows = j.get('resultList') or []
+        for r in rows:
+            out.append({'id': str(r.get('boardId')), 'title': ' '.join((r.get('nttSj') or '').split()), 'kind': '공공임대' if str(r.get('optn2')) == '1' else '민간임대',
+                        'stage': '최초' if str(r.get('optn5')) == '1' else '추가', 'posted': r.get('optn1') or '', 'apply': r.get('optn4') or '', 'org': r.get('optn3') or '',
+                        'url': f"{YA}/bbs/BMSR00015/view.do?boardId={r.get('boardId')}&menuNo=400008", 'text': _txt(r.get('content'))[:500]})
+        if len(rows) < 10: break
+        time.sleep(0.4)
+    log('청년안심 공고:', len(out))
+    return out
+def _won(s):
+    s = re.sub(r'[^\d]', '', str(s or ''))
+    return int(s) if s else None
+def ya_detail(code):
+    r = S.get(YA + f'/pgm/home/yohome/view.do?menuNo=400002&homeCode={code}', timeout=60); r.raise_for_status()
+    soup = BeautifulSoup(r.text, 'html.parser')
+    info = {}
+    for p in soup.select('ul.detail-list p'):
+        st = p.find('strong')
+        if not st: continue
+        k = st.get_text(' ', strip=True).rstrip(':').strip(); v = p.get_text(' ', strip=True)
+        v = v[len(st.get_text(' ', strip=True)):].strip() if v.startswith(st.get_text(' ', strip=True)) else v
+        info[k] = v
+    m = re.search(r'총\s*([\d,]+)\s*세대\s*\(공공임대\s*([\d,\-]+)\s*세대,\s*공공지원민간임대\s*([\d,\-]+)\s*세대\)', info.get('규모', ''))
+    scale = {'total': _won(m.group(1)), 'pub': _won(m.group(2)), 'priv': _won(m.group(3))} if m else {}
+    status = ''
+    st_el = soup.find(string=re.compile(r'공급상태'))
+    if st_el:
+        nxt = st_el.find_parent().find_next(string=True)
+        status = (nxt or '').strip()
+    rows = {'special': [], 'general': []}
+    art = soup.select_one('#detail3')
+    if art:
+        cur = None
+        for el in art.find_all(['div', 'table']):
+            if el.name == 'div' and re.match(r'(특별공급|일반공급)', el.get_text(' ', strip=True)):
+                cur = 'special' if '특별' in el.get_text() else 'general'; continue
+            if el.name == 'table' and cur:
+                for tr in el.select('tbody tr'):
+                    td = [x.get_text(' ', strip=True) for x in tr.find_all('td')]
+                    if len(td) >= 6 and td[1]:
+                        rows[cur].append({'room': td[0], 'ty': td[1], 'who': td[2], 'n': _won(td[3]), 'dep': _won(td[4]), 'rent': _won(td[5]), 'mc': _won(td[6]) if len(td) > 6 else None})
+    homepage = ''
+    hp = soup.find('strong', string=re.compile(r'홈페이지'))
+    if hp and hp.find('a'): homepage = hp.find('a').get('href', '')
+    elif info.get('홈페이지'): homepage = info['홈페이지']
+    return {'addr': info.get('주소', ''), 'station': info.get('지하철역', ''), 'scale': scale, 'builder': info.get('시행사', ''), 'first_notice': info.get('최초모집공고일', ''),
+            'movein': info.get('입주(예정)일', ''), 'phone': info.get('대표전화', ''), 'homepage': homepage, 'status': status, 'rows': rows}
+def ya_complexes(details=True):
+    """단지 목록(99곳 안팎) + 구별 지도목록으로 좌표 + 상세 페이지(규모·입주현황 표)"""
+    j = ya_post('/yoHomeListJson.json', {'pageNum': 1, 'rowCount': 500, 'searchPresale': '', 'searchTheme': '', 'searchMovinHoman': '', 'searchHouseType': '', 'searchHouseForm': '', 'searchAdresGu': '', 'searchSil': '', 'searchWrd': ''})
+    comps = {}
+    for r in j.get('resultList') or []:
+        code = str(r.get('homeCode'))
+        comps[code] = {'code': code, 'name': r.get('homeName') or '', 'gu': r.get('adresGu') or '', 'addr': r.get('adres') or '', 'subway': r.get('optionSubway') or '',
+                       'dep_lo': r.get('moneyDepositLow'), 'dep_hi_txt': r.get('fnMoneyDepositHigh'), 'dep_lo_txt': r.get('fnMoneyDepositLow'), 'rent_lo': r.get('moneyRentalLow'), 'rent_hi_txt': r.get('fnMoneyRentalHigh'), 'rent_lo_txt': r.get('fnMoneyRentalLow'),
+                       'mc': [r.get('mcLow'), r.get('mcHigh')], 'room': r.get('roomTotArea'), 'vacant': r.get('silYn'), 'img': (f"https://soco.seoul.go.kr/coHouse/cmmn/file/fileDown.do?atchFileId={r.get('fileId')}&fileSn={r.get('fileSn')}" if r.get('fileId') else '')}
+    log('청년안심 단지 목록:', len(comps))
+    for gu in YA_GUS:
+        try:
+            m = ya_post('/maplist.json', {'searchWrd': gu, 'xpos': '', 'ypos': ''})
+            for r in m.get('mapResultList') or []:
+                code = str(r.get('homeCode'))
+                c = comps.setdefault(code, {'code': code, 'name': r.get('homeName') or '', 'gu': r.get('adresGu') or '', 'addr': r.get('adres') or '', 'subway': r.get('optionSubway') or ''})
+                try: c['lat'] = float(r.get('ypos')); c['lng'] = float(r.get('xpos'))
+                except Exception: pass
+                c['scale_tot'] = _won(r.get('scaleTot')); c['phone'] = r.get('managerPhone') or ''; c['homepage'] = r.get('homepage') or ''
+        except Exception as e:
+            log('청년안심 지도목록 실패', gu, repr(e))
+        time.sleep(0.3)
+    if details:
+        for code, c in comps.items():
+            try:
+                d = ya_detail(code); c.update({k: v for k, v in d.items() if v not in ('', None, {}, [])})
+            except Exception as e:
+                log('청년안심 상세 실패', code, repr(e))
+            time.sleep(0.4)
+    log('청년안심 단지(좌표 있음):', sum(1 for c in comps.values() if c.get('lat')))
+    return list(comps.values())

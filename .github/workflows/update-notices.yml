@@ -27,7 +27,7 @@ jobs:
       - name: commit
         run: |
           git config user.name 'gonggo-bot'; git config user.email 'gonggo-bot@users.noreply.github.com'
-          git add data/notices.json data/lh.json data/rates.json data/sh_files
+          git add data/notices.json data/lh.json data/ya.json data/rates.json data/sh_files
           git diff --cached --quiet && { echo 'no change'; exit 0; }
           git commit -m "data: 공고 갱신 $(date -u +%F)"
           for i in 1 2 3; do git pull --rebase -X theirs origin gh-pages && git push && exit 0; git rebase --abort 2>/dev/null; sleep 15; done
