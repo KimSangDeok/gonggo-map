@@ -16,8 +16,9 @@ for spec in os.environ.get('URLS', '').split():
         else:
             r = S.get(url, timeout=60)
         name = re.sub(r'[^A-Za-z0-9]+', '_', url.split('//', 1)[-1])[:80] + '_' + hashlib.md5(spec.encode()).hexdigest()[:6]
-        ext = '.json' if 'json' in (r.headers.get('content-type') or '') else ('.js' if url.endswith('.js') else '.html')
-        open(os.path.join(OUT, name + ext), 'wb').write(r.content[:3_000_000])
+        ct = (r.headers.get('content-type') or '').lower()
+        ext = '.json' if 'json' in ct else ('.pdf' if ('pdf' in ct or r.content[:5] == b'%PDF-') else ('.js' if url.endswith('.js') else '.html'))
+        open(os.path.join(OUT, name + ext), 'wb').write(r.content[:12_000_000])   # 공고문 PDF 도 받을 수 있게 12MB
         index.append({'url': url, 'post': post, 'status': r.status_code, 'type': r.headers.get('content-type'), 'bytes': len(r.content), 'file': name + ext})
     except Exception as e:
         index.append({'url': url, 'post': post, 'error': repr(e)})

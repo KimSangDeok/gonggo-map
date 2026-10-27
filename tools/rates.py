@@ -191,7 +191,7 @@ def happy_rows_for(rows, name, m2, grp_pref=('청년', '대학생')):
     out = []
     for r in rows:
         dn = norm(r['danji'])
-        if not (key in dn or dn in key or key[:6] in dn): continue
+        if not (key in dn or (len(dn) >= 5 and dn in key)): continue   # 앞 6자 매칭은 천왕이펜하우스7/8 같은 이웃 단지를 섞어서 뺌(사이트 JS 와 같은 규칙)
         if base and re.sub(r'[^0-9]', '', r['ty'] or '') != base: continue
         if r['ty'] and r['ty'].upper().endswith('S'): continue
         if r['grp'] not in grp_pref: continue
