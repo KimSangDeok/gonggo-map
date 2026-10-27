@@ -1,42 +1,26 @@
 [
  {
-  "url": "https://www.i-sh.co.kr/houseinfo/main/selectSearchList.do",
-  "post": "keyword=숲속마을",
+  "url": "https://www.i-sh.co.kr/app/lay2/program/S1T294C295/www/brd/m_241/list.do",
+  "post": "page=1&srchTp=0&srchWord=경쟁률",
   "status": 200,
-  "type": "application/json;charset=UTF-8",
-  "bytes": 13,
-  "file": "www_i_sh_co_kr_houseinfo_main_selectSearchList_do_45b513.json"
+  "type": "text/html; charset=UTF-8",
+  "bytes": 151398,
+  "file": "www_i_sh_co_kr_app_lay2_program_S1T294C295_www_brd_m_241_list_do_6f5bed.html"
  },
  {
-  "url": "https://www.i-sh.co.kr/houseinfo/main/selectSearchList.do",
-  "post": "keyword=신정4",
+  "url": "https://www.i-sh.co.kr/app/lay2/program/S1T294C295/www/brd/m_241/list.do",
+  "post": "page=2&srchTp=0&srchWord=경쟁률",
   "status": 200,
-  "type": "application/json;charset=UTF-8",
-  "bytes": 258,
-  "file": "www_i_sh_co_kr_houseinfo_main_selectSearchList_do_5c808b.json"
+  "type": "text/html; charset=UTF-8",
+  "bytes": 151246,
+  "file": "www_i_sh_co_kr_app_lay2_program_S1T294C295_www_brd_m_241_list_do_45bfb8.html"
  },
  {
-  "url": "https://www.i-sh.co.kr/houseinfo/main/selectSearchList.do",
-  "post": "keyword=신정숲속마을",
+  "url": "https://www.i-sh.co.kr/app/lay2/program/S1T294C295/www/brd/m_241/list.do",
+  "post": "page=3&srchTp=0&srchWord=경쟁률",
   "status": 200,
-  "type": "application/json;charset=UTF-8",
-  "bytes": 13,
-  "file": "www_i_sh_co_kr_houseinfo_main_selectSearchList_do_244568.json"
- },
- {
-  "url": "https://www.i-sh.co.kr/houseinfo/main/selectSearchList.do",
-  "post": "keyword=신정로110",
-  "status": 200,
-  "type": "application/json;charset=UTF-8",
-  "bytes": 258,
-  "file": "www_i_sh_co_kr_houseinfo_main_selectSearchList_do_bc17a3.json"
- },
- {
-  "url": "https://www.i-sh.co.kr/houseinfo/main/selectSearchList.do",
-  "post": "keyword=신정이펜하우스",
-  "status": 200,
-  "type": "application/json;charset=UTF-8",
-  "bytes": 1198,
-  "file": "www_i_sh_co_kr_houseinfo_main_selectSearchList_do_f81a65.json"
+  "type": "text/html; charset=UTF-8",
+  "bytes": 151260,
+  "file": "www_i_sh_co_kr_app_lay2_program_S1T294C295_www_brd_m_241_list_do_e7d9c7.html"
  }
 ]
