@@ -57,7 +57,7 @@ def kapt_summary(codes):
     def mode(key):
         vals = [k[key] for k in ks if k.get(key) and k[key] not in ('-', '기타')]
         return max(set(vals), key=vals.count) if vals else None
-    o['heat'] = mode('heat'); o['hall'] = mode('hall')
+    o['heat'] = mode('heat'); o['hall'] = mode('hall'); o['apt'] = mode('apt'); o['str'] = mode('str')   # 주택유형(아파트 등)·구조 — K-apt 등록값
     pk = [(k['pg'] or 0, k['pu'] or 0, k['hh'] or 0, int(k['cars']) if (k.get('cars') or '').isdigit() else None, int(k['ev']) if (k.get('ev') or '').isdigit() else None) for k in ks]
     pk = [p for p in pk if (p[0] + p[1]) > 0 and p[2] > 0]
     if pk:
