@@ -126,6 +126,41 @@ def sh_notices(known_seqs):
 LH_LIST = 'https://apply.lh.or.kr/lhapply/apply/wt/wrtanc/selectWrtancList.do'
 LH_INFO = 'https://apply.lh.or.kr/lhapply/apply/wt/wrtanc/selectWrtancInfo.do'
 LH_TYPES = ('행복주택', '국민임대', '통합공공임대')
+def lh_detail(url):
+    """LH 공고 상세 페이지: 단지별 소재지·좌표(var lat_N/lng_N)·세대수·주택형 표·공급일정."""
+    r = S.get(url, timeout=60, headers={'Referer': LH_LIST + '?mi=1026'}); r.raise_for_status()
+    html = r.text
+    lat = dict(re.findall(r'var\s+lat_(\d+)\s*=\s*"([\d.]+)"', html)); lng = dict(re.findall(r'var\s+lng_(\d+)\s*=\s*"([\d.]+)"', html))
+    soup = BeautifulSoup(html, 'html.parser')
+    comps = []
+    for div in soup.select('div[id^=wrtancSbdTab]'):
+        idx = div.get('id', '').replace('wrtancSbdTab', '')
+        h4 = div.select_one('h4.tit2'); name = h4.get_text(' ', strip=True) if h4 else ''
+        info = {}
+        for li in div.select('ul.list_st1 li'):
+            txt = li.get_text(' ', strip=True)
+            if ':' in txt:
+                k, v = txt.split(':', 1); info[k.strip()] = v.strip()
+        rows = []
+        tbl = div.select_one('table')
+        if tbl:
+            for tr in tbl.select('tbody tr'):
+                th = tr.find('th'); tds = tr.find_all('td')
+                def cell(td):
+                    d = td.find('div'); return (d.get_text(' ', strip=True) if d else td.get_text(' ', strip=True))
+                vals = [cell(td) for td in tds]
+                if th and len(vals) >= 5:
+                    rows.append({'ty': th.get_text(' ', strip=True), 'm2': vals[0], 'n': vals[1], 'dep': vals[2], 'rent': vals[3], 'net': vals[4]})
+        comps.append({'name': name, 'addr': info.get('소재지', ''), 'm2': info.get('전용면적(㎡)', ''), 'hh': info.get('총 세대수', ''), 'heat': info.get('난방방식', ''),
+                      'movein': info.get('입주예정월', ''), 'lat': float(lat[idx]) if idx in lat else None, 'lng': float(lng[idx]) if idx in lng else None, 'rows': rows})
+    text = soup.get_text('\n', strip=True)
+    sched = {}
+    for key, pat in [('접수', r'접수기간\s*:\s*(\d{4}\.\d{2}\.\d{2})\s*~\s*(\d{4}\.\d{2}\.\d{2})'), ('서류대상자 발표', r'서류제출대상자\s*발표일\s*:\s*(\d{4}\.\d{2}\.\d{2})'),
+                     ('서류 접수', r'서류접수기간\s*:\s*(\d{4}\.\d{2}\.\d{2})\s*~\s*(\d{4}\.\d{2}\.\d{2})'), ('당첨자 발표', r'당첨자발표일\s*:\s*(\d{4}\.\d{2}\.\d{2})')]:
+        m = re.search(pat, text)
+        if m: sched[key] = [g.replace('.', '-') for g in m.groups()]
+    return {'complexes': comps, 'sched': sched}
+
 def lh_notices(regions=(('41', '경기도'), ('11', '서울특별시')), days=150):
     today = datetime.date.today(); start = today - datetime.timedelta(days=days)
     out = []
@@ -160,6 +195,14 @@ def lh_notices(regions=(('41', '경기도'), ('11', '서울특별시')), days=15
         if k in seen: continue
         seen.add(k)
         if any(t in x['type'] for t in LH_TYPES) and '신혼희망' not in x['type']: res.append(x)
+    nc = 0
+    for x in res:
+        try:
+            d = lh_detail(x['url']); x['complexes'] = d['complexes']; x['sched'] = d['sched']; nc += len(d['complexes'])
+        except Exception as e:
+            log('LH detail fail', x['panId'], repr(e))
+        time.sleep(0.7)
+    log(f'LH details: {len(res)} notices, {nc} complexes')
     return res
 
 # ---------------- SH 주택정보 (houseinfo) ----------------

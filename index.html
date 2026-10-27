@@ -235,6 +235,12 @@ main section.view{margin-top:0}
 .nm-mk.sq{border-radius:4px}
 .nm-mk.hl{background:#fff;box-shadow:inset 0 0 0 4.5px var(--c),0 0 0 1.5px rgba(0,0,0,.35),0 2px 6px rgba(0,0,0,.45)}
 .dot{background:var(--c)}.dot.sm{width:10px;height:10px}
+.dot.lh{width:auto;height:auto;border-radius:4px;color:#fff;font:800 9px/1 var(--font-body);padding:2px 3px}
+.nm-mk.lh{width:24px;height:22px;border-radius:7px;color:#fff;font:800 9.5px/17px var(--font-body);text-align:center;letter-spacing:.02em}
+.nm-sel.lh{border-radius:8px;color:#fff;font:800 11px/20px var(--font-body);text-align:center}
+.iw-k tr.y th,.iw-k tr.y td{background:#fff7f7}
+.iw-lh th{width:auto;white-space:normal}
+.iw-lh td{padding-right:6px}
 .dot.hl{background:#fff;box-shadow:inset 0 0 0 3px var(--c),0 0 0 1px rgba(0,0,0,.25)}
 .nm-iw{min-width:270px;max-width:min(372px,calc(100vw - 24px));padding:12px 14px 12px}
 .nm-iw table{min-width:0;width:100%;font-size:inherit;border-collapse:collapse;display:table}
@@ -314,6 +320,7 @@ main section.view{margin-top:0}
         <label><input type="checkbox" data-cat="big" checked> <span class="dot hl" style="--c:#D32F2F"></span> 36㎡↑ 일반</label>
         <label><input type="checkbox" data-cat="small"> <span class="dot sm" style="--c:#8a94a3"></span> 27~35㎡</label>
         <label><input type="checkbox" data-cat="kook" checked> <span class="dot sq" style="--c:#6A1B9A"></span> 국민임대</label>
+        <label><input type="checkbox" data-cat="lh" checked> <span class="dot lh" style="--c:#37474F">LH</span> LH 경기·서울</label>
         <span id="nm-status" class="src"></span> <small id="lh-brief" class="k"></small>
       </div>
       <div class="nmbar" style="border-top:0;padding-top:0"><label style="gap:8px">공고 <select id="nm-notice" style="font:inherit;padding:4px 6px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--fg)"><option value="">전체 (2026년 공고 3건)</option></select></label></div>
@@ -902,7 +909,30 @@ function moneyHtml(p, n){
     '<small class="k">보증금은 ' + pct + '%까지만 월세로 바꿀 수 있고(전환이율 연 2.5%), 월세를 보증금으로 바꾸는 쪽은 없음. 그래서 공고 그대로 = 보증금 최대·월세 최소, 전환하면 보증금 최소·월세 최대. 계산: ' + fmtMan(cut) + ' × 2.5% ÷ 12 = 월 ' + (Math.round(add * 10) / 10) + '만 추가.' +
     ' 근거: <a href="' + n.url + '" target="_blank" rel="noopener">' + n.name + ' 공고문</a>의 임대조건·보증금 전환 항목' + (REITS[p.name] ? ' (서울리츠 단지는 20%)' : '') + '</small></div>';
 }
+function lhWon(s){ var n = String(s || '').replace(/[^\d]/g, ''); if (!n) return s || '-'; var v = +n; return v >= 10000 ? (v >= 100000000 ? Math.floor(v / 100000000) + '억 ' : '') + (Math.round((v % 100000000) / 10000)).toLocaleString() + '만' : v.toLocaleString() + '원'; }
+function lhHtml(p){
+  var c = p.comp, n0 = p.notices[0], nav = 'https://map.naver.com/p/search/' + encodeURIComponent(p.name.replace(/\([^)]*\)/g, ''));
+  var head = '<div class="iw-h"><b>' + p.name + '</b><span class="pill info">' + p.kind + '</span><button type="button" class="iw-x" onclick="nmInfo.close()" aria-label="닫기">×</button></div>';
+  var sch = n0.sched || {}, schTxt = [];
+  if (sch['접수']) schTxt.push('접수 ' + fmtD(sch['접수'][0]) + '~' + fmtD(sch['접수'][1]));
+  if (sch['서류대상자 발표']) schTxt.push('서류대상자 발표 ' + fmtD(sch['서류대상자 발표'][0]));
+  if (sch['당첨자 발표']) schTxt.push('당첨자 발표 ' + fmtD(sch['당첨자 발표'][0]));
+  var body = '<table class="iw-t">' +
+    '<tr><th>공고</th><td>' + p.notices.slice(0, 2).map(function(n){ return '<a href="' + n.url + '" target="_blank" rel="noopener">' + n.title + '</a> <span class="pill ' + (n.status === '접수중' ? 'ok' : 'info') + '">' + n.status + '</span><br><small class="k">게시 ' + n.posted + ' · 마감 ' + n.deadline + '</small>'; }).join('<br>') + '</td></tr>' +
+    (schTxt.length ? '<tr><th>일정</th><td>' + schTxt.join(' · ') + '</td></tr>' : '') +
+    '<tr><th>단지</th><td>' + [c.hh ? c.hh + '세대' : '', c.m2 ? '전용 ' + c.m2 + '㎡' : '', c.heat, c.movein ? '입주 ' + c.movein : ''].filter(Boolean).join(' · ') + '</td></tr>' +
+    '</table>';
+  var rows = (c.rows || []);
+  if (rows.length) {
+    body += '<div class="iw-sec"><div class="iw-sh">주택형 <small class="k">이번 공고 물량 · LH 공고 페이지 표 그대로</small></div><table class="iw-t iw-k iw-lh"><tr><th>주택형</th><th>전용</th><th>금회 공급</th><th>보증금</th><th>월세</th></tr>' +
+      rows.map(function(r){ var y = /청년|대학생/.test(r.ty); return '<tr' + (y ? ' class="y"' : '') + '><th>' + (y ? '<b>' + r.ty + '</b>' : r.ty) + '</th><td>' + r.m2 + '</td><td>' + r.n + '</td><td>' + lhWon(r.dep) + '</td><td>' + lhWon(r.rent) + '</td></tr>'; }).join('') + '</table>' +
+      '<small class="k">보증금·월세가 "공고문 확인"이면 LH 페이지에도 숫자가 없는 것 → 공고문 PDF 참조. 자격·순위는 LH 기준이라 SH와 다름(이 지도는 위치·물량·일정만 자동 수집).</small></div>';
+  }
+  var foot = '<div class="iw-f"><small class="k">' + (c.addr || '') + '</small><a class="iw-btn" href="' + nav + '" target="_blank" rel="noopener">네이버지도 앱에서 열기 · 길찾기</a></div>';
+  return '<div class="nm-iw">' + head + body + foot + '</div>';
+}
 function nmHtml(p, approx){
+  if (p.lh) return lhHtml(p);
   var nav = 'https://map.naver.com/p/search/' + encodeURIComponent(p.q || p.name);
   var head = '<div class="iw-h"><b>' + p.name + '</b><span class="pill info">' + p.kind + '</span><button type="button" class="iw-x" onclick="nmInfo.close()" aria-label="닫기">×</button></div>';
   var body;
@@ -976,9 +1006,34 @@ function nmInit(){
   var sel = document.getElementById('nm-notice');
   buildNoticeSelect();
   sel.addEventListener('change', function(){ applyFilter(); });
-  var groups = { pri: '우선공급 1순위 가능 (강서·동대문)', big: '36㎡ 이상 · 일반 추첨', kook: '국민임대 지구', small: '27~35㎡' };
+  var groups = { pri: '우선공급 1순위 가능 (강서·동대문)', big: '36㎡ 이상 · 일반 추첨', kook: '국민임대 지구', lh: 'LH 경기·서울 — 공고 페이지에서 매일 자동 수집', small: '27~35㎡' };
   var groupEl = {};
-  ['pri','big','kook','small'].forEach(function(k){ var g = document.createElement('div'); g.className = 'grp'; g.textContent = groups[k]; g.dataset.cat = k; list.appendChild(g); groupEl[k] = g; });
+  ['pri','big','kook','lh','small'].forEach(function(k){ var g = document.createElement('div'); g.className = 'grp'; g.textContent = groups[k]; g.dataset.cat = k; list.appendChild(g); groupEl[k] = g; });
+  var lhAdded = {};
+  window.nmAddLH = function(j){
+    var items = (j && j.items || []).slice().sort(function(a, b){ return (b.posted || '').localeCompare(a.posted || ''); });
+    var comps = {};
+    items.forEach(function(it){ (it.complexes || []).forEach(function(c){ if (!c.name) return; var key = c.name + '|' + c.addr; var o = comps[key] || (comps[key] = { lh: true, cat: 'lh', nid: 'LH', name: c.name, addr: c.addr, comp: c, notices: [] }); o.notices.push(it); if (!o.comp.lat && c.lat) o.comp = c; }); });
+    Object.keys(comps).forEach(function(key){
+      if (lhAdded[key]) return; lhAdded[key] = 1;
+      var p = comps[key], c = p.comp, n0 = p.notices[0]; p.kind = 'LH ' + (n0.type || '');
+      function place(pos, approx){
+        var mk = new naver.maps.Marker({ map: nmMap, position: new naver.maps.LatLng(pos[0], pos[1]), icon: { content: '<div class="nm-mk lh' + (approx ? ' ap' : '') + '" style="--c:#37474F" title="' + p.name + '">LH</div>', anchor: new naver.maps.Point(12, 11) }, zIndex: 12 });
+        mk.__p = p; mk.__approx = approx; nmMarkers.push(mk); var k = keyOf(p.name); (nmIndex[k] = nmIndex[k] || []).push(mk);
+        naver.maps.Event.addListener(mk, 'click', function(){ nmFocusMarker(mk); });
+        var open = p.notices.some(function(n){ return n.status === '접수중' || n.status === '공고중'; });
+        var youth = (c.rows || []).filter(function(r){ return /청년|대학생/.test(r.ty); });
+        var it = document.createElement('div'); it.className = 'it'; it.dataset.cat = 'lh'; it.setAttribute('data-key', k); it.setAttribute('data-nid', 'LH');
+        it.innerHTML = '<span class="dot lh" style="--c:#37474F;margin-top:3px">LH</span><div><b>' + p.name + ' <span class="pill ' + (open ? 'ok' : 'info') + '" style="font-size:11px;padding:0 7px">' + (n0.type || 'LH') + ' · ' + (n0.status || '') + '</span></b><small>' + (c.addr ? c.addr.replace(/^경기도 |^서울특별시 /, '') : '') + (c.hh ? ' · ' + c.hh + '세대' : '') + (youth.length ? ' · 청년형 ' + youth.map(function(r){ return r.ty.split(' ')[0]; }).join('/') : '') + ' · 게시 ' + (n0.posted || '') + '</small></div><div class="num"></div>';
+        it.__mk = mk; it.addEventListener('click', function(){ nmFocusMarker(mk); });
+        var g = groupEl.lh; var ref = g.nextSibling; while (ref && ref.className === 'it') ref = ref.nextSibling; list.insertBefore(it, ref);
+      }
+      if (c.lat && c.lng) place([c.lat, c.lng], false);
+      else if (c.addr) nmGeocode(c.addr.replace(/\([^)]*\)/g, '').trim(), function(pt){ if (pt) place(pt, false); });
+    });
+    applyFilter();
+  };
+  if (window.__lhPending) { try { window.nmAddLH(window.__lhPending); } catch(e) { console.error(e); } window.__lhPending = null; }
   var i = 0, done = 0, approxN = 0;
   function next(){
     if (i >= PLACES.length) { status.textContent = PLACES.length + '곳' + (approxN ? ' (' + approxN + '곳 근사)' : ''); applyFilter(); return; }
@@ -1114,11 +1169,12 @@ function applyLive(){
     if (!j || !j.items) { box.innerHTML = '<p class="src">LH 자동 수집 데이터 없음 (첫 실행 전이거나 실패)</p>'; return; }
     var items = j.items.slice().sort(function(a, b){ return (b.posted || '').localeCompare(a.posted || ''); });
     if (!items.length) { box.innerHTML = '<p class="src">최근 150일 안에 경기·서울 LH 행복주택·국민임대·통합공공임대 공고 없음 (갱신 ' + j.updated + ')</p>'; return; }
+    if (window.nmAddLH && window.nmMap) { try { window.nmAddLH(j); } catch(e) { console.error(e); } } else window.__lhPending = j;
     var openN = items.filter(function(x){ return x.status === '접수중' || x.status === '공고중'; }).length, ggN = items.filter(function(x){ return /경기/.test(x.region); }).length;
     var head = document.getElementById('lh-head'); if (head) head.innerHTML = '경기·서울 LH 공고 <small>(자동 수집 · 최근 150일 ' + items.length + '건, 경기 ' + ggN + '건, 지금 접수 중 ' + openN + '건)</small>';
     var brief = document.getElementById('lh-brief'); if (brief) brief.innerHTML = '· LH 경기·서울 접수 중 <b>' + openN + '건</b> <a href="#calendar">(공고 일정 탭)</a>';
     box.innerHTML = '<div class="tbl"><table class="stack"><thead><tr><th>유형</th><th>공고명</th><th>지역</th><th>게시일</th><th>마감일</th><th>상태</th></tr></thead><tbody>' +
-      items.map(function(x){ return '<tr><td>' + x.type + '</td><td><a href="' + x.url + '" target="_blank" rel="noopener">' + x.title + '</a></td><td>' + x.region + '</td><td class="num">' + x.posted + '</td><td class="num">' + x.deadline + '</td><td>' + (x.status === '접수중' ? '<span class="pill ok">' : '<span class="pill info">') + x.status + '</span></td></tr>'; }).join('') +
+      items.map(function(x){ return '<tr><td>' + x.type + '</td><td><a href="' + x.url + '" target="_blank" rel="noopener">' + x.title + '</a>' + (x.complexes && x.complexes.length ? ' <small class="k">단지 ' + x.complexes.length + '곳 · 지도에 표시</small>' : '') + '</td><td>' + x.region + '</td><td class="num">' + x.posted + '</td><td class="num">' + x.deadline + '</td><td>' + (x.status === '접수중' ? '<span class="pill ok">' : '<span class="pill info">') + x.status + '</span></td></tr>'; }).join('') +
       '</tbody></table></div><p class="src">갱신 ' + j.updated + ' · 출처 <a href="https://apply.lh.or.kr/lhapply/apply/wt/wrtanc/selectWrtancList.do?mi=1026" target="_blank" rel="noopener">LH 청약플러스 공고문 목록</a></p>';
     var heads = ['유형','공고명','지역','게시일','마감일','상태']; box.querySelectorAll('tbody tr').forEach(function(tr){ Array.prototype.forEach.call(tr.children, function(td, i){ td.setAttribute('data-label', heads[i]); }); });
   });
