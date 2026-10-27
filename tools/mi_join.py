@@ -39,7 +39,7 @@ for k, g in G.items():
     if not blds and h: blds = sorted(set(t['bld'] for t in h['types']))
     if not h: no_type += 1
     groups.append({'sec': g['sec'], 'gu': g['gu'], 'name': g['name'], 'ty': g['ty'], 'sex': g['sex'], 'addr': g['addr'], 'struct': g['struct'], 'n': len(us),
-                   'bld': '·'.join(b.replace(' ', '·') for b in blds) if blds else None, 'lift': (h or {}).get('lift') or None, 'park': (h or {}).get('park') or None, 'tot': (h or {}).get('tot') or None, 'm2_min': min(m2s), 'm2_max': max(m2s), 'm2s': sorted(m2s),
+                   'bld': '·'.join(b.replace(' ', '·') for b in blds) if blds else None, 'lift': (h or {}).get('lift') or None, 'park': (h or {}).get('park') or None, 'tot': (h or {}).get('tot') or None, 'star': bool((h or {}).get('star')), 'm2_min': min(m2s), 'm2_max': max(m2s), 'm2s': sorted(m2s),
                    'p1': {'dep': min(u['p1']['dep'] or 0 for u in us) or None, 'rent': min(u['p1']['rent'] or 0 for u in us) or None, 'dep_hi': max(u['p1']['dep'] or 0 for u in us) or None, 'rent_hi': max(u['p1']['rent'] or 0 for u in us) or None},
                    'p23': {'dep': min(u['p23']['dep'] or 0 for u in us) or None, 'rent': min(u['p23']['rent'] or 0 for u in us) or None, 'dep_hi': max(u['p23']['dep'] or 0 for u in us) or None, 'rent_hi': max(u['p23']['rent'] or 0 for u in us) or None},
                    'rate': ({'n': s['n'], 'r1': r1['applicants'] if r1 else 0, 'r2': r2['applicants'] if r2 else 0, 'r3': r3['applicants'] if r3 else 0, 'sum': s['applicants'], 'rate': s['rate'], 'r1_fills': (r1['applicants'] if r1 else 0) >= s['n']} if s else None)})

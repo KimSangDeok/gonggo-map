@@ -50,7 +50,8 @@ def parse(path):
                     if r[0]: gu = r[0]
                     if r[1]:
                         name, addr = _split_name_addr(r[1])
-                        cur = {'gu': gu, 'name': name, 'addr': addr, 'tot': r[ci['tot']] if ci['tot'] is not None else '', 'lift': r[ci['lift']] if ci['lift'] is not None else '', 'park': r[ci['park']] if ci['park'] is not None else '', 'types': []}
+                        star = r[1].lstrip().startswith('*')   # 공고문 20쪽: 재공급 중 주택명 앞 * = 전세형(월세의 80%까지 보증금 전환)
+                        cur = {'gu': gu, 'name': name, 'addr': addr, 'star': star, 'tot': r[ci['tot']] if ci['tot'] is not None else '', 'lift': r[ci['lift']] if ci['lift'] is not None else '', 'park': r[ci['park']] if ci['park'] is not None else '', 'types': []}
                         houses.append(cur); bld = struct = ''
                     if cur is None: continue
                     if ci['bld'] is not None and r[ci['bld']]:
