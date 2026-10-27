@@ -213,6 +213,14 @@ def hi_post(path, params):
     except Exception: return {}
 def hi_init():
     S.get(HI + '/main/mainPage.do', timeout=40)
+def hi_search(keyword):
+    """주택정보 검색(아파트 등 · 지역 · 지하철 · 학교 · 모집공고) → 단지(gb 1) 결과 [{biznsCd, nm, etc1(주소), hsSe}]"""
+    r = hi_post('/main/selectSearchList.do', {'keyword': re.sub(r'\s', '', keyword)})
+    out = []
+    for k in ('result1', 'result2'):
+        for x in (r.get(k) or []):
+            if x.get('biznsCd') and x.get('biznsCd') != 'null': out.append({'cd': str(x['biznsCd']), 'nm': x.get('nm') or '', 'addr': x.get('etc1') or '', 'hsSe': x.get('hsSe')})
+    return out
 def hi_fetch(cd):
     o = {'cd': cd, 'types': [], 'plans': {}}
     sply = hi_post('/map/selectSplyTyInfo.do', {'biznsCd': cd})
