@@ -331,7 +331,7 @@ main section.view{margin-top:0}
         <label><input type="checkbox" data-cat="big" checked> <span class="dot hl" style="--c:#D32F2F"></span> 36㎡↑ 일반</label>
         <label><input type="checkbox" data-cat="small"> <span class="dot sm" style="--c:#8a94a3"></span> 27~35㎡</label>
         <label><input type="checkbox" data-cat="kook" checked> <span class="dot sq" style="--c:#6A1B9A"></span> 국민임대</label>
-        <label><input type="checkbox" data-cat="lh" checked> <span class="dot lh" style="--c:#37474F">LH</span> LH 경기·서울</label>
+        <label><input type="checkbox" data-cat="lh" checked> <span class="dot lh" style="--c:#37474F">LH</span> LH 서울</label>
         <span id="nm-status" class="src"></span> <small id="lh-brief" class="k"></small>
       </div>
       <div class="nmbar" style="border-top:0;padding-top:0"><label style="gap:8px">공고 <select id="nm-notice" style="font:inherit;padding:4px 6px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--fg)"><option value="">전체 (2026년 공고 3건)</option></select></label></div>
@@ -512,8 +512,8 @@ main section.view{margin-top:0}
     <h3 id="rates-head">SH 공고별 청약 경쟁률 <small>(결과 게시 PDF 자동 수집 · 2021년~)</small></h3>
     <p>공고가 끝나면 SH가 게시판에 "최종 청약 경쟁률"(행복주택) · "선순위 청약접수결과"(국민임대) 게시물을 올리고 단지·형·계층별 표를 PDF로 붙입니다. 그 PDF를 매일 읽어 와서 지도의 단지 상세에 <b>그 단지·그 형의 지난 경쟁률</b>을 붙이고, 여기엔 공고별 총괄을 둡니다.</p>
     <div id="rates-all"><p class="src">불러오는 중…</p></div>
-    <h3 id="lh-head">경기·서울 LH 공고 <small>(자동 수집)</small></h3>
-    <p>LH 청약플러스 공고 목록(경기도·서울특별시, 행복주택·국민임대·통합공공임대)을 매일 09:23·15:23에 읽어 옵니다. 공고 상세 페이지에 있는 단지 좌표·주택형 표·일정도 같이 읽어 지도에 LH 마커로 찍습니다.</p>
+    <h3 id="lh-head">서울 LH 공고 <small>(자동 수집)</small></h3>
+    <p>LH 청약플러스 공고 목록(서울특별시, 행복주택·국민임대·통합공공임대)을 매일 09:23·15:23에 읽어 옵니다. 공고 상세 페이지에 있는 단지 좌표·주택형 표·일정도 같이 읽어 지도에 LH 마커로 찍습니다.</p>
     <div id="lh-live"><p class="src">불러오는 중…</p></div>
   </div></section>
 
@@ -1095,7 +1095,7 @@ function nmInit(){
   var sel = document.getElementById('nm-notice');
   buildNoticeSelect();
   sel.addEventListener('change', function(){ applyFilter(); });
-  var groups = { pri: '우선공급 1순위 가능 (강서·동대문)', big: '36㎡ 이상 · 일반 추첨', kook: '국민임대 지구', lh: 'LH 경기·서울 — 공고 페이지에서 매일 자동 수집', small: '27~35㎡' };
+  var groups = { pri: '우선공급 1순위 가능 (강서·동대문)', big: '36㎡ 이상 · 일반 추첨', kook: '국민임대 지구', lh: 'LH 서울 — 공고 페이지에서 매일 자동 수집', small: '27~35㎡' };
   var groupEl = {};
   ['pri','big','kook','lh','small'].forEach(function(k){ var g = document.createElement('div'); g.className = 'grp'; g.textContent = groups[k]; g.dataset.cat = k; list.appendChild(g); groupEl[k] = g; });
   var lhAdded = {};
@@ -1257,12 +1257,13 @@ function applyLive(){
   liveFetch('data/lh.json').then(function(j){
     var box = document.getElementById('lh-live'); if (!box) return;
     if (!j || !j.items) { box.innerHTML = '<p class="src">LH 자동 수집 데이터 없음 (첫 실행 전이거나 실패)</p>'; return; }
-    var items = j.items.slice().sort(function(a, b){ return (b.posted || '').localeCompare(a.posted || ''); });
-    if (!items.length) { box.innerHTML = '<p class="src">최근 150일 안에 경기·서울 LH 행복주택·국민임대·통합공공임대 공고 없음 (갱신 ' + j.updated + ')</p>'; return; }
+    var items = j.items.filter(function(x){ return !/경기/.test(x.region || ''); }).sort(function(a, b){ return (b.posted || '').localeCompare(a.posted || ''); });   // 서울만 (경기 제외)
+    j = { updated: j.updated, items: items };
+    if (!items.length) { box.innerHTML = '<p class="src">최근 150일 안에 서울 LH 행복주택·국민임대·통합공공임대 공고 없음 (갱신 ' + j.updated + ')</p>'; return; }
     if (window.nmAddLH && window.nmMap) { try { window.nmAddLH(j); } catch(e) { console.error(e); } } else window.__lhPending = j;
-    var openN = items.filter(function(x){ return x.status === '접수중' || x.status === '공고중'; }).length, ggN = items.filter(function(x){ return /경기/.test(x.region); }).length;
-    var head = document.getElementById('lh-head'); if (head) head.innerHTML = '경기·서울 LH 공고 <small>(자동 수집 · 최근 150일 ' + items.length + '건, 경기 ' + ggN + '건, 지금 접수 중 ' + openN + '건)</small>';
-    var brief = document.getElementById('lh-brief'); if (brief) brief.innerHTML = '· LH 경기·서울 접수 중 <b>' + openN + '건</b> <a href="#calendar">(공고 일정 탭)</a>';
+    var openN = items.filter(function(x){ return x.status === '접수중' || x.status === '공고중'; }).length;
+    var head = document.getElementById('lh-head'); if (head) head.innerHTML = '서울 LH 공고 <small>(자동 수집 · 최근 150일 ' + items.length + '건, 지금 접수 중 ' + openN + '건)</small>';
+    var brief = document.getElementById('lh-brief'); if (brief) brief.innerHTML = '· LH 서울 접수 중 <b>' + openN + '건</b> <a href="#calendar">(공고 일정 탭)</a>';
     box.innerHTML = '<div class="tbl"><table class="stack"><thead><tr><th>유형</th><th>공고명</th><th>지역</th><th>게시일</th><th>마감일</th><th>상태</th></tr></thead><tbody>' +
       items.map(function(x){ return '<tr><td>' + x.type + '</td><td><a href="' + x.url + '" target="_blank" rel="noopener">' + x.title + '</a>' + (x.complexes && x.complexes.length ? ' <small class="k">단지 ' + x.complexes.length + '곳 · 지도에 표시</small>' : '') + '</td><td>' + x.region + '</td><td class="num">' + x.posted + '</td><td class="num">' + x.deadline + '</td><td>' + (x.status === '접수중' ? '<span class="pill ok">' : '<span class="pill info">') + x.status + '</span></td></tr>'; }).join('') +
       '</tbody></table></div><p class="src">갱신 ' + j.updated + ' · 출처 <a href="https://apply.lh.or.kr/lhapply/apply/wt/wrtanc/selectWrtancList.do?mi=1026" target="_blank" rel="noopener">LH 청약플러스 공고문 목록</a></p>';

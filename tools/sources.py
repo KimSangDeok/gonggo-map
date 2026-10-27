@@ -161,7 +161,7 @@ def lh_detail(url):
         if m: sched[key] = [g.replace('.', '-') for g in m.groups()]
     return {'complexes': comps, 'sched': sched}
 
-def lh_notices(regions=(('41', '경기도'), ('11', '서울특별시')), days=150):
+def lh_notices(regions=(('11', '서울특별시'),), days=150):   # 서울만 (경기 제외 — 2026-10-27)
     today = datetime.date.today(); start = today - datetime.timedelta(days=days)
     out = []
     for code, rname in regions:
