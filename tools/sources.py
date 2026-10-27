@@ -316,7 +316,11 @@ def ya_detail(code):
                 for tr in el.select('tbody tr'):
                     td = [x.get_text(' ', strip=True) for x in tr.find_all('td')]
                     if len(td) >= 6 and td[1]:
-                        rows[cur].append({'room': td[0], 'ty': td[1], 'who': td[2], 'n': _won(td[3]), 'dep': _won(td[4]), 'rent': _won(td[5]), 'mc': _won(td[6]) if len(td) > 6 else None})
+                        dep, rent = _won(td[4]), _won(td[5])
+                        # 몇 단지(역삼역 더원역삼·화곡역 보눔하우스)는 표에 만원 단위로 적혀 있음(6500 = 6,500만원, 37 = 37만원) → 원으로 통일
+                        if dep is not None and 0 < dep < 100000: dep *= 10000
+                        if rent is not None and 0 < rent < 10000: rent *= 10000
+                        rows[cur].append({'room': td[0], 'ty': td[1], 'who': td[2], 'n': _won(td[3]), 'dep': dep, 'rent': rent, 'mc': _won(td[6]) if len(td) > 6 else None, 'unit_fixed': bool((dep or 0) and _won(td[4]) != dep)})
     homepage = ''
     hp = soup.find('strong', string=re.compile(r'홈페이지'))
     if hp and hp.find('a'): homepage = hp.find('a').get('href', '')
