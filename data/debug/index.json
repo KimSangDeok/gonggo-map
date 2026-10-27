@@ -1,26 +1,34 @@
 [
  {
-  "url": "https://www.i-sh.co.kr/app/lay2/program/S1T294C295/www/brd/m_241/list.do",
-  "post": "page=1&srchTp=0&srchWord=경쟁률",
+  "url": "https://www.i-sh.co.kr/app/lay2/program/S1T294C295/www/brd/m_241/view.do?multi_itm_seqs=1%2C2%2C4%2C8%2C16%2C32%2C64%2C128%2C256&seq=307073",
+  "post": "",
   "status": 200,
   "type": "text/html; charset=UTF-8",
-  "bytes": 151398,
-  "file": "www_i_sh_co_kr_app_lay2_program_S1T294C295_www_brd_m_241_list_do_6f5bed.html"
+  "bytes": 148387,
+  "file": "www_i_sh_co_kr_app_lay2_program_S1T294C295_www_brd_m_241_view_do_multi_itm_seqs__dd8f46.html"
  },
  {
   "url": "https://www.i-sh.co.kr/app/lay2/program/S1T294C295/www/brd/m_241/list.do",
-  "post": "page=2&srchTp=0&srchWord=경쟁률",
+  "post": "page=1&srchTp=0&srchWord=청년+매입임대주택",
   "status": 200,
   "type": "text/html; charset=UTF-8",
-  "bytes": 151246,
-  "file": "www_i_sh_co_kr_app_lay2_program_S1T294C295_www_brd_m_241_list_do_45bfb8.html"
+  "bytes": 139609,
+  "file": "www_i_sh_co_kr_app_lay2_program_S1T294C295_www_brd_m_241_list_do_0be8ca.html"
  },
  {
   "url": "https://www.i-sh.co.kr/app/lay2/program/S1T294C295/www/brd/m_241/list.do",
-  "post": "page=3&srchTp=0&srchWord=경쟁률",
+  "post": "page=2&srchTp=0&srchWord=청년+매입임대주택",
   "status": 200,
   "type": "text/html; charset=UTF-8",
-  "bytes": 151260,
-  "file": "www_i_sh_co_kr_app_lay2_program_S1T294C295_www_brd_m_241_list_do_e7d9c7.html"
+  "bytes": 139609,
+  "file": "www_i_sh_co_kr_app_lay2_program_S1T294C295_www_brd_m_241_list_do_db47fa.html"
+ },
+ {
+  "url": "https://www.i-sh.co.kr/app/lay2/program/S1T294C295/www/brd/m_241/list.do",
+  "post": "page=1&srchTp=0&srchWord=매입임대주택+입주자+모집공고",
+  "status": 200,
+  "type": "text/html; charset=UTF-8",
+  "bytes": 139625,
+  "file": "www_i_sh_co_kr_app_lay2_program_S1T294C295_www_brd_m_241_list_do_f1f11b.html"
  }
 ]
