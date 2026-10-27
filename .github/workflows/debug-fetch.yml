@@ -1,0 +1,33 @@
+name: debug-fetch
+on:
+  workflow_dispatch:
+    inputs:
+      urls:
+        description: '공백으로 구분한 URL 목록 (POST는 url|a=1&b=2)'
+        required: true
+        type: string
+permissions:
+  contents: write
+concurrency:
+  group: debug-fetch
+  cancel-in-progress: false
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.12' }
+      - run: pip install -q requests beautifulsoup4
+      - run: python tools/debug_fetch.py
+        env:
+          URLS: ${{ inputs.urls }}
+      - name: commit
+        run: |
+          git config user.name 'gonggo-bot'; git config user.email 'gonggo-bot@users.noreply.github.com'
+          git add -A data/debug
+          git diff --cached --quiet && { echo 'no change'; exit 0; }
+          git commit -m "debug: fetch $(date -u +%FT%TZ)"
+          for i in 1 2 3; do git pull --rebase -X theirs origin gh-pages && git push && exit 0; git rebase --abort 2>/dev/null; sleep 10; done
+          exit 1
