@@ -1,26 +1,26 @@
 [
  {
-  "url": "https://www.i-sh.co.kr/app/lay2/program/S1T294C295/www/brd/m_241/view.do?multi_itm_seqs=1%2C2%2C4%2C8%2C16%2C32%2C64%2C128%2C256&seq=309925",
+  "url": "https://www.i-sh.co.kr/app/com/file/innoFD.do?brdId=GS0401&seq=309925&fileTp=A&fileSeq=1",
   "post": "",
   "status": 200,
-  "type": "text/html; charset=UTF-8",
-  "bytes": 151412,
-  "file": "www_i_sh_co_kr_app_lay2_program_S1T294C295_www_brd_m_241_view_do_multi_itm_seqs__df3c3d.html"
+  "type": "application/octet-stream;charset=UTF-8",
+  "bytes": 625704,
+  "file": "www_i_sh_co_kr_app_com_file_innoFD_do_brdId_GS0401_seq_309925_fileTp_A_fileSeq_1_4230e1.pdf"
  },
  {
-  "url": "https://www.i-sh.co.kr/app/lay2/program/S1T294C295/www/brd/m_241/view.do?multi_itm_seqs=1%2C2%2C4%2C8%2C16%2C32%2C64%2C128%2C256&seq=302646",
+  "url": "https://www.i-sh.co.kr/app/com/file/innoFD.do?brdId=GS0401&seq=302646&fileTp=A&fileSeq=1",
   "post": "",
   "status": 200,
-  "type": "text/html; charset=UTF-8",
-  "bytes": 176358,
-  "file": "www_i_sh_co_kr_app_lay2_program_S1T294C295_www_brd_m_241_view_do_multi_itm_seqs__b69a49.html"
+  "type": "application/octet-stream;charset=UTF-8",
+  "bytes": 660208,
+  "file": "www_i_sh_co_kr_app_com_file_innoFD_do_brdId_GS0401_seq_302646_fileTp_A_fileSeq_1_702b68.pdf"
  },
  {
-  "url": "https://www.i-sh.co.kr/app/lay2/program/S1T294C295/www/brd/m_241/view.do?multi_itm_seqs=1%2C2%2C4%2C8%2C16%2C32%2C64%2C128%2C256&seq=308650",
+  "url": "https://www.i-sh.co.kr/app/com/file/innoFD.do?brdId=GS0401&seq=308650&fileTp=A&fileSeq=1",
   "post": "",
   "status": 200,
-  "type": "text/html; charset=UTF-8",
-  "bytes": 148730,
-  "file": "www_i_sh_co_kr_app_lay2_program_S1T294C295_www_brd_m_241_view_do_multi_itm_seqs__0bb967.html"
+  "type": "application/octet-stream;charset=UTF-8",
+  "bytes": 321843,
+  "file": "www_i_sh_co_kr_app_com_file_innoFD_do_brdId_GS0401_seq_308650_fileTp_A_fileSeq_1_a0e052.pdf"
  }
 ]
