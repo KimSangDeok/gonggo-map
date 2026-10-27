@@ -1,18 +1,18 @@
 [
  {
-  "url": "https://soco.seoul.go.kr/youth/pgm/home/yohome/view.do?menuNo=400002&homeCode=20000567",
-  "post": "",
+  "url": "https://soco.seoul.go.kr/youth/pgm/home/yohome/yoHomeListJson.json",
+  "post": "pageNum=1&rowCount=3",
   "status": 200,
-  "type": "text/html;charset=utf-8",
-  "bytes": 61486,
-  "file": "soco_seoul_go_kr_youth_pgm_home_yohome_view_do_menuNo_400002_homeCode_20000567_34ddac.html"
+  "type": "application/json;charset=UTF-8",
+  "bytes": 5324,
+  "file": "soco_seoul_go_kr_youth_pgm_home_yohome_yoHomeListJson_json_6862ba.json"
  },
  {
-  "url": "https://soco.seoul.go.kr/youth/pgm/home/yohome/view.do?menuNo=400002&homeCode=20000520",
+  "url": "https://soco.seoul.go.kr/youth/pgm/home/yohome/list.do?menuNo=400002",
   "post": "",
   "status": 200,
   "type": "text/html;charset=utf-8",
-  "bytes": 58807,
-  "file": "soco_seoul_go_kr_youth_pgm_home_yohome_view_do_menuNo_400002_homeCode_20000520_009620.html"
+  "bytes": 67599,
+  "file": "soco_seoul_go_kr_youth_pgm_home_yohome_list_do_menuNo_400002_52d844.html"
  }
 ]
