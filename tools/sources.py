@@ -303,10 +303,8 @@ def ya_detail(code):
     m = re.search(r'총\s*([\d,]+)\s*세대\s*\(공공임대\s*([\d,\-]+)\s*세대,\s*공공지원민간임대\s*([\d,\-]+)\s*세대\)', info.get('규모', ''))
     scale = {'total': _won(m.group(1)), 'pub': _won(m.group(2)), 'priv': _won(m.group(3))} if m else {}
     status = ''
-    st_el = soup.find(string=re.compile(r'공급상태'))
-    if st_el:
-        nxt = st_el.find_parent().find_next(string=True)
-        status = (nxt or '').strip()
+    hs = soup.select_one('.homeStatus p')
+    if hs: status = hs.get_text(' ', strip=True)
     rows = {'special': [], 'general': []}
     art = soup.select_one('#detail3')
     if art:

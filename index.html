@@ -233,6 +233,9 @@ main section.view{margin-top:0}
 .nm-mk{width:20px;height:20px;background:var(--c);border:2.5px solid #fff;box-shadow:0 0 0 1.5px rgba(0,0,0,.35),0 2px 6px rgba(0,0,0,.45)}
 .nm-mk.sm{width:14px;height:14px}
 .nm-mk.sq{border-radius:4px}
+.nm-mk.ya{width:16px;height:16px;border-radius:3px;transform:rotate(45deg);background:#fff;box-shadow:inset 0 0 0 3.5px var(--c),0 0 0 1.5px rgba(0,0,0,.35),0 2px 6px rgba(0,0,0,.4)}
+.nm-mk.ya.on{background:var(--c)}
+.dot.ya{border-radius:2px;transform:rotate(45deg);width:10px;height:10px;background:var(--c)}
 .nm-mk.hl{background:#fff;box-shadow:inset 0 0 0 4.5px var(--c),0 0 0 1.5px rgba(0,0,0,.35),0 2px 6px rgba(0,0,0,.45)}
 .dot{background:var(--c)}.dot.sm{width:10px;height:10px}
 .dot.lh{width:auto;height:auto;border-radius:4px;color:#fff;font:800 9px/1 var(--font-body);padding:2px 3px}
@@ -342,6 +345,7 @@ main section.view{margin-top:0}
         <label><input type="checkbox" data-cat="big" checked> <span class="dot hl" style="--c:#D32F2F"></span> 36㎡↑ 일반</label>
         <label><input type="checkbox" data-cat="small"> <span class="dot sm" style="--c:#8a94a3"></span> 27~35㎡</label>
         <label><input type="checkbox" data-cat="kook" checked> <span class="dot sq" style="--c:#6A1B9A"></span> 국민임대</label>
+        <label><input type="checkbox" data-cat="ya" checked> <span class="dot ya" style="--c:#00897B"></span> 청년안심</label>
         <label><input type="checkbox" data-cat="na"> <span class="dot sq hl" style="--c:#9aa4b2"></span> 해당 없음</label>
         <label><input type="checkbox" data-cat="lh" checked> <span class="dot lh" style="--c:#37474F">LH</span> LH 서울</label>
         <span id="nm-status" class="src"></span> <small id="lh-brief" class="k"></small>
@@ -524,6 +528,9 @@ main section.view{margin-top:0}
     <h3 id="rates-head">SH 공고별 청약 경쟁률 <small>(결과 게시 PDF 자동 수집 · 2021년~)</small></h3>
     <p>공고가 끝나면 SH가 게시판에 "최종 청약 경쟁률"(행복주택) · "선순위 청약접수결과"(국민임대) 게시물을 올리고 단지·형·계층별 표를 PDF로 붙입니다. 그 PDF를 매일 읽어 와서 지도의 단지 상세에 <b>그 단지·그 형의 지난 경쟁률</b>을 붙이고, 여기엔 공고별 총괄을 둡니다.</p>
     <div id="rates-all"><p class="src">불러오는 중…</p></div>
+    <h3 id="ya-head">서울시 청년안심주택 공고 <small>(자동 수집)</small></h3>
+    <p>서울시 청년안심주택 모집공고 게시판(공공임대·민간임대)을 매일 읽어 옵니다. 단지 99곳은 지도에 청년안심 마커(초록 마름모, 공고 있는 곳은 채움)로 찍히고, 단지를 누르면 서울시 단지정보의 입주현황 표(형·세대·보증금·월세)가 나옵니다.</p>
+    <div id="ya-live"><p class="src">불러오는 중…</p></div>
     <h3 id="lh-head">서울 LH 공고 <small>(자동 수집)</small></h3>
     <p>LH 청약플러스 공고 목록(서울특별시, 행복주택·국민임대·통합공공임대)을 매일 09:23·15:23에 읽어 옵니다. 공고 상세 페이지에 있는 단지 좌표·주택형 표·일정도 같이 읽어 지도에 LH 마커로 찍습니다.</p>
     <div id="lh-live"><p class="src">불러오는 중…</p></div>
@@ -532,7 +539,7 @@ main section.view{margin-top:0}
   <section class="view" id="view-rules"><div class="wrap">
     <h2>어디에 넣나 — 유형별 우선순위와 금액</h2>
 
-  <p>서울 공고 기준입니다. 가구원 수별 면적 기준은 2024년 폐지돼 1인 가구도 36㎡ 이상을 신청할 수 있습니다. 전용 8평(26㎡) 이하 원룸만 나오는 유형(청년매입임대·청년안심주택 청년형·행복주택 16~26㎡형)은 뺐고, 서울 공고가 드문 LH 통합공공임대는 서울 밖 선택지로 맨 아래에 따로 뒀습니다. 금액은 각 공고에 적힌 실제 숫자이며, 추정치는 따로 표시했습니다.</p>
+  <p>서울 공고 기준입니다. 가구원 수별 면적 기준은 2024년 폐지돼 1인 가구도 36㎡ 이상을 신청할 수 있습니다. 1~5번은 처음 추린 '원룸 제외' 트랙이고, 6~8번은 <b>2026-10-27에 추가한 원룸 위주 트랙</b>(청년안심주택 공공·민간, 청년 매입임대)입니다 — 면적은 작지만 소득 50% 이하인 내 조건에선 임대료가 가장 낮게 나오는 유형이라 넣었습니다. 서울 공고가 드문 LH 통합공공임대는 서울 밖 선택지. 금액은 각 공고에 적힌 실제 숫자이며, 추정치는 따로 표시했습니다. 뺀 것: 장기전세(보증금 수억), 서울시 청년월세지원(차량 2,500만원 미만 기준) — 사유는 표 아래.</p>
 
   <h3>면적 읽는 법 — 공고의 ㎡는 전용면적, 내가 실제 쓰는 공간</h3>
   <div class="grid2">
@@ -612,9 +619,37 @@ main section.view{margin-top:0}
         <td><span class="pill ok">우선공급 충족</span></td>
         <td class="src"><a href="https://jugeo.co.kr/blog/guide/tonghap-gonggong-imdae">통합공공임대 가이드</a> · <a href="https://housing.gg.go.kr/html/24110.do">공급면적</a> · <a href="https://m.news.nate.com/view/20260311n22686">2026 LH 물량</a></td>
       </tr>
+      <tr>
+        <td class="num rank">6</td>
+        <td><b>청년안심주택 공공임대</b> (옛 역세권청년주택, SH 접수) <span class="pill info">서울 · 연 2회</span><br><small>2026년 1차 3/31 공고 573세대(접수 4/10~14, 당첨 8/12) · 2차 7/31 공고 581세대(입주 2027-02). 둘 다 접수 끝 → 2027년 1차(3월 말 예상) 대비. 단지는 지도의 '청년안심' 마커(공공임대 세대수 표시)</small></td>
+        <td>청년형 대부분 전용 16~30㎡(원룸, 2023년부터 1인 최소 23㎡) · 신혼부부형 36~49㎡는 미혼 제외</td>
+        <td class="num">공고문 단지별 표 기준(공공임대는 서울시 단지정보 표에 금액이 안 실림). 민간 금액 참고: 등촌역 아르체움 20㎡ 특별공급 8,400만 · 44만</td>
+        <td>주변 시세 <b>30~50%</b> (소득 구간별)<br>최장 10년</td>
+        <td><span class="pill ok">19~39세·미혼·무주택 · 소득 100% 이하(행복주택 청년과 같은 틀: 1인 가구 가산, 무소득이면 부모 합산) · 자산 2억 5,100만 · 자동차 4,542만</span></td>
+        <td class="src"><a href="https://soco.seoul.go.kr/youth/pgm/home/yohome/supportYouth1.do?menuNo=400039">서울시 입주자격(2026 기준)</a> · <a href="https://soco.seoul.go.kr/youth/bbs/BMSR00015/view.do?boardId=6485&menuNo=400008">2026 1차 공고</a> · <a href="https://mediahub.seoul.go.kr/archives/2009425">시세 30~50%·10년(서울시)</a> · <a href="https://news.mtn.co.kr/news-detail/2023040407122246568">1인 최소 23㎡(2023 개편)</a></td>
+      </tr>
+      <tr>
+        <td class="num rank">7</td>
+        <td><b>청년 매입임대 (SH·LH)</b> <span class="pill info">서울 · SH 연 2회</span><br><small>SH 2026년 1차 6/26 공고 849호(신규 490·재공급 359), 접수 7/13~15, 당첨 11/20. 2차는 12월 말 예상. 다가구·원룸 위주, 집은 공고 목록에서 고름</small></td>
+        <td>대부분 전용 14~25㎡ 원룸(사례 17.12㎡) · 일부 2룸</td>
+        <td class="num">청년 2·3순위: 보증금 약 1,860만~7,969만 · 월세 11.5만~(1순위 최저)… 2·3순위는 시세 50%. 보증금↔월세 전환 가능(신규 80%·재공급 60%)</td>
+        <td>시세 <b>40~50%</b> (1순위 30%, 2·3순위 50%)<br>2년×재계약 4회 = 10년</td>
+        <td><span class="pill ok">3순위: 본인 소득 100%(4,576,036원) · 총자산 2억 5,100만 · 자동차 4,542만</span><br><small>2순위는 본인+부모 소득 100%·자산 3억 4,500만 — 부모 소득 확인 필요</small></td>
+        <td class="src"><a href="https://gobang.kr/contents/7973">SH 2026 1차 요약(순위·금액)</a> · <a href="https://www.i-sh.co.kr/app/lay2/program/S1T294C295/www/brd/m_241/list.do">SH 공고 게시판</a> · <a href="https://apply.lh.or.kr/lhapply/apply/wt/wrtanc/selectWrtancList.do?mi=1026">LH 청약플러스(서울 청년매입)</a></td>
+      </tr>
+      <tr>
+        <td class="num rank">8</td>
+        <td><b>청년안심주택 민간임대</b> (공공지원민간임대, 사업자 접수) <span class="pill warn">서울 · 수시</span><br><small>서울시 게시판에 사업자별 공고가 수시로 올라옴(최근 30건 중 민간 대부분). 지도의 청년안심 마커를 누르면 단지별 입주현황(형·보증금·월세)</small></td>
+        <td>원룸 20~30㎡ 위주, 일부 40㎡·1.5룸</td>
+        <td class="num">예: 대흥역 리마크빌 30㎡ 특별공급 7,500만 · 62만 / 등촌역 아르체움 20㎡ 일반 9,900만 · 54만 — 공공임대보다 훨씬 비쌈</td>
+        <td>시세 <b>75~85%</b>(2023 개편)<br>최장 10년 · 보증금 무이자 지원 별도</td>
+        <td><span class="pill ok">특별공급: 소득 120% · 자산 2억 5,100만 · 자동차 4,542만</span> <span class="pill info">일반공급: 소득·자산 무관</span></td>
+        <td class="src"><a href="https://soco.seoul.go.kr/youth/pgm/home/yohome/supportYouth1.do?menuNo=400039">입주자격</a> · <a href="https://soco.seoul.go.kr/youth/bbs/BMSR00015/list.do?menuNo=400008">서울시 모집공고 게시판</a> · <a href="https://news.mtn.co.kr/news-detail/2023040407122246568">임대료 75~85%</a></td>
+      </tr>
     </tbody>
   </table></div>
   <div class="note warnbox"><p><b>미혼 요건.</b> 행복주택 청년·청년 전세임대는 혼인 중이 아닐 것. 결혼 계획이 생기면 신혼부부 트랙(행복주택 14년 등)으로 다시 짜야 합니다.</p></div>
+  <div class="note"><p><b>뺀 것과 이유.</b> <b>장기전세(SH 시프트)</b>: 보증금이 수억이라 총자산(내 조건 탭)으로는 대출을 끼어도 무리. <b>서울시 청년월세지원</b>(월 20만×12개월, 추첨 1만 명): 2026년은 4월 모집으로 끝났고 <b>차량 2,500만원 미만</b> 기준이 있어 내 차로는 불가(가액은 내 조건 탭) — <a href="https://gobang.kr/contents/7691">기준 기사</a>. <b>공공지원민간임대 청년 특별공급</b>: 서울 물량이 드물고 경기 위주라 제외. <b>청년 전세임대</b>는 1번(2027 보편형)에 포함.</p></div>
     <h2 style="margin-top:32px">주의할 점</h2>
 
   <ul>
@@ -1081,8 +1116,44 @@ function buildRatesTable(){
     '</tbody></table></div><p class="src">출처: SH 공고 게시판의 "최종 청약 경쟁률 게시"(행복주택) · "선순위 청약접수결과"(국민임대) 게시물 첨부 PDF를 매일 자동 수집해 표를 읽음(수집 ' + RATES.updated + '). "경쟁률"은 게시물 본문의 총괄 숫자, "PDF 표 검증"은 PDF 표의 행을 모두 더해 다시 나눈 값과의 비교. 단지별·형별 숫자는 지도에서 단지를 누르면 "지난 공고 경쟁률"에 나옴.</p>';
   var heads = ['공고','결과 게시','공급','신청','경쟁률','PDF 표 검증']; box.querySelectorAll('tbody tr').forEach(function(tr){ Array.prototype.forEach.call(tr.children, function(td, i){ td.setAttribute('data-label', heads[i]); }); });
 }
+// ===== 서울시 청년안심주택 (data/ya.json: 공고 게시판 + 단지 99곳) =====
+function yaWon(n){ if (n == null) return '—'; return n >= 100000000 ? Math.floor(n / 100000000) + '억' + (Math.round((n % 100000000) / 10000) ? ' ' + Math.round((n % 100000000) / 10000).toLocaleString() + '만' : '') : (Math.round(n / 10000)).toLocaleString() + '만'; }
+function yaRng(c, key){ var v = []; ['special', 'general'].forEach(function(g){ (((c.rows || {})[g]) || []).forEach(function(r){ if (r[key] != null) v.push(r[key]); }); }); if (!v.length) return null; var lo = Math.min.apply(null, v), hi = Math.max.apply(null, v); return [lo, hi]; }
+function yaRentTxt(c){ var r = yaRng(c, 'rent'); if (r) return Math.round(r[0] / 10000) + (r[1] !== r[0] ? '~' + Math.round(r[1] / 10000) : '') + '만'; return c.rent_lo_txt ? c.rent_lo_txt + (c.rent_hi_txt && c.rent_hi_txt !== c.rent_lo_txt ? '~' + c.rent_hi_txt : '') : ''; }
+function yaDepTxt(c){ var r = yaRng(c, 'dep'); if (r) return yaWon(r[0]) + (r[1] !== r[0] ? '~' + yaWon(r[1]) : ''); return c.dep_lo_txt ? c.dep_lo_txt + (c.dep_hi_txt && c.dep_hi_txt !== c.dep_lo_txt ? '~' + c.dep_hi_txt : '') : ''; }
+function yaTyNum(ty){ var m = String(ty || '').match(/(\d{2})/); return m ? +m[1] : null; }
+function yaNoticesFor(c){ // 공고 제목에 단지명(공백 제거, 앞 6자) 포함
+  var js = window.YA && window.YA.notices || [], key = (c.name || '').replace(/\s+/g, '').replace(/청년안심주택|청년주택/g, '');
+  var k6 = key.slice(0, 6); if (!k6) return [];
+  return js.filter(function(n){ var t = (n.title || '').replace(/\s+/g, ''); return t.indexOf(k6) >= 0 || (key.length >= 4 && t.indexOf(key) >= 0); });
+}
+function yaHtml(p){
+  var c = p.comp, ns = yaNoticesFor(c), nav = 'https://map.naver.com/p/search/' + encodeURIComponent((c.addr || c.name || '').replace(/\([^)]*\)/g, ''));
+  var head = '<div class="iw-h"><b>' + p.name + '</b><span class="pill info">청년안심주택</span><button type="button" class="iw-x" onclick="nmInfo.close()" aria-label="닫기">×</button></div>';
+  var sc = c.scale || {};
+  var body = '<table class="iw-t">' +
+    '<tr><th>규모</th><td>' + (sc.total != null ? '총 ' + sc.total + '세대 · <b>공공임대 ' + (sc.pub == null ? '—' : sc.pub) + '</b> · 민간임대 ' + (sc.priv == null ? '—' : sc.priv) : (c.scale_tot ? '총 ' + c.scale_tot + '세대 (공공·민간 구분 없음)' : '<small class="k">세대수 미기재</small>')) + '</td></tr>' +
+    '<tr><th>지하철</th><td>' + (c.subway || c.station || '<small class="k">미기재</small>') + '</td></tr>' +
+    '<tr><th>입주</th><td>' + (c.movein || '<small class="k">미기재</small>') + (c.first_notice ? ' <small class="k">(최초 공고 ' + c.first_notice + ')</small>' : '') + (c.status && c.status !== '공급상태' ? ' · ' + c.status : '') + '</td></tr>' +
+    '<tr><th>보증금·월세</th><td>' + (yaDepTxt(c) ? '보증금 ' + yaDepTxt(c) + ' · 월세 ' + (yaRentTxt(c) || '—') + ' <small class="k">(민간임대, 서울시 단지정보 등록값)</small>' : '<small class="k">서울시 단지정보에 금액 없음</small>') + (c.mc && c.mc[0] ? '<br><small class="k">관리비 ' + Math.round(c.mc[0] / 10000) + '~' + Math.round(c.mc[1] / 10000) + '만</small>' : '') + '</td></tr>' +
+    '<tr><th>공고</th><td>' + (ns.length ? ns.slice(0, 3).map(function(n){ return '<a href="' + n.url + '" target="_blank" rel="noopener">' + n.title + '</a> <small class="k">' + n.kind + (n.stage === '추가' ? '·추가' : '') + ' · 게시 ' + n.posted + (n.apply ? ' · 청약 ' + n.apply : '') + '</small>'; }).join('<br>') : '<small class="k">서울시 공고 게시판 최근 30건에 이 단지 공고 없음</small>') + '</td></tr>' +
+    '</table>';
+  var rows = c.rows || {}, sp = rows.special || [], ge = rows.general || [];
+  if (sp.length || ge.length) {
+    var tr = function(r, kind){ var y = /청년/.test(r.who || ''); return '<tr' + (y ? ' class="y"' : '') + '><th>' + kind + '</th><td>' + (r.room || '') + ' ' + (r.ty || '') + (yaTyNum(r.ty) ? ' <small class="k">(' + yaTyNum(r.ty) + '㎡대)</small>' : '') + '</td><td>' + (r.who || '') + '</td><td>' + (r.n == null ? '—' : r.n) + '</td><td>' + yaWon(r.dep) + '</td><td>' + (r.rent == null ? '—' : Math.round(r.rent / 10000) + '만') + '</td></tr>'; };
+    body += '<div class="iw-sec"><div class="iw-sh">입주현황 <small class="k">서울시 단지정보 표 그대로 · 민간임대(특별공급=소득 120%↓, 일반공급=소득 무관)</small></div><table class="iw-t iw-k iw-lh"><tr><th>구분</th><th>형</th><th>자격</th><th>세대</th><th>보증금</th><th>월세</th></tr>' +
+      sp.map(function(r){ return tr(r, '특별'); }).join('') + ge.map(function(r){ return tr(r, '일반'); }).join('') + '</table>' +
+      '<small class="k">공공임대 물량(' + (sc.pub == null ? '—' : sc.pub) + '세대)은 이 표가 아니라 SH 청년안심주택(공공임대) 공고(연 2회)로만 모집 · 시세 30~50%. 위 표는 민간임대 금액.</small></div>';
+  } else {
+    body += '<div class="iw-nophoto">입주현황 표 없음 — 서울시 단지정보에 형·보증금·월세가 등록돼 있지 않음</div>';
+  }
+  var foot = '<div class="iw-f"><small class="k">' + (c.addr || '') + (c.phone ? ' · ' + c.phone : '') + '</small>' +
+    '<div style="display:flex;gap:6px;flex-wrap:wrap"><a class="iw-btn" style="flex:1" href="https://soco.seoul.go.kr/youth/pgm/home/yohome/view.do?menuNo=400002&homeCode=' + c.code + '" target="_blank" rel="noopener">서울시 단지정보</a>' + (c.homepage ? '<a class="iw-btn" style="flex:1;background:#455a64" href="' + c.homepage + '" target="_blank" rel="noopener">사업자 홈페이지</a>' : '') + '<a class="iw-btn" style="flex:1;background:#2e7d32" href="' + nav + '" target="_blank" rel="noopener">네이버지도</a></div></div>';
+  return '<div class="nm-iw">' + head + body + foot + '</div>';
+}
 function nmHtml(p, approx){
   if (p.lh) return lhHtml(p);
+  if (p.ya) return yaHtml(p);
   var nav = 'https://map.naver.com/p/search/' + encodeURIComponent(p.q || p.name);
   var head = '<div class="iw-h"><b>' + p.name + '</b><span class="pill info">' + p.kind + '</span><button type="button" class="iw-x" onclick="nmInfo.close()" aria-label="닫기">×</button></div>';
   var body;
@@ -1188,9 +1259,9 @@ function nmInit(){
   var sel = document.getElementById('nm-notice');
   buildNoticeSelect();
   sel.addEventListener('change', function(){ applyFilter(); });
-  var groups = { pri: '우선공급 1순위 가능 (강서·동대문)', big: '36㎡ 이상 · 일반 추첨', kook: '국민임대 지구 — 2026 공고에 일반공급 있음', lh: 'LH 서울 — 공고 페이지에서 매일 자동 수집', small: '27~35㎡', na: '지금 공고엔 해당 없음 — 2026 국민임대 일반공급 없음(주거약자만), 2025 공고는 접수 종료' };
+  var groups = { pri: '우선공급 1순위 가능 (강서·동대문)', big: '36㎡ 이상 · 일반 추첨', kook: '국민임대 지구 — 2026 공고에 일반공급 있음', lh: 'LH 서울 — 공고 페이지에서 매일 자동 수집', small: '27~35㎡', ya: '청년안심주택 단지 (서울시 99곳, 공공+민간) — 공고 있는 곳 먼저', na: '지금 공고엔 해당 없음 — 2026 국민임대 일반공급 없음(주거약자만), 2025 공고는 접수 종료' };
   var groupEl = {};
-  ['pri','big','kook','lh','small','na'].forEach(function(k){ var g = document.createElement('div'); g.className = 'grp'; g.textContent = groups[k]; g.dataset.cat = k; list.appendChild(g); groupEl[k] = g; });
+  ['pri','big','kook','lh','ya','small','na'].forEach(function(k){ var g = document.createElement('div'); g.className = 'grp'; g.textContent = groups[k]; g.dataset.cat = k; list.appendChild(g); groupEl[k] = g; });
   var lhAdded = {};
   window.nmAddLH = function(j){
     var items = (j && j.items || []).slice().sort(function(a, b){ return (b.posted || '').localeCompare(a.posted || ''); });
@@ -1216,6 +1287,27 @@ function nmInit(){
     applyFilter();
   };
   if (window.__lhPending) { try { window.nmAddLH(window.__lhPending); } catch(e) { console.error(e); } window.__lhPending = null; }
+  var yaAdded = {};
+  window.nmAddYA = function(j){
+    var comps = (j && j.complexes || []).filter(function(c){ return c.lat && c.lng; });
+    var open = {}; (j.notices || []).forEach(function(n){ /* 최근 공고가 있는 단지 표시용 */ });
+    comps.forEach(function(c){
+      if (yaAdded[c.code]) return; yaAdded[c.code] = 1;
+      var p = { ya: true, cat: 'ya', nid: 'YA', name: c.name, addr: c.addr, comp: c, kind: '청년안심주택' };
+      var ns = yaNoticesFor(c), hasPub = c.scale && c.scale.pub;
+      var mk = new naver.maps.Marker({ map: nmMap, position: new naver.maps.LatLng(c.lat, c.lng), icon: { content: '<div class="nm-mk ya' + (ns.length ? ' on' : '') + '" style="--c:#00897B" title="' + c.name + '"></div>', anchor: new naver.maps.Point(9, 9) }, zIndex: 9 });
+      mk.__p = p; mk.__approx = false; nmMarkers.push(mk); var k = keyOf(c.name); (nmIndex[k] = nmIndex[k] || []).push(mk);
+      naver.maps.Event.addListener(mk, 'click', function(){ nmFocusMarker(mk); });
+      var tys = []; ['special', 'general'].forEach(function(g){ ((c.rows || {})[g] || []).forEach(function(r){ var n = yaTyNum(r.ty); if (n && tys.indexOf(n) < 0) tys.push(n); }); }); tys.sort(function(a, b){ return a - b; });
+      var it = document.createElement('div'); it.className = 'it'; it.dataset.cat = 'ya'; it.setAttribute('data-key', k); it.setAttribute('data-nid', 'YA'); it.dataset.open = ns.length ? '1' : '0';
+      it.innerHTML = '<span class="dot ya" style="--c:#00897B;margin-top:3px"></span><div><b>' + c.name + ' <span class="pill ' + (ns.length ? 'ok' : 'info') + '" style="font-size:11px;padding:0 7px">' + (ns.length ? '공고 ' + ns.length + '건' : '공고 없음') + '</span></b><small>' + (c.gu || '') + (c.station ? ' · ' + c.station : '') + (c.scale && c.scale.total != null ? ' · 공공 ' + c.scale.pub + '/민간 ' + c.scale.priv : (c.scale_tot ? ' · ' + c.scale_tot + '세대' : '')) + (tys.length ? ' · ' + tys[0] + (tys.length > 1 ? '~' + tys[tys.length - 1] : '') + '㎡대' : '') + (c.movein ? ' · 입주 ' + c.movein.slice(0, 7) : '') + '</small></div><div class="num">' + (yaRentTxt(c) ? '월 ' + yaRentTxt(c) : '') + '</div>';
+      it.__mk = mk; it.addEventListener('click', function(){ nmFocusMarker(mk); });
+      var g = groupEl.ya; var ref = g.nextSibling; while (ref && ref.className === 'it' && (ref.dataset.open === '1' || !ns.length)) ref = ref.nextSibling; list.insertBefore(it, ref);
+    });
+    applyFilter();
+  };
+  if (window.__yaPending) { try { window.nmAddYA(window.__yaPending); } catch(e) { console.error(e); } window.__yaPending = null; }
+
   var i = 0, done = 0, approxN = 0;
   function next(){
     if (i >= PLACES.length) { status.textContent = PLACES.length + '곳' + (approxN ? ' (' + approxN + '곳 근사)' : ''); applyFilter(); return; }
@@ -1337,7 +1429,7 @@ function applyLive(){
       if (id && NOTICES[id]) {
         it.steps.forEach(function(s){ var i = NOTICES[id].steps.findIndex(function(x){ return x[0] === s[0]; }); if (i >= 0) NOTICES[id].steps[i] = s; else NOTICES[id].steps.push(s); });
         NOTICES[id].steps.sort(function(a, b){ return a[1].localeCompare(b[1]); }); NOTICES[id].live = j.updated; touched++;
-      } else if (it.kind === '공고' && /행복주택|국민임대|통합공공임대/.test(it.title || '')) {
+      } else if (it.kind === '공고' && /행복주택|국민임대|통합공공임대|청년안심주택|매입임대/.test(it.title || '')) {
         var nid = 'S' + it.seq;
         if (!NOTICES[nid]) { NOTICES[nid] = { name: it.title, short: it.title.slice(0, 12), url: it.url, steps: it.steps, auto: true, live: j.updated }; added++; }
       }
@@ -1347,6 +1439,19 @@ function applyLive(){
   });
   liveFetch('data/fact.json').then(function(j){ if (j && j.fact) { Object.keys(j.fact).forEach(function(k){ FACT[k] = j.fact[k]; }); window.FACT_UPDATED = j.updated; } });
   liveFetch('data/pamphlets.json').then(function(j){ if (j && j.items) window.PAM = j; });
+  liveFetch('data/ya.json').then(function(j){
+    var box = document.getElementById('ya-live'); 
+    if (!j || !(j.notices || j.complexes)) { if (box) box.innerHTML = '<p class="src">청년안심주택 자동 수집 데이터 없음 (첫 실행 전이거나 실패)</p>'; return; }
+    window.YA = j;
+    if (window.nmAddYA && window.nmMap) { try { window.nmAddYA(j); } catch(e) { console.error(e); } } else window.__yaPending = j;
+    if (!box) return;
+    var ns = (j.notices || []).slice();
+    var head = document.getElementById('ya-head'); if (head) head.innerHTML = '서울시 청년안심주택 공고 <small>(자동 수집 · 최근 ' + ns.length + '건 · 단지 ' + (j.complexes || []).length + '곳 지도 표시)</small>';
+    box.innerHTML = '<div class="tbl"><table class="stack"><thead><tr><th>구분</th><th>공고명</th><th>게시일</th><th>청약신청일</th><th>담당·사업자</th></tr></thead><tbody>' +
+      ns.map(function(n){ return '<tr><td><span class="pill ' + (n.kind === '공공임대' ? 'ok' : 'info') + '">' + n.kind + (n.stage === '추가' ? ' 추가' : '') + '</span></td><td><a href="' + n.url + '" target="_blank" rel="noopener">' + n.title + '</a></td><td class="num">' + n.posted + '</td><td class="num">' + (n.apply || '—') + '</td><td>' + (n.org || '') + '</td></tr>'; }).join('') +
+      '</tbody></table></div><p class="src">갱신 ' + j.updated + ' · 출처 <a href="' + j.source + '" target="_blank" rel="noopener">서울시 청년안심주택 모집공고 게시판</a>. 공공임대는 SH 인터넷청약에서 접수(연 2회, 시세 30~50%), 민간임대는 사업자별 접수(특별공급 소득 120% 이하 / 일반공급 소득 무관, 시세 75~85%).</p>';
+    var heads = ['구분','공고명','게시일','청약신청일','담당·사업자']; box.querySelectorAll('tbody tr').forEach(function(tr){ Array.prototype.forEach.call(tr.children, function(td, i){ td.setAttribute('data-label', heads[i]); }); });
+  });
   liveFetch('data/rates.json').then(function(j){ if (j && j.posts) { window.RATES = j; buildRatesTable(); } else { var b = document.getElementById('rates-all'); if (b) b.innerHTML = '<p class="src">경쟁률 데이터 없음 (첫 실행 전이거나 실패)</p>'; } });
   liveFetch('data/lh.json').then(function(j){
     var box = document.getElementById('lh-live'); if (!box) return;
