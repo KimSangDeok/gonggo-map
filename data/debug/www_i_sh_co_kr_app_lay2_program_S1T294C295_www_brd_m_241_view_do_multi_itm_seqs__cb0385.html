@@ -1570,6 +1570,11 @@ $(document).ready(function(){
 
 
 
+
+
+<script type="text/javascript" src="/app/inno/common/innorix.config.js"></script>
+<script type="text/javascript" src="/app/js/sh/board-common.js"></script>
+<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=514b939ad0481fef4897fd799b0b5c22&amp;libraries=services"></script>
 <!-- <script type="text/javascript" src="/app/js/sh/netfunnel.js" charset="UTF-8"></script> -->
 <script
     src="https://netf.i-sh.co.kr/content/netfunnel-statics/agents/client/javascript/netfunnel-javascript-agent.js"
@@ -1580,798 +1585,603 @@ $(document).ready(function(){
     data-nf-retry-count="0"
     data-nf-network-timeout="3000"
 ></script>
-<script type="text/javascript">
-//<![CDATA[
-	/**
-	 * 페이징
-	 */
-	function getPaging(pageNo, param) {
-		if (pageNo) {
-			$('#page').val(pageNo);
+	<script type="text/javascript">
+		//<![CDATA[
+//		document.title = "2026년 1차 청년 매입임대주택 입주자 모집공고(2026. 6. 26.)" + " < " + vTitle;
+
+		function goList() {
+			var f = document.mainform;
+			f.submit();
 		}
-		var f = document.mainform;
-		f.submit();
-	}
-	
-	/** 상세 이동 */
-	function getDetailView(seq){
+
+		/**메뉴 만족도 Script **/
 		
-		/* NetFunnel_Action(
-			{action_id:'app'}, 
-			function(ev,ret){ 
-				var f = document.mainform;
-				f.seq.value = seq;
-				f.action = "view.do";
-				f.submit();
-				return false;
-			}
-		); */
-		
-		nfStart({
-			projectKey: "service_1",
-			segmentKey: "app"
-		}, function(response) {
-			// TODO: response에 따라 상황에 맞는 콜백 함수를 구현합니다.
-			if(response.status === "Success" || response.status === "Error" || response.status === "NetworkError") {
-				var f = document.mainform;
-				f.seq.value = seq;
-				f.action = "view.do";
-				f.submit();
-				return false;	
-			}
+
+		$(document).ready(function(){
+			
+			/*
+			* 이노릭스 시작
+			*/
+			
+			initParam = {"allowExt":["HWP","hwp","PDF","pdf","PPT","ppt","PPTX","pptx","DOC","doc","DOCX","docx","DWG","dwg","JPG","jpg","BMP","bmp","TIF","tif","TIFF","tiff","GIF","gif","TXT","txt","AVI","avi","ASF","asf","MPEG","mpeg","MOV","mov","WMV","wmv","MP4","mp4","SKM","skm","K3G","k3g","MP3","mp3","WAV","wav","ZIP","zip","AI","ai","M4A","m4a","HWPX","hwpx","ODT","odt","ODS","ods"],"fileSize":"5242880","fileCnt":"30","width":"710","height":"200","type":"I","downList":"","callBackFunction":"FSubmit()"};
+			initParam.downList = [{"brdId":"GS0401","seq":"306214","fileSeq":"5","fileSize":"1003811","oriFileNm":"1_ [공고문] 2026년 1차 청년 매입임대주택 입주자 모집공고.pdf","fileTp":"A"},{"brdId":"GS0401","seq":"306214","fileSeq":"6","fileSize":"623181","oriFileNm":"2_ [주택목록] 2026년 1차 청년 매입임대주택 입주자 모집공고(홈페이지 공개용).pdf","fileTp":"A"},{"brdId":"GS0401","seq":"306214","fileSeq":"7","fileSize":"75612","oriFileNm":"3_ [첨부] 도면 및 사진(링크).pdf","fileTp":"A"},{"brdId":"GS0401","seq":"306214","fileSeq":"8","fileSize":"59476","oriFileNm":"4_ [첨부] 청년 매입임대주택 신청 관련 부모 범위 기준.pdf","fileTp":"A"}];
+			initInnorix();
+			
+			/*
+			* 이노릭스 끝
+			*/
 		});
-	}
-	
-	/** 검색 */
-	function goSearch(){
-		$("#page").val(1);
-		var f = document.mainform;
-		f.submit();
-	}
-//]]>
-</script>
-
-
-
-	
-
-	<form name="mainform" id="mainform" action="./list.do" method="post" onSubmit="$('#page').val(1); return true;">
-		<input type="hidden" name="page" id="page" value="5" />
-		<input type="hidden" name="seq" id="seq" value="" />
-		<input type="hidden" name="multi_itm_seq" value="0" />
-		<input type="hidden" name="multi_itm_seqsStr" value="" />
 		
+		function biznsImg(flag, fileNm){
+			var imgPath = "";
+			imgPath += '<div class="tabContent">';
+			imgPath += '		<div class="imgWrap">';
+			imgPath += "			<img src=\"/app/upload/biznsmng/thumbnail/" + fileNm + "\" alt=\"단지 관련 이미지\" onError=\"this.src='/app/images/www/common/img_noimg01.gif'\"/>";
+			imgPath += '		</div>';
+			imgPath += '</div>';
+			
+			$('.bizns_lnb ul li').removeClass('curr');
+			
+			$('#li_'+flag).addClass('curr');
+			
+			$('#imgLayer').html(imgPath);
+		}
+		
+		function goPage(gubun){
+			if(gubun == 'P'){
+				window.open("/app/lay2/program/S1T1645C348/www/brd/m_135/list.do?itm_seq_1=1", "_blank");
+			}else if(gubun == 'C'){
+				window.open("/app/lay2/S1T1642C1643/contents.do", "_blank");
+			}
+		}
+		
+		function showMap(addr){
+			if($('#biznsMap').css('display') == 'block'){
+				$('#biznsMap').css('display', 'none');
+				$('#biznsMap').html();
+			}else{
+				$('#biznsMap').css('display', 'block');
+				
+				var address = addr;
+				var map = createMap("biznsMap"); // 지도 생성
+			
+				buildMarker(map, address);
+			}
+		}
+		
+	 	/**
+	 	 * 지도를 생성한다.
+	 	 */
+	 	function createMap(elId) {
+	 		var map = new daum.maps.Map(document.getElementById(elId), { // 지도를 생성할 때 필요한 기본 옵션
+	 			center : new daum.maps.LatLng(37.6, 127), // 지도의 중심좌표
+	 			level : 6
+	 		// 지도의 레벨(확대, 축소 정도)
+	 		}); // 지도 생성 및 객체 리턴
+	 		map.addControl(new daum.maps.MapTypeControl(), daum.maps.ControlPosition.TOPRIGHT); // 일반 지도와 스카이뷰로 지도 타입을 전환할 수 있는 지도타입 컨트롤을 생성합니다.
+	 		map.addControl(new daum.maps.ZoomControl(), daum.maps.ControlPosition.RIGHT); // 지도 확대 축소를 제어할 수 있는  줌 컨트롤을 생성합니다.
 
- 			
-				<!-- 검색 영역 [2개=v2, 3개=없음, 4개=v8] -->
+	 		return map;
+	 	}
+
+	 	/**
+	 	 * 마커를 생성한다.
+	 	 */
+	 	function buildMarker(map, addr) {
+	 		var geocoder = new daum.maps.services.Geocoder(); // 주소-좌표 변환 객체를 생성합니다.
+	 		
+	 		geocoder.addressSearch(addr, function(result,status) { // 주소로 좌표를 검색합니다.
+				if (status === daum.maps.services.Status.OK) { // 정상적으로 검색이 완료됐으면
+					var coords = new daum.maps.LatLng(result[0].y, result[0].x);
 				
+					var toolTip = '<div class="blue_box j-tooltip" padding: 10px; width: 168px; text-align: center;">'
+				                + '<p class="mb10">'+addr+'</p>'
+				                + '</div>';
+
+					var customOverlay = new daum.maps.CustomOverlay({ // 커스텀 오버레이를 생성합니다.
+						content : toolTip,
+						map : map,
+						position : coords,
+						xAnchor : -0.1,
+						yAnchor : 1
+					});
+					customOverlay.setVisible(false);
+
+					daum.maps.event.addListener(new daum.maps.Marker({ // 결과값으로 받은 위치를 마커로 표시합니다.
+						clickable : true,// 마커를 클릭했을 때 지도의 클릭 이벤트가 발생하지 않도록 설정합니다.
+						map : map,
+						position : coords
+					}), 'click', function() { // 마커에 클릭이벤트를 등록합니다.
+						customOverlay.setVisible(!customOverlay.getVisible());
+					});
+					map.setCenter(coords);
+				}
+			});
+	 	}	
+		
+		/** 상세 이동 */
+		function getDetailView(seq){
+			var f = document.mainform;
+			f.seq.value = seq;
+			f.action = "view.do";
+			f.submit();
+		}
+		
+		/**
+		 * 진행중인 모집공고 클릭 후 단지목록 조회
+		 */
+		function selectHouseList(pageNum,recrnotiCd,ctgrCd,sortGubun,gubun, seq) {
+			
+			if(typeof pageNum == "undefined" || pageNum == null || pageNum == ""){
+				pageNum =1;
+			}
+			
+			if(typeof sortGubun == "undefined" || sortGubun == null || sortGubun == "" ){
+				sortGubun = "hoCntSort";
+			}
+			
+			//진행중인 모집공고에서 들어올 경우 주택 유형이 없음.
+			$("#ctgrCd").val("");
+			
+			//진행중인 모집공고 타이틀 보이기 설정
+			$("#sigEmdNm").show();
+			$("#viewGb").val(gubun);
+			//정렬 보이게 설정
+			$("#sortCategory").show();
+			
+			
+			//진행중인 공고 있을 경우 class 추가
+			$(".cont-item").removeClass("no-title");
+			
+			//진쟁중인 공고명 길이가 50자 이상일 경우 정렬 클래스 추가
+			if($(".notice-tit span").text().trim().length >= 50){
 				
+				$(".notice-tit").addClass("t50");
 				
-					
+			}
+			
+			//진쟁중인 공고명 길이가 80자 이상일 경우 정렬 클래스 추가
+			if($(".notice-tit span").text().trim().length >= 80){
+				
+				$(".notice-tit").addClass("t80");
+				
+			}
+			
+			//아파트 등 다가구 원룸 다보이도록 설정
+			$("#aptMainView").addClass("apt on");
+			$("#mtlMainView").addClass("mtl on");
+			$("#ormMainView").addClass("orm on");
+
+			
+			
+			var params = {
+				pageNum : pageNum,
+				recrnotiCd : recrnotiCd,
+				ctgrCd : ctgrCd,
+				sortGubun : sortGubun,
+				gubun : gubun, 
+				seq : seq
+			}
+			
+			postOpen("POST", "/houseinfo/main/selectFromMain.do", params, "_blank");
+			
+		}//function end
+		
+		//주택정보 홈페이지 새창열기
+		function postOpen(method, url, data, target) {
+			var domain = "";
+			let exp = /dev/;
+			var hostNm = window.location.hostname;
+			if (hostNm == "127.0.0.1") {
+				domain = "http://127.0.0.1";
+			} else if (exp.test(hostNm)){ // 개발서버
+				domain = window.location.protocol + "//dev.i-sh.co.kr";
+			} else {
+				domain = window.location.protocol + "//www.i-sh.co.kr";
+			}
+			
+			var form = document.createElement("form");
+			
+			form.action = domain + url;
+			form.method = method;
+			form.target = target || "_blank";
+			//form.target = target || "_self";
+			
+			if (data) {
+				for (var key in data) {
+					var input = document.createElement("textarea");
+					input.name = key;
+					input.value = typeof data[key] == "object" ? JSON.stringify(data[key]) : data[key];
+					form.appendChild(input);
+				}
+			}
+			form.style.display = "none";
+			document.body.appendChild(form);
+			form.submit();
+		}
+
+		//]]>
+	</script>
+	
+
+
+				<!-- 테이블 영역 -->
+				<div class="detailTable gs0401Table firgs0401Table">
+					<table>
+						<caption>2026년 1차 청년 매입임대주택 입주자 모집공고(2026. 6. 26.)</caption>
+						<colgroup>
+							<col style="width:85px">
+							<col style="width:auto">
+						</colgroup>
+						<thead>
+							<tr>
+								<th scope="col" colspan="2">2026년 1차 청년 매입임대주택 입주자 모집공고(2026. 6. 26.)</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td colspan="2">
+									<ul>
+									
+									
+										<!-- 등록일 -->
+										<li>
+											<strong>등록일 : </strong>
+											
+												
+													2026-06-26
+												
+												
+											
+										</li>
+										<!-- 조회수 -->
+										<li><strong>조회수 : </strong>335,179</li>
+
+									</ul>
+								</td>
+							</tr>
+					<!-- 첨부파일 Start -->
 					
 						
+							<tr>
+								<th scope="row">첨부</th>
+								<td>
+									<div id="fileControl" style="display: none"></div>
+									<!--
+									파일 확장자에 따른 아이콘입니다.
+									<a href="#" class="btnAttach v1">.pdf</a>
+									<a href="#" class="btnAttach v2">.hwp</a>
+									<a href="#" class="btnAttach v3">.xls</a>
+									<a href="#" class="btnAttach v4">.ppt</a>
+									<a href="#" class="btnAttach v5">.doc</a>
+									<a href="#" class="btnAttach v6">.txt</a>
+									<a href="#" class="btnAttach v7">.png</a>
+									<a href="#" class="btnAttach v8">.mp4</a>
+									<a href="#" class="btnAttach v9">.mp3</a>
+									<a href="#" class="btnAttach v10">.zip</a>
+									<a href="#" class="btnAttach v11">.etc</a>
+									-->
+									
+									
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+									
+									<a href="#" class="btnAttach v1" onclick="existFile('0'); return false;">
+										
+										1_ [공고문] 2026년 1차 청년 매입임대주택 입주자 모집공고.pdf
+									</a>
+									
+									
+										<a href="/app/com/util/htmlConverter.do?brd_id=GS0401&amp;seq=306214&amp;data_tp=A&amp;file_seq=5" class="btn btnWhite h32 icoView" target="_blank" title="1_ [공고문] 2026년 1차 청년 매입임대주택 입주자 모집공고.pdf 미리보기 새창열림"><span>미리보기</span></a>
+								
+								</td>
+							</tr>
+						
 					
-				
-				<div class="searchArea v2">
-					<div class="inner">
-						<p>
-						<!-- 분류1  -->
-						 
-					<!-- 분류2  -->
+						
+							<tr>
+								<th scope="row">첨부</th>
+								<td>
+									<div id="fileControl" style="display: none"></div>
+									<!--
+									파일 확장자에 따른 아이콘입니다.
+									<a href="#" class="btnAttach v1">.pdf</a>
+									<a href="#" class="btnAttach v2">.hwp</a>
+									<a href="#" class="btnAttach v3">.xls</a>
+									<a href="#" class="btnAttach v4">.ppt</a>
+									<a href="#" class="btnAttach v5">.doc</a>
+									<a href="#" class="btnAttach v6">.txt</a>
+									<a href="#" class="btnAttach v7">.png</a>
+									<a href="#" class="btnAttach v8">.mp4</a>
+									<a href="#" class="btnAttach v9">.mp3</a>
+									<a href="#" class="btnAttach v10">.zip</a>
+									<a href="#" class="btnAttach v11">.etc</a>
+									-->
+									
+									
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+									
+									<a href="#" class="btnAttach v1" onclick="existFile('1'); return false;">
+										
+										2_ [주택목록] 2026년 1차 청년 매입임대주택 입주자 모집공고(홈페이지 공개용).pdf
+									</a>
+									
+									
+										<a href="/app/com/util/htmlConverter.do?brd_id=GS0401&amp;seq=306214&amp;data_tp=A&amp;file_seq=6" class="btn btnWhite h32 icoView" target="_blank" title="2_ [주택목록] 2026년 1차 청년 매입임대주택 입주자 모집공고(홈페이지 공개용).pdf 미리보기 새창열림"><span>미리보기</span></a>
+								
+								</td>
+							</tr>
+						
 					
-							<select name="srchTp" id="s_keyword" title="검색목록선택">
-								<option value="0"  selected="selected">제목</option>
-								<option value="1" >내용</option>
-							</select>
-						</p>
-						<p>
-							<input type="text" value="매입임대주택" name="srchWord" id="srchWord" title="검색어 입력" placeholder="검색어 입력"/>
-							<a href="javascript:void(0);" class="btn btnGreen" onclick="goSearch();">검색</a>
-						</p>
-					</div>
-				</div>
-				<!--// 검색 영역 -->
-	</form>
+						
+							<tr>
+								<th scope="row">첨부</th>
+								<td>
+									<div id="fileControl" style="display: none"></div>
+									<!--
+									파일 확장자에 따른 아이콘입니다.
+									<a href="#" class="btnAttach v1">.pdf</a>
+									<a href="#" class="btnAttach v2">.hwp</a>
+									<a href="#" class="btnAttach v3">.xls</a>
+									<a href="#" class="btnAttach v4">.ppt</a>
+									<a href="#" class="btnAttach v5">.doc</a>
+									<a href="#" class="btnAttach v6">.txt</a>
+									<a href="#" class="btnAttach v7">.png</a>
+									<a href="#" class="btnAttach v8">.mp4</a>
+									<a href="#" class="btnAttach v9">.mp3</a>
+									<a href="#" class="btnAttach v10">.zip</a>
+									<a href="#" class="btnAttach v11">.etc</a>
+									-->
+									
+									
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+									
+									<a href="#" class="btnAttach v1" onclick="existFile('2'); return false;">
+										
+										3_ [첨부] 도면 및 사진(링크).pdf
+									</a>
+									
+									
+										<a href="/app/com/util/htmlConverter.do?brd_id=GS0401&amp;seq=306214&amp;data_tp=A&amp;file_seq=7" class="btn btnWhite h32 icoView" target="_blank" title="3_ [첨부] 도면 및 사진(링크).pdf 미리보기 새창열림"><span>미리보기</span></a>
+								
+								</td>
+							</tr>
+						
+					
+						
+							<tr>
+								<th scope="row">첨부</th>
+								<td>
+									<div id="fileControl" style="display: none"></div>
+									<!--
+									파일 확장자에 따른 아이콘입니다.
+									<a href="#" class="btnAttach v1">.pdf</a>
+									<a href="#" class="btnAttach v2">.hwp</a>
+									<a href="#" class="btnAttach v3">.xls</a>
+									<a href="#" class="btnAttach v4">.ppt</a>
+									<a href="#" class="btnAttach v5">.doc</a>
+									<a href="#" class="btnAttach v6">.txt</a>
+									<a href="#" class="btnAttach v7">.png</a>
+									<a href="#" class="btnAttach v8">.mp4</a>
+									<a href="#" class="btnAttach v9">.mp3</a>
+									<a href="#" class="btnAttach v10">.zip</a>
+									<a href="#" class="btnAttach v11">.etc</a>
+									-->
+									
+									
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+									
+									<a href="#" class="btnAttach v1" onclick="existFile('3'); return false;">
+										
+										4_ [첨부] 청년 매입임대주택 신청 관련 부모 범위 기준.pdf
+									</a>
+									
+									
+										<a href="/app/com/util/htmlConverter.do?brd_id=GS0401&amp;seq=306214&amp;data_tp=A&amp;file_seq=8" class="btn btnWhite h32 icoView" target="_blank" title="4_ [첨부] 청년 매입임대주택 신청 관련 부모 범위 기준.pdf 미리보기 새창열림"><span>미리보기</span></a>
+								
+								</td>
+							</tr>
+						
+					
+					<!-- 첨부파일 End -->
 
-				<!-- 테이블 탑 -->
-				<div class="topTxt">
-					<p>총 <strong class="cBrown bold">203</strong> 건 [5/21페이지]</p>
+
+
+							<tr>
+								<td colspan="2" class="cont">
+									
+										
+											<p style="line-height: 160%; text-align: center;"><span style="font-weight: bold;">2026년 1차 청년 매입임대주택 입주자 모집공고(2026. 6. 26.)</span></p>
+<p style="line-height: 160%; text-align: left;"><br/></p>
+<p style="line-height: 160%; text-align: left;"><br/>
+□ 공급호수 : <span style="font-weight: bold;">총 849호</span> (신규공급 490호, 재공급 359호)<br/>
+<br/>
+□ 공급주택 유형 : 도시형생활주택, 다가구, 다세대, 오피스텔, 연립주택 등<br/>
+&nbsp;※ 공급주택 참고자료 : [첨부] 도면 및 사진(링크),&nbsp;SH인터넷청약 - 전자 팸플릿 참고(신규공급에 한함)<br/>
+<br/>
+□ 신청자격 : 모집공고일(2026. 6. 26.) 현재 무주택자(본인)이면서 미혼(현재 혼인상태가 아님)인 대학생, 취업준비생, 청년, 이공계인재로서 각 순위 별 소득 및 자산, 자동차가액 기준을 충족하는 자<br/>
+&nbsp;※ 이공계 인재는 이공계 인재 성장주택으로 공급하는 주택(마포구 성미산로11길 108)만 신청 가능<br/>
+&nbsp;※ 신청순위(1~3순위) 별 상세 자격기준 및 가점사항은 모집공고문 참조<br/>
+<br/>
+□ 공급일정<br/>
+<span style="font-weight: bold;">&nbsp;○ 인터넷 청약신청 : 2026. 7. 13.(월) 10:00 ~ 7. 15.(수) 17:00<br/>&nbsp;○ 서류심사대상자 발표 : 2026. 7. 20.(월) 16:00 예정</span><br/>
+&nbsp;○ 서류심사대상자 입주자격 심사 : ~ 2026. 11월<br/>
+<span style="font-weight: bold;">&nbsp;○ 당첨자 및 예비자 발표 : 2026. 11. 20.(금) 16:00 예정</span><br/>
+&nbsp; &nbsp;※ 범정부 사회보장정보시스템 소득 및 자산 조회 결과 회신 시기에 따라 발표일은 변경 가능하며, 변경 시 별도 안내 예정<br/>
+&nbsp;○ 당첨자 계약 : 2026. 12. 7.(월) ~ 12. 10.(목)<br/>
+&nbsp; - 온라인(전자)계약 기간: 2026. 12. 7.(월) ~ 12. 9.(수)<br/>
+&nbsp; -&nbsp;방문 계약 기간: 2026. 12. 10.(목)<br/>
+&nbsp;○ 입주기간 : 2026. 12. 28.(월) ~ 2027. 2. 25.(목)<br/>
+<span style="font-weight: bold;">&nbsp; ※ 청년 매입임대주택과 기숙사형 청년주택은 별도의 입주자 모집공고로 중복 신청 가능합니다. (중복 당첨 시, 한 곳만 입주 가능)</span><br/>
+<br/>
+□ 유의사항<br/>
+&nbsp;○ 문의전화 : <span style="font-weight: bold;">1600-3456(서울주택도시개발공사 콜센터)</span><br/>
+&nbsp;○ 공사에서는 입주자 모집공고의 내용과 관련한 상담을 진행하고 있으나 신청자 개인의 다양한 정보나 상황에 대한 자료 없이 상담을 진행하오니, <span style="font-weight: bold;">상담 정보는 참고자료로만 활용해 주시기 바라며 입주자 모집공고문을 직접 숙지하신 후 신청</span>해주시기 바랍니다.<br/>
+&nbsp;○ 1인 1주택만 신청가능하며 복수주택을 중복신청할 경우 전부 무효처리 합니다.<br/>
+&nbsp;○ 신청자 본인이 선택한 순위 및 유형, 가점사항에 대해 자격심사를 진행하며 신청 시 오기입 등의 이유로 신청기간 종료 이후 자격사항 변동은 절대 불가하오니 유의하시기 바랍니다.<br/>
+&nbsp;○ 개별 주택의 임대보증금, 월임대료, 면적 등은 [주택목록]을 참고하여 주시기 바랍니다.<br/>&nbsp;○ 공급주택 별 사진 및 도면 등 참고자료는 [첨부] 도면 및 사진(링크)를&nbsp;참고하여 주시기 바랍니다.</p>
+<p style="line-height: 160%; text-align: left;">&nbsp;○ <span style="font-weight: bold;">신규공급 주택의 사진, 도면 등 정보는 SH 인터넷청약시스템 &gt; 청약정보 &gt; 전자팸플릿 에서 주택별로 확인하여 주시기 바랍니다.</span><br/>
+&nbsp;○ 청약신청 접수는 인터넷으로만 진행하오니 이점 유의하시기 바랍니다.(우편접수, 방문접수 불가)<br/>
+&nbsp;○ 입주자 모집공고일(2026. 6. 26.) 기준 신청자격에 의거하여 입주자 선정 절차를 진행하며, 입주자 모집공고문의 내용을 정확히 숙지하시어 <span style="font-weight: bold;">신청과정에서 불이익(신청순위를 실제보다 낮게 기재, 신청유형을 잘못 선택 등)이 발생하지 않도록 유의하시기 바랍니다.</span><br/>
+&nbsp;○ 신청접수 방법 및 제출서류, 공급주택 목록 등 기타 자세한 사항은 첨부파일 [공고문], [주택목록] 등을 참고하시기 바랍니다.<br/>
+<br/>
+<br/></p>
+<p style="line-height: 160%; text-align: left;"><br/></p>
+<p style="line-height: 160%; text-align: center;"><br/></p>
+<p style="line-height: 160%; text-align: center;"><span style="font-weight: bold;">&nbsp;2026. 6. 26.</span></p>
+<p style="line-height: 160%; text-align: center;"><span style="font-weight: bold;">서울주택도시개발공사 매입주택공급부</span></p>
+										
+										
+									
+									
+										
+											 
+										
+									
+								</td>
+							</tr>
+							
+						</tbody>
+					</table>
 				</div>
-				<!--// 테이블 탑 -->
 				
 					
-						<!-- 테이블 영역 -->
-						<div id="listTb" class="listTable colRm">
+						<div class="detailTable gs0401Tab"> 
 							<table>
-								<caption>
-									
-									
-									
-									
-									공고 및 공지 목록
-								</caption>
-								
-								
-									
-								
-								 
-								 
-								 
-								 
-								 
-								 
-								
-								
-								
-									<!-- 번호 -->
-									
-								
-								
-								
-								
-								
-								
-								<!-- 제목 -->
-								
-								
-								
-								
-									<!-- 부서명 -->
-									
-								
-								
-								
-									<!-- 등록일  -->
-									
-								
-								
-									<!-- 조회수  -->
-									 <!-- 조회수는 글번호와 같이 빠진다  -->
-								
-								
-								
-								
-								
-								<!-- 반응형으로 삭제되는 컬럼 지정 -->
-								 
-									
-									
-									
-										
-										
-										
-										
-										
-											
-											<script>$(function(){ $("#listTb").addClass("col1  col4 col5   col3"); });</script>
-											
-											
-												
-												 
-													 
-														
-														<script>$(function(){ $("#listTb").removeClass("col4"); });</script>
-													
-													
-													
-												
-												
-											
-										
-									
-								
-								
-								<colgroup>
-									
-										<col style="width :10%" />
-									<!-- 번호 -->
-									
-									
-									
-									
-									
-									<col style="width: auto" />
-									<!-- 제목 -->
-									
-									
-										<col style="width :160px" />
-									<!-- 부서명 -->
-									
-									
-									
-										<col style="width :100px" />
-									<!-- 작성일 -->
-									
-									
-										<col style="width :80px" />
-									<!-- 조회수 -->
-									
-									
-									
+								<caption>공지문과 관련된 공고를 게시한 표</caption>
+								<colgroup>							
+									<col style="width:auto">
+									<col style="width:auto">
 									
 								</colgroup>
 								<thead>
 									<tr>
-										
-											<th scope="col">번호</th>
-										<!-- 번호 -->
-										
-										
-										
-										
-										
-											<th scope="col">제목</th>
-										<!-- 제목 -->
-										
-										<!-- bckang 리스트에서 첨부파일 삭제 -->
-										
-										
-											<th scope="col">담당부서</th>
-										<!-- 부서명 -->
-										
-										
-										
-										
-											<th scope="col">등록일</th>
-										<!-- 작성일 -->
-										
-										
-											<th scope="col">조회수</th>
-										<!-- 조회수 -->
-										
-										
-										
+										<th colspan="2">관련 공고</th>
 									</tr>
 								</thead>
 								<tbody>
-								<!-- 공지여부 -->
 								
-								
-									<tr>
-										
-											<td>163</td>
-											<!-- 번호 -->
-										
-										
-										
-										
-										
-										<td class="txtL">
+									<tr class="gs0401RecrnotiCdTr">
+										<th>
 											
-												<a href="#" class="ellipsis " onclick="javascript:getDetailView('307073');return false;">
+											서류심사공고
 											
+										</th>
+										<td>
+												<a href="#" title="페이지 이동" class="btnPrev" onclick="javascript:getDetailView('307233');return false;">
 												
-											2026년 1차 청년 매입임대주택 입주자 모집공고(2026.6.26.) 최종 청약 경쟁률 게시
-											
-												</a>
-											
+												2026년 1차 청년 매입임대주택 입주자 모집공고(2026. 6. 26.) 서류심사대상자 발표 및 제출서류 안내</a><span>2026-07-20</span>
 										</td>
-										<!-- 제목 -->
-										<!-- 첨부파일 Start -->
-										
-										<!-- 첨부파일 End -->
-										
-											<td>
-												매입주택공급부
-											</td>
-											<!-- 부서명 -->
-										
-										
-										
-										
-											
-												
-													<td class="num">
-														
-															
-															2026-07-15
-														
-													</td>
-												
-											
-											
-										
-										
-											<td class="num">31676</td>
-											<!-- 조회수 -->
-										
-										
-										
-									</tr>
-								
-									<tr>
-										
-											<td>162</td>
-											<!-- 번호 -->
-										
-										
-										
-										
-										
-										<td class="txtL">
-											
-												<a href="#" class="ellipsis " onclick="javascript:getDetailView('306649');return false;">
-											
-												
-											[청년형] 특화형 매입임대주택(금천구) 입주자 모집 공고(운영기관 : 한지붕 협동조합)
-											
-												</a>
-											
-										</td>
-										<!-- 제목 -->
-										<!-- 첨부파일 Start -->
-										
-										<!-- 첨부파일 End -->
-										
-											<td>
-												매입주택공급부
-											</td>
-											<!-- 부서명 -->
-										
-										
-										
-										
-											
-												
-													<td class="num">
-														
-															
-															2026-07-08
-														
-													</td>
-												
-											
-											
-										
-										
-											<td class="num">14048</td>
-											<!-- 조회수 -->
-										
-										
-										
-									</tr>
-								
-									<tr>
-										
-											<td>161</td>
-											<!-- 번호 -->
-										
-										
-										
-										
-										
-										<td class="txtL">
-											
-												<a href="#" class="ellipsis " onclick="javascript:getDetailView('306648');return false;">
-											
-												
-											[청년형] 특화형 매입임대주택(금천구) 입주자 모집 공고(운영기관 : 사단법인 가치있는누림)
-											
-												</a>
-											
-										</td>
-										<!-- 제목 -->
-										<!-- 첨부파일 Start -->
-										
-										<!-- 첨부파일 End -->
-										
-											<td>
-												매입주택공급부
-											</td>
-											<!-- 부서명 -->
-										
-										
-										
-										
-											
-												
-													<td class="num">
-														
-															
-															2026-07-08
-														
-													</td>
-												
-											
-											
-										
-										
-											<td class="num">11509</td>
-											<!-- 조회수 -->
-										
-										
-										
-									</tr>
-								
-									<tr>
-										
-											<td>160</td>
-											<!-- 번호 -->
-										
-										
-										
-										
-										
-										<td class="txtL">
-											
-												<a href="#" class="ellipsis " onclick="javascript:getDetailView('306410');return false;">
-											
-												
-											2026년도 제1차 신축약정 매입임대주택 매도인 추천 감정평가법인 선정 결과 공개
-											
-												</a>
-											
-										</td>
-										<!-- 제목 -->
-										<!-- 첨부파일 Start -->
-										
-										<!-- 첨부파일 End -->
-										
-											<td>
-												주택매입사업부
-											</td>
-											<!-- 부서명 -->
-										
-										
-										
-										
-											
-												
-													<td class="num">
-														
-															
-															2026-07-01
-														
-													</td>
-												
-											
-											
-										
-										
-											<td class="num">3305</td>
-											<!-- 조회수 -->
-										
-										
-										
-									</tr>
-								
-									<tr>
-										
-											<td>159</td>
-											<!-- 번호 -->
-										
-										
-										
-										
-										
-										<td class="txtL">
-											
-												<a href="#" class="ellipsis " onclick="javascript:getDetailView('306301');return false;">
-											
-												
-											[청년형] 특화형 매입임대주택(강동구) 입주자 모집 공고(운영기관 : 마을과집 협동조합)
-											
-												</a>
-											
-										</td>
-										<!-- 제목 -->
-										<!-- 첨부파일 Start -->
-										
-										<!-- 첨부파일 End -->
-										
-											<td>
-												매입주택공급부
-											</td>
-											<!-- 부서명 -->
-										
-										
-										
-										
-											
-												
-													<td class="num">
-														
-															
-															2026-07-01
-														
-													</td>
-												
-											
-											
-										
-										
-											<td class="num">19432</td>
-											<!-- 조회수 -->
-										
-										
-										
-									</tr>
-								
-									<tr>
-										
-											<td>158</td>
-											<!-- 번호 -->
-										
-										
-										
-										
-										
-										<td class="txtL">
-											
-												<a href="#" class="ellipsis " onclick="javascript:getDetailView('306284');return false;">
-											
-												
-											[청년형] 특화형 매입임대주택(금천구) 입주자 모집 공고(운영기관 : 한지붕 협동조합)_은행나무C 201호
-											
-												</a>
-											
-										</td>
-										<!-- 제목 -->
-										<!-- 첨부파일 Start -->
-										
-										<!-- 첨부파일 End -->
-										
-											<td>
-												매입주택공급부
-											</td>
-											<!-- 부서명 -->
-										
-										
-										
-										
-											
-												
-													<td class="num">
-														
-															
-															2026-06-30
-														
-													</td>
-												
-											
-											
-										
-										
-											<td class="num">10961</td>
-											<!-- 조회수 -->
-										
-										
-										
-									</tr>
-								
-									<tr>
-										
-											<td>157</td>
-											<!-- 번호 -->
-										
-										
-										
-										
-										
-										<td class="txtL">
-											
-												<a href="#" class="ellipsis " onclick="javascript:getDetailView('306283');return false;">
-											
-												
-											[청년형] 특화형 매입임대주택(서초구) 입주자 모집 공고(운영기관 : 한지붕 협동조합)_대명파크힐 201호
-											
-												</a>
-											
-										</td>
-										<!-- 제목 -->
-										<!-- 첨부파일 Start -->
-										
-										<!-- 첨부파일 End -->
-										
-											<td>
-												매입주택공급부
-											</td>
-											<!-- 부서명 -->
-										
-										
-										
-										
-											
-												
-													<td class="num">
-														
-															
-															2026-06-30
-														
-													</td>
-												
-											
-											
-										
-										
-											<td class="num">13748</td>
-											<!-- 조회수 -->
-										
-										
-										
-									</tr>
-								
-									<tr>
-										
-											<td>156</td>
-											<!-- 번호 -->
-										
-										
-										
-										
-										
-										<td class="txtL">
-											
-												<a href="#" class="ellipsis " onclick="javascript:getDetailView('306294');return false;">
-											
-												
-											2025년 2-1차 미리내집(신혼신생아매입임대주택2) 예비자 공급 일정 안내(예비1~4차)
-											
-												</a>
-											
-										</td>
-										<!-- 제목 -->
-										<!-- 첨부파일 Start -->
-										
-										<!-- 첨부파일 End -->
-										
-											<td>
-												매입주택공급부
-											</td>
-											<!-- 부서명 -->
-										
-										
-										
-										
-											
-												
-													<td class="num">
-														
-															
-															2026-06-29
-														
-													</td>
-												
-											
-											
-										
-										
-											<td class="num">11884</td>
-											<!-- 조회수 -->
-										
-										
-										
-									</tr>
-								
-									<tr>
-										
-											<td>155</td>
-											<!-- 번호 -->
-										
-										
-										
-										
-										
-										<td class="txtL">
-											
-												<a href="#" class="ellipsis " onclick="javascript:getDetailView('306214');return false;">
-											
-												
-											2026년 1차 청년 매입임대주택 입주자 모집공고(2026. 6. 26.)
-											
-												</a>
-											
-										</td>
-										<!-- 제목 -->
-										<!-- 첨부파일 Start -->
-										
-										<!-- 첨부파일 End -->
-										
-											<td>
-												매입주택공급부
-											</td>
-											<!-- 부서명 -->
-										
-										
-										
-										
-											
-												
-													<td class="num">
-														
-															
-															2026-06-26
-														
-													</td>
-												
-											
-											
-										
-										
-											<td class="num">335176</td>
-											<!-- 조회수 -->
-										
-										
-										
-									</tr>
-								
-									<tr>
-										
-											<td>154</td>
-											<!-- 번호 -->
-										
-										
-										
-										
-										
-										<td class="txtL">
-											
-												<a href="#" class="ellipsis " onclick="javascript:getDetailView('306202');return false;">
-											
-												
-											2026년 상반기 일반 매입임대주택(다가구, 원룸) 입주대기자 선정결과 발표
-											
-												</a>
-											
-										</td>
-										<!-- 제목 -->
-										<!-- 첨부파일 Start -->
-										
-										<!-- 첨부파일 End -->
-										
-											<td>
-												매입주택공급부
-											</td>
-											<!-- 부서명 -->
-										
-										
-										
-										
-											
-												
-													<td class="num">
-														
-															
-															2026-06-26
-														
-													</td>
-												
-											
-											
-										
-										
-											<td class="num">10325</td>
-											<!-- 조회수 -->
-										
-										
-										
-									</tr>
-								
-								
+									</tr>	
+								 
 								</tbody>
 							</table>
-						</div>
-						<!--// 테이블 영역 -->
-					
+						</div>	
 					
 				
-
-				<!-- 페이징 영역 -->
-				<div class="pagingWrap">
-					<div class="inner"><a href="#none" onclick="getPaging(1,null);return false" class="btnFirst">첫페이지</a>
-<a href="#none" onclick="getPaging(1,null);return false" class="btnPrev">이전페이지</a>
-<div class="page"><a href="#none" onclick="getPaging(1,null);return false">1</a>
-<a href="#none" onclick="getPaging(2,null);return false">2</a>
-<a href="#none" onclick="getPaging(3,null);return false">3</a>
-<a href="#none" onclick="getPaging(4,null);return false">4</a>
-<strong>5</strong>
-</div><a href="#none" onclick="getPaging(6,null);return false" class="btnNext">다음페이지</a>
-<a href="#none" onclick="getPaging(21,null);return false" class="btnLast">마지막페이지</a></div>
-
+				<div class="detailTable"> 
+					<table>
+						<caption>다음, 이전글의 제목을 확인하고 이동할 수 있는 버튼이 있는 표</caption>
+						<colgroup>							
+							<col style="width:85px">
+							<col style="width:auto">							
+						</colgroup>
+						<tbody>
+							
+								
+								<tr class="tableNav">
+									<th><a href="#" class="btnPrev" onclick="javascript:getDetailView('306294');return false;" title="페이지 이동">이전글</a></th>
+									<td><a href="#" onclick="javascript:getDetailView('306294');return false;" title="페이지 이동">2025년 2-1차 미리내집(신혼신생아매입임대주택2) 예비자 공급 일정 안내(예비1~4차)</a><span>2026-06-29</span></td>
+								</tr>
+								
+								
+							
+							
+								
+								<tr class="tableNav">
+									<th><a href="#" class="btnNext"  onclick="javascript:getDetailView('306210');return false;" title="페이지 이동">다음글</a></th>
+									<td><a href="#" onclick="javascript:getDetailView('306210');return false;" title="페이지 이동">2025년 2차 청년안심주택(2025. 7. 30. 공고) 예비3차 당첨자 발표</a><span>2026-06-26</span></td>
+								</tr>
+								
+								
+							
+						</tbody>
+					</table>
 				</div>
+				<div class="btnRight">
+					<a href="#" class="btn btnGreen" onclick="javascript:goList();return false;">목록</a>
+				</div>
+				<!--// 테이블 영역 -->
 				
-				<!--// 페이징 영역 -->
 				
+
+	<form name="mainform" id="mainform" action="./list.do" method="post">
+		<input type="hidden" name="page" id="page" value="1" />
+		<input type="hidden" name="srchFr" id="srchFr" value="" />
+		<input type="hidden" name="srchTo" id="srchTo" value="" />
+		<input type="hidden" name="srchWord" id="srchWord" value="" />
+		<input type="hidden" name="srchTp" id="srchTp" value="" />
+		<input type="hidden" name="itm_seq_1" id="itm_seq_1" value="0" />
+		<input type="hidden" name="itm_seq_2" id="itm_seq_2" value="0" />
+		<input type="hidden" name="multi_itm_seq" id="multi_itm_seq" value="0" />
+		<input type="hidden" name="multi_itm_seqs" id="multi_itm_seqs" value="1,2,4,8,16,32,64,128,256" />
+		
+		<input type="hidden" name="seq" id="seq" value="" />
+	</form>
+	
+	
+
+				<!-- 박스 영역 -->
+				<ul class="personInfo">
+					<li><span>담당부서</span> : 매입주택공급부</li>
+					<li></li>
+					<li><span>전화번호</span> : 1600-3456</li>
+				</ul>
+				<!--// 박스 영역 -->
+
+
+
+	
+
 <script type="text/javascript">
 	$(document).ready(function(){	
 		/* NetFunnel_Complete(); */
