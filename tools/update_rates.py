@@ -28,8 +28,9 @@ def search(word, pages=4):
             if not s: continue
             a = re.search(r'<a[^>]*>([\s\S]*?)</a>', tr)
             title = ' '.join(re.sub(r'<[^>]+>', ' ', a.group(1) if a else '').split())
-            date = re.search(r'(\d{4})[-.](\d{2})[-.](\d{2})', re.sub(r'<[^>]+>', ' ', tr))
-            out.append({'seq': s.group(1), 'title': title, 'date': '-'.join(date.groups()) if date else ''}); got += 1
+            dates = re.findall(r'(\d{4})[-.](\d{2})[-.](\d{2})', re.sub(r'<[^>]+>', ' ', tr))
+            date = dates[-1] if dates else None   # 마지막 날짜 = 등록일 열(제목 안의 공고일이 먼저 나옴)
+            out.append({'seq': s.group(1), 'title': title, 'date': '-'.join(date) if date else ''}); got += 1
         log(f'SH search {word!r} page {page}: {got}')
         if got < 10: break
         time.sleep(0.5)
@@ -85,13 +86,15 @@ def download(seq, file_seq, brd='GS0401'):
     log('downloaded', path, len(r.content))
     return path
 
-def main(reparse=False):
+def main(reparse=False, offline=False):
     old = {}
     if os.path.exists(OUT):
         try: old = json.load(open(OUT, encoding='utf-8')).get('posts', {})
         except Exception: old = {}
     found = {}
-    for w in ('경쟁률', '접수결과', '접수 결과'):
+    if offline:   # 네트워크 없이 캐시된 PDF 만 다시 파싱(파서 개발용)
+        for seq, p in old.items(): found[seq] = {'seq': seq, 'title': p['title'], 'date': p['date'], 'kind': p['kind']}
+    for w in (() if offline else ('경쟁률', '접수결과', '접수 결과')):
         try:
             for x in search(w):
                 k = classify(x['title'])
@@ -101,25 +104,39 @@ def main(reparse=False):
     log('result posts found:', len(found))
     posts = dict(old)
     for seq, x in sorted(found.items(), key=lambda kv: kv[1]['date'], reverse=True):
-        if not reparse and seq in old and old[seq].get('rows'):
+        if not reparse and seq in old and old[seq].get('rows') and old[seq].get('pv') == rates.PARSER_VER:
+            if not offline and x.get('date'): posts[seq]['date'] = x['date']; posts[seq]['title'] = x['title']; posts[seq]['label'] = label_of(x['title'], x['kind'])
             continue
         try:
-            files, text = view(seq); time.sleep(0.6)
+            if offline:
+                files = [{'fileSeq': f['fileSeq'], 'oriFileNm': f['name'], 'fileSize': f['size']} for f in old[seq]['files']]; text = ''
+            else:
+                files, text = view(seq); time.sleep(0.6)
             pdfs = [f for f in files if (f.get('oriFileNm') or '').lower().endswith('.pdf')]
             rows, total = [], None
             parsed_files = []
             for f in pdfs:
-                path = download(seq, f['fileSeq'], f.get('brdId') or 'GS0401'); time.sleep(0.6)
+                path = download(seq, f['fileSeq'], f.get('brdId') or 'GS0401'); time.sleep(0 if offline else 0.6)
                 data = open(path, 'rb').read()
                 res = rates.parse_happy(data) if x['kind'] == 'happy' else rates.parse_kook(data)
                 rows += res['rows']
-                if res.get('total'): total = res['total']
+                if res.get('total') and not total: total = res['total']
                 parsed_files.append({'fileSeq': f['fileSeq'], 'name': f.get('oriFileNm'), 'size': int(f.get('fileSize') or 0), 'rows': len(res['rows'])})
-            bt = body_total(text)
+            # 단지명 열이 없는 단일 단지 PDF(예: 2021년 행복주택(상아2차)) → 제목의 괄호 안 이름으로 채움
+            one = re.search(r'행복주택\s*\(([^)]+)\)', x['title'])
+            for r in rows:
+                if not r.get('danji') and one: r['danji'] = one.group(1)
+            # 사이트용으로 슬림화: 빈 값·화면에 안 쓰는 열(인터넷/방문/공가/예비 세부) 제거
+            DROP = ('net', 'visit', 'total', 'vac', 'wait')
+            rows = [{k: v for k, v in r.items() if v not in (None, '') and k not in DROP} for r in rows]
+            bt = body_total(text) if text else (old.get(seq) or {}).get('body_total')
+            sum_n = sum((r.get('n') or 0) for r in rows); sum_s = sum((r.get('sum') or 0) for r in rows)
+            calc = {'supply': sum_n, 'sum': sum_s, 'rate': round(sum_s / sum_n, 1) if sum_n else None}
             posts[seq] = {'seq': seq, 'title': x['title'], 'date': x['date'], 'kind': x['kind'], 'label': label_of(x['title'], x['kind']),
-                          'url': SH_VIEW.format(seq=seq), 'files': parsed_files, 'total': total, 'body_total': bt, 'rows': rows,
+                          'url': SH_VIEW.format(seq=seq), 'files': parsed_files, 'total': total, 'body_total': bt, 'calc': calc, 'rows': rows, 'pv': rates.PARSER_VER,
                           'parsed_at': datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9))).strftime('%Y-%m-%d %H:%M')}
-            log(f"{seq} {x['date']} {x['kind']} rows={len(rows)} total={total} body={bt} :: {x['title'][:60]}")
+            ok = (bt or total or {}).get('rate')
+            log(f"{seq} {x['date']} {x['kind']} rows={len(rows)} calc={calc['rate']} official={ok} {'OK' if ok and calc['rate'] and abs(calc['rate'] - ok) < 0.6 else 'CHECK'} :: {x['title'][:60]}")
         except Exception as e:
             log('post fail', seq, repr(e))
     out = {'updated': datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9))).strftime('%Y-%m-%d %H:%M KST'),
@@ -129,4 +146,4 @@ def main(reparse=False):
     log('wrote', OUT, 'posts', len(posts), 'rows', sum(len(p.get('rows') or []) for p in posts.values()))
 
 if __name__ == '__main__':
-    main(reparse='--all' in sys.argv)
+    main(reparse='--all' in sys.argv, offline='--offline' in sys.argv)
