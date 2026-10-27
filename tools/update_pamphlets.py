@@ -186,6 +186,15 @@ def main():
         TYS.setdefault(pl['name'], set())
         if pl.get('m2'): TYS[pl['name']].add(str(int(pl['m2'])))
         elif pl.get('kind') == '국민임대': TYS[pl['name']] |= {'39', '49', '59'}
+    # PAM 에 없는 PLACES 단지는 팸플릿 목록의 제목·파일명에서 이름으로 찾아 자동 매핑(신정숲속마을처럼 나중에 넣은 단지)
+    def _norm(x): return re.sub(r'[\s()\[\]_·,.\-~]', '', x or '')
+    for pl in PLACES:
+        nm = pl['name']
+        if nm in PAM: continue
+        key = _norm(re.sub(r'\d+(?:~\d+)?단지|\d+(?:,\d+)*단지|지구', '', nm))[:6]
+        hits = [c for c in cat if c.get('seq') and len(key) >= 3 and key in _norm((c.get('title') or '') + ' ' + (c.get('file') or ''))]
+        if hits: PAM[nm] = [(h['seq'], key) for h in hits[:2]]; log('auto-mapped', nm, [(h['seq'], h.get('title')) for h in hits[:2]])
+        else: log('no pamphlet found for', nm, 'key', key)
     # 같은 쪽을 여러 단지가 쓰면 한 번은 고해상도 조건을 만족할 때 다시 그린다(아래 hi 판정)
     items, rendered, errors = {}, {}, []
     for name, lst in PAM.items():
