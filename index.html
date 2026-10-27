@@ -314,7 +314,7 @@ main section.view{margin-top:0}
         <label><input type="checkbox" data-cat="big" checked> <span class="dot hl" style="--c:#D32F2F"></span> 36㎡↑ 일반</label>
         <label><input type="checkbox" data-cat="small"> <span class="dot sm" style="--c:#8a94a3"></span> 27~35㎡</label>
         <label><input type="checkbox" data-cat="kook" checked> <span class="dot sq" style="--c:#6A1B9A"></span> 국민임대</label>
-        <span id="nm-status" class="src"></span>
+        <span id="nm-status" class="src"></span> <small id="lh-brief" class="k"></small>
       </div>
       <div class="nmbar" style="border-top:0;padding-top:0"><label style="gap:8px">공고 <select id="nm-notice" style="font:inherit;padding:4px 6px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--fg)"><option value="">전체 (2026년 공고 3건)</option></select></label></div>
       <div id="nm-msg" class="note warnbox" hidden style="margin:10px"></div>
@@ -1114,6 +1114,9 @@ function applyLive(){
     if (!j || !j.items) { box.innerHTML = '<p class="src">LH 자동 수집 데이터 없음 (첫 실행 전이거나 실패)</p>'; return; }
     var items = j.items.slice().sort(function(a, b){ return (b.posted || '').localeCompare(a.posted || ''); });
     if (!items.length) { box.innerHTML = '<p class="src">최근 150일 안에 경기·서울 LH 행복주택·국민임대·통합공공임대 공고 없음 (갱신 ' + j.updated + ')</p>'; return; }
+    var openN = items.filter(function(x){ return x.status === '접수중' || x.status === '공고중'; }).length, ggN = items.filter(function(x){ return /경기/.test(x.region); }).length;
+    var head = document.getElementById('lh-head'); if (head) head.innerHTML = '경기·서울 LH 공고 <small>(자동 수집 · 최근 150일 ' + items.length + '건, 경기 ' + ggN + '건, 지금 접수 중 ' + openN + '건)</small>';
+    var brief = document.getElementById('lh-brief'); if (brief) brief.innerHTML = '· LH 경기·서울 접수 중 <b>' + openN + '건</b> <a href="#calendar">(공고 일정 탭)</a>';
     box.innerHTML = '<div class="tbl"><table class="stack"><thead><tr><th>유형</th><th>공고명</th><th>지역</th><th>게시일</th><th>마감일</th><th>상태</th></tr></thead><tbody>' +
       items.map(function(x){ return '<tr><td>' + x.type + '</td><td><a href="' + x.url + '" target="_blank" rel="noopener">' + x.title + '</a></td><td>' + x.region + '</td><td class="num">' + x.posted + '</td><td class="num">' + x.deadline + '</td><td>' + (x.status === '접수중' ? '<span class="pill ok">' : '<span class="pill info">') + x.status + '</span></td></tr>'; }).join('') +
       '</tbody></table></div><p class="src">갱신 ' + j.updated + ' · 출처 <a href="https://apply.lh.or.kr/lhapply/apply/wt/wrtanc/selectWrtancList.do?mi=1026" target="_blank" rel="noopener">LH 청약플러스 공고문 목록</a></p>';
