@@ -104,27 +104,31 @@ def download(seq, file_seq='1', brd='JI1901'):
                 last = e; time.sleep(3)
     raise last
 
-def pick_pages(pdf, kw):
-    """키워드 없는 단일 단지 팸플릿: 앞에서부터 MAX_PAGES 쪽. 묶음 팸플릿: 키워드('a|b' 로 대안 가능)가 글자로 들어 있는 쪽(+다음 2쪽).
-    키워드가 모든 쪽 바닥글에 찍히는 팸플릿(2017년 1차 등)이 있어, 쪽 머리(앞 120자)에 키워드가 있는 쪽이 있으면 그것만 쓴다.
-    앞 3쪽(표지·목차)은 뒤쪽에 다른 히트가 있으면 뺀다. 반환: (선택 쪽 인덱스, 히트 쪽 번호)"""
+def _cnt(t, keys): return sum(t.count(k) for k in keys)
+def pick_pages(pdf, kw, others=()):
+    """키워드 없는 단일 단지 팸플릿: 앞에서부터 MAX_PAGES 쪽.
+    묶음 팸플릿: 키워드('a|b' 로 대안 가능)가 글자로 들어 있는 쪽. 같은 팸플릿을 쓰는 다른 단지의 키워드(others)보다 이 키워드가 더 많이 나오는 쪽만
+    (머리글·바닥글에 모든 단지명이 찍히는 2017년 1차 같은 팸플릿 대비). 앞 3쪽(표지·목차)은 뒤쪽에 히트가 있으면 뺀다. 선택 쪽 + 다음 2쪽(다른 단지 쪽이 아니면).
+    반환: (선택 쪽 인덱스, 히트 쪽 번호)"""
     n = len(pdf.pages)
     if not kw: return list(range(min(n, MAX_PAGES))), []
     keys = [k.replace(' ', '') for k in kw.split('|') if k.strip()]
+    okeys = [k.replace(' ', '') for o in others for k in o.split('|') if k.strip() and k.replace(' ', '') not in keys]
     texts = []
     for pg in pdf.pages:
         try: texts.append((pg.extract_text() or '').replace(' ', ''))
         except Exception: texts.append('')
-    hit = [i for i, t in enumerate(texts) if any(k in t for k in keys)]
+    mine = [_cnt(t, keys) for t in texts]; theirs = [_cnt(t, okeys) for t in texts]
+    hit = [i for i in range(n) if mine[i] > 0 and mine[i] >= theirs[i]]
+    strong = [i for i in hit if mine[i] > theirs[i]]
+    if okeys and strong: hit = strong
     if not hit: return list(range(min(n, 3))), []
-    head = [i for i, t in enumerate(texts) if any(k in t[:120] for k in keys)]
-    if len(hit) > n * 0.6 and head: hit = head          # 바닥글에 전부 찍히는 경우 → 머리글 기준
     late = [i for i in hit if i >= 3]
     use = late or hit
     sel = []
     for i in use:
         for j in (i, i + 1, i + 2):
-            if j < n and j not in sel: sel.append(j)
+            if j < n and j not in sel and not (j != i and theirs[j] > mine[j]): sel.append(j)
     return sel[:MAX_PAGES], [h + 1 for h in hit]
 
 def main():
@@ -150,7 +154,8 @@ def main():
             try:
                 data, fs = get(seq)
                 with pdfplumber.open(io.BytesIO(data)) as pdf:
-                    sel, hits = pick_pages(pdf, kw)
+                    others = [k2 for nm2, l2 in PAM.items() for s2, k2 in l2 if s2 == seq and k2 and k2 != kw]
+                    sel, hits = pick_pages(pdf, kw, others)
                     pages = []
                     for i in sel:
                         key = f'{seq}_p{i + 1}'
