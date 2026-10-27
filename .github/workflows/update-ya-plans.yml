@@ -1,0 +1,31 @@
+name: update-ya-plans
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '41 1 * * 1'       # 매주 월 10:41 KST — 새 단지·새 평면도만 읽음(이미 읽은 건 캐시)
+  push:
+    paths: ['tools/ya_plan_ocr.py', '.github/workflows/update-ya-plans.yml']
+permissions:
+  contents: write
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.12' }
+      - run: sudo apt-get update -qq && sudo apt-get install -y -qq tesseract-ocr tesseract-ocr-kor
+      - run: pip install -q requests pillow
+      - run: python tools/ya_plan_ocr.py
+      - name: commit
+        run: |
+          git config user.name 'gonggo-bot'; git config user.email 'gonggo-bot@users.noreply.github.com'
+          git add data/ya_plans.json
+          git diff --cached --quiet && { echo 'no change'; exit 0; }
+          git commit -m "data: 청년안심 평면도 전용면적 판독 $(date -u +%F)"
+          for i in 1 2 3; do git pull --rebase -X theirs origin gh-pages && git push && exit 0; git rebase --abort 2>/dev/null; sleep 15; done
+          exit 1
