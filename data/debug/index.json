@@ -1,34 +1,42 @@
 [
  {
-  "url": "https://www.i-sh.co.kr/app/lay2/program/S1T294C295/www/brd/m_241/view.do?multi_itm_seqs=1%2C2%2C4%2C8%2C16%2C32%2C64%2C128%2C256&seq=307073",
+  "url": "https://www.i-sh.co.kr/app/com/file/innoFD.do?brdId=GS0401&seq=307073&fileTp=A&fileSeq=1",
   "post": "",
   "status": 200,
-  "type": "text/html; charset=UTF-8",
-  "bytes": 148387,
-  "file": "www_i_sh_co_kr_app_lay2_program_S1T294C295_www_brd_m_241_view_do_multi_itm_seqs__dd8f46.html"
+  "type": "application/octet-stream;charset=UTF-8",
+  "bytes": 189502,
+  "file": "www_i_sh_co_kr_app_com_file_innoFD_do_brdId_GS0401_seq_307073_fileTp_A_fileSeq_1_da259e.pdf"
  },
  {
   "url": "https://www.i-sh.co.kr/app/lay2/program/S1T294C295/www/brd/m_241/list.do",
-  "post": "page=1&srchTp=0&srchWord=청년+매입임대주택",
+  "post": "page=1&srchTp=0&srchWord=매입임대주택",
   "status": 200,
   "type": "text/html; charset=UTF-8",
-  "bytes": 139609,
-  "file": "www_i_sh_co_kr_app_lay2_program_S1T294C295_www_brd_m_241_list_do_0be8ca.html"
+  "bytes": 151296,
+  "file": "www_i_sh_co_kr_app_lay2_program_S1T294C295_www_brd_m_241_list_do_1a01fd.html"
  },
  {
   "url": "https://www.i-sh.co.kr/app/lay2/program/S1T294C295/www/brd/m_241/list.do",
-  "post": "page=2&srchTp=0&srchWord=청년+매입임대주택",
+  "post": "page=2&srchTp=0&srchWord=매입임대주택",
   "status": 200,
   "type": "text/html; charset=UTF-8",
-  "bytes": 139609,
-  "file": "www_i_sh_co_kr_app_lay2_program_S1T294C295_www_brd_m_241_list_do_db47fa.html"
+  "bytes": 151352,
+  "file": "www_i_sh_co_kr_app_lay2_program_S1T294C295_www_brd_m_241_list_do_985d99.html"
  },
  {
   "url": "https://www.i-sh.co.kr/app/lay2/program/S1T294C295/www/brd/m_241/list.do",
-  "post": "page=1&srchTp=0&srchWord=매입임대주택+입주자+모집공고",
+  "post": "page=3&srchTp=0&srchWord=매입임대주택",
   "status": 200,
   "type": "text/html; charset=UTF-8",
-  "bytes": 139625,
-  "file": "www_i_sh_co_kr_app_lay2_program_S1T294C295_www_brd_m_241_list_do_f1f11b.html"
+  "bytes": 151389,
+  "file": "www_i_sh_co_kr_app_lay2_program_S1T294C295_www_brd_m_241_list_do_a6c0d7.html"
+ },
+ {
+  "url": "https://www.i-sh.co.kr/app/lay2/program/S1T294C295/www/brd/m_241/list.do",
+  "post": "page=4&srchTp=0&srchWord=매입임대주택",
+  "status": 200,
+  "type": "text/html; charset=UTF-8",
+  "bytes": 151415,
+  "file": "www_i_sh_co_kr_app_lay2_program_S1T294C295_www_brd_m_241_list_do_db1ee7.html"
  }
 ]
