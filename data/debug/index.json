@@ -1,26 +1,42 @@
 [
  {
-  "url": "https://www.i-sh.co.kr/app/com/file/innoFD.do?brdId=GS0401&seq=309925&fileTp=A&fileSeq=1",
-  "post": "",
+  "url": "https://www.i-sh.co.kr/houseinfo/main/selectSearchList.do",
+  "post": "keyword=숲속마을",
   "status": 200,
-  "type": "application/octet-stream;charset=UTF-8",
-  "bytes": 625704,
-  "file": "www_i_sh_co_kr_app_com_file_innoFD_do_brdId_GS0401_seq_309925_fileTp_A_fileSeq_1_4230e1.pdf"
+  "type": "application/json;charset=UTF-8",
+  "bytes": 13,
+  "file": "www_i_sh_co_kr_houseinfo_main_selectSearchList_do_45b513.json"
  },
  {
-  "url": "https://www.i-sh.co.kr/app/com/file/innoFD.do?brdId=GS0401&seq=302646&fileTp=A&fileSeq=1",
-  "post": "",
+  "url": "https://www.i-sh.co.kr/houseinfo/main/selectSearchList.do",
+  "post": "keyword=신정4",
   "status": 200,
-  "type": "application/octet-stream;charset=UTF-8",
-  "bytes": 660208,
-  "file": "www_i_sh_co_kr_app_com_file_innoFD_do_brdId_GS0401_seq_302646_fileTp_A_fileSeq_1_702b68.pdf"
+  "type": "application/json;charset=UTF-8",
+  "bytes": 258,
+  "file": "www_i_sh_co_kr_houseinfo_main_selectSearchList_do_5c808b.json"
  },
  {
-  "url": "https://www.i-sh.co.kr/app/com/file/innoFD.do?brdId=GS0401&seq=308650&fileTp=A&fileSeq=1",
-  "post": "",
+  "url": "https://www.i-sh.co.kr/houseinfo/main/selectSearchList.do",
+  "post": "keyword=신정숲속마을",
   "status": 200,
-  "type": "application/octet-stream;charset=UTF-8",
-  "bytes": 321843,
-  "file": "www_i_sh_co_kr_app_com_file_innoFD_do_brdId_GS0401_seq_308650_fileTp_A_fileSeq_1_a0e052.pdf"
+  "type": "application/json;charset=UTF-8",
+  "bytes": 13,
+  "file": "www_i_sh_co_kr_houseinfo_main_selectSearchList_do_244568.json"
+ },
+ {
+  "url": "https://www.i-sh.co.kr/houseinfo/main/selectSearchList.do",
+  "post": "keyword=신정로110",
+  "status": 200,
+  "type": "application/json;charset=UTF-8",
+  "bytes": 258,
+  "file": "www_i_sh_co_kr_houseinfo_main_selectSearchList_do_bc17a3.json"
+ },
+ {
+  "url": "https://www.i-sh.co.kr/houseinfo/main/selectSearchList.do",
+  "post": "keyword=신정이펜하우스",
+  "status": 200,
+  "type": "application/json;charset=UTF-8",
+  "bytes": 1198,
+  "file": "www_i_sh_co_kr_houseinfo_main_selectSearchList_do_f81a65.json"
  }
 ]
