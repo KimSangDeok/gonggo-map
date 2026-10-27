@@ -1,18 +1,42 @@
 [
  {
-  "url": "https://www.i-sh.co.kr/houseinfo/js/map/map.search.js?ver=20260317",
-  "post": "",
+  "url": "https://www.i-sh.co.kr/app/lay2/program/S1T294C295/www/brd/m_241/list.do",
+  "post": "page=2&srchTp=0&srchWord=청년안심주택",
   "status": 200,
-  "type": "text/javascript;charset=UTF-8",
-  "bytes": 8782,
-  "file": "www_i_sh_co_kr_houseinfo_js_map_map_search_js_ver_20260317_352c0a.html"
+  "type": "text/html; charset=UTF-8",
+  "bytes": 151104,
+  "file": "www_i_sh_co_kr_app_lay2_program_S1T294C295_www_brd_m_241_list_do_235e8d.html"
  },
  {
-  "url": "https://www.i-sh.co.kr/houseinfo/js/map/map.house.js?ver=20260807",
-  "post": "",
+  "url": "https://www.i-sh.co.kr/app/lay2/program/S1T294C295/www/brd/m_241/list.do",
+  "post": "page=3&srchTp=0&srchWord=청년안심주택",
   "status": 200,
-  "type": "text/javascript;charset=UTF-8",
-  "bytes": 50070,
-  "file": "www_i_sh_co_kr_houseinfo_js_map_map_house_js_ver_20260807_719c3f.html"
+  "type": "text/html; charset=UTF-8",
+  "bytes": 151012,
+  "file": "www_i_sh_co_kr_app_lay2_program_S1T294C295_www_brd_m_241_list_do_421b92.html"
+ },
+ {
+  "url": "https://www.i-sh.co.kr/app/lay2/program/S1T294C295/www/brd/m_241/list.do",
+  "post": "page=4&srchTp=0&srchWord=청년안심주택",
+  "status": 200,
+  "type": "text/html; charset=UTF-8",
+  "bytes": 151103,
+  "file": "www_i_sh_co_kr_app_lay2_program_S1T294C295_www_brd_m_241_list_do_affbca.html"
+ },
+ {
+  "url": "https://www.i-sh.co.kr/app/lay2/program/S1T294C295/www/brd/m_241/list.do",
+  "post": "page=1&srchTp=0&srchWord=청년%20매입임대주택",
+  "status": 200,
+  "type": "text/html; charset=UTF-8",
+  "bytes": 139611,
+  "file": "www_i_sh_co_kr_app_lay2_program_S1T294C295_www_brd_m_241_list_do_82909e.html"
+ },
+ {
+  "url": "https://www.i-sh.co.kr/app/lay2/program/S1T294C295/www/brd/m_241/list.do",
+  "post": "page=1&srchTp=0&srchWord=매입임대주택%20입주자",
+  "status": 200,
+  "type": "text/html; charset=UTF-8",
+  "bytes": 139614,
+  "file": "www_i_sh_co_kr_app_lay2_program_S1T294C295_www_brd_m_241_list_do_cac50e.html"
  }
 ]
