@@ -342,8 +342,8 @@ main section.view{margin-top:0}
       <div class="handle" id="sheet-handle"><i></i><button type="button" id="sheet-btn" aria-label="시트 펼치기/접기">목록 펼치기 ▲</button></div>
       <div class="nmbar">
         <label><input type="checkbox" data-cat="pri" checked> <span class="dot" style="--c:#D32F2F"></span> 우선 1순위</label>
-        <label><input type="checkbox" data-cat="big" checked> <span class="dot hl" style="--c:#D32F2F"></span> 36㎡↑ 일반</label>
-        <label><input type="checkbox" data-cat="small"> <span class="dot sm" style="--c:#8a94a3"></span> 27~35㎡</label>
+        <label><input type="checkbox" data-cat="big" checked> <span class="dot hl" style="--c:#D32F2F"></span> 36㎡(10.9평)↑ 일반</label>
+        <label><input type="checkbox" data-cat="small"> <span class="dot sm" style="--c:#8a94a3"></span> 27~35㎡(8.2~10.6평)</label>
         <label><input type="checkbox" data-cat="kook" checked> <span class="dot sq" style="--c:#6A1B9A"></span> 국민임대</label>
         <label><input type="checkbox" data-cat="ya" checked> <span class="dot ya" style="--c:#00897B"></span> 청년안심</label>
         <label><input type="checkbox" data-cat="na"> <span class="dot sq hl" style="--c:#9aa4b2"></span> 해당 없음</label>
@@ -994,12 +994,12 @@ function factHtml(p){
     rows.push(['단지', '<small class="k">K-apt(공동주택관리정보시스템)에 미등록 → 준공·동수·주차 정보 없음</small>']);
   }
   if (!f.type && p.kind === '행복주택') rows.push(['이 형', '<small class="k">SH 주택정보에 이 단지 형별 정보 없음 → 공가·퇴거 모름</small>']);
-  if (f.type) { var ty = f.type; rows.push(['이 형', ty.sp + '형 ' + ty.ar + '㎡ · ' + (ty.rooms ? '방 <b>' + ty.rooms + '개</b>' : '원룸형') + ' · ' + ty.hh + '세대' + (ty.exact ? '' : ' <small class="k">(가장 가까운 형)</small>')]);
+  if (f.type) { var ty = f.type; rows.push(['이 형', ty.sp + '형 ' + m2py(ty.ar) + ' · ' + (ty.rooms ? '방 <b>' + ty.rooms + '개</b>' : '원룸형') + ' · ' + ty.hh + '세대' + (ty.exact ? '' : ' <small class="k">(가장 가까운 형)</small>')]);
     rows.push(['공가·퇴거', '공가 <b>' + ty.vac + '</b> · 최근 1년 퇴거 <b>' + ty.out + '</b> / ' + ty.hh + '세대 <small class="k">(' + ty.ym + ')</small>']); }
-  if (f.types) { Object.keys(f.types).sort().forEach(function(b){ var d = f.types[b]; rows.push([b + '㎡', (d.rooms ? '방 ' + d.rooms + '개 · ' : '') + d.hh.toLocaleString() + '세대 · 공가 <b>' + d.vac + '</b> · 1년 퇴거 <b>' + d.out + '</b>' + (d.cost ? '<br>관리비 ' + won(d.cost[0]) + (d.cost[1] !== d.cost[0] ? '~' + won(d.cost[1]) : '') + '/월' : '') + (d.plan ? ' · <a href="' + d.plan + '" target="_blank" rel="noopener">평면도</a>' : '')]); }); }
-  if (f.cost) rows.push(['관리비', '<b>' + won(f.cost.won) + '</b>/월 <small class="k">(' + f.cost.ym.slice(0,4) + '.' + f.cost.ym.slice(4) + ' 실적, ' + (f.type ? f.type.ar + '㎡' : '') + ')</small>']);
+  if (f.types) { Object.keys(f.types).sort().forEach(function(b){ var d = f.types[b]; rows.push([m2py(b), (d.rooms ? '방 ' + d.rooms + '개 · ' : '') + d.hh.toLocaleString() + '세대 · 공가 <b>' + d.vac + '</b> · 1년 퇴거 <b>' + d.out + '</b>' + (d.cost ? '<br>관리비 ' + won(d.cost[0]) + (d.cost[1] !== d.cost[0] ? '~' + won(d.cost[1]) : '') + '/월' : '') + (d.plan ? ' · <a href="' + d.plan + '" target="_blank" rel="noopener">평면도</a>' : '')]); }); }
+  if (f.cost) rows.push(['관리비', '<b>' + won(f.cost.won) + '</b>/월 <small class="k">(' + f.cost.ym.slice(0,4) + '.' + f.cost.ym.slice(4) + ' 실적, ' + (f.type ? m2py(f.type.ar) : '') + ')</small>']);
   else if (p.kind === '행복주택') rows.push(['관리비', '<small class="k">SH 주택정보에 관리비 실적 없음</small>']);
-  if (f.types) { ['39', '49', '59'].forEach(function(b){ if (!f.types[b]) rows.push([b + '㎡', '<small class="k">SH 주택정보에 이 면적 국민임대 없음</small>']); }); }
+  if (f.types) { ['39', '49', '59'].forEach(function(b){ if (!f.types[b]) rows.push([m2py(b), '<small class="k">SH 주택정보에 이 면적 국민임대 없음</small>']); }); }
   else if (p.kind === '국민임대') rows.push(['면적별', '<small class="k">SH 주택정보에 국민임대 형별 정보 없음</small>']);
   if (f.subway) rows.push(['지하철', f.subway.join(' · ')]);
   else rows.push(['지하철', '<small class="k">SH 주택정보에 역 거리 정보 없음</small>']);
@@ -1030,12 +1030,12 @@ function lhHtml(p){
   var body = '<table class="iw-t">' +
     '<tr><th>공고</th><td>' + p.notices.slice(0, 2).map(function(n){ return '<a href="' + n.url + '" target="_blank" rel="noopener">' + n.title + '</a> <span class="pill ' + (n.status === '접수중' ? 'ok' : 'info') + '">' + n.status + '</span><br><small class="k">게시 ' + n.posted + ' · 마감 ' + n.deadline + '</small>'; }).join('<br>') + '</td></tr>' +
     (schTxt.length ? '<tr><th>일정</th><td>' + schTxt.join(' · ') + '</td></tr>' : '') +
-    '<tr><th>단지</th><td>' + [c.hh ? c.hh + '세대' : '', c.m2 ? '전용 ' + c.m2 + '㎡' : '', c.heat, c.movein ? '입주 ' + c.movein : ''].filter(Boolean).join(' · ') + '</td></tr>' +
+    '<tr><th>단지</th><td>' + [c.hh ? c.hh + '세대' : '', c.m2 ? '전용 ' + c.m2 + '㎡ (' + (String(c.m2).indexOf('~') >= 0 ? String(c.m2).split('~').map(function(x){ return py(x); }).join('~') : py(c.m2)) + ')' : '', c.heat, c.movein ? '입주 ' + c.movein : ''].filter(Boolean).join(' · ') + '</td></tr>' +
     '</table>';
   var rows = (c.rows || []);
   if (rows.length) {
     body += '<div class="iw-sec"><div class="iw-sh">주택형 <small class="k">이번 공고 물량 · LH 공고 페이지 표 그대로</small></div><table class="iw-t iw-k iw-lh"><tr><th>주택형</th><th>전용</th><th>금회 공급</th><th>보증금</th><th>월세</th></tr>' +
-      rows.map(function(r){ var y = /청년|대학생/.test(r.ty); return '<tr' + (y ? ' class="y"' : '') + '><th>' + (y ? '<b>' + r.ty + '</b>' : r.ty) + '</th><td>' + r.m2 + '</td><td>' + r.n + '</td><td>' + lhWon(r.dep) + '</td><td>' + lhWon(r.rent) + '</td></tr>'; }).join('') + '</table>' +
+      rows.map(function(r){ var y = /청년|대학생/.test(r.ty); return '<tr' + (y ? ' class="y"' : '') + '><th>' + (y ? '<b>' + r.ty + '</b>' : r.ty) + '</th><td>' + r.m2 + (py(r.m2) ? '<br><small class="k">' + py(r.m2) + '</small>' : '') + '</td><td>' + r.n + '</td><td>' + lhWon(r.dep) + '</td><td>' + lhWon(r.rent) + '</td></tr>'; }).join('') + '</table>' +
       '<small class="k">보증금·월세가 "공고문 확인"이면 LH 페이지에도 숫자가 없는 것 → 공고문 PDF 참조. 자격·순위는 LH 기준이라 SH와 다름(이 지도는 위치·물량·일정만 자동 수집).</small></div>';
   }
   var foot = '<div class="iw-f"><small class="k">' + (c.addr || '') + '</small><a class="iw-btn" href="' + nav + '" target="_blank" rel="noopener">네이버지도 앱에서 열기 · 길찾기</a></div>';
@@ -1084,7 +1084,7 @@ function happyRates(p){
     });
   });
   if (!trs.length) return '<div class="iw-sec"><div class="iw-sh">지난 공고 경쟁률 <small class="k">SH 결과 PDF ' + posts.length + '건 검색</small></div><small class="k">' + posts[0].label.slice(0, 4) + '~' + posts[posts.length - 1].label.slice(0, 4) + '년 SH 행복주택 결과 PDF에 이 단지가 안 나옴(첫 공급이거나 단지명 표기가 다름).</small></div>';
-  return '<div class="iw-sec"><div class="iw-sh">지난 공고 경쟁률 <small class="k">청년 계층 · ' + base + '형 · 호수 → 신청자 → 경쟁률</small></div>' +
+  return '<div class="iw-sec"><div class="iw-sh">지난 공고 경쟁률 <small class="k">청년 계층 · ' + base + '형(전용 ' + p.m2 + '㎡ · ' + py(p.m2) + ') · 호수 → 신청자 → 경쟁률</small></div>' +
     '<table class="iw-t iw-k iw-r"><tr><th>공고</th><th' + (mine === '우선' ? ' class="me"' : '') + '>우선공급</th><th' + (mine !== '우선' ? ' class="me"' : '') + '>일반공급</th><th>청년 전체</th></tr>' + trs.join('') + '</table>' +
     '<small class="k">경쟁률 = 신청자 ÷ 호수. <b style="color:#b71c1c">굵은 값</b>은 SH PDF에 적힌 숫자, 가는 값은 PDF에 없어 나눠서 계산(2024년부터 일반공급 경쟁률은 PDF에 없음). "청년 전체"는 이 형·청년의 우선+일반 합(PDF의 단지 경쟁률). 연한 붉은 열 = 내 순위(' + p.rank + ')에 해당하는 구분. 공고 이름을 누르면 SH 결과 게시물(첨부 PDF)' + (window.RATES.updated ? ' · 수집 ' + window.RATES.updated.slice(0, 10) : '') + '</small></div>';
 }
@@ -1102,7 +1102,7 @@ function kookRates(p){
   });
   if (!trs.length) return '<div class="iw-sec"><div class="iw-sh">지난 공고 경쟁률</div><small class="k">SH 국민임대 결과 PDF ' + posts.length + '건에 이 지구의 일반공급 행 없음(주거약자만 공급됐거나 미공급)</small></div>';
   return '<div class="iw-sec"><div class="iw-sh">지난 공고 경쟁률 <small class="k">일반공급(주거약자 제외) · 선순위 접수 결과 · 호수 → 신청자 → 경쟁률</small></div>' +
-    '<table class="iw-t iw-k iw-r k4"><tr><th>공고 · PDF의 단지명</th><th>39㎡</th><th>49㎡</th><th>59㎡</th></tr>' + trs.join('') + '</table>' +
+    '<table class="iw-t iw-k iw-r k4"><tr><th>공고 · PDF의 단지명</th><th>39㎡<br><small>' + py(39) + '</small></th><th>49㎡<br><small>' + py(49) + '</small></th><th>59㎡<br><small>' + py(59) + '</small></th></tr>' + trs.join('') + '</table>' +
     '<small class="k">국민임대는 1순위(선순위) 접수에서 신청자가 모집의 200%를 넘으면 그걸로 마감이라, 이 숫자가 사실상 최종 경쟁률(SH 게시물 본문). 경쟁률은 SH PDF 그대로(굵은 값). 공고 이름을 누르면 SH 결과 게시물' + (window.RATES.updated ? ' · 수집 ' + window.RATES.updated.slice(0, 10) : '') + '</small></div>';
 }
 function ratesHtml(p){ try { return p.kind === '국민임대' ? kookRates(p) : happyRates(p); } catch(e) { console.error(e); return ''; } }
@@ -1117,6 +1117,9 @@ function buildRatesTable(){
   var heads = ['공고','결과 게시','공급','신청','경쟁률','PDF 표 검증']; box.querySelectorAll('tbody tr').forEach(function(tr){ Array.prototype.forEach.call(tr.children, function(td, i){ td.setAttribute('data-label', heads[i]); }); });
 }
 // ===== 서울시 청년안심주택 (data/ya.json: 공고 게시판 + 단지 99곳) =====
+function py(m2){ var v = parseFloat(m2); if (isNaN(v)) return ''; return (Math.round(v / 3.3058 * 10) / 10) + '평'; }   // 1평 = 3.3058㎡
+function m2py(m2){ var v = parseFloat(m2); if (isNaN(v)) return String(m2 || ''); return v + '㎡ (' + py(v) + ')'; }
+function tyArea(ty){ var n = yaTyNum(ty); if (!n) return ''; return n + '㎡대 · 약 ' + py(n) + '~' + py(n + 0.99); }   // 형 숫자 = 전용면적 정수부(소수점은 사업자 공고문 평면도)
 function yaWon(n){ if (n == null) return '—'; return n >= 100000000 ? Math.floor(n / 100000000) + '억' + (Math.round((n % 100000000) / 10000) ? ' ' + Math.round((n % 100000000) / 10000).toLocaleString() + '만' : '') : (Math.round(n / 10000)).toLocaleString() + '만'; }
 function yaRng(c, key){ var v = []; ['special', 'general'].forEach(function(g){ (((c.rows || {})[g]) || []).forEach(function(r){ if (r[key] != null) v.push(r[key]); }); }); if (!v.length) return null; var lo = Math.min.apply(null, v), hi = Math.max.apply(null, v); return [lo, hi]; }
 function yaRentTxt(c){ var r = yaRng(c, 'rent'); if (r) return Math.round(r[0] / 10000) + (r[1] !== r[0] ? '~' + Math.round(r[1] / 10000) : '') + '만'; return c.rent_lo_txt ? c.rent_lo_txt + (c.rent_hi_txt && c.rent_hi_txt !== c.rent_lo_txt ? '~' + c.rent_hi_txt : '') : ''; }
@@ -1140,10 +1143,10 @@ function yaHtml(p){
     '</table>';
   var rows = c.rows || {}, sp = rows.special || [], ge = rows.general || [];
   if (sp.length || ge.length) {
-    var tr = function(r, kind){ var y = /청년/.test(r.who || ''); return '<tr' + (y ? ' class="y"' : '') + '><th>' + kind + '</th><td>' + (r.room || '') + ' ' + (r.ty || '') + (yaTyNum(r.ty) ? ' <small class="k">(' + yaTyNum(r.ty) + '㎡대)</small>' : '') + '</td><td>' + (r.who || '') + '</td><td>' + (r.n == null ? '—' : r.n) + '</td><td>' + yaWon(r.dep) + '</td><td>' + (r.rent == null ? '—' : Math.round(r.rent / 10000) + '만') + '</td></tr>'; };
+    var tr = function(r, kind){ var y = /청년/.test(r.who || ''); return '<tr' + (y ? ' class="y"' : '') + '><th>' + kind + '</th><td>' + (r.room || '') + ' <b>' + (r.ty || '') + '</b>' + (yaTyNum(r.ty) ? '<br><small>전용 ' + tyArea(r.ty) + '</small>' : '<br><small class="k">면적 미기재</small>') + '</td><td>' + (r.who || '') + '</td><td>' + (r.n == null ? '—' : r.n) + '</td><td>' + yaWon(r.dep) + '</td><td>' + (r.rent == null ? '—' : Math.round(r.rent / 10000) + '만') + '</td></tr>'; };
     body += '<div class="iw-sec"><div class="iw-sh">입주현황 <small class="k">서울시 단지정보 표 그대로 · 민간임대(특별공급=소득 120%↓, 일반공급=소득 무관)</small></div><table class="iw-t iw-k iw-lh"><tr><th>구분</th><th>형</th><th>자격</th><th>세대</th><th>보증금</th><th>월세</th></tr>' +
       sp.map(function(r){ return tr(r, '특별'); }).join('') + ge.map(function(r){ return tr(r, '일반'); }).join('') + '</table>' +
-      '<small class="k">공공임대 물량(' + (sc.pub == null ? '—' : sc.pub) + '세대)은 이 표가 아니라 SH 청년안심주택(공공임대) 공고(연 2회)로만 모집 · 시세 30~50%. 위 표는 민간임대 금액.</small></div>';
+      '<small class="k">형 숫자(17A·43B)는 서울시 표기대로 전용면적 정수부라 "17㎡대"로 적고 평은 그 범위로 환산(1평 = 3.3058㎡). 소수점까지의 정확한 전용면적은 사업자 공고문·평면도에만 있음. 공공임대 물량(' + (sc.pub == null ? '—' : sc.pub) + '세대)은 이 표가 아니라 SH 청년안심주택(공공임대) 공고(연 2회)로만 모집 · 시세 30~50%. 위 표는 민간임대 금액.</small></div>';
   } else {
     body += '<div class="iw-nophoto">입주현황 표 없음 — 서울시 단지정보에 형·보증금·월세가 등록돼 있지 않음</div>';
   }
@@ -1178,7 +1181,7 @@ function nmHtml(p, approx){
     };
     body = (p.na ? '<div class="iw-nophoto" style="border-color:#e0a800;background:#fff8e1;color:#5d4a00"><b>지금 공고엔 해당 없음</b> — ' + p.na + '</div>' : '') +
       '<table class="iw-t iw-k"><tr><th></th><th>2025 공고</th><th>2026 공고</th></tr>' +
-      (rows.length ? rows.map(function(r){ return '<tr><th>' + r[0] + '</th><td>' + kcell(r[1], 'K25') + '</td><td>' + kcell(r[2], 'K26') + '</td></tr>'; }).join('') : '<tr><td colspan="3"><small class="k">이 지구는 2025·2026 공고 표에서 정리한 금액 없음</small></td></tr>') + '</table>' +
+      (rows.length ? rows.map(function(r){ return '<tr><th>' + r[0].replace(/^(\d+)㎡$/, function(_, n){ return n + '㎡<br><small class="k">' + py(n) + '</small>'; }) + '</th><td>' + kcell(r[1], 'K25') + '</td><td>' + kcell(r[2], 'K26') + '</td></tr>'; }).join('') : '<tr><td colspan="3"><small class="k">이 지구는 2025·2026 공고 표에서 정리한 금액 없음</small></td></tr>') + '</table>' +
       '<small class="k" style="display:block;margin-top:4px">금액 범위(예: 4,002~4,323만)는 공고 표의 최저~최고 · 월세는 1인 가구 기준</small>' +
       '<table class="iw-t iw-t2">' +
       '<tr><th>내 순위</th><td>' + rankPill(p.rank) + '</td></tr>' +
@@ -1259,7 +1262,7 @@ function nmInit(){
   var sel = document.getElementById('nm-notice');
   buildNoticeSelect();
   sel.addEventListener('change', function(){ applyFilter(); });
-  var groups = { pri: '우선공급 1순위 가능 (강서·동대문)', big: '36㎡ 이상 · 일반 추첨', kook: '국민임대 지구 — 2026 공고에 일반공급 있음', lh: 'LH 서울 — 공고 페이지에서 매일 자동 수집', small: '27~35㎡', ya: '청년안심주택 단지 (서울시 99곳, 공공+민간) — 공고 있는 곳 먼저', na: '지금 공고엔 해당 없음 — 2026 국민임대 일반공급 없음(주거약자만), 2025 공고는 접수 종료' };
+  var groups = { pri: '우선공급 1순위 가능 (강서·동대문)', big: '36㎡(10.9평) 이상 · 일반 추첨', kook: '국민임대 지구 — 2026 공고에 일반공급 있음', lh: 'LH 서울 — 공고 페이지에서 매일 자동 수집', small: '27~35㎡ (8.2~10.6평)', ya: '청년안심주택 단지 (서울시 99곳, 공공+민간) — 공고 있는 곳 먼저', na: '지금 공고엔 해당 없음 — 2026 국민임대 일반공급 없음(주거약자만), 2025 공고는 접수 종료' };
   var groupEl = {};
   ['pri','big','kook','lh','ya','small','na'].forEach(function(k){ var g = document.createElement('div'); g.className = 'grp'; g.textContent = groups[k]; g.dataset.cat = k; list.appendChild(g); groupEl[k] = g; });
   var lhAdded = {};
@@ -1300,7 +1303,7 @@ function nmInit(){
       naver.maps.Event.addListener(mk, 'click', function(){ nmFocusMarker(mk); });
       var tys = []; ['special', 'general'].forEach(function(g){ ((c.rows || {})[g] || []).forEach(function(r){ var n = yaTyNum(r.ty); if (n && tys.indexOf(n) < 0) tys.push(n); }); }); tys.sort(function(a, b){ return a - b; });
       var it = document.createElement('div'); it.className = 'it'; it.dataset.cat = 'ya'; it.setAttribute('data-key', k); it.setAttribute('data-nid', 'YA'); it.dataset.open = ns.length ? '1' : '0';
-      it.innerHTML = '<span class="dot ya" style="--c:#00897B;margin-top:3px"></span><div><b>' + c.name + ' <span class="pill ' + (ns.length ? 'ok' : 'info') + '" style="font-size:11px;padding:0 7px">' + (ns.length ? '공고 ' + ns.length + '건' : '공고 없음') + '</span></b><small>' + (c.gu || '') + (c.station ? ' · ' + c.station : '') + (c.scale && c.scale.total != null ? ' · 공공 ' + c.scale.pub + '/민간 ' + c.scale.priv : (c.scale_tot ? ' · ' + c.scale_tot + '세대' : '')) + (tys.length ? ' · ' + tys[0] + (tys.length > 1 ? '~' + tys[tys.length - 1] : '') + '㎡대' : '') + (c.movein ? ' · 입주 ' + c.movein.slice(0, 7) : '') + '</small></div><div class="num">' + (yaRentTxt(c) ? '월 ' + yaRentTxt(c) : '') + '</div>';
+      it.innerHTML = '<span class="dot ya" style="--c:#00897B;margin-top:3px"></span><div><b>' + c.name + ' <span class="pill ' + (ns.length ? 'ok' : 'info') + '" style="font-size:11px;padding:0 7px">' + (ns.length ? '공고 ' + ns.length + '건' : '공고 없음') + '</span></b><small>' + (c.gu || '') + (c.station ? ' · ' + c.station : '') + (c.scale && c.scale.total != null ? ' · 공공 ' + c.scale.pub + '/민간 ' + c.scale.priv : (c.scale_tot ? ' · ' + c.scale_tot + '세대' : '')) + (tys.length ? ' · 전용 ' + tys[0] + (tys.length > 1 ? '~' + tys[tys.length - 1] : '') + '㎡대(' + py(tys[0]) + (tys.length > 1 ? '~' + py(tys[tys.length - 1]) : '') + ')' : '') + (c.movein ? ' · 입주 ' + c.movein.slice(0, 7) : '') + '</small></div><div class="num">' + (yaRentTxt(c) ? '월 ' + yaRentTxt(c) : '') + '</div>';
       it.__mk = mk; it.addEventListener('click', function(){ nmFocusMarker(mk); });
       var g = groupEl.ya; var ref = g.nextSibling; while (ref && ref.className === 'it' && (ref.dataset.open === '1' || !ns.length)) ref = ref.nextSibling; list.insertBefore(it, ref);
     });
@@ -1322,7 +1325,7 @@ function nmInit(){
         naver.maps.Event.addListener(mk, 'click', function(){ nmFocusMarker(mk); });
         var it = document.createElement('div'); it.className = 'it'; it.dataset.cat = p.cat; it.setAttribute('data-key', k);
         it.setAttribute('data-nid', p.nid);
-        it.innerHTML = '<span class="dot' + nmCls(p) + '" style="--c:' + nmColor(p) + ';margin-top:3px"></span><div><b>' + p.name + ' <span class="pill info" style="font-size:11px;padding:0 7px">' + (p.cat === 'na' ? '지금 해당 없음' : p.kind === '국민임대' ? '26년 국민임대 ' + (p.ok26 || []).join('·') : NOTICES[p.nid].short) + '</span></b><small>' + (p.kind === '행복주택' ? p.m2 + '㎡ ' + p.py + ' · 공가 ' + p.vac + (p.wait ? ' · 예비 ' + p.wait : '') + ' · ' + p.rank : p.rank) + '</small></div><div class="num">' + (p.kind === '행복주택' ? p.dep + '<br>월 ' + p.rent : '') + '</div>';
+        it.innerHTML = '<span class="dot' + nmCls(p) + '" style="--c:' + nmColor(p) + ';margin-top:3px"></span><div><b>' + p.name + ' <span class="pill info" style="font-size:11px;padding:0 7px">' + (p.cat === 'na' ? '지금 해당 없음' : p.kind === '국민임대' ? '26년 국민임대 ' + (p.ok26 || []).map(function(a){ return a.replace(/^(\d+)㎡$/, function(_, n){ return n + '㎡(' + py(n) + ')'; }); }).join('·') : NOTICES[p.nid].short) + '</span></b><small>' + (p.kind === '행복주택' ? p.m2 + '㎡ ' + p.py + ' · 공가 ' + p.vac + (p.wait ? ' · 예비 ' + p.wait : '') + ' · ' + p.rank : p.rank) + '</small></div><div class="num">' + (p.kind === '행복주택' ? p.dep + '<br>월 ' + p.rent : '') + '</div>';
         it.__mk = mk;
         it.addEventListener('click', function(){ nmFocusMarker(mk); });
         var g = groupEl[p.cat]; var ref = g.nextSibling; while (ref && ref.className === 'it') ref = ref.nextSibling; list.insertBefore(it, ref);
