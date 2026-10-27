@@ -13,7 +13,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUTD = os.path.join(ROOT, 'data', 'pamphlets'); OUTJ = os.path.join(ROOT, 'data', 'pamphlets.json')
 LIST = 'https://www.i-sh.co.kr/app/lay2/program/S48T582C583/www/brd/m_134/list.do'
 DL = 'https://www.i-sh.co.kr/app/com/file/innoFD.do'
-MAX_PAGES = 8        # 단지당 최대 렌더 페이지
+MAX_PAGES = 12       # 단지당 최대 렌더 페이지(평면도·배치도 먼저, 조감도 등은 데이터용으로 뒤에)
 WIDTH = 1000         # 렌더 가로 px
 
 # 단지(사이트의 pick 이름) → [(팸플릿 seq, 페이지 고르는 키워드 또는 None=전체)]. 2026-10-27 전자팸플릿 목록(572건)에서 대조.
@@ -105,31 +105,51 @@ def download(seq, file_seq='1', brd='JI1901'):
     raise last
 
 def _cnt(t, keys): return sum(t.count(k) for k in keys)
+TY_RE = re.compile(r'(?<!\d)(\d{2})(?:\.\d+)?\s*(?:㎡|m²|㎡형|형|타입|TYPE|Type|[A-D]\b)')
+def _kind(t):
+    """쪽 성격: plan(평면도) > site(배치도) > other(조감도·교통망·위치도·표지·마감재 등 — 안 씀)"""
+    if '평면' in t: return 'plan'
+    if '배치도' in t or '단지배치' in t: return 'site'
+    return 'other'
+def _tys(t):
+    out = []
+    for m in TY_RE.finditer(t):
+        v = m.group(1)
+        if 15 <= int(v) <= 90 and v not in out: out.append(v)
+    return out
 def pick_pages(pdf, kw, others=()):
-    """키워드 없는 단일 단지 팸플릿: 앞에서부터 MAX_PAGES 쪽.
-    묶음 팸플릿: 키워드('a|b' 로 대안 가능)가 글자로 들어 있는 쪽. 같은 팸플릿을 쓰는 다른 단지의 키워드(others)보다 이 키워드가 더 많이 나오는 쪽만
-    (머리글·바닥글에 모든 단지명이 찍히는 2017년 1차 같은 팸플릿 대비). 앞 3쪽(표지·목차)은 뒤쪽에 히트가 있으면 뺀다. 선택 쪽 + 다음 2쪽(다른 단지 쪽이 아니면).
-    반환: (선택 쪽 인덱스, 히트 쪽 번호)"""
+    """이 단지 구간의 쪽들을 평면도(plan)·배치도(site)·그 외(other: 조감도·교통망·표지 등) 로 나눠 돌려준다. 화면은 plan/site 만 쓰고 other 는 데이터로만 보관.
+    - 키워드 없음(단일 단지 팸플릿): 전체 쪽이 구간
+    - 키워드('a|b'): 키워드가 글자로 있고, 같은 팸플릿을 나눠 쓰는 다른 단지 키워드(others)보다 많이 나오는 쪽부터 다음 다른 단지 쪽 전까지가 구간
+    반환: ([{i, kind, tys}], 히트 쪽 번호). plan 먼저(형 숫자 있는 쪽 우선), 그다음 site. 최대 MAX_PAGES."""
     n = len(pdf.pages)
-    if not kw: return list(range(min(n, MAX_PAGES))), []
-    keys = [k.replace(' ', '') for k in kw.split('|') if k.strip()]
-    okeys = [k.replace(' ', '') for o in others for k in o.split('|') if k.strip() and k.replace(' ', '') not in keys]
     texts = []
     for pg in pdf.pages:
         try: texts.append((pg.extract_text() or '').replace(' ', ''))
         except Exception: texts.append('')
-    mine = [_cnt(t, keys) for t in texts]; theirs = [_cnt(t, okeys) for t in texts]
-    hit = [i for i in range(n) if mine[i] > 0 and mine[i] >= theirs[i]]
-    strong = [i for i in hit if mine[i] > theirs[i]]
-    if okeys and strong: hit = strong
-    if not hit: return list(range(min(n, 3))), []
-    late = [i for i in hit if i >= 3]
-    use = late or hit
-    sel = []
-    for i in use:
-        for j in (i, i + 1, i + 2):
-            if j < n and j not in sel and not (j != i and theirs[j] > mine[j]): sel.append(j)
-    return sel[:MAX_PAGES], [h + 1 for h in hit]
+    hits = []
+    if not kw:
+        section = list(range(n))
+    else:
+        keys = [k.replace(' ', '') for k in kw.split('|') if k.strip()]
+        okeys = [k.replace(' ', '') for o in others for k in o.split('|') if k.strip() and k.replace(' ', '') not in keys]
+        mine = [_cnt(t, keys) for t in texts]; theirs = [_cnt(t, okeys) for t in texts]
+        hit = [i for i in range(n) if mine[i] > 0 and mine[i] >= theirs[i]]
+        strong = [i for i in hit if mine[i] > theirs[i]]
+        if okeys and strong: hit = strong
+        hits = [h + 1 for h in hit]
+        late = [i for i in hit if i >= 3]
+        use = late or hit
+        if not use: return [], hits
+        start = min(use); end = n
+        for j in range(start + 1, n):
+            if theirs[j] > mine[j] and j > max(use): end = j; break
+        section = [i for i in range(start, end) if not (theirs[i] > mine[i])]
+    cands = [{'i': i, 'kind': _kind(texts[i]), 'tys': _tys(texts[i])} for i in section]
+    plans = [c for c in cands if c['kind'] == 'plan']; sites = [c for c in cands if c['kind'] == 'site']; others = [c for c in cands if c['kind'] == 'other']
+    plans.sort(key=lambda c: (0 if c['tys'] else 1, c['i']))
+    # 데이터로는 구간 전체(조감도·교통망 포함)를 갖고 있고, 화면에는 plan/site 만 보여준다(kind 로 구분)
+    return (plans + sites + others)[:MAX_PAGES], hits
 
 def main():
     os.makedirs(OUTD, exist_ok=True)
@@ -157,15 +177,15 @@ def main():
                     others = [k2 for nm2, l2 in PAM.items() for s2, k2 in l2 if s2 == seq and k2 and k2 != kw]
                     sel, hits = pick_pages(pdf, kw, others)
                     pages = []
-                    for i in sel:
-                        key = f'{seq}_p{i + 1}'
+                    for c in sel:
+                        i = c['i']; key = f'{seq}_p{i + 1}'
                         if key not in rendered:
                             pg = pdf.pages[i]
                             scale = WIDTH / float(pg.width)
                             im = pg.to_image(resolution=int(72 * scale)).original.convert('RGB')
                             path = os.path.join(OUTD, key + '.jpg'); im.save(path, 'JPEG', quality=72, optimize=True)
                             rendered[key] = {'img': 'data/pamphlets/' + key + '.jpg', 'w': im.width, 'h': im.height}
-                        pages.append(dict(n=i + 1, **rendered[key]))
+                        pages.append(dict(n=i + 1, kind=c['kind'], tys=c['tys'], **rendered[key]))
                     ent.append({'seq': seq, 'title': meta.get(seq, {}).get('title') or (old.get('items', {}).get(name, [{}])[0].get('title') if old else '') or '', 'file': meta.get(seq, {}).get('file', ''),
                                 'pdf': f'{DL}?brdId=JI1901&seq={seq}&fileTp=&fileSeq={fs}', 'total': len(pdf.pages), 'kw': kw, 'hits': hits, 'pages': pages})
             except Exception as e:
