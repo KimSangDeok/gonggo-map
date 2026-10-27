@@ -1,26 +1,18 @@
 [
  {
-  "url": "https://www.i-sh.co.kr/app/lay2/program/S1T294C295/www/brd/m_241/list.do",
-  "post": "page=1&srchTp=0&srchWord=청년안심주택",
+  "url": "https://www.i-sh.co.kr/houseinfo/main/mainPage.do",
+  "post": "",
   "status": 200,
   "type": "text/html; charset=UTF-8",
-  "bytes": 151049,
-  "file": "www_i_sh_co_kr_app_lay2_program_S1T294C295_www_brd_m_241_list_do_d02f97.html"
+  "bytes": 56226,
+  "file": "www_i_sh_co_kr_houseinfo_main_mainPage_do_7acf73.html"
  },
  {
-  "url": "https://www.i-sh.co.kr/app/lay2/program/S1T294C295/www/brd/m_241/list.do",
-  "post": "page=1&srchTp=0&srchWord=청년%20매입임대",
-  "status": 200,
+  "url": "https://www.i-sh.co.kr/houseinfo/map/mapPage.do",
+  "post": "",
+  "status": 404,
   "type": "text/html; charset=UTF-8",
-  "bytes": 139605,
-  "file": "www_i_sh_co_kr_app_lay2_program_S1T294C295_www_brd_m_241_list_do_54e2e1.html"
- },
- {
-  "url": "https://www.i-sh.co.kr/app/lay2/program/S1T294C295/www/brd/m_241/list.do",
-  "post": "page=1&srchTp=0&srchWord=청년매입임대",
-  "status": 200,
-  "type": "text/html; charset=UTF-8",
-  "bytes": 145008,
-  "file": "www_i_sh_co_kr_app_lay2_program_S1T294C295_www_brd_m_241_list_do_050098.html"
+  "bytes": 806,
+  "file": "www_i_sh_co_kr_houseinfo_map_mapPage_do_65b291.html"
  }
 ]
