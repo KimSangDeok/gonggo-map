@@ -13,7 +13,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUTD = os.path.join(ROOT, 'data', 'pamphlets'); OUTJ = os.path.join(ROOT, 'data', 'pamphlets.json')
 LIST = 'https://www.i-sh.co.kr/app/lay2/program/S48T582C583/www/brd/m_134/list.do'
 DL = 'https://www.i-sh.co.kr/app/com/file/innoFD.do'
-MAX_PAGES = 6        # 단지당 최대 렌더 페이지
+MAX_PAGES = 8        # 단지당 최대 렌더 페이지
 WIDTH = 1000         # 렌더 가로 px
 
 # 단지(사이트의 pick 이름) → [(팸플릿 seq, 페이지 고르는 키워드 또는 None=전체)]. 2026-10-27 전자팸플릿 목록(572건)에서 대조.
@@ -89,26 +89,35 @@ def catalog(pages=60):
     return out
 
 def download(seq):
-    r = S.get(DL, params={'brdId': 'JI1901', 'seq': seq, 'fileTp': '', 'fileSeq': '1'}, timeout=180, headers={'Referer': LIST}); r.raise_for_status()
-    if not r.content.startswith(b'%PDF'): raise RuntimeError(f'not pdf: {r.content[:40]!r}')
-    return r.content
+    last = None
+    for attempt in range(2):
+        try:
+            r = S.get(DL, params={'brdId': 'JI1901', 'seq': seq, 'fileTp': '', 'fileSeq': '1'}, timeout=300, headers={'Referer': LIST}); r.raise_for_status()
+            if not r.content.startswith(b'%PDF'): raise RuntimeError(f'not pdf: {r.content[:40]!r}')
+            return r.content
+        except Exception as e:
+            last = e; time.sleep(3)
+    raise last
 
 def pick_pages(pdf, kw):
+    """키워드 없는 단일 단지 팸플릿: 앞에서부터 MAX_PAGES 쪽. 묶음 팸플릿: 키워드가 글자로 들어 있는 쪽(+다음 2쪽).
+    앞 3쪽(표지·목차)에도 키워드가 있기 마련이라 뒤쪽에 다른 히트가 있으면 앞 3쪽은 뺀다. 반환: (선택 쪽 인덱스, 히트 쪽 번호)"""
     n = len(pdf.pages)
-    if not kw: return list(range(min(n, MAX_PAGES)))
+    if not kw: return list(range(min(n, MAX_PAGES))), []
     k = kw.replace(' ', '')
     hit = []
     for i, pg in enumerate(pdf.pages):
         try: t = (pg.extract_text() or '').replace(' ', '')
         except Exception: t = ''
         if k in t: hit.append(i)
-    if not hit: return list(range(min(n, 3)))          # 키워드가 글자로 안 잡히면(이미지 PDF) 앞 3쪽
-    # 키워드 쪽 + 바로 다음 쪽(평면도가 다음 장에 오는 경우가 많음)
+    if not hit: return list(range(min(n, 3))), []
+    late = [i for i in hit if i >= 3]
+    use = late or hit
     sel = []
-    for i in hit:
-        for j in (i, i + 1):
+    for i in use:
+        for j in (i, i + 1, i + 2):
             if j < n and j not in sel: sel.append(j)
-    return sel[:MAX_PAGES]
+    return sel[:MAX_PAGES], [h + 1 for h in hit]
 
 def main():
     os.makedirs(OUTD, exist_ok=True)
@@ -125,14 +134,14 @@ def main():
         if seq not in pdfs:
             pdfs[seq] = download(seq); time.sleep(0.5); log('downloaded', seq, len(pdfs[seq]))
         return pdfs[seq]
-    items, rendered = {}, {}
+    items, rendered, errors = {}, {}, []
     for name, lst in PAM.items():
         ent = []
         for seq, kw in lst:
             try:
                 data = get(seq)
                 with pdfplumber.open(io.BytesIO(data)) as pdf:
-                    sel = pick_pages(pdf, kw)
+                    sel, hits = pick_pages(pdf, kw)
                     pages = []
                     for i in sel:
                         key = f'{seq}_p{i + 1}'
@@ -144,15 +153,15 @@ def main():
                             rendered[key] = {'img': 'data/pamphlets/' + key + '.jpg', 'w': im.width, 'h': im.height}
                         pages.append(dict(n=i + 1, **rendered[key]))
                     ent.append({'seq': seq, 'title': meta.get(seq, {}).get('title') or (old.get('items', {}).get(name, [{}])[0].get('title') if old else '') or '', 'file': meta.get(seq, {}).get('file', ''),
-                                'pdf': f'{DL}?brdId=JI1901&seq={seq}&fileTp=&fileSeq=1', 'total': len(pdf.pages), 'kw': kw, 'pages': pages})
+                                'pdf': f'{DL}?brdId=JI1901&seq={seq}&fileTp=&fileSeq=1', 'total': len(pdf.pages), 'kw': kw, 'hits': hits, 'pages': pages})
             except Exception as e:
-                log('pamphlet fail', name, seq, repr(e))
+                log('pamphlet fail', name, seq, repr(e)); errors.append({'name': name, 'seq': seq, 'err': repr(e)[:300]})
         if ent: items[name] = ent
     now = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9))).strftime('%Y-%m-%d %H:%M KST')
     # 새 행복주택/국민임대 팸플릿(최근 400일) 중 PAM에 없는 것 — 사람이 보고 PAM에 추가하라고 로그·JSON에 남김
     known = {s for lst in PAM.values() for s, _ in lst}
     recent = [c for c in cat if c.get('seq') and c['seq'] not in known and re.search(r'행복주택|국민임대', c.get('title') or '')][:40]
-    json.dump({'updated': now, 'source': 'SH 인터넷청약 > 청약정보 > 전자 팸플릿', 'list_url': LIST, 'items': items, 'unmapped_recent': recent}, open(OUTJ, 'w', encoding='utf-8'), ensure_ascii=False, separators=(',', ':'))
+    json.dump({'updated': now, 'source': 'SH 인터넷청약 > 청약정보 > 전자 팸플릿', 'list_url': LIST, 'items': items, 'errors': errors, 'unmapped_recent': recent}, open(OUTJ, 'w', encoding='utf-8'), ensure_ascii=False, separators=(',', ':'))
     log('wrote', OUTJ, 'items', len(items), 'pages', len(rendered))
 
 if __name__ == '__main__':
