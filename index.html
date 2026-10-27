@@ -283,6 +283,12 @@ main section.view{margin-top:0}
 .iw-ph .iw-plan img{object-fit:contain;background:#fff}
 .iw-ph a span{position:absolute;left:0;right:0;bottom:0;font-size:11px;font-weight:600;color:#fff;background:rgba(0,0,0,.55);padding:2px 6px;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .iw-rooms a{height:84px}
+.iw-strip{display:flex;gap:6px;overflow-x:auto;overflow-y:hidden;margin:6px -2px 6px;padding:0 2px 6px;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:thin}
+.iw-strip a{flex:0 0 auto;width:128px;height:96px;border-radius:8px;overflow:hidden;background:#eef1f5;position:relative;display:block;scroll-snap-align:start}
+.iw-strip a.pl{background:#fff;border:1px solid #e5e9ef}
+.iw-strip img{width:100%;height:100%;object-fit:cover;display:block}
+.iw-strip a.pl img{object-fit:cover;object-position:top}
+.iw-strip a span{position:absolute;left:0;right:0;bottom:0;font-size:11px;font-weight:600;color:#fff;background:rgba(0,0,0,.55);padding:2px 6px;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .iw-pam a{height:110px;background:#fff;border:1px solid #e5e9ef}
 .iw-pam img{object-fit:cover;object-position:top}
 .iw-phn{display:block;margin:-4px 0 8px}
@@ -893,52 +899,63 @@ function nmIcon(p, approx){ var size = p.cat === 'small' ? 14 : 20; return { con
 function factOf(p){ return FACT[p.name + '|' + (p.m2 === undefined ? '' : p.m2)] || null; }
 function won(n){ return n >= 10000 ? (Math.round(n / 1000) / 10) + '만' : n.toLocaleString() + '원'; }
 function factHtml(p){
-  var f = factOf(p);
-  if (!f || (!f.k && !f.type && !f.types)) return '<div class="iw-sec"><div class="iw-sh">단지 정보</div><small class="k">SH 주택정보·K-apt에 등록된 단지 정보 없음</small></div>';
-  var h = '<div class="iw-sec"><div class="iw-sh">단지 정보 <small class="k">' + f.src.join(' · ') + (window.FACT_UPDATED ? ' · 갱신 ' + window.FACT_UPDATED.slice(0, 10) : '') + '</small></div>';
-  // 사진: 실내 각 방(SH 사진유형 07) → 전경 → 평면도. 없으면 없다고 쓴다.
-  var ph = '';
-  if (f.rooms && f.rooms.length) {
-    ph += '<div class="iw-ph iw-rooms">' + f.rooms.slice(0, 4).map(function(r){ return '<a href="' + r.u + '" target="_blank" rel="noopener" title="' + r.t + '"><img src="' + r.u + '" alt="' + r.t + '" loading="lazy" onerror="this.parentNode.style.display=\'none\'"><span>' + r.t + '</span></a>'; }).join('') + '</div>';
-    var rk = f.rooms_k || f.rooms.length, rn = f.rooms_n || rk;
-    ph += '<small class="k iw-phn">' + (f.rooms_mine ? '이 형 실내 사진 ' + rk + '장' + (rn > rk ? ' (단지 전체 ' + rn + '장)' : '') : (f.rooms_mine === false ? '실내 사진 ' + rk + '장 <b>— 이 형 사진은 없음, 다른 형·공용부</b>' : '실내 사진 ' + rn + '장')) + (rk > 4 ? ' · <a href="' + f.rooms[4].u + '" target="_blank" rel="noopener">더 보기</a>' : '') + ' — SH 주택정보 "실내 각 방"' + (f.cyber && f.cyber.length ? ' · <a href="' + f.cyber[0][1] + '" target="_blank" rel="noopener">사이버 모델하우스' + (f.cyber[0][0] ? ' ' + f.cyber[0][0] + '형' : '') + '</a>' : '') + '</small>';
+  var f = factOf(p), noFact = !f || (!f.k && !f.type && !f.types);
+  if (!f) f = { src: [] };
+  var h = '<div class="iw-sec"><div class="iw-sh">단지 정보 <small class="k">' + (noFact ? 'SH 주택정보·K-apt 둘 다 미등록' : f.src.join(' · ') + (window.FACT_UPDATED ? ' · 갱신 ' + window.FACT_UPDATED.slice(0, 10) : '')) + '</small></div>';
+  if (noFact) h += '<div class="iw-nophoto"><b>단지 정보 없음</b> — SH 주택정보(공가·퇴거·관리비·사진)에도 K-apt(동·세대·주차)에도 이 단지가 없음. 아래는 전자팸플릿만</div>';
+  // 사진 띠(가로 스크롤, 전부): 실내 각 방(SH 사진유형 07, 이 형 우선) → 전경 → SH 평면도 → 전자팸플릿 평면도·배치도. 없으면 없다고 쓴다.
+  var tiles = [], when = window.FACT_UPDATED ? ' (' + window.FACT_UPDATED.slice(0, 10) + ' 확인)' : '';
+  (f.rooms || []).forEach(function(r){ tiles.push({ u: r.u, th: r.u, t: r.t, cls: 'rm' }); });
+  (f.photos || []).forEach(function(u){ tiles.push({ u: u, th: u, t: '전경', cls: '' }); });
+  if (f.plan) tiles.push({ u: f.plan, th: f.plan, t: (f.type ? f.type.sp + '형 ' : '') + '평면도(SH 주택정보)', cls: 'pl' });
+  var pam = window.PAM && window.PAM.items && window.PAM.items[p.name], base = p.m2 ? String(Math.floor(p.m2)) : null, pamPages = [], pamAll = 0;
+  if (pam && pam.length) {
+    pam.forEach(function(e){ e.pages.forEach(function(pg){ pamAll++; if (pg.kind === 'plan' || pg.kind === 'site') pamPages.push({ img: pg.img, th: pg.th || pg.img, n: pg.n, e: e, kind: pg.kind, tys: pg.tys || [] }); }); });
+    pamPages.sort(function(a, b){ var ra = (a.kind === 'plan' ? 0 : 2) + (base && a.tys.indexOf(base) >= 0 ? -1 : 0), rb = (b.kind === 'plan' ? 0 : 2) + (base && b.tys.indexOf(base) >= 0 ? -1 : 0); return ra - rb || a.n - b.n; });
+    pamPages.forEach(function(x){ var ty = base && x.tys.indexOf(base) >= 0 ? base : (x.tys[0] || ''); tiles.push({ u: x.img, th: x.th, t: '팸플릿 ' + (x.kind === 'plan' ? '평면도' : '배치도') + (ty ? ' ' + ty + '형' : '') + ' · ' + x.n + '쪽', cls: 'pl' }); });
   }
-  if (f.photos || f.plan) {
-    ph += '<div class="iw-ph">' + (f.photos || []).slice(0, 2).map(function(u){ return '<a href="' + u + '" target="_blank" rel="noopener"><img src="' + u + '" alt="단지 전경" loading="lazy" onerror="this.parentNode.style.display=\'none\'"><span>전경</span></a>'; }).join('') +
-         (f.plan ? '<a class="iw-plan" href="' + f.plan + '" target="_blank" rel="noopener"><img src="' + f.plan + '" alt="평면도" loading="lazy" onerror="this.parentNode.style.display=\'none\'"><span>' + (f.type ? f.type.sp + '형 ' : '') + '평면도</span></a>' : '') + '</div>';
+  var ph = '';
+  if (tiles.length) {
+    ph += '<div class="iw-strip">' + tiles.map(function(x){ return '<a href="' + x.u + '" target="_blank" rel="noopener" class="' + x.cls + '" title="' + x.t + '"><img src="' + x.th + '" alt="' + x.t + '" loading="lazy" onerror="this.parentNode.style.display=\'none\'"><span>' + x.t + '</span></a>'; }).join('') + '</div>';
+    var rk = f.rooms_k || (f.rooms || []).length, rn = f.rooms_n || rk;
+    var parts = [];
+    parts.push(f.rooms && f.rooms.length ? (f.rooms_mine ? '이 형 실내 ' + rk + '장' + (rn > rk ? '(단지 전체 ' + rn + '장)' : '') : (f.rooms_mine === false ? '실내 ' + rk + '장(이 형 사진은 없음, 다른 형·공용부)' : '실내 ' + rn + '장')) : '실내 사진 없음');
+    parts.push((f.photos || []).length ? '전경 ' + f.photos.length + '장' : '전경 없음');
+    parts.push(f.plan ? 'SH 평면도 1장' : 'SH 평면도 없음');
+    if (window.PAM) parts.push(pam && pam.length ? '팸플릿 평면도·배치도 ' + pamPages.length + '장' + (pamAll > pamPages.length ? '(조감도·교통망 등 ' + (pamAll - pamPages.length) + '쪽은 안 보여줌)' : '') : '팸플릿 없음');
+    ph += '<small class="k iw-phn">' + tiles.length + '장 · 좌우로 넘김 · 누르면 원본 — ' + parts.join(' · ') + (f.cyber && f.cyber.length ? ' · <a href="' + f.cyber[0][1] + '" target="_blank" rel="noopener">사이버 모델하우스' + (f.cyber[0][0] ? ' ' + f.cyber[0][0] + '형' : '') + '</a>' : '') + '</small>';
   }
   if (!(f.rooms && f.rooms.length)) {
-    var when = window.FACT_UPDATED ? ' (' + window.FACT_UPDATED.slice(0, 10) + ' 확인)' : '';
-    var hasPam = window.PAM && window.PAM.items && window.PAM.items[p.name] && window.PAM.items[p.name].length;
-    if (f.nophoto) ph += '<div class="iw-nophoto"><b>사진 없음</b> — SH 주택정보에 이 단지의 사진(전경·실내)도 평면도도 등록돼 있지 않음' + when + (hasPam ? '. 아래 <b>전자팸플릿</b>의 평면도·배치도가 SH가 공개한 유일한 그림' : '') + '</div>';
+    if (f.nophoto) ph += '<div class="iw-nophoto"><b>사진 없음</b> — SH 주택정보에 이 단지의 사진(전경·실내)도 평면도도 등록돼 있지 않음' + when + (pamPages.length ? '. 위 <b>전자팸플릿</b>의 평면도·배치도가 SH가 공개한 유일한 그림' : '') + '</div>';
     else if (f.phototypes) ph += '<div class="iw-nophoto"><b>실내(방) 사진 없음</b> — SH 주택정보에 올라온 사진 유형: ' + (f.phototypes.length ? f.phototypes.join('·') : '없음') + (f.phototypes.indexOf('실내 각 방') >= 0 ? ' (실내 유형은 있으나 이미지 0장)' : '') + (f.plan ? ' · 평면도는 있음(위)' : '') + when + '</div>';
   }
-  h += ph;
-  // SH 전자팸플릿(청약정보 > 전자 팸플릿): 단지 해당 페이지를 그림으로 — 사진이 없는 단지(방화스카이포레 등)도 조감도·평면도·배치도는 여기 있음
-  var pam = window.PAM && window.PAM.items && window.PAM.items[p.name];
   if (pam && pam.length) {
-    // 화면엔 평면도(이 형 우선)·배치도만. 조감도·교통망 같은 쪽은 데이터(pamphlets.json)로만 갖고 있음
-    var base = p.m2 ? String(Math.floor(p.m2)) : null, pages = [];
-    pam.forEach(function(e){ e.pages.forEach(function(pg){ if (pg.kind === 'plan' || pg.kind === 'site') pages.push({ img: pg.img, n: pg.n, e: e, kind: pg.kind, tys: pg.tys || [] }); }); });
-    pages.sort(function(a, b){ var ra = (a.kind === 'plan' ? 0 : 2) + (base && a.tys.indexOf(base) >= 0 ? -1 : 0), rb = (b.kind === 'plan' ? 0 : 2) + (base && b.tys.indexOf(base) >= 0 ? -1 : 0); return ra - rb || a.n - b.n; });
-    var lab = function(x){ var ty = base && x.tys.indexOf(base) >= 0 ? base : (x.tys[0] || ''); return (x.kind === 'plan' ? '평면도' : '배치도') + (ty ? ' ' + ty + '형' : '') + ' · ' + x.n + '쪽'; };
-    if (pages.length) h += '<div class="iw-ph iw-pam">' + pages.slice(0, 3).map(function(x){ return '<a href="' + x.img + '" target="_blank" rel="noopener" title="' + (x.e.title || '전자팸플릿') + ' ' + x.n + '쪽"><img src="' + x.img + '" alt="' + lab(x) + '" loading="lazy" onerror="this.parentNode.style.display=\'none\'"><span>' + lab(x) + '</span></a>'; }).join('') + '</div>';
     var tt = function(e){ var t = e.title || e.file || e.seq; return t.length > 28 ? t.slice(0, 28) + '…' : t; };
-    var nAll = 0; pam.forEach(function(e){ nAll += e.pages.length; });
-    h += '<small class="k iw-phn">SH 전자팸플릿: ' + pam.map(function(e){ return '<a href="' + e.pdf + '" target="_blank" rel="noopener" title="' + (e.title || '') + '">' + tt(e) + ' (PDF ' + e.total + '쪽)</a>'; }).join(' · ') + (pages.length ? ' · 평면도·배치도 ' + pages.length + '쪽' + (pages.length > 3 ? ' 중 3쪽' : '') + '(누르면 큰 그림)' : ' · 글자로 평면도 쪽을 못 찾음 → PDF로') + (nAll > pages.length ? ' · 조감도·교통망 등 ' + (nAll - pages.length) + '쪽은 안 보여줌' : '') + (pam[0].kw ? ' · 묶음 팸플릿에서 이 단지 쪽만' : '') + ' — <a href="' + window.PAM.list_url + '" target="_blank" rel="noopener">목록</a></small>';
+    ph += '<small class="k iw-phn">SH 전자팸플릿: ' + pam.map(function(e){ return '<a href="' + e.pdf + '" target="_blank" rel="noopener" title="' + (e.title || '') + '">' + tt(e) + ' (PDF ' + e.total + '쪽)</a>'; }).join(' · ') + (pamPages.length ? '' : ' · 글자가 안 뽑히는 PDF라 평면도 쪽을 못 골라냄 → PDF로 직접') + (pam[0].kw ? ' · 묶음 팸플릿에서 이 단지 쪽만' : '') + ' — <a href="' + window.PAM.list_url + '" target="_blank" rel="noopener">목록</a></small>';
+  } else if (window.PAM && window.PAM.items) {
+    ph += '<div class="iw-nophoto"><b>전자팸플릿 없음</b> — SH 전자팸플릿 목록(' + (window.PAM.count || 572) + '건)에 이 단지 없음</div>';
   }
+  h += ph;
   var rows = [];
   var k = f.k;
+  if (noFact) { h += '</div>'; return h; }
   if (k) {
     rows.push(['단지', (k.n > 1 ? k.n + '개 단지 · ' : '') + k.built + ' 준공 · ' + (k.dong ? k.dong + '동 ' : '') + k.hh.toLocaleString() + '세대' + (k.hall ? ' · ' + k.hall : '') + (k.heat ? ' · ' + k.heat : '')]);
     if (k.park) { var pk = k.park; rows.push(['주차', '세대당 <b>' + pk.per + '대</b>' + (pk.per_rng ? ' (' + pk.per_rng[0] + '~' + pk.per_rng[1] + ')' : '') + ' · 총 ' + pk.t.toLocaleString() + '면 (지하 ' + pk.under + '%)' + (pk.cars ? '<br>등록 차량 ' + pk.cars.toLocaleString() + '대 = 주차면의 <b>' + pk.cars_per + '%</b>' : '') + (pk.ev ? ' · 전기차 ' + pk.ev : '')]); }
     else rows.push(['주차', '<small class="k">K-apt에 주차대수 미등록</small>']);
+  } else {
+    rows.push(['단지', '<small class="k">K-apt(공동주택관리정보시스템)에 미등록 → 준공·동수·주차 정보 없음</small>']);
   }
+  if (!f.type && p.kind === '행복주택') rows.push(['이 형', '<small class="k">SH 주택정보에 이 단지 형별 정보 없음 → 공가·퇴거 모름</small>']);
   if (f.type) { var ty = f.type; rows.push(['이 형', ty.sp + '형 ' + ty.ar + '㎡ · ' + (ty.rooms ? '방 <b>' + ty.rooms + '개</b>' : '원룸형') + ' · ' + ty.hh + '세대' + (ty.exact ? '' : ' <small class="k">(가장 가까운 형)</small>')]);
     rows.push(['공가·퇴거', '공가 <b>' + ty.vac + '</b> · 최근 1년 퇴거 <b>' + ty.out + '</b> / ' + ty.hh + '세대 <small class="k">(' + ty.ym + ')</small>']); }
   if (f.types) { Object.keys(f.types).sort().forEach(function(b){ var d = f.types[b]; rows.push([b + '㎡', (d.rooms ? '방 ' + d.rooms + '개 · ' : '') + d.hh.toLocaleString() + '세대 · 공가 <b>' + d.vac + '</b> · 1년 퇴거 <b>' + d.out + '</b>' + (d.cost ? '<br>관리비 ' + won(d.cost[0]) + (d.cost[1] !== d.cost[0] ? '~' + won(d.cost[1]) : '') + '/월' : '') + (d.plan ? ' · <a href="' + d.plan + '" target="_blank" rel="noopener">평면도</a>' : '')]); }); }
   if (f.cost) rows.push(['관리비', '<b>' + won(f.cost.won) + '</b>/월 <small class="k">(' + f.cost.ym.slice(0,4) + '.' + f.cost.ym.slice(4) + ' 실적, ' + (f.type ? f.type.ar + '㎡' : '') + ')</small>']);
+  else if (p.kind === '행복주택') rows.push(['관리비', '<small class="k">SH 주택정보에 관리비 실적 없음</small>']);
+  if (f.types) { ['39', '49', '59'].forEach(function(b){ if (!f.types[b]) rows.push([b + '㎡', '<small class="k">SH 주택정보에 이 면적 국민임대 없음</small>']); }); }
+  else if (p.kind === '국민임대') rows.push(['면적별', '<small class="k">SH 주택정보에 국민임대 형별 정보 없음</small>']);
   if (f.subway) rows.push(['지하철', f.subway.join(' · ')]);
+  else rows.push(['지하철', '<small class="k">SH 주택정보에 역 거리 정보 없음</small>']);
   h += '<table class="iw-t">' + rows.map(function(r){ return '<tr><th>' + r[0] + '</th><td>' + r[1] + '</td></tr>'; }).join('') + '</table></div>';
   return h;
 }
@@ -946,7 +963,7 @@ function manwon(s){ var m = String(s).match(/(\d+)\s*억/); var eok = m ? +m[1] 
 function fmtMan(n){ n = Math.round(n); return n >= 10000 ? Math.floor(n / 10000) + '억' + (n % 10000 ? ' ' + (n % 10000).toLocaleString() + '만' : '') : n.toLocaleString() + '만'; }
 var REITS = { '이든채': 1, '창경궁롯데캐슬시그니처': 1 };   // 서울리츠 단지: 전환 한도 20% (그 외 SH·서울시 소유 50%)
 function moneyHtml(p, n){
-  var dep = manwon(p.dep), rent = parseFloat(p.rent); if (!dep || isNaN(rent)) return '';
+  var dep = manwon(p.dep), rent = parseFloat(p.rent); if (!dep || isNaN(rent)) return '<div class="iw-sec"><div class="iw-sh">임대조건</div><small class="k">공고 표의 보증금·월세를 숫자로 못 읽음(' + (p.dep || '보증금 없음') + ' / ' + (p.rent || '월세 없음') + ') → <a href="' + n.url + '" target="_blank" rel="noopener">공고문</a>에서 확인</small></div>';
   var pct = REITS[p.name] ? 20 : 50, cut = dep * pct / 100, add = cut * 0.025 / 12, rentMax = Math.round((rent + add) * 10) / 10;
   return '<div class="iw-sec"><div class="iw-sh">임대조건 <small class="k">청년(소득 있음) 기준 · 이 공고 표의 숫자</small></div>' +
     '<table class="iw-m"><tr><th></th><th>보증금</th><th>월세</th></tr>' +
@@ -1036,7 +1053,7 @@ function kookRates(p){
       trs.push('<tr><th>' + (i ? '' : postHead(po)) + '<br><small class="k">' + nm + '</small></th>' + ['39', '49', '59'].map(function(a){ var r = g[a]; if (!r) return '<td class="k">—</td>'; var x = rateOf(r); return '<td>' + r.n + '호 · ' + (r.sum == null ? '?' : r.sum.toLocaleString()) + '명<br>' + (x ? (x.pdf ? '<b>' + x.v + ':1</b>' : '<span class="calc">' + x.v + ':1</span>') : '—') + '</td>'; }).join('') + '</tr>');
     });
   });
-  if (!trs.length) return '';
+  if (!trs.length) return '<div class="iw-sec"><div class="iw-sh">지난 공고 경쟁률</div><small class="k">SH 국민임대 결과 PDF ' + posts.length + '건에 이 지구의 일반공급 행 없음(주거약자만 공급됐거나 미공급)</small></div>';
   return '<div class="iw-sec"><div class="iw-sh">지난 공고 경쟁률 <small class="k">일반공급(주거약자 제외) · 선순위 접수 결과 · 호수 → 신청자 → 경쟁률</small></div>' +
     '<table class="iw-t iw-k iw-r k4"><tr><th>공고 · PDF의 단지명</th><th>39㎡</th><th>49㎡</th><th>59㎡</th></tr>' + trs.join('') + '</table>' +
     '<small class="k">국민임대는 1순위(선순위) 접수에서 신청자가 모집의 200%를 넘으면 그걸로 마감이라, 이 숫자가 사실상 최종 경쟁률(SH 게시물 본문). 경쟁률은 SH PDF 그대로(굵은 값). 공고 이름을 누르면 SH 결과 게시물' + (window.RATES.updated ? ' · 수집 ' + window.RATES.updated.slice(0, 10) : '') + '</small></div>';
@@ -1068,8 +1085,16 @@ function nmHtml(p, approx){
       '</table>' + moneyHtml(p, n);
   } else {
     var rows = KOOK_ROWS[p.name] || [], s25 = noticeStatus(NOTICES.K25), s26 = noticeStatus(NOTICES.K26);
+    // 빈 칸 금지: 금액이 없으면 왜 없는지 적는다(공급 없음 / 주거약자만 / 미정리)
+    var kcell = function(c, nid){
+      if (/정리 안 함/.test(c)) return '<small class="k">금액 미정리(접수 끝난 공고) · <a href="' + NOTICES[nid].url + '" target="_blank" rel="noopener">공고문 표</a></small>';
+      if (/^없음$/.test(c)) return '<small class="k">이 면적 공급 없음 → 금액 해당 없음</small>';
+      if (/일반 없음/.test(c)) return c.replace('일반 없음', '<b>일반공급 없음</b> → 금액 해당 없음').replace(/주거약자/, '주거약자(장애인·고령자)');
+      if (!/월\s*[\d.]+만/.test(c)) c += '<br><small class="k">월세: 공고 표에서 미정리</small>';
+      return c;
+    };
     body = '<table class="iw-t iw-k"><tr><th></th><th>2025 공고</th><th>2026 공고</th></tr>' +
-      rows.map(function(r){ return '<tr><th>' + r[0] + '</th><td>' + r[1] + '</td><td>' + r[2] + '</td></tr>'; }).join('') + '</table>' +
+      (rows.length ? rows.map(function(r){ return '<tr><th>' + r[0] + '</th><td>' + kcell(r[1], 'K25') + '</td><td>' + kcell(r[2], 'K26') + '</td></tr>'; }).join('') : '<tr><td colspan="3"><small class="k">이 지구는 2025·2026 공고 표에서 정리한 금액 없음</small></td></tr>') + '</table>' +
       '<small class="k" style="display:block;margin-top:4px">금액 범위(예: 4,002~4,323만)는 공고 표의 최저~최고 · 월세는 1인 가구 기준</small>' +
       '<table class="iw-t iw-t2">' +
       '<tr><th>내 순위</th><td>' + rankPill(p.rank) + '</td></tr>' +

@@ -125,7 +125,7 @@ def facts_for(name, m2=None, kind='행복주택'):
             o['rooms_mine'] = bool(mine)
         else:
             pick = rooms_all
-        o['rooms'] = [{'t': r['t'], 'u': r['u']} for r in pick[:8]]
+        o['rooms'] = [{'t': r['t'], 'u': r['u']} for r in pick[:24]]
         o['rooms_n'] = len(rooms_all); o['rooms_k'] = len(pick)
     pts = sorted({t for s in shs for t in (s.get('phototypes') or [])})
     if pts: o['phototypes'] = pts

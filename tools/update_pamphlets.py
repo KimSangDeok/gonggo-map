@@ -14,7 +14,9 @@ OUTD = os.path.join(ROOT, 'data', 'pamphlets'); OUTJ = os.path.join(ROOT, 'data'
 LIST = 'https://www.i-sh.co.kr/app/lay2/program/S48T582C583/www/brd/m_134/list.do'
 DL = 'https://www.i-sh.co.kr/app/com/file/innoFD.do'
 MAX_PAGES = 12       # 단지당 최대 렌더 페이지(평면도·배치도 먼저, 조감도 등은 데이터용으로 뒤에)
-WIDTH = 1000         # 렌더 가로 px
+WIDTH = 1000         # 기본 렌더 가로 px(조감도 등 데이터용)
+HI_WIDTH = 1800      # 평면도(이 사이트 단지의 형)·배치도: 폰에서 확대해도 깨지지 않게 크게
+TH_WIDTH = 360       # 카드 가로 스크롤 띠에 쓰는 썸네일
 
 # 단지(사이트의 pick 이름) → [(팸플릿 seq, 페이지 고르는 키워드 또는 None=전체)]. 2026-10-27 전자팸플릿 목록(572건)에서 대조.
 PAM = {
@@ -167,6 +169,18 @@ def main():
             m = meta.get(seq, {})
             data, fs = download(seq, m.get('fileSeq') or '1', m.get('brdId') or 'JI1901'); pdfs[seq] = (data, fs); time.sleep(0.5); log('downloaded', seq, 'fileSeq', fs, len(data))
         return pdfs[seq]
+    # 사이트 단지별 형(㎡ 정수부) — 그 형의 평면도 쪽은 고해상도로. 국민임대 지구는 39·49·59
+    try:
+        html = open(os.path.join(ROOT, 'index.html'), encoding='utf-8').read()
+        PLACES = json.loads(re.search(r"var PLACES = (\[.*?\]);\n", html, re.S).group(1))
+    except Exception as e:
+        PLACES = []; log('PLACES read fail', repr(e))
+    TYS = {}
+    for pl in PLACES:
+        TYS.setdefault(pl['name'], set())
+        if pl.get('m2'): TYS[pl['name']].add(str(int(pl['m2'])))
+        elif pl.get('kind') == '국민임대': TYS[pl['name']] |= {'39', '49', '59'}
+    # 같은 쪽을 여러 단지가 쓰면 한 번은 고해상도 조건을 만족할 때 다시 그린다(아래 hi 판정)
     items, rendered, errors = {}, {}, []
     for name, lst in PAM.items():
         ent = []
@@ -179,12 +193,15 @@ def main():
                     pages = []
                     for c in sel:
                         i = c['i']; key = f'{seq}_p{i + 1}'
-                        if key not in rendered:
+                        hi = c['kind'] == 'site' or (c['kind'] == 'plan' and (not TYS.get(name) or bool(set(c['tys']) & TYS.get(name, set()))))
+                        if key not in rendered or (hi and not rendered[key].get('hi')):
                             pg = pdf.pages[i]
-                            scale = WIDTH / float(pg.width)
+                            width = HI_WIDTH if hi else WIDTH
+                            scale = width / float(pg.width)
                             im = pg.to_image(resolution=int(72 * scale)).original.convert('RGB')
-                            path = os.path.join(OUTD, key + '.jpg'); im.save(path, 'JPEG', quality=72, optimize=True)
-                            rendered[key] = {'img': 'data/pamphlets/' + key + '.jpg', 'w': im.width, 'h': im.height}
+                            path = os.path.join(OUTD, key + '.jpg'); im.save(path, 'JPEG', quality=(80 if hi else 72), optimize=True)
+                            th = im.copy(); th.thumbnail((TH_WIDTH, TH_WIDTH * 2)); th.save(os.path.join(OUTD, key + '_t.jpg'), 'JPEG', quality=70, optimize=True)
+                            rendered[key] = {'img': 'data/pamphlets/' + key + '.jpg', 'th': 'data/pamphlets/' + key + '_t.jpg', 'w': im.width, 'h': im.height, 'hi': hi}
                         pages.append(dict(n=i + 1, kind=c['kind'], tys=c['tys'], **rendered[key]))
                     ent.append({'seq': seq, 'title': meta.get(seq, {}).get('title') or (old.get('items', {}).get(name, [{}])[0].get('title') if old else '') or '', 'file': meta.get(seq, {}).get('file', ''),
                                 'pdf': f'{DL}?brdId=JI1901&seq={seq}&fileTp=&fileSeq={fs}', 'total': len(pdf.pages), 'kw': kw, 'hits': hits, 'pages': pages})
@@ -194,14 +211,14 @@ def main():
     # 더 이상 안 쓰는 렌더 파일 정리(쪽 선택 규칙이 바뀌면 생김)
     if rendered:
         for fn in os.listdir(OUTD):
-            if fn.endswith('.jpg') and fn[:-4] not in rendered:
+            if fn.endswith('.jpg') and re.sub(r'_t$', '', fn[:-4]) not in rendered:
                 try: os.remove(os.path.join(OUTD, fn)); log('removed stale', fn)
                 except Exception: pass
     now = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9))).strftime('%Y-%m-%d %H:%M KST')
     # 새 행복주택/국민임대 팸플릿(최근 400일) 중 PAM에 없는 것 — 사람이 보고 PAM에 추가하라고 로그·JSON에 남김
     known = {s for lst in PAM.values() for s, _ in lst}
     recent = [c for c in cat if c.get('seq') and c['seq'] not in known and re.search(r'행복주택|국민임대', c.get('title') or '')][:40]
-    json.dump({'updated': now, 'source': 'SH 인터넷청약 > 청약정보 > 전자 팸플릿', 'list_url': LIST, 'items': items, 'errors': errors, 'unmapped_recent': recent}, open(OUTJ, 'w', encoding='utf-8'), ensure_ascii=False, separators=(',', ':'))
+    json.dump({'updated': now, 'source': 'SH 인터넷청약 > 청약정보 > 전자 팸플릿', 'list_url': LIST, 'count': len(cat), 'items': items, 'errors': errors, 'unmapped_recent': recent}, open(OUTJ, 'w', encoding='utf-8'), ensure_ascii=False, separators=(',', ':'))
     log('wrote', OUTJ, 'items', len(items), 'pages', len(rendered))
 
 if __name__ == '__main__':
