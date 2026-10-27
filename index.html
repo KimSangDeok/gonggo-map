@@ -242,7 +242,7 @@ main section.view{margin-top:0}
 .iw-lh th{width:auto;white-space:normal}
 .iw-lh td{padding-right:6px}
 .dot.hl{background:#fff;box-shadow:inset 0 0 0 3px var(--c),0 0 0 1px rgba(0,0,0,.25)}
-.nm-iw{width:min(400px,calc(100vw - 24px));padding:12px 14px 12px}  /* 고정 폭: 네이버 InfoWindow는 내용 크기를 재서 창 크기를 정하는데, 줌 애니메이션 중 첫 열기에서 0으로 재는 일이 있어 min/max 범위를 두면 폭이 들쭉날쭉해짐 */
+.nm-iw{width:min(400px,calc(100vw - 24px));min-width:0;max-width:none;padding:12px 14px 12px}  /* 고정 폭: 네이버 InfoWindow는 내용 크기를 재서 창 크기를 정하는데, 줌 애니메이션 중 첫 열기에서 0으로 재는 일이 있어 min/max 범위를 두면 폭이 들쭉날쭉해짐 */
 .nm-iw table{min-width:0;width:100%;font-size:inherit;border-collapse:collapse;display:table}
 .nm-iw th,.nm-iw td{border:0;padding:0;background:none;letter-spacing:0;font-size:inherit;color:inherit}
 .iw-h{display:flex;flex-wrap:wrap;gap:4px 8px;align-items:center;margin-bottom:8px;padding-right:22px;position:relative}
