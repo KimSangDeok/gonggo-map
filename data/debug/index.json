@@ -1,0 +1,34 @@
+[
+ {
+  "url": "https://soco.seoul.go.kr/youth/pgm/home/yohome/list.do?menuNo=400002",
+  "post": "",
+  "status": 200,
+  "type": "text/html;charset=utf-8",
+  "bytes": 67599,
+  "file": "soco_seoul_go_kr_youth_pgm_home_yohome_list_do_menuNo_400002_52d844.html"
+ },
+ {
+  "url": "https://soco.seoul.go.kr/youth/bbs/BMSR00015/list.do?menuNo=400008",
+  "post": "",
+  "status": 200,
+  "type": "text/html;charset=utf-8",
+  "bytes": 43440,
+  "file": "soco_seoul_go_kr_youth_bbs_BMSR00015_list_do_menuNo_400008_ebb1bc.html"
+ },
+ {
+  "url": "https://soco.seoul.go.kr/youth/pgm/home/yohome/view.do?menuNo=400002&homeCode=20000589",
+  "post": "",
+  "status": 200,
+  "type": "text/html;charset=utf-8",
+  "bytes": 54886,
+  "file": "soco_seoul_go_kr_youth_pgm_home_yohome_view_do_menuNo_400002_homeCode_20000589_887ef5.html"
+ },
+ {
+  "url": "https://soco.seoul.go.kr/youth/bbs/BMSR00015/view.do?boardId=6485&menuNo=400008",
+  "post": "",
+  "status": 200,
+  "type": "text/html;charset=utf-8",
+  "bytes": 58727,
+  "file": "soco_seoul_go_kr_youth_bbs_BMSR00015_view_do_boardId_6485_menuNo_400008_a16513.html"
+ }
+]
