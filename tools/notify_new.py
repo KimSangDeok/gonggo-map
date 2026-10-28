@@ -121,7 +121,7 @@ def collect():
     return out
 
 def ntfy(title, msg, url, prio=3, tags=('house',)):
-    body = {'topic': TOPIC, 'title': title[:250], 'message': msg[:3500], 'priority': prio, 'tags': list(tags),
+    body = {'topic': TOPIC, 'title': title[:120], 'message': msg[:1000], 'priority': prio, 'tags': list(tags),   # ntfy 메시지 한도 4,096바이트(한글 3바이트) 안으로
             'actions': [{'action': 'view', 'label': '공고 열기', 'url': url}, {'action': 'view', 'label': '내 지도', 'url': SITE}]}
     if url: body['click'] = url
     req = urllib.request.Request('https://ntfy.sh/', data=json.dumps(body, ensure_ascii=False).encode('utf-8'), headers={'Content-Type': 'application/json'})
