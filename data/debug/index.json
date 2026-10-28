@@ -1,34 +1,26 @@
 [
  {
-  "url": "https://www.i-sh.co.kr/houseinfo/main/mainPage.do",
+  "url": "https://www.i-sh.co.kr/app/lay2/program/S48T582C583/www/brd/m_134/list.do?page=1&srchWord=상암&srchTp=&itm_seq_1=0&multi_itm_seq=0",
   "post": "",
   "status": 200,
   "type": "text/html; charset=UTF-8",
-  "bytes": 56226,
-  "file": "www_i_sh_co_kr_houseinfo_main_mainPage_do_7acf73.html"
+  "bytes": 119358,
+  "file": "www_i_sh_co_kr_app_lay2_program_S48T582C583_www_brd_m_134_list_do_page_1_srchWor_3def0e.html"
  },
  {
-  "url": "https://www.i-sh.co.kr/houseinfo/main/selectSearchList.do",
-  "post": "keyword=상암월드컵",
+  "url": "https://www.i-sh.co.kr/app/lay2/program/S48T582C583/www/brd/m_134/list.do?page=1&srchWord=상암&srchTp=0&itm_seq_1=0&multi_itm_seq=0",
+  "post": "",
   "status": 200,
-  "type": "application/json;charset=UTF-8",
-  "bytes": 1440,
-  "file": "www_i_sh_co_kr_houseinfo_main_selectSearchList_do_e68394.json"
+  "type": "text/html; charset=UTF-8",
+  "bytes": 117552,
+  "file": "www_i_sh_co_kr_app_lay2_program_S48T582C583_www_brd_m_134_list_do_page_1_srchWor_e2e75d.html"
  },
  {
-  "url": "https://www.i-sh.co.kr/houseinfo/main/selectSearchList.do",
-  "post": "keyword=월드컵로42길",
+  "url": "https://www.i-sh.co.kr/app/lay2/program/S48T582C583/www/brd/m_134/list.do?page=1&srchWord=월드컵&srchTp=0&itm_seq_1=0&multi_itm_seq=0",
+  "post": "",
   "status": 200,
-  "type": "application/json;charset=UTF-8",
-  "bytes": 552,
-  "file": "www_i_sh_co_kr_houseinfo_main_selectSearchList_do_d76313.json"
- },
- {
-  "url": "https://www.i-sh.co.kr/houseinfo/main/selectSearchList.do",
-  "post": "keyword=상암3-8",
-  "status": 200,
-  "type": "application/json;charset=UTF-8",
-  "bytes": 13,
-  "file": "www_i_sh_co_kr_houseinfo_main_selectSearchList_do_aa4c92.json"
+  "type": "text/html; charset=UTF-8",
+  "bytes": 114758,
+  "file": "www_i_sh_co_kr_app_lay2_program_S48T582C583_www_brd_m_134_list_do_page_1_srchWor_1ec33a.html"
  }
 ]
