@@ -1459,7 +1459,9 @@ function factHtml(p){
   if (pam && pam.length) {
     pam.forEach(function(e){ e.pages.forEach(function(pg){ pamAll++; if (pg.kind === 'plan' || pg.kind === 'site') pamPages.push({ img: pg.img, th: pg.th || pg.img, n: pg.n, e: e, kind: pg.kind, tys: pg.tys || [], ex: pg.ex || [], code: pg.code || [], tag: pg.tag || [] }); }); });
     // 주거약자형·고령자형·신혼부부형만 실린 평면도는 같은 형 안에서 뒤로(청년 1인이 받는 형은 기본형·청년형)
-    var other = function(x){ return x.tag.length && x.tag.every(function(t){ return /주거약자|고령자|장애인|신혼부부/.test(t); }) ? 0.5 : 0; };
+    // 공급 유형 글자((기본형)·(주거약자형))는 쪽에 형이 하나·유형 글자도 하나일 때만 믿음 — 범례·각주의 '(주거약자형)'까지 잡혀 틀린 표시가 되던 것(신정숲속마을 19쪽 등)
+    var tagOf = function(x){ return x.code.length === 1 && x.tag.length === 1 ? x.tag[0] : ''; };
+    var other = function(x){ return /주거약자|고령자|장애인|신혼부부/.test(tagOf(x)) ? 0.5 : 0; };
     pamPages.sort(function(a, b){ var ra = (a.kind === 'plan' ? 0 : 2) + (base && a.tys.indexOf(base) >= 0 ? -1 : 0) + other(a), rb = (b.kind === 'plan' ? 0 : 2) + (base && b.tys.indexOf(base) >= 0 ? -1 : 0) + other(b); return ra - rb || a.n - b.n; });
     // 평면도 쪽에 실린 형이 전부 기준 미만이면 뺌(배치도는 둠). 판단은 쪽 글자의 전용면적(29.09) → 형 이름(29A) → 형 번호 순 — 형 번호는 치수 숫자가 섞일 수 있어 마지막
     var pageOk = function(x){
@@ -1474,9 +1476,9 @@ function factHtml(p){
       var ty = base && x.tys.indexOf(base) >= 0 ? base : (x.tys.filter(tyOk)[0] || x.tys[0] || '');
       if (x.kind !== 'plan') { tiles.push({ u: x.img, th: x.th, t: '팸플릿 배치도 · ' + x.n + '쪽', s: '배치도 · ' + x.n + '쪽', cls: 'pl' }); return; }
       // 쪽 글자에서 뽑은 형 이름(29A)·전용면적(29.09㎡)·공급 유형((기본형)·(주거약자형)) — 없으면 형 번호만
-      var lab = x.code.length && x.code.length <= 2 ? x.code.join('·') : (ty ? ty + '형' : '');
-      var exs = x.ex.length && x.ex.length <= 3 ? x.ex.map(function(v){ return v + '㎡(' + py1(v) + '평)'; }).join('·') : '';
-      var tg = x.tag.length && x.tag.length <= 2 ? x.tag.join('·') : '';
+      var lab = x.code.length && x.code.length <= 2 ? x.code.join('·') : (x.ex.length === 1 ? Math.floor(parseFloat(x.ex[0])) + '형' : (ty ? ty + '형' : ''));   // 전용면적이 하나면 그 정수부로(천왕연지마을1 17쪽 35.21㎡ → 35형)
+      var exs = x.ex.length && x.ex.length <= 3 ? x.ex.map(function(v){ return (Math.round(parseFloat(v) * 100) / 100) + '㎡(' + py1(v) + '평)'; }).join('·') : '';
+      var tg = tagOf(x);
       tiles.push({ u: x.img, th: x.th, cls: 'pl',
         t: '팸플릿 ' + x.n + '쪽 평면도' + (lab ? ' ' + lab : '') + (exs ? ' · 전용 ' + exs : '') + (tg ? ' · ' + tg : ''),
         s: '평면 ' + (lab || x.n + '쪽') + (tg ? ' ' + tg : (x.ex.length === 1 ? ' ' + py1(x.ex[0]) + '평' : '')) });
