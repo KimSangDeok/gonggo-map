@@ -32,7 +32,8 @@ def get(u):
     return im
 
 index, sheet_no = [], 0
-for key in sorted(fact):
+ONLY_FULL = bool((os.environ.get('FULL_URLS') or '').strip())   # 원본 크기 자르기만 요청하면 모아보기 그림은 건너뜀(빠름)
+for key in ([] if ONLY_FULL else sorted(fact)):
     v = fact[key]
     tiles = []
     if v.get('plan'): tiles.append(('SH 평면도' + (' ' + v['type']['sp'] + '형' if v.get('type') else ''), v['plan']))
@@ -71,7 +72,7 @@ nn = importlib.util.module_from_spec(_spec); _spec.loader.exec_module(nn)
 ya = nn.apply_ya_fix(json.load(open(os.path.join(ROOT, 'data', 'ya.json'), encoding='utf-8')))   # 형 이름 ≠ 전용면적 고침 반영
 ocr = json.load(open(os.path.join(ROOT, 'data', 'ya_plans.json'), encoding='utf-8')).get('items', {})
 FLOOR = 26.45
-for c in sorted(ya.get('complexes', []), key=lambda c: c.get('name', '')):
+for c in ([] if ONLY_FULL else sorted(ya.get('complexes', []), key=lambda c: c.get('name', ''))):
     ok, _ = nn.ya_split(c)
     if not ok: continue
     ph = c.get('photos') or []
