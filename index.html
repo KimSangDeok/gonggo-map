@@ -1460,7 +1460,14 @@ function factHtml(p){
     // 주거약자형·고령자형·신혼부부형만 실린 평면도는 같은 형 안에서 뒤로(청년 1인이 받는 형은 기본형·청년형)
     var other = function(x){ return x.tag.length && x.tag.every(function(t){ return /주거약자|고령자|장애인|신혼부부/.test(t); }) ? 0.5 : 0; };
     pamPages.sort(function(a, b){ var ra = (a.kind === 'plan' ? 0 : 2) + (base && a.tys.indexOf(base) >= 0 ? -1 : 0) + other(a), rb = (b.kind === 'plan' ? 0 : 2) + (base && b.tys.indexOf(base) >= 0 ? -1 : 0) + other(b); return ra - rb || a.n - b.n; });
-    pamPages = pamPages.filter(function(x){ if (x.kind !== 'plan' || !x.tys.length || x.tys.some(tyOk)) return true; hidSmall++; return false; });   // 평면도 쪽에 실린 형이 전부 기준 미만이면 뺌(배치도는 둠)
+    // 평면도 쪽에 실린 형이 전부 기준 미만이면 뺌(배치도는 둠). 판단은 쪽 글자의 전용면적(29.09) → 형 이름(29A) → 형 번호 순 — 형 번호는 치수 숫자가 섞일 수 있어 마지막
+    var pageOk = function(x){
+      if (x.kind !== 'plan') return true;
+      if (x.ex.length) return x.ex.some(function(v){ return inSel(parseFloat(v)); });
+      if (x.code.length) return x.code.some(function(c){ return tyOk(String(parseInt(c, 10))); });
+      return !x.tys.length || x.tys.some(tyOk);
+    };
+    pamPages = pamPages.filter(function(x){ if (pageOk(x)) return true; hidSmall++; return false; });
     var py1 = function(v){ return (parseFloat(v) / 3.3058).toFixed(1); };
     pamPages.forEach(function(x){
       var ty = base && x.tys.indexOf(base) >= 0 ? base : (x.tys.filter(tyOk)[0] || x.tys[0] || '');

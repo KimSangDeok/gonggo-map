@@ -110,19 +110,54 @@ def download(seq, file_seq='1', brd='JI1901'):
 
 # 쪽 직접 지정(쪽 그림을 눈으로 확인한 것) — (단지, seq) → {'keep': [...]} 이면 그 쪽만, {'drop': [...]} 이면 그 쪽은 뺌.
 # 여러 단지 묶음 팸플릿은 '히트 + 다음 2쪽' 규칙 때문에 다음 단지 쪽이 끼거나, 머리말이 그림이라 단지를 못 가르는 경우가 있음
+# 'kind': {쪽: 'other'|'site'} 는 쪽 성격 고침(목차를 평면도로 잘못 고른 경우 등), 'tys': {쪽: [...]} 는 형 번호 고침
+# (쪽 글자 속 치수·계약면적 숫자를 형으로 잘못 읽은 경우 — 고쳐 두면 화면의 면적 필터가 8평 미만 형 평면도를 제대로 뺌)
+# 2026-10-28 화면에 뜨는 197장을 전부 열어 보고 정리
 PAGE_FIX = {
   ('마포더클래시', '249616'): {'drop': [19, 20]},           # 19·20쪽 = '2022 행복주택 1차 상봉태솔(상봉동 105-97)' 배치도·59형 (2026-10-28 확인)
-  ('공덕동 크로시티', '256854'): {'drop': [9]},             # 9쪽 = '2022 행복주택 2차 개포자이프레지던스(개포주공4)' 배치도·39형
-  ('강동리엔파크14단지', '217510'): {'drop': [22]},        # 22쪽 = '2020 행복주택 1차 신정동 행복주택' 배치도(총 101세대)
+  ('공덕동 크로시티', '256854'): {'drop': [9],              # 9쪽 = '2022 행복주택 2차 개포자이프레지던스(개포주공4)' 배치도·39형
+                                  'kind': {5: 'site'},      # 5쪽 = 단지배치도 + 17A 평면 → 배치도로
+                                  'tys': {6: ['17', '18']}},  # 6쪽 = 17AS·18A(17~18㎡대, 8평 미만)
+  ('강동리엔파크14단지', '217510'): {'drop': [22],         # 22쪽 = '2020 행복주택 1차 신정동 행복주택' 배치도(총 101세대)
+                                    'tys': {19: ['17']}},   # 19쪽 = 동호수배치도 + 17A(8평 미만) — 배치도는 18쪽에 있음
+  ('강동리엔파크11단지', '217510'): {'tys': {13: ['17'], 14: ['17']}},   # 13쪽 = 동호수배치도 + 17A, 14쪽 = 17B·17C (8평 미만)
+  ('신내3-4 도시형생활주택', '191854'): {'tys': {17: ['21']}},          # 17쪽 = 21A·21AS(21㎡대, 8평 미만)
   ('천왕연지마을1', '182670'): {'keep': [14, 15, 16, 17]},  # 천왕2지구 도시형(1) 32㎡A 32.31·32㎡B 32.64·35㎡A 35.21 — 10~13쪽 20㎡형(6.2평)은 8평 미만, 23~26쪽은 도시형(2)
   ('천왕연지마을2', '182670'): {'keep': [26]},             # 천왕2지구 도시형(2) 31㎡ 31.06 — 23~25쪽 19·22㎡형은 8평 미만, 10~17쪽은 도시형(1)
   ('마곡엠밸리 1~15단지', '170823'): {'drop': [17, 18, 19, 20]},  # 17~20쪽 = 신정4지구(신정숲속마을) 위치도·조감도·39A·39A-S
+  # 목차(CONTENTS)·'행복주택이란' 소개 쪽 — 목차에 '39형·26.78㎡' 같은 글자가 있어 평면도로 잘못 잡혔던 쪽
+  ('e편한세상 청계센트럴포레', '234861'): {'kind': {2: 'other'}},
+  ('목동센트럴아이파크위브', '216153'): {'kind': {2: 'other'}},
+  ('아크로타워스퀘어', '185053'): {'kind': {2: 'other'}},
+  ('래미안루센티아', '211674'): {'kind': {2: 'other'}},
+  ('북한산두산위브', '211671'): {'kind': {2: 'other'}},
+  ('왕십리자이', '261091'): {'kind': {2: 'other'}},
+  ('서울숲리버뷰자이', '261097'): {'kind': {2: 'other'}},
+  ('꿈의숲코오롱하늘채', '185054'): {'kind': {2: 'other'}},
+  ('꿈의숲아이파크', '221026'): {'kind': {2: 'other'}},
+  ('은뜨락', '256702'): {'kind': {3: 'other'},
+                         'tys': {7: ['39'], 8: ['39'], 9: ['39'], 10: ['39'], 11: ['44']}},   # 7~10쪽 39A·39A(주거약자)·39B·39B(주거약자), 11쪽 44
+  # 이든채(신정3 A6BL): 쪽마다 글자에 '39·26'이 같이 있어 전부 '39형'으로 붙던 것 — 쪽 그림의 형 이름대로
+  ('이든채', '256703'): {'kind': {3: 'other'},
+                         'tys': {7: ['26'], 8: ['26'], 9: ['31'], 10: ['39'], 11: ['39'], 12: ['39'], 13: ['39'], 14: ['44']}},   # 26A·26B·31·39A·39AS·39B·39BS·44
 }
 def _fix_ok(name, seq, n):
     f = PAGE_FIX.get((name, str(seq)))
     if not f: return True
     if 'keep' in f: return n in f['keep']
     return n not in f.get('drop', [])
+def _fix_page(name, seq, c):
+    """PAGE_FIX 의 kind·tys 고침을 후보 쪽(c: {i, kind, tys, meta})에 적용"""
+    f = PAGE_FIX.get((name, str(seq))) or {}
+    n = c['i'] + 1
+    if n in f.get('kind', {}): c['kind'] = f['kind'][n]
+    if n in f.get('tys', {}):
+        c['tys'] = list(f['tys'][n])
+        m = dict(c.get('meta') or {})   # 글자에서 뽑은 전용면적·형 이름도 고친 형 번호에 맞는 것만 남김(화면 필터가 이 값을 먼저 봄)
+        if 'ex' in m: m['ex'] = [v for v in m['ex'] if str(int(float(v))) in c['tys']]
+        if 'code' in m: m['code'] = [v for v in m['code'] if re.match(r'\d+', v).group(0) in c['tys']]
+        c['meta'] = {k: v for k, v in m.items() if v}
+    return c
 
 def _cnt(t, keys): return sum(t.count(k) for k in keys)
 TY_RE = re.compile(r'(?<!\d)(\d{2})(?:\.\d+)?\s*(?:㎡|m²|㎡형|형|타입|TYPE|Type|[A-D]\b)')
@@ -192,7 +227,10 @@ def pick_pages(pdf, kw, others=()):
         section = [i for i in range(start, end) if not (theirs[i] > mine[i])]
     cands = [{'i': i, 'kind': _kind(texts[i]), 'tys': _tys(texts[i]), 'meta': _meta(texts[i])} for i in section]
     for c in cands:   # 목차·공통 유의사항('평면도는 …' 문구 때문에 평면으로 잡히던 쪽)·표지: 형 숫자가 없고 앞 3쪽이거나 목차·유의사항 글자가 있으면 평면도 아님
-        if c['kind'] == 'plan' and not c['tys'] and (c['i'] < 3 or re.search(r'유의사항|목차|CONTENTS', texts[c['i']], re.I)): c['kind'] = 'other'
+        t = texts[c['i']]
+        if c['kind'] == 'plan' and not c['tys'] and (c['i'] < 3 or re.search(r'유의사항|목차|CONTENTS', t, re.I)): c['kind'] = 'other'
+        # 목차 쪽은 '평면도 39형·46형'·'26.78㎡' 처럼 형 숫자가 있어도 평면도가 아님 — 진짜 평면도 쪽엔 '(주거)전용면적 29.09㎡' 같은 글자가 있음
+        if c['kind'] == 'plan' and re.search(r'CONTENTS|목차', t, re.I) and not EX_RE.search(t): c['kind'] = 'other'
     plans = [c for c in cands if c['kind'] == 'plan']; sites = [c for c in cands if c['kind'] == 'site']; others = [c for c in cands if c['kind'] == 'other']
     plans.sort(key=lambda c: (0 if c['tys'] else 1, c['i']))
     # 데이터로는 구간 전체(조감도·교통망 포함)를 갖고 있고, 화면에는 plan/site 만 보여준다(kind 로 구분)
@@ -244,7 +282,7 @@ def main():
                 with pdfplumber.open(io.BytesIO(data)) as pdf:
                     others = [k2 for nm2, l2 in PAM.items() for s2, k2 in l2 if s2 == seq and k2 and k2 != kw]
                     sel, hits = pick_pages(pdf, kw, others)
-                    sel = [c for c in sel if _fix_ok(name, seq, c['i'] + 1)]
+                    sel = [_fix_page(name, seq, c) for c in sel if _fix_ok(name, seq, c['i'] + 1)]
                     pages = []
                     for c in sel:
                         i = c['i']; key = f'{seq}_p{i + 1}'
