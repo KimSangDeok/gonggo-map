@@ -1,0 +1,22 @@
+name: photo-audit
+# 점검용(수동): 사이트에 뜨는 SH 주택정보 사진을 단지별 모아보기 그림으로 만들어 아티팩트로 올림. 저장소에는 커밋 안 함
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.12' }
+      - run: sudo apt-get install -y -q fonts-noto-cjk > /dev/null
+      - run: pip install -q requests beautifulsoup4 pillow
+      - run: python tools/photo_audit.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: photo-audit
+          path: audit_out
+          retention-days: 3
