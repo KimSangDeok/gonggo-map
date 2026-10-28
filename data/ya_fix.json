@@ -1,0 +1,1052 @@
+{
+ "updated": "2026-10-28",
+ "source": "서울시 청년안심주택 단지정보 평면도 이미지를 사람이(Claude) 한 장씩 열어 확인한 값 — tools/ya_plan_ocr.py 글자 판독(OCR)이 틀리거나 못 읽은 것, 형 이름 숫자가 전용면적이 아닌 단지",
+ "how": {
+  "확인": "도면 표의 전용면적을 읽음",
+  "형": "도면에 면적 글자가 없어 형 번호(㎡대)만",
+  "셰어": "셰어형 — 표의 ㎡는 집 전체(내 몫은 방 하나)",
+  "복층": "복층·2층형",
+  "실내": "평면도 칸에 올라온 실내 사진"
+ },
+ "types": {
+  "대흥역 리마크빌 마포": {
+   "30": 25.35,
+   "40": 33.67,
+   "53": 45.09
+  },
+  "문정역 마에스트로": {
+   "16A": 16.42,
+   "20A1": 20.34,
+   "26B": 26.4,
+   "26D1": 26.19,
+   "29D": 29.15,
+   "30C4": 30.19,
+   "31C3": 31.18,
+   "33E": 33.18,
+   "34C1": 34.87,
+   "35C2": 35.46
+  },
+  "숭곡초교역(예정) 성북 펠릭스": {
+   "21": 16.46,
+   "26": 20.08,
+   "49": 38.39,
+   "56": 37.32,
+   "58": 39.13
+  },
+  "서울대벤처타운역 센터스퀘어 서울대점": {
+   "28형": 22.96,
+   "33형": 26.55,
+   "54형": 44.62
+  },
+  "노원역 해링턴플레이스 노원 센트럴": {
+   "26": 26.83
+  }
+ },
+ "plans": {
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=6d66ee9b60e6474b824c2361e4c3dacd&fileSn=7": {
+   "name": "강변역 비바힐스 강변",
+   "m2": [
+    31.77
+   ],
+   "label": "C",
+   "how": "확인",
+   "why": "C TYPE 표 주거전용 31.77㎡(공급 51.12 − 공용 19.35) — 판독 19.35는 공용면적"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=574ff167f8e943d8872c996cbcf652e2&fileSn=11": {
+   "name": "건대입구역 더포디엄 830",
+   "m2": [
+    20.17
+   ],
+   "label": "25A",
+   "how": "확인",
+   "why": "표 전용 20.17㎡(공급 33.77 − 공용 13.60)"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=574ff167f8e943d8872c996cbcf652e2&fileSn=12": {
+   "name": "건대입구역 더포디엄 830",
+   "m2": [
+    20.4
+   ],
+   "label": "25B",
+   "how": "확인",
+   "why": "표 전용 20.40㎡"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=574ff167f8e943d8872c996cbcf652e2&fileSn=13": {
+   "name": "건대입구역 더포디엄 830",
+   "m2": [
+    41.25
+   ],
+   "label": "52A",
+   "how": "확인",
+   "why": "표 전용 41.25㎡"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=574ff167f8e943d8872c996cbcf652e2&fileSn=14": {
+   "name": "건대입구역 더포디엄 830",
+   "m2": [
+    42.17
+   ],
+   "label": "52B",
+   "how": "확인",
+   "why": "표 전용 42.17㎡(공급 70.61 − 공용 28.44)"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=90714d90e2f140e381768190f139243d&fileSn=9": {
+   "name": "군자역 리마크빌 군자",
+   "m2": [
+    30.41
+   ],
+   "label": "30A",
+   "how": "확인",
+   "why": "표 주거전용 30.41㎡/9.20PY — 판독 30.413"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=f7ac2e54920148c7822a4a6d23b47b51&fileSn=4": {
+   "name": "남영역 용산 남영역 롯데캐슬 헤리티지",
+   "m2": [
+    23.98,
+    39.83,
+    39.83,
+    49.76
+   ],
+   "label": "23·39A·39B·49㎡",
+   "how": "확인",
+   "why": "UNIT PLAN 전용면적 23.9784·39.8291·39.8291·49.7596"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=926a7b6e2e8b4a2f9380541b5ecaa41c&fileSn=1": {
+   "name": "남영역 용산 원효 루미니",
+   "m2": [
+    15
+   ],
+   "label": "15A",
+   "how": "형",
+   "why": "도면 제목 15A(복층), 면적 글자 없음"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=926a7b6e2e8b4a2f9380541b5ecaa41c&fileSn=2": {
+   "name": "남영역 용산 원효 루미니",
+   "m2": [
+    15
+   ],
+   "label": "15B",
+   "how": "형",
+   "why": "도면 제목 15B(복층)"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=926a7b6e2e8b4a2f9380541b5ecaa41c&fileSn=3": {
+   "name": "남영역 용산 원효 루미니",
+   "m2": [
+    33
+   ],
+   "label": "33(셰어)",
+   "how": "셰어",
+   "why": "도면 제목 33(셰어)"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=926a7b6e2e8b4a2f9380541b5ecaa41c&fileSn=4": {
+   "name": "남영역 용산 원효 루미니",
+   "m2": [
+    33
+   ],
+   "label": "33",
+   "how": "형",
+   "why": "도면 제목 33"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=926a7b6e2e8b4a2f9380541b5ecaa41c&fileSn=5": {
+   "name": "남영역 용산 원효 루미니",
+   "m2": [
+    43
+   ],
+   "label": "43A",
+   "how": "형",
+   "why": "도면 제목 43A"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=926a7b6e2e8b4a2f9380541b5ecaa41c&fileSn=6": {
+   "name": "남영역 용산 원효 루미니",
+   "m2": [
+    43
+   ],
+   "label": "43B",
+   "how": "형",
+   "why": "도면 제목 43B"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=4ed6311ac1194a6cbe37ff21b81b1041&fileSn=5": {
+   "name": "노량진역 더써밋타워",
+   "m2": [
+    33.56,
+    34.72
+   ],
+   "label": "33.56A·34.72A",
+   "how": "확인",
+   "why": "한 장에 단층 33.56 A Type·34.72 A Type — 판독은 앞의 것만"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=4ed6311ac1194a6cbe37ff21b81b1041&fileSn=6": {
+   "name": "노량진역 더써밋타워",
+   "m2": [
+    32.61,
+    32.89,
+    34.46
+   ],
+   "label": "2층형 B",
+   "how": "복층",
+   "why": "2층형(복층) 32.61·32.89·34.46 B Type"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=4ed6311ac1194a6cbe37ff21b81b1041&fileSn=7": {
+   "name": "노량진역 더써밋타워",
+   "m2": [
+    34.98,
+    36.48,
+    42.02,
+    45.96
+   ],
+   "label": "2층형 B",
+   "how": "복층",
+   "why": "2층형(복층) 34.98·36.48·42.02·45.96 B Type"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=4ed6311ac1194a6cbe37ff21b81b1041&fileSn=8": {
+   "name": "노량진역 더써밋타워",
+   "m2": [
+    17.78,
+    18.08,
+    18.71
+   ],
+   "label": "최상층복층형 C",
+   "how": "복층",
+   "why": "최상층 복층형 17.78·18.08·18.71 C Type"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=4ed6311ac1194a6cbe37ff21b81b1041&fileSn=9": {
+   "name": "노량진역 더써밋타워",
+   "m2": [
+    18.84,
+    19.58,
+    22.22,
+    24.38
+   ],
+   "label": "최상층복층형 C",
+   "how": "복층",
+   "why": "최상층 복층형 18.84·19.58·22.22·24.38 C Type"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=325b58ac0eb340e396ccf246b01d53fe&fileSn=3": {
+   "name": "노원역 해링턴플레이스 노원 센트럴",
+   "m2": [
+    22.76
+   ],
+   "label": "청년형 22-B",
+   "how": "확인",
+   "why": "표 22-B TYPE 주거전용 22.76㎡ — 판독 49.55는 계약면적(8평 미만 원룸이 띠에 15평으로 뜨던 것)"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=325b58ac0eb340e396ccf246b01d53fe&fileSn=5": {
+   "name": "노원역 해링턴플레이스 노원 센트럴",
+   "m2": [
+    48
+   ],
+   "label": "신혼부부형 48",
+   "how": "형",
+   "why": "표 글자 판독 불가, 탭 이름 48타입"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=325b58ac0eb340e396ccf246b01d53fe&fileSn=9": {
+   "name": "노원역 해링턴플레이스 노원 센트럴",
+   "m2": [
+    51
+   ],
+   "label": "신혼부부형 51",
+   "how": "형",
+   "why": "탭 이름 51타입"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=2b1adad7140b45098651ac3ed93e2bee&fileSn=3": {
+   "name": "대흥역 리마크빌 마포",
+   "m2": [
+    25.35
+   ],
+   "label": "30형",
+   "how": "확인",
+   "why": "전용면적 25.35㎡(판독 30.04는 실사용면적 = 전용+서비스) — 8평 미만"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=2b1adad7140b45098651ac3ed93e2bee&fileSn=4": {
+   "name": "대흥역 리마크빌 마포",
+   "m2": [
+    33.67
+   ],
+   "label": "40형",
+   "how": "확인",
+   "why": "전용면적 33.67㎡(실사용 40.16)"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=2b1adad7140b45098651ac3ed93e2bee&fileSn=5": {
+   "name": "대흥역 리마크빌 마포",
+   "m2": [
+    45.09
+   ],
+   "label": "53형",
+   "how": "확인",
+   "why": "전용면적 45.09㎡(실사용 53.89)"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=d608d0950c2b4172b7bd13bad9fbb56b&fileSn=13": {
+   "name": "동묘앞역 청계로벤하임",
+   "m2": [
+    20.11,
+    20.32,
+    20.25
+   ],
+   "label": "20·20A·20B",
+   "how": "확인",
+   "why": "표 주거전용 20.11·20.32·20.25"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=9281e51682e54f38a7aceb5763a8e82d&fileSn=12": {
+   "name": "등촌역 센터스퀘어 등촌",
+   "m2": [
+    22,
+    31,
+    49,
+    49,
+    59
+   ],
+   "label": "22·31·49투룸·49·59형",
+   "how": "형",
+   "why": "주거타입 소개 — 형마다 \"실 주거면적\"만 적힘(22.32·31.62·49.2·59.42), 전용 표기 없음"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=3dc0afa680a4458e8f77de172f3b51c2&fileSn=6": {
+   "name": "등촌역 아르체움 등촌 청년주택",
+   "m2": [
+    20.12
+   ],
+   "label": "20D",
+   "how": "확인",
+   "why": "표 주거전용 20.12㎡(판독 20.127)"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=3dc0afa680a4458e8f77de172f3b51c2&fileSn=8": {
+   "name": "등촌역 아르체움 등촌 청년주택",
+   "m2": [
+    25.03
+   ],
+   "label": "25",
+   "how": "확인",
+   "why": "표 주거전용 25.03㎡(= 계약 50.07 − 공용 15.29 − 기타 9.75)"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=3dc0afa680a4458e8f77de172f3b51c2&fileSn=9": {
+   "name": "등촌역 아르체움 등촌 청년주택",
+   "m2": [
+    40.51
+   ],
+   "label": "40",
+   "how": "확인",
+   "why": "표 주거전용 40.51㎡(판독 24.74는 주거공용; 40.51+24.74+15.78 = 계약 81.03) — 8평 이상인데 접혀 있던 것"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=920c57725cbe4855b5722e87f81cbab3&fileSn=4": {
+   "name": "문정역 마에스트로",
+   "m2": [
+    16.42
+   ],
+   "label": "16A",
+   "how": "확인",
+   "why": "전용 16.42(판독 21.37은 실사용)"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=920c57725cbe4855b5722e87f81cbab3&fileSn=5": {
+   "name": "문정역 마에스트로",
+   "m2": [
+    20.34
+   ],
+   "label": "20A1",
+   "how": "확인",
+   "why": "전용 20.34(실사용 25.29)"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=920c57725cbe4855b5722e87f81cbab3&fileSn=6": {
+   "name": "문정역 마에스트로",
+   "m2": [
+    26.4
+   ],
+   "label": "26B",
+   "how": "확인",
+   "why": "전용 26.40㎡ = 7.99평 — 8평 미만인데 실사용 31.30으로 띠에 뜨던 것"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=920c57725cbe4855b5722e87f81cbab3&fileSn=7": {
+   "name": "문정역 마에스트로",
+   "m2": [
+    26.19
+   ],
+   "label": "26D1",
+   "how": "확인",
+   "why": "전용 26.19㎡ = 7.9평 — 8평 미만인데 실사용 42.01로 띠에 뜨던 것"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=920c57725cbe4855b5722e87f81cbab3&fileSn=8": {
+   "name": "문정역 마에스트로",
+   "m2": [
+    29.15
+   ],
+   "label": "29D",
+   "how": "확인",
+   "why": "전용 29.15(실사용 45.87)"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=920c57725cbe4855b5722e87f81cbab3&fileSn=9": {
+   "name": "문정역 마에스트로",
+   "m2": [
+    30.19
+   ],
+   "label": "30C4",
+   "how": "확인",
+   "why": "전용 30.19(실사용 40.09)"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=920c57725cbe4855b5722e87f81cbab3&fileSn=10": {
+   "name": "문정역 마에스트로",
+   "m2": [
+    31.18
+   ],
+   "label": "31C3",
+   "how": "확인",
+   "why": "전용 31.18(실사용 41.08)"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=920c57725cbe4855b5722e87f81cbab3&fileSn=11": {
+   "name": "문정역 마에스트로",
+   "m2": [
+    33.18
+   ],
+   "label": "33E",
+   "how": "확인",
+   "why": "전용 33.18(실사용 47.86)"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=920c57725cbe4855b5722e87f81cbab3&fileSn=12": {
+   "name": "문정역 마에스트로",
+   "m2": [
+    34.87
+   ],
+   "label": "34C1",
+   "how": "확인",
+   "why": "전용 34.87(실사용 44.77)"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=920c57725cbe4855b5722e87f81cbab3&fileSn=13": {
+   "name": "문정역 마에스트로",
+   "m2": [
+    35.46
+   ],
+   "label": "35C2",
+   "how": "확인",
+   "why": "전용 35.46(실사용 45.92)"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=944761af0f044c54a682d11b08859f4e&fileSn=3": {
+   "name": "발산역 센터스퀘어 발산",
+   "m2": [
+    19.96
+   ],
+   "label": "A",
+   "how": "확인",
+   "why": "19.96㎡(A타입) — 탭 줄의 다른 형 면적이 섞여 띠에 뜨던 것(8평 미만)"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=944761af0f044c54a682d11b08859f4e&fileSn=4": {
+   "name": "발산역 센터스퀘어 발산",
+   "m2": [
+    22.16
+   ],
+   "label": "B",
+   "how": "확인",
+   "why": "22.16㎡(B타입) — 같은 이유로 띠에 뜨던 것(8평 미만)"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=944761af0f044c54a682d11b08859f4e&fileSn=7": {
+   "name": "발산역 센터스퀘어 발산",
+   "m2": [
+    41.02
+   ],
+   "label": "C-1",
+   "how": "확인",
+   "why": "41.02㎡(C-1타입) — 판독 12.4는 평(PY) 값, 8평 이상인데 접혀 있던 것"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=dab03b7f6cf14fd9af259a623a91f6d4&fileSn=5": {
+   "name": "발산역 엘크루",
+   "m2": [
+    15.33,
+    15.33,
+    15.93,
+    30.79,
+    30.86
+   ],
+   "label": "A·B·C·D·E 타입",
+   "how": "확인",
+   "why": "긴 소개 그림 — D 타입 전용 30.79·E 타입 30.86(확장 후 38.868·39.718); 판독은 A의 15.33만 잡아 접혀 있던 것"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=6d4122b0a0fc4913be49a1665de8b68d&fileSn=15": {
+   "name": "삼각지역 용산 베르디움 프렌즈",
+   "m2": [
+    39.8
+   ],
+   "label": "39B 청년2인셰어",
+   "how": "셰어",
+   "why": "평면정보 \"39B 청년2인셰어\" 주거전용 39.80 — 집 전체 면적, 내 몫은 방 하나"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=6d4122b0a0fc4913be49a1665de8b68d&fileSn=18": {
+   "name": "삼각지역 용산 베르디움 프렌즈",
+   "m2": [
+    48.9
+   ],
+   "label": "48 청년3인셰어",
+   "how": "셰어",
+   "why": "평면정보 \"48 청년3인셰어\" 주거전용 48.90 — 집 전체 면적"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=01dccb9cec424549b0f6b671b3e69887&fileSn=4": {
+   "name": "상봉역 상봉동양엔파트",
+   "m2": [
+    18.03
+   ],
+   "label": "18㎡A",
+   "how": "확인",
+   "why": "주거전용 18.0282㎡"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=01dccb9cec424549b0f6b671b3e69887&fileSn=5": {
+   "name": "상봉역 상봉동양엔파트",
+   "m2": [
+    18.21
+   ],
+   "label": "18㎡B",
+   "how": "확인",
+   "why": "주거전용 18.2127㎡"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=01dccb9cec424549b0f6b671b3e69887&fileSn=6": {
+   "name": "상봉역 상봉동양엔파트",
+   "m2": [
+    18.22
+   ],
+   "label": "18㎡C",
+   "how": "확인",
+   "why": "주거전용 18.2202㎡"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=01dccb9cec424549b0f6b671b3e69887&fileSn=7": {
+   "name": "상봉역 상봉동양엔파트",
+   "m2": [
+    38.12
+   ],
+   "label": "38㎡A",
+   "how": "확인",
+   "why": "주거전용 38.1225㎡ — 8평 이상인데 접혀 있던 것"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=01dccb9cec424549b0f6b671b3e69887&fileSn=8": {
+   "name": "상봉역 상봉동양엔파트",
+   "m2": [
+    38.09
+   ],
+   "label": "38㎡B",
+   "how": "확인",
+   "why": "주거전용 38.0896㎡ — 〃"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=01dccb9cec424549b0f6b671b3e69887&fileSn=9": {
+   "name": "상봉역 상봉동양엔파트",
+   "m2": [
+    38.06
+   ],
+   "label": "38㎡C",
+   "how": "확인",
+   "why": "주거전용 38.0557㎡ — 〃"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=01dccb9cec424549b0f6b671b3e69887&fileSn=10": {
+   "name": "상봉역 상봉동양엔파트",
+   "m2": [
+    38.09
+   ],
+   "label": "38㎡D",
+   "how": "확인",
+   "why": "주거전용 38.0902㎡ — 〃"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=1c91030026d74a9a8bbf703e9f87c72b&fileSn=38": {
+   "name": "서울대입구역 BX201",
+   "m2": [
+    15
+   ],
+   "label": "15형",
+   "how": "형",
+   "why": "도면 제목 15형, 면적 글자 없음"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=1c91030026d74a9a8bbf703e9f87c72b&fileSn=39": {
+   "name": "서울대입구역 BX201",
+   "m2": [
+    30
+   ],
+   "label": "30형",
+   "how": "형",
+   "why": "도면 제목 30형"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=584ec05014cd47b881388dfc3fe6bed9&fileSn=15": {
+   "name": "서울역 어반허브 서울스테이션",
+   "m2": [
+    20
+   ],
+   "label": "20형",
+   "how": "형",
+   "why": "도면 제목 20형"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=584ec05014cd47b881388dfc3fe6bed9&fileSn=16": {
+   "name": "서울역 어반허브 서울스테이션",
+   "m2": [
+    24
+   ],
+   "label": "24A형",
+   "how": "형",
+   "why": "도면 제목 24A형"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=584ec05014cd47b881388dfc3fe6bed9&fileSn=17": {
+   "name": "서울역 어반허브 서울스테이션",
+   "m2": [
+    24
+   ],
+   "label": "24B형",
+   "how": "형",
+   "why": "도면 제목 24B형"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=584ec05014cd47b881388dfc3fe6bed9&fileSn=18": {
+   "name": "서울역 어반허브 서울스테이션",
+   "m2": [
+    24
+   ],
+   "label": "24C형",
+   "how": "형",
+   "why": "도면 제목 24C형"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=584ec05014cd47b881388dfc3fe6bed9&fileSn=19": {
+   "name": "서울역 어반허브 서울스테이션",
+   "m2": [
+    25
+   ],
+   "label": "25형",
+   "how": "형",
+   "why": "도면 제목 25형"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=584ec05014cd47b881388dfc3fe6bed9&fileSn=20": {
+   "name": "서울역 어반허브 서울스테이션",
+   "m2": [
+    26
+   ],
+   "label": "26A형",
+   "how": "형",
+   "why": "도면 제목 26A형(26㎡대 — 8평 경계)"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=584ec05014cd47b881388dfc3fe6bed9&fileSn=21": {
+   "name": "서울역 어반허브 서울스테이션",
+   "m2": [
+    27
+   ],
+   "label": "27형",
+   "how": "형",
+   "why": "도면 제목 27형"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=584ec05014cd47b881388dfc3fe6bed9&fileSn=22": {
+   "name": "서울역 어반허브 서울스테이션",
+   "m2": [
+    35
+   ],
+   "label": "35형",
+   "how": "형",
+   "why": "도면 제목 35형"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=7747fd7f0f594048b33df60ce5a4ea5f&fileSn=9": {
+   "name": "솔밭공원역 에드가쌍문",
+   "m2": [
+    20.4
+   ],
+   "label": "20 Type",
+   "how": "확인",
+   "why": "전용 20.3968㎡"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=7747fd7f0f594048b33df60ce5a4ea5f&fileSn=10": {
+   "name": "솔밭공원역 에드가쌍문",
+   "m2": [
+    21.19
+   ],
+   "label": "21 Type",
+   "how": "확인",
+   "why": "전용 21.1866㎡"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=7747fd7f0f594048b33df60ce5a4ea5f&fileSn=11": {
+   "name": "솔밭공원역 에드가쌍문",
+   "m2": [
+    22.47
+   ],
+   "label": "22 Type",
+   "how": "확인",
+   "why": "전용 22.4666㎡"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=7747fd7f0f594048b33df60ce5a4ea5f&fileSn=12": {
+   "name": "솔밭공원역 에드가쌍문",
+   "m2": [
+    23.19
+   ],
+   "label": "23A Type",
+   "how": "확인",
+   "why": "전용 23.1866㎡"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=7747fd7f0f594048b33df60ce5a4ea5f&fileSn=13": {
+   "name": "솔밭공원역 에드가쌍문",
+   "m2": [
+    23.19
+   ],
+   "label": "23B Type",
+   "how": "확인",
+   "why": "전용 23.1866㎡"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=7747fd7f0f594048b33df60ce5a4ea5f&fileSn=14": {
+   "name": "솔밭공원역 에드가쌍문",
+   "m2": [
+    30.03
+   ],
+   "label": "30A Type",
+   "how": "확인",
+   "why": "전용 30.0311㎡ — 8평 이상인데 접혀 있던 것"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=7747fd7f0f594048b33df60ce5a4ea5f&fileSn=15": {
+   "name": "솔밭공원역 에드가쌍문",
+   "m2": [
+    30.03
+   ],
+   "label": "30B Type",
+   "how": "확인",
+   "why": "전용 30.0311㎡ — 〃"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=026959a4cebf4445808dae680de47353&fileSn=3": {
+   "name": "숭곡초교역(예정) 성북 펠릭스",
+   "m2": [
+    16.46
+   ],
+   "label": "21 TYPE",
+   "how": "확인",
+   "why": "전용 16.46㎡"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=026959a4cebf4445808dae680de47353&fileSn=4": {
+   "name": "숭곡초교역(예정) 성북 펠릭스",
+   "m2": [
+    20.08
+   ],
+   "label": "26 TYPE",
+   "how": "확인",
+   "why": "전용 20.08㎡ = 6.1평 — 형 이름 26이지만 8평 미만"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=026959a4cebf4445808dae680de47353&fileSn=5": {
+   "name": "숭곡초교역(예정) 성북 펠릭스",
+   "m2": [
+    38.39
+   ],
+   "label": "49 TYPE",
+   "how": "확인",
+   "why": "전용 38.39㎡"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=026959a4cebf4445808dae680de47353&fileSn=6": {
+   "name": "숭곡초교역(예정) 성북 펠릭스",
+   "m2": [
+    37.32
+   ],
+   "label": "56 TYPE",
+   "how": "확인",
+   "why": "전용 37.32㎡"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=026959a4cebf4445808dae680de47353&fileSn=7": {
+   "name": "숭곡초교역(예정) 성북 펠릭스",
+   "m2": [
+    39.13
+   ],
+   "label": "58 TYPE",
+   "how": "확인",
+   "why": "전용 39.13㎡ — 판독 21.33은 공용면적(12평이 8평 미만으로 접혀 있던 것)"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=63bbf5888a4245dcb58d6c9be60d93e1&fileSn=9": {
+   "name": "신논현역 리스트 강남",
+   "m2": [
+    14
+   ],
+   "label": "14-A",
+   "how": "형",
+   "why": "형 이름만"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=63bbf5888a4245dcb58d6c9be60d93e1&fileSn=10": {
+   "name": "신논현역 리스트 강남",
+   "m2": [
+    14
+   ],
+   "label": "14-A-B",
+   "how": "형",
+   "why": "형 이름만"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=63bbf5888a4245dcb58d6c9be60d93e1&fileSn=11": {
+   "name": "신논현역 리스트 강남",
+   "m2": [
+    14
+   ],
+   "label": "14-C",
+   "how": "형",
+   "why": "형 이름만"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=63bbf5888a4245dcb58d6c9be60d93e1&fileSn=12": {
+   "name": "신논현역 리스트 강남",
+   "m2": [
+    41
+   ],
+   "label": "41-A",
+   "how": "형",
+   "why": "3룸"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=63bbf5888a4245dcb58d6c9be60d93e1&fileSn=13": {
+   "name": "신논현역 리스트 강남",
+   "m2": [
+    42
+   ],
+   "label": "42-A",
+   "how": "형",
+   "why": "3룸"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=63bbf5888a4245dcb58d6c9be60d93e1&fileSn=14": {
+   "name": "신논현역 리스트 강남",
+   "m2": [
+    42
+   ],
+   "label": "42-B",
+   "how": "형",
+   "why": "3룸"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=63bbf5888a4245dcb58d6c9be60d93e1&fileSn=15": {
+   "name": "신논현역 리스트 강남",
+   "m2": [
+    45
+   ],
+   "label": "45-A",
+   "how": "형",
+   "why": "3룸"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=63bbf5888a4245dcb58d6c9be60d93e1&fileSn=16": {
+   "name": "신논현역 리스트 강남",
+   "m2": [
+    45
+   ],
+   "label": "45-B",
+   "how": "형",
+   "why": "3룸"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=63bbf5888a4245dcb58d6c9be60d93e1&fileSn=17": {
+   "name": "신논현역 리스트 강남",
+   "m2": [
+    49
+   ],
+   "label": "49-A",
+   "how": "형",
+   "why": "4룸"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=63bbf5888a4245dcb58d6c9be60d93e1&fileSn=18": {
+   "name": "신논현역 리스트 강남",
+   "m2": [
+    49
+   ],
+   "label": "49-B",
+   "how": "형",
+   "why": "3룸"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=a127e3c0636b4470a20d47e37f7c76eb&fileSn=8": {
+   "name": "신대방삼거리역 골드타워",
+   "m2": [
+    36.0
+   ],
+   "label": "2인 쉐어 E 40 TYPE",
+   "how": "셰어",
+   "why": "\"2인 쉐어 E 40 TYPE\" 전용 36.001 — 집 전체 면적"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=22c45710620542fd934bbc9b8c7bca9c&fileSn=3": {
+   "name": "아차산역 백악관타워",
+   "m2": [
+    18.07
+   ],
+   "label": "18A",
+   "how": "확인",
+   "why": "주거전용 18.0651"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=22c45710620542fd934bbc9b8c7bca9c&fileSn=4": {
+   "name": "아차산역 백악관타워",
+   "m2": [
+    18.93
+   ],
+   "label": "18B",
+   "how": "확인",
+   "why": "주거전용 18.9270"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=22c45710620542fd934bbc9b8c7bca9c&fileSn=5": {
+   "name": "아차산역 백악관타워",
+   "m2": [
+    19.15
+   ],
+   "label": "19",
+   "how": "확인",
+   "why": "주거전용 19.1456"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=22c45710620542fd934bbc9b8c7bca9c&fileSn=6": {
+   "name": "아차산역 백악관타워",
+   "m2": [
+    23.42
+   ],
+   "label": "23A",
+   "how": "확인",
+   "why": "주거전용 23.4206"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=22c45710620542fd934bbc9b8c7bca9c&fileSn=7": {
+   "name": "아차산역 백악관타워",
+   "m2": [
+    23.65
+   ],
+   "label": "23B",
+   "how": "확인",
+   "why": "주거전용 23.6526"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=22c45710620542fd934bbc9b8c7bca9c&fileSn=8": {
+   "name": "아차산역 백악관타워",
+   "m2": [
+    33.59
+   ],
+   "label": "33A",
+   "how": "확인",
+   "why": "주거전용 33.5879 — 8평 이상인데 접혀 있던 것"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=22c45710620542fd934bbc9b8c7bca9c&fileSn=9": {
+   "name": "아차산역 백악관타워",
+   "m2": [
+    33.97
+   ],
+   "label": "33B",
+   "how": "확인",
+   "why": "주거전용 33.9739 — 〃"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=22c45710620542fd934bbc9b8c7bca9c&fileSn=10": {
+   "name": "아차산역 백악관타워",
+   "m2": [
+    44.86
+   ],
+   "label": "44",
+   "how": "확인",
+   "why": "주거전용 44.8597"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=137ff6c16185412b856b248cf08b2b25&fileSn=3": {
+   "name": "연신내역 루미노 816",
+   "m2": [
+    17.65,
+    17.54,
+    17.02
+   ],
+   "label": "청년 A·E·D",
+   "how": "확인",
+   "why": "\"평면도(청년)\" 17.65(A)·17.54(E)·17.02(D)"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=137ff6c16185412b856b248cf08b2b25&fileSn=4": {
+   "name": "연신내역 루미노 816",
+   "m2": [
+    35.84,
+    35.14
+   ],
+   "label": "신혼 B·C",
+   "how": "확인",
+   "why": "\"평면도(신혼)\" 35.84(B)·35.14(C) — 8평 이상인데 접혀 있던 것"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=137ff6c16185412b856b248cf08b2b25&fileSn=5": {
+   "name": "연신내역 루미노 816",
+   "m2": [
+    36.39,
+    39.03
+   ],
+   "label": "신혼 G·H",
+   "how": "확인",
+   "why": "\"평면도(신혼)\" 36.39(G)·39.03(H) — 〃"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=560e43d864c145f78cd6c6a394bd0835&fileSn=7": {
+   "name": "종암경찰서역 라온프라이빗 종암",
+   "m2": [
+    21,
+    23,
+    23,
+    29,
+    36,
+    45
+   ],
+   "label": "21·23A·23B·29·36·45형",
+   "how": "형",
+   "why": "주거타입 소개 — \"실 주거면적\" 27.14·30.13·30.77·37.46·46.83·58.01(전용+발코니), 전용 표기 없음"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=80a8b79268094f6d88a95d81a3376973&fileSn=3": {
+   "name": "증산역 이랜드 PEER DMC",
+   "m2": [
+    20.5,
+    46.37,
+    59.9
+   ],
+   "label": "20·46·59타입",
+   "how": "확인",
+   "why": "한 장에 20타입 전용 20.50·46타입 46.37·59타입 59.90 — 판독 31.61은 20타입 공급면적"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=80a8b79268094f6d88a95d81a3376973&fileSn=4": {
+   "name": "증산역 이랜드 PEER DMC",
+   "m2": [
+    20
+   ],
+   "label": "20타입",
+   "how": "형",
+   "why": "원룸 그림, 글자 없음(위 한 장 그림과 모양 대조)"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=80a8b79268094f6d88a95d81a3376973&fileSn=5": {
+   "name": "증산역 이랜드 PEER DMC",
+   "m2": [
+    46
+   ],
+   "label": "46타입",
+   "how": "형",
+   "why": "방 2 그림, 글자 없음(모양 대조)"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=80a8b79268094f6d88a95d81a3376973&fileSn=6": {
+   "name": "증산역 이랜드 PEER DMC",
+   "m2": [
+    59
+   ],
+   "label": "59타입",
+   "how": "형",
+   "why": "방 3 그림, 글자 없음(모양 대조)"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=f0e08a041a944fc0bf2e0908723ca320&fileSn=17": {
+   "name": "충정로역 어바니엘 위드 더 스타일 충정로",
+   "m2": [],
+   "label": "실내 사진 A-3(17㎡)·B-1(21㎡)·C-4",
+   "how": "실내",
+   "why": "평면도 칸에 올라온 실내 사진 묶음"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=f0e08a041a944fc0bf2e0908723ca320&fileSn=27": {
+   "name": "충정로역 어바니엘 위드 더 스타일 충정로",
+   "m2": [
+    15,
+    16,
+    21,
+    26,
+    35,
+    36,
+    39
+   ],
+   "label": "A·B·C TYPE 타입정보",
+   "how": "형",
+   "why": "운영사 누리집 화면 — 형 이름(15·16·21·26㎡ …)과 \"전용면적(확장)\" 평만 적힘"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=356f0ab9e20e42f88b4c06e1c18e46ad&fileSn=4": {
+   "name": "태릉입구역 와이엔타워",
+   "m2": [
+    16.3,
+    30.33,
+    35.66
+   ],
+   "label": "16.3·30.33·35.66",
+   "how": "확인",
+   "why": "\"평면도 및 임대료\" 표 주거전용 16.30·30.33·35.66 — 판독 26.11은 다른 숫자"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=049330c9a9c34446ac8562009866cfea&fileSn=12": {
+   "name": "화곡역 보눔하우스 화곡",
+   "m2": [
+    14.93,
+    18.18,
+    22.89,
+    28.45,
+    28.85,
+    28.88,
+    29.51,
+    30.01
+   ],
+   "label": "원룸형 8개 타입",
+   "how": "확인",
+   "why": "타입별 전용면적(형 이름과 같음)"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=049330c9a9c34446ac8562009866cfea&fileSn=13": {
+   "name": "화곡역 보눔하우스 화곡",
+   "m2": [
+    14.35,
+    16.9,
+    18.18,
+    28.45
+   ],
+   "label": "원룸형 복층 14.35A·16.90A·18.18A·28.45A",
+   "how": "복층",
+   "why": "복층형 묶음 — 판독은 16.9만 잡음"
+  }
+ }
+}

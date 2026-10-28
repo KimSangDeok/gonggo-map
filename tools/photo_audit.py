@@ -68,7 +68,7 @@ for key in sorted(fact):
 import importlib.util
 _spec = importlib.util.spec_from_file_location('nn', os.path.join(ROOT, 'tools', 'notify_new.py'))
 nn = importlib.util.module_from_spec(_spec); _spec.loader.exec_module(nn)
-ya = json.load(open(os.path.join(ROOT, 'data', 'ya.json'), encoding='utf-8'))
+ya = nn.apply_ya_fix(json.load(open(os.path.join(ROOT, 'data', 'ya.json'), encoding='utf-8')))   # 형 이름 ≠ 전용면적 고침 반영
 ocr = json.load(open(os.path.join(ROOT, 'data', 'ya_plans.json'), encoding='utf-8')).get('items', {})
 FLOOR = 26.45
 for c in sorted(ya.get('complexes', []), key=lambda c: c.get('name', '')):

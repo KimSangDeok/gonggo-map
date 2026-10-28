@@ -61,6 +61,19 @@ def ya_split(c):
             f = fit_area(r.get('ty'))
             if f in (1, 2): ok.append((r, f))
     return ok, anyrow
+def apply_ya_fix(ya, fix=None):
+    """data/ya_fix.json 의 types(형 이름 숫자 ≠ 전용면적인 단지 — 서울시 단지정보 평면도에서 사람이 읽은 전용면적)를 형 이름 뒤에 붙임.
+    '30' → '30 25.35' 처럼 붙이면 ty_exact 가 전용면적으로 판정(지도 JS yaApplyFix 와 같은 규칙). 원본 파일은 안 바꿈(메모리에서만)"""
+    if fix is None: fix = load(D('ya_fix.json'), {})
+    types = (fix or {}).get('types') or {}
+    for c in (ya or {}).get('complexes') or []:
+        t = types.get(c.get('name'))
+        if not t: continue
+        for g in ('special', 'general'):
+            for r in ((c.get('rows') or {}).get(g) or []):
+                k = str(r.get('ty') or '').strip()
+                if k in t and not ty_exact(k): r['ty'] = f"{k} {float(t[k]):.2f}"
+    return ya
 def ya_key(name): return re.sub(r'청년안심주택|청년주택', '', re.sub(r'\s+', '', name or ''))
 def ya_fit(n, comps):
     """('8평 이상' | '경계' | '원룸뿐' | '판정 불가', 설명)"""
@@ -115,7 +128,7 @@ def collect():
         send = not re.search(r'정정', title) and youth_ok(title) and (it.get('type') or '') != '영구임대'
         out.append({'key': 'lh:' + str(it['panId']), 'src': 'LH 서울 ' + (it.get('type') or ''), 'title': title, 'url': it.get('url') or 'https://apply.lh.or.kr/lhapply/apply/wt/wrtanc/selectWrtancList.do?mi=1026',
                     'posted': it.get('posted') or '', 'apply': ('~' + it['deadline']) if it.get('deadline') else '', 'fit': '', 'why': '', 'send': send, 'prio': 4})
-    ya = load(D('ya.json'), {})
+    ya = apply_ya_fix(load(D('ya.json'), {}))   # 형 이름 ≠ 전용면적인 단지는 평면도의 전용면적으로
     comps = ya.get('complexes') or []
     for n in ya.get('notices') or []:
         if not n.get('id'): continue

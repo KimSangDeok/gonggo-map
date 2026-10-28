@@ -1727,24 +1727,42 @@ function yaHtml(p){
   // 사진: 서울시 단지정보 상세 페이지 이미지(대표 · 평면도). 투시도(조감도)는 데이터로만
   var ph = (c.photos || []).slice(), persp = ph.filter(function(x){ return x.k === 'persp'; }).length, mains = ph.filter(function(x){ return x.k === 'main'; }), plans = ph.filter(function(x){ return x.k === 'plan'; });
   if (!ph.length && c.img) mains = [{ u: c.img, t: '대표 사진', k: 'main' }];
-  var OCR = (window.YA_PLANS && window.YA_PLANS.items) || {}, nPh = 0;
-  var pOk = [], pSmall = [], pUnk = [];
-  plans.forEach(function(x){ var o = OCR[x.u], ms = o && o.m2 ? o.m2.filter(function(m){ return m >= 10 && m <= 120; }).map(function(m){ return Math.round(m * 100) / 100; }).filter(function(v, i, a){ return a.indexOf(v) === i; }) : [];
+  var OCR = (window.YA_PLANS && window.YA_PLANS.items) || {}, FX = (window.YA_FIX && window.YA_FIX.plans) || {}, nPh = 0;
+  var pOk = [], pSmall = [], pUnk = [], pShare = [], pDup = [], rooms = [];
+  var m2s = function(ms){ return ms.map(function(m){ return m + '㎡(' + py(m) + ')'; }).join('·'); };
+  // 평면도마다 전용면적: 사람이 확인한 값(data/ya_fix.json) → 없으면 글자 판독(data/ya_plans.json)
+  plans.forEach(function(x){
+    var fo = FX[x.u], lab0 = fo && fo.label ? fo.label + ' ' : '';
+    if (fo && fo.how === '실내') { x.lab = fo.label || '실내 사진'; x.k = 'room'; return rooms.push(x); }
+    var ms = fo ? (fo.m2 || []).slice() : (OCR[x.u] && OCR[x.u].m2 ? OCR[x.u].m2.filter(function(m){ return m >= 10 && m <= 120; }).map(function(m){ return Math.round(m * 100) / 100; }).filter(function(v, i, a){ return a.indexOf(v) === i; }) : []);
     if (!ms.length) return pUnk.push(x);
-    var good = ms.filter(inSel); if (good.length) { x.lab = '평면도 ' + good.map(function(m){ return m + '㎡(' + py(m) + ')'; }).join('·'); pOk.push(x); } else { x.lab = '평면도 ' + ms.map(function(m){ return m + '㎡(' + py(m) + ')'; }).join('·'); pSmall.push(x); } });
+    if (fo && fo.how === '셰어') { x.lab = '셰어형 ' + lab0 + '집 전체 ' + m2s(ms); return pShare.push(x); }
+    if (fo && fo.how === '복층' && NO_DUP) { x.lab = '복층 ' + lab0 + m2s(ms); return pDup.push(x); }
+    if (fo && fo.how === '형') {   // 도면에 면적 글자가 없어 형 번호(정수 ㎡대)만 — 기준선이 그 ㎡대 안을 지나면 '경계'
+      var fr = ms.map(function(n){ return fitRange(n, n + 1); }), tag = ms.filter(function(v, i, a){ return a.indexOf(v) === i; }).map(function(n){ return n + '㎡대'; }).join('·') + ', 도면에 면적 글자 없음';
+      x.lab = '평면도 ' + lab0 + '(' + tag + ')';
+      if (fr.indexOf(1) >= 0) return pOk.push(x);
+      if (fr.indexOf(2) >= 0) { x.lab += ' — 8평 경계'; return pOk.push(x); }
+      return pSmall.push(x);
+    }
+    var good = ms.filter(inSel); if (good.length) { x.lab = '평면도 ' + lab0 + m2s(good); pOk.push(x); } else { x.lab = '평면도 ' + lab0 + m2s(ms); pSmall.push(x); } });
   var tile = function(x, lab){ return '<a href="' + x.u + '" target="_blank" rel="noopener" class="' + (x.k === 'plan' ? 'pl' : '') + '" title="' + lab + '"><img src="' + x.u + '" alt="' + lab + '" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentNode.style.display=\'none\'"><span>' + lab + '</span></a>'; };
   var mainLab = function(x){ return /실제\s*전경/.test(x.t || '') ? '실제 전경' : (/상세소개/.test(x.t || '') ? '단지 소개' : '사진 ' + (++nPh)); };
-  var strip = mains.map(function(x){ return tile(x, mainLab(x)); }).concat(pOk.map(function(x){ return tile(x, x.lab); }));
+  var strip = mains.map(function(x){ return tile(x, mainLab(x)); }).concat(rooms.map(function(x){ return tile(x, x.lab); })).concat(pOk.map(function(x){ return tile(x, x.lab); }));
   var folded = function(arr, title, why){ if (!arr.length) return ''; var n = 0; return '<details class="iw-out"><summary>' + title + ' ' + arr.length + '장 <small class="k">— ' + why + '</small></summary><div class="iw-strip" data-lb="1">' + arr.map(function(x){ return tile(x, x.lab || ('평면도 ' + (++n))); }).join('') + '</div></details>'; };
-  body += (strip.length || plans.length) ? '<div class="iw-sec"><div class="iw-sh">사진 <small class="k">서울시 단지정보 · 단지 사진 ' + mains.length + '장 · 평면도 ' + plans.length + '장 중 ' + selLabel() + ' 형 ' + pOk.length + '장(도면 글자를 판독한 전용면적 기준' + (window.YA_PLANS ? ', ' + window.YA_PLANS.updated.slice(0, 10) : '') + ')' + (persp ? ' · 투시도(조감도) ' + persp + '장은 데이터로만' : '') + '</small></div>' +
+  body += (strip.length || plans.length) ? '<div class="iw-sec"><div class="iw-sh">사진 <small class="k">서울시 단지정보 · 단지 사진 ' + mains.length + '장 · 평면도 ' + plans.length + '장 중 ' + selLabel() + ' 형 ' + pOk.length + '장(평면도의 전용면적 기준 — ' + (function(){ var nf = plans.filter(function(x){ return FX[x.u]; }).length, by = '사람이 도면을 열어 확인' + (window.YA_FIX ? '(' + window.YA_FIX.updated + ')' : ''), ocr = '글자 판독' + (window.YA_PLANS ? '(' + window.YA_PLANS.updated.slice(0, 10) + ')' : ''); return !nf ? ocr : (nf >= plans.length ? '전부 ' + by : nf + '장은 ' + by + ', 나머지는 ' + ocr); })() + ')' + (persp ? ' · 투시도(조감도) ' + persp + '장은 데이터로만' : '') + '</small></div>' +
       (strip.length ? '<div class="iw-strip" data-lb="1">' + strip.join('') + '</div>' : '') +
       folded(pSmall, belowTxt() + ' 형 평면도', '도면에서 읽은 전용면적이 기준 미만 · 데이터로만') +
+      folded(pShare, '셰어형 평면도', '표의 ㎡는 집 전체 — 내 몫은 방 하나라 8평 기준에 못 넣음') +
+      folded(pDup, '복층·2층형 평면도', '지도 범례의 "복층 빼기"가 켜져 있음') +
       folded(pUnk, '면적을 못 읽은 평면도', window.YA_PLANS ? '도면 글자 판독(OCR)으로 전용면적을 못 찾음 — 기준 이상인지 모름' : '도면 글자 판독 결과(data/ya_plans.json)가 아직 없음') +
-      '<div class="iw-nophoto">실내(방) 사진은 서울시 단지정보에 없음 — 평면도로 대신</div></div>'
+      (rooms.length ? '' : '<div class="iw-nophoto">실내(방) 사진은 서울시 단지정보에 없음 — 평면도로 대신</div>') + '</div>'
     : '<div class="iw-nophoto"><b>사진 없음</b> — 서울시 단지정보 상세 페이지에 이미지가 없음</div>';
   var rows = c.rows || {}, sp = rows.special || [], ge = rows.general || [];
   var tyLabel = function(ty){ var t = String(ty || ''); var e = tyExact(t); if (e) t = t.replace(/[-\s]*\d{2,3}\.\d{1,2}/, '').replace(/\(\s*\)/g, '').replace(/^\s+|\s+$/g, ''); return t; };   // 'A-15.33' → 'A'
   body += yaMoney(c, sp, ge, tyLabel);
+  var fixed = {}; sp.concat(ge).forEach(function(r){ if (r.tyFix) fixed[r.ty0] = r.tyFix; });
+  if (Object.keys(fixed).length) body += '<div class="iw-nophoto" style="border-color:#90caf9;background:#f3f8fe;color:#1d3f66"><b>형 이름 숫자 ≠ 전용면적</b> — ' + Object.keys(fixed).map(function(k){ return k + ' → 전용 <b>' + fixed[k] + '㎡(' + py(fixed[k]) + ')</b>'; }).join(' · ') + '. 서울시 단지정보 평면도 표의 전용면적(사람이 도면을 열어 확인' + (window.YA_FIX ? ', ' + window.YA_FIX.updated : '') + ')으로 내 조건을 판정함. 형 이름만으로는 전용면적을 알 수 없음(실사용·공급면적 기준 이름이거나 소수점이 없음)</div>';
   if (sp.length || ge.length) {
     var tr = function(r, kind){ var y = /청년/.test(r.who || ''); return '<tr' + (y ? ' class="y"' : '') + '><th>' + kind + '<br><small class="k">' + (r.who || '').split(/,\s*/).join('<br>') + '</small></th><td>' + (r.room || '') + ' <b>' + tyLabel(r.ty) + '</b><br><small>' + (yaTyNum(r.ty) ? tyArea(r.ty) : '<span class="k">면적 미기재</span>') + '</small></td><td>' + (r.n == null ? '<small class="k">미기재</small>' : r.n) + '</td><td>' + yaWon(r.dep) + '<br><small>월 ' + (r.rent == null ? '미기재' : Math.round(r.rent / 10000) + '만') + '</small>' + (r.fix ? '<br><small class="k">† 서울시 표엔 ' + (r.fix.k === 'both' ? yaWon(r.fix.raw) + '·월 ' + Math.round(r.fix.raw2 / 10000).toLocaleString() + '만' : r.fix.k === 'dep' ? yaWon(r.fix.raw) : '월 ' + Math.round(r.fix.raw / 10000).toLocaleString() + '만') + '</small>' : '') + '</td></tr>'; };
     var split = yaSplit(c), outN = split.small.length + split.other.length + split.share.length + split.unknown.length + split.dup.length;
@@ -1822,6 +1840,14 @@ function kookConvHtml(p){
 // 조건 셋 다: ① 값이 목록 범위(±5%) 밖 ② 10의 거듭제곱을 곱하거나 나누면 범위 안 ③ 그 형의 보증금/월세 비율이 범위 안 형들의 중앙값과 4배 넘게 어긋나고, 고치면 2.5배 안
 function krwTxt(t){ t = String(t || '').replace(/[\s,]/g, ''); var m = t.match(/^(?:(\d+)억)?(?:(\d+)천)?(?:(\d+)백)?(?:(\d+)십)?(\d+)?만(?:(\d+)천)?(\d+)?$/); if (!m) return null; var n = function(x){ return x ? +x : 0; };
   return n(m[1]) * 1e8 + (n(m[2]) * 1000 + n(m[3]) * 100 + n(m[4]) * 10 + n(m[5])) * 1e4 + n(m[6]) * 1000 + n(m[7]); }
+// data/ya_fix.json — 서울시 단지정보 평면도를 한 장씩 열어 확인한 값. types: 형 이름 숫자가 전용면적이 아닌 단지(대흥역 리마크빌 30형 = 전용 25.35㎡ 등)
+// '30' → '30 25.35' 로 붙이면 tyExact 가 전용면적을 쓰고 tyLabel 은 '30' 만 보여 줌(tools/notify_new.py apply_ya_fix 와 같은 규칙)
+function yaApplyFix(j, fx){
+  var T = (fx && fx.types) || {};
+  (j.complexes || []).forEach(function(c){ var t = T[c.name]; if (!t) return;
+    ['special', 'general'].forEach(function(g){ (((c.rows || {})[g]) || []).forEach(function(r){ var k = String(r.ty || '').replace(/^\s+|\s+$/g, '');
+      if (t[k] != null && !tyExact(k)) { r.ty0 = k; r.ty = k + ' ' + Number(t[k]).toFixed(2); r.tyFix = Number(t[k]); } }); }); });
+}
 function yaFixTypos(j){
   var fixed = 0;
   (j.complexes || []).forEach(function(c){
@@ -2182,7 +2208,10 @@ function applyLive(){
   liveFetch('data/fact.json').then(function(j){ if (j && j.fact) { Object.keys(j.fact).forEach(function(k){ FACT[k] = j.fact[k]; }); window.FACT_UPDATED = j.updated; } });
   liveFetch('data/pamphlets.json').then(function(j){ if (j && j.items) window.PAM = j; });
   liveFetch('data/ya_plans.json').then(function(j){ if (j && j.items) window.YA_PLANS = j; });
-  liveFetch('data/ya.json').then(function(j){
+  Promise.all([liveFetch('data/ya.json'), liveFetch('data/ya_fix.json')]).then(function(rs){
+    var j = rs[0], fx = rs[1];
+    if (fx) window.YA_FIX = fx;
+    if (j && fx) yaApplyFix(j, fx);   // 형 이름 숫자 ≠ 전용면적인 단지: 평면도에서 읽은 전용면적으로(분류·판정 전에)
     if (j) yaFixTypos(j);
     var box = document.getElementById('ya-live'); 
     if (!j || !(j.notices || j.complexes)) { if (box) box.innerHTML = '<p class="src">청년안심주택 자동 수집 데이터 없음 (첫 실행 전이거나 실패)</p>'; return; }

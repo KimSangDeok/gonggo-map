@@ -25,7 +25,7 @@ def langs():
         return 'eng'
 LANG = langs()
 
-NUM = r'(\d{2,3})\s?[.,·]\s?(\d{1,3})'
+NUM = r'(\d{2,3})\s?[.,·]\s?(\d{1,4})'   # 소수 넷째 자리까지(상봉동양엔파트 18.0282㎡·백악관타워 33.5879 같은 표 — 셋째 자리까지만 받던 때는 통째로 못 읽음)
 def nums_in(t):
     return [float(a + '.' + b) for a, b in re.findall(r'(?<![\d.])' + NUM + r'(?![\d])', t)]
 
