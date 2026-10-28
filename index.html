@@ -1456,14 +1456,27 @@ function factHtml(p){
   if (f.plan) tiles.push({ u: f.plan, th: f.plan, t: (f.type ? f.type.sp + '형 ' : '') + '평면도(SH 주택정보)', cls: 'pl' });
   var pam = window.PAM && window.PAM.items && window.PAM.items[p.name], base = p.m2 ? String(Math.floor(p.m2)) : null, pamPages = [], pamAll = 0;
   if (pam && pam.length) {
-    pam.forEach(function(e){ e.pages.forEach(function(pg){ pamAll++; if (pg.kind === 'plan' || pg.kind === 'site') pamPages.push({ img: pg.img, th: pg.th || pg.img, n: pg.n, e: e, kind: pg.kind, tys: pg.tys || [] }); }); });
-    pamPages.sort(function(a, b){ var ra = (a.kind === 'plan' ? 0 : 2) + (base && a.tys.indexOf(base) >= 0 ? -1 : 0), rb = (b.kind === 'plan' ? 0 : 2) + (base && b.tys.indexOf(base) >= 0 ? -1 : 0); return ra - rb || a.n - b.n; });
+    pam.forEach(function(e){ e.pages.forEach(function(pg){ pamAll++; if (pg.kind === 'plan' || pg.kind === 'site') pamPages.push({ img: pg.img, th: pg.th || pg.img, n: pg.n, e: e, kind: pg.kind, tys: pg.tys || [], ex: pg.ex || [], code: pg.code || [], tag: pg.tag || [] }); }); });
+    // 주거약자형·고령자형·신혼부부형만 실린 평면도는 같은 형 안에서 뒤로(청년 1인이 받는 형은 기본형·청년형)
+    var other = function(x){ return x.tag.length && x.tag.every(function(t){ return /주거약자|고령자|장애인|신혼부부/.test(t); }) ? 0.5 : 0; };
+    pamPages.sort(function(a, b){ var ra = (a.kind === 'plan' ? 0 : 2) + (base && a.tys.indexOf(base) >= 0 ? -1 : 0) + other(a), rb = (b.kind === 'plan' ? 0 : 2) + (base && b.tys.indexOf(base) >= 0 ? -1 : 0) + other(b); return ra - rb || a.n - b.n; });
     pamPages = pamPages.filter(function(x){ if (x.kind !== 'plan' || !x.tys.length || x.tys.some(tyOk)) return true; hidSmall++; return false; });   // 평면도 쪽에 실린 형이 전부 기준 미만이면 뺌(배치도는 둠)
-    pamPages.forEach(function(x){ var ty = base && x.tys.indexOf(base) >= 0 ? base : (x.tys.filter(tyOk)[0] || x.tys[0] || ''); tiles.push({ u: x.img, th: x.th, t: '팸플릿 ' + (x.kind === 'plan' ? '평면도' : '배치도') + (ty ? ' ' + ty + '형' : '') + ' · ' + x.n + '쪽', cls: 'pl' }); });
+    var py1 = function(v){ return (parseFloat(v) / 3.3058).toFixed(1); };
+    pamPages.forEach(function(x){
+      var ty = base && x.tys.indexOf(base) >= 0 ? base : (x.tys.filter(tyOk)[0] || x.tys[0] || '');
+      if (x.kind !== 'plan') { tiles.push({ u: x.img, th: x.th, t: '팸플릿 배치도 · ' + x.n + '쪽', s: '배치도 · ' + x.n + '쪽', cls: 'pl' }); return; }
+      // 쪽 글자에서 뽑은 형 이름(29A)·전용면적(29.09㎡)·공급 유형((기본형)·(주거약자형)) — 없으면 형 번호만
+      var lab = x.code.length && x.code.length <= 2 ? x.code.join('·') : (ty ? ty + '형' : '');
+      var exs = x.ex.length && x.ex.length <= 3 ? x.ex.map(function(v){ return v + '㎡(' + py1(v) + '평)'; }).join('·') : '';
+      var tg = x.tag.length && x.tag.length <= 2 ? x.tag.join('·') : '';
+      tiles.push({ u: x.img, th: x.th, cls: 'pl',
+        t: '팸플릿 ' + x.n + '쪽 평면도' + (lab ? ' ' + lab : '') + (exs ? ' · 전용 ' + exs : '') + (tg ? ' · ' + tg : ''),
+        s: '평면 ' + (lab || x.n + '쪽') + (tg ? ' ' + tg : (x.ex.length === 1 ? ' ' + py1(x.ex[0]) + '평' : '')) });
+    });
   }
   var ph = '';
   if (tiles.length) {
-    ph += '<div class="iw-strip" data-lb="1">' + tiles.map(function(x){ return '<a href="' + x.u + '" target="_blank" rel="noopener" class="' + x.cls + '" title="' + x.t + '"><img src="' + x.th + '" alt="' + x.t + '" loading="lazy" onerror="this.parentNode.style.display=\'none\'"><span>' + x.t + '</span></a>'; }).join('') + '</div>';
+    ph += '<div class="iw-strip" data-lb="1">' + tiles.map(function(x){ return '<a href="' + x.u + '" target="_blank" rel="noopener" class="' + x.cls + '" title="' + x.t + '"><img src="' + x.th + '" alt="' + x.t + '" loading="lazy" onerror="this.parentNode.style.display=\'none\'"><span>' + (x.s || x.t) + '</span></a>'; }).join('') + '</div>';
     var rk = f.rooms_k || (f.rooms || []).length, rn = f.rooms_n || rk;
     var parts = [];
     parts.push(f.rooms && f.rooms.length ? (f.rooms_mine ? '이 형 실내 ' + rk + '장' + (rn > rk ? '(단지 전체 ' + rn + '장)' : '') : (f.rooms_mine === false ? '실내 ' + rk + '장(이 형 사진은 없음, 다른 형·공용부)' : '실내 ' + rn + '장')) : '실내 사진 없음');

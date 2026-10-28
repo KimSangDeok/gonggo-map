@@ -137,6 +137,25 @@ def _tys(t):
         v = m.group(1)
         if 15 <= int(v) <= 90 and v not in out: out.append(v)
     return out
+# 평면도 쪽 글자에서 화면 설명용 정보: 정확한 전용면적(29.09) · 형 이름(29A, 29AS) · 공급 유형((기본형)·(주거약자형) 등)
+# 예) 2023 행복주택 2차 방화동 19쪽 '29A 85세대(기본형) … 주거전용면적 29.09㎡' (글자는 띄어쓰기를 지운 상태로 들어옴)
+EX_RE = re.compile(r'(?:주거)?전용(?:면적)?[:：]?\s*(\d{2,3}\.\d{1,4})')
+CODE_RE = re.compile(r'(?<![\d.A-Za-z])(\d{2,3}[A-Z]{1,3})(?=\s*\d{1,4}세대)')
+TAG_RE = re.compile(r'\((기본형|일반형|주거약자형|주거약자용|고령자형|고령자용|장애인형|신혼부부형|청년형|대학생형|특화형)\)')
+def _meta(t):
+    def uniq(it, keep=lambda v: True):
+        out = []
+        for v in it:
+            if keep(v) and v not in out: out.append(v)
+        return out
+    ex = uniq((m.group(1) for m in EX_RE.finditer(t)), lambda v: 14 <= float(v) <= 120)
+    code = uniq(m.group(1) for m in CODE_RE.finditer(t))
+    tag = uniq(m.group(1) for m in TAG_RE.finditer(t))
+    out = {}
+    if ex: out['ex'] = ex[:6]
+    if code: out['code'] = code[:4]
+    if tag: out['tag'] = tag[:3]
+    return out
 def pick_pages(pdf, kw, others=()):
     """이 단지 구간의 쪽들을 평면도(plan)·배치도(site)·그 외(other: 조감도·교통망·표지 등) 로 나눠 돌려준다. 화면은 plan/site 만 쓰고 other 는 데이터로만 보관.
     - 키워드 없음(단일 단지 팸플릿): 전체 쪽이 구간
@@ -171,7 +190,7 @@ def pick_pages(pdf, kw, others=()):
         for k2 in range(start + 1, end):
             if theirs[k2] > mine[k2]: end = k2; break
         section = [i for i in range(start, end) if not (theirs[i] > mine[i])]
-    cands = [{'i': i, 'kind': _kind(texts[i]), 'tys': _tys(texts[i])} for i in section]
+    cands = [{'i': i, 'kind': _kind(texts[i]), 'tys': _tys(texts[i]), 'meta': _meta(texts[i])} for i in section]
     for c in cands:   # 목차·공통 유의사항('평면도는 …' 문구 때문에 평면으로 잡히던 쪽)·표지: 형 숫자가 없고 앞 3쪽이거나 목차·유의사항 글자가 있으면 평면도 아님
         if c['kind'] == 'plan' and not c['tys'] and (c['i'] < 3 or re.search(r'유의사항|목차|CONTENTS', texts[c['i']], re.I)): c['kind'] = 'other'
     plans = [c for c in cands if c['kind'] == 'plan']; sites = [c for c in cands if c['kind'] == 'site']; others = [c for c in cands if c['kind'] == 'other']
@@ -238,7 +257,7 @@ def main():
                             path = os.path.join(OUTD, key + '.jpg'); im.save(path, 'JPEG', quality=(80 if hi else 72), optimize=True)
                             th = im.copy(); th.thumbnail((TH_WIDTH, TH_WIDTH * 2)); th.save(os.path.join(OUTD, key + '_t.jpg'), 'JPEG', quality=70, optimize=True)
                             rendered[key] = {'img': 'data/pamphlets/' + key + '.jpg', 'th': 'data/pamphlets/' + key + '_t.jpg', 'w': im.width, 'h': im.height, 'hi': hi}
-                        pages.append(dict(n=i + 1, kind=c['kind'], tys=c['tys'], **rendered[key]))
+                        pages.append(dict(n=i + 1, kind=c['kind'], tys=c['tys'], **(c.get('meta') if c['kind'] == 'plan' else {}), **rendered[key]))
                     ent.append({'seq': seq, 'title': meta.get(seq, {}).get('title') or (old.get('items', {}).get(name, [{}])[0].get('title') if old else '') or '', 'file': meta.get(seq, {}).get('file', ''),
                                 'pdf': f'{DL}?brdId=JI1901&seq={seq}&fileTp=&fileSeq={fs}', 'total': len(pdf.pages), 'kw': kw, 'hits': hits, 'pages': pages})
             except Exception as e:
