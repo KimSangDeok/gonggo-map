@@ -13,7 +13,7 @@ concurrency:
 jobs:
   run:
     runs-on: ubuntu-latest
-    timeout-minutes: 55
+    timeout-minutes: 58
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -21,6 +21,7 @@ jobs:
       - run: sudo apt-get update -qq && sudo apt-get install -y -qq tesseract-ocr tesseract-ocr-kor
       - run: pip install -q requests pillow
       - run: python tools/ya_plan_ocr.py
+        env: { OCR_BUDGET_SEC: '2400' }
       - name: commit
         run: |
           git config user.name 'gonggo-bot'; git config user.email 'gonggo-bot@users.noreply.github.com'

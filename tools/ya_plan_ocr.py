@@ -6,7 +6,8 @@
   2) '전용' 이 들어간 줄의 첫 소수(예: '주거전용면적 17.84㎡') — 실사용·공용·계약면적은 안 씀
   3) 그래도 없으면, 그 단지 입주현황 표의 형(17A → 17㎡대, A-15.33 → 15.33)과 정수부가 같은 소수 (약한 근거: how='known')
 사용: python tools/ya_plan_ocr.py [--all]   (--all: 이미 읽은 이미지도 다시)"""
-import os, re, sys, json, io, subprocess, tempfile, datetime
+import os, re, sys, json, io, subprocess, tempfile, datetime, time
+os.environ.setdefault('OMP_THREAD_LIMIT', '1')   # 여러 장을 동시에 읽을 때 tesseract 내부 스레드끼리 다투지 않게
 from concurrent.futures import ThreadPoolExecutor
 import requests
 from PIL import Image, ImageOps
@@ -98,16 +99,28 @@ def main(redo=False):
             jobs.append((p['u'], ks))
     print('lang', LANG, 'to read', len(jobs), 'cached', len(old))
     res = dict(old)
-    with ThreadPoolExecutor(max_workers=4) as ex:
-        for (u, ks), o in zip(jobs, ex.map(lambda j: read_one(*j), jobs)):
-            res[u] = o
     keep = {p['u'] for c in ya.get('complexes', []) for p in (c.get('photos') or []) if p.get('k') == 'plan'}
+    budget = float(os.environ.get('OCR_BUDGET_SEC', '2400')); t0 = time.time(); done = 0
+    def save(final=False):
+        r = {u: o for u, o in res.items() if u in keep}
+        hows = {}
+        for o in r.values(): hows[o.get('how') or 'none'] = hows.get(o.get('how') or 'none', 0) + 1
+        json.dump({'updated': datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9))).strftime('%Y-%m-%d %H:%M KST'), 'lang': LANG,
+                   'source': '서울시 청년안심주택 단지정보 상세 페이지 평면도 이미지 → Tesseract OCR(' + LANG + ')로 전용면적 판독. how: type=도면 제목(NN.NN Type), 전용=전용면적 줄, known=단지 형과 정수부 일치(약한 근거)',
+                   'stats': hows, 'pending': max(0, len(jobs) - done), 'items': r}, open(OUT, 'w', encoding='utf-8'), ensure_ascii=False, separators=(',', ':'))
+        return hows
+    # 시간 예산 안에서만 읽고(남은 건 다음 실행 때 이어서 — 이미 읽은 건 캐시), 25장마다 중간 저장
+    with ThreadPoolExecutor(max_workers=4) as ex:
+        futs = []
+        for u, ks in jobs: futs.append((u, ex.submit(read_one, u, ks)))
+        for u, f in futs:
+            if time.time() - t0 > budget:
+                for _, f2 in futs: f2.cancel()
+                print('time budget reached; done', done, 'of', len(jobs)); break
+            res[u] = f.result(); done += 1
+            if done % 25 == 0: save(); print('progress', done, '/', len(jobs), round(time.time() - t0), 's', flush=True)
     res = {u: o for u, o in res.items() if u in keep}
-    hows = {}
-    for o in res.values(): hows[o.get('how') or 'none'] = hows.get(o.get('how') or 'none', 0) + 1
-    json.dump({'updated': datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9))).strftime('%Y-%m-%d %H:%M KST'), 'lang': LANG,
-               'source': '서울시 청년안심주택 단지정보 상세 페이지 평면도 이미지 → Tesseract OCR(' + LANG + ')로 전용면적 판독. how: type=도면 제목(NN.NN Type), 전용=전용면적 줄, known=단지 형과 정수부 일치(약한 근거)',
-               'stats': hows, 'items': res}, open(OUT, 'w', encoding='utf-8'), ensure_ascii=False, separators=(',', ':'))
+    hows = save(True)
     print('wrote', OUT, len(res), hows)
 
 if __name__ == '__main__':
