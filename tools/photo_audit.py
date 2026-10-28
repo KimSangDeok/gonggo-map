@@ -63,5 +63,45 @@ for key in sorted(fact):
         safe = re.sub(r'[^0-9A-Za-z가-힣]+', '_', name)[:30]
         sh.save(os.path.join(OUT, f'{sheet_no:02d}_{safe}.jpg'), 'JPEG', quality=82)
         sheet_no += 1
+# ---------- 청년안심주택(서울시 단지정보 사진): 내 조건에 드는 단지(청년 형 8평 이상)만 — 화면과 같은 규칙 ----------
+# 대표 사진(main)은 늘 보이고, 평면도(plan)는 도면 글자 판독(ya_plans.json) 전용면적이 8평(26.45㎡) 이상이면 띠에, 아니면 접힘
+import importlib.util
+_spec = importlib.util.spec_from_file_location('nn', os.path.join(ROOT, 'tools', 'notify_new.py'))
+nn = importlib.util.module_from_spec(_spec); _spec.loader.exec_module(nn)
+ya = json.load(open(os.path.join(ROOT, 'data', 'ya.json'), encoding='utf-8'))
+ocr = json.load(open(os.path.join(ROOT, 'data', 'ya_plans.json'), encoding='utf-8')).get('items', {})
+FLOOR = 26.45
+for c in sorted(ya.get('complexes', []), key=lambda c: c.get('name', '')):
+    ok, _ = nn.ya_split(c)
+    if not ok: continue
+    ph = c.get('photos') or []
+    tiles = [('대표 · ' + (x.get('t') or '')[:12], x['u']) for x in ph if x.get('k') == 'main'] or ([('대표', c['img'])] if c.get('img') else [])
+    for x in ph:
+        if x.get('k') != 'plan': continue
+        o = ocr.get(x['u']) or {}
+        ms = [m for m in (o.get('m2') or []) if 10 <= m <= 120]
+        where = '띠' if any(m >= FLOOR for m in ms) else ('접힘<8평' if ms else '접힘?')
+        tiles.append((f"평면 {'·'.join(str(m) for m in ms) or '?'}㎡ [{o.get('how', '')}] {where}", x['u']))
+    if not tiles: continue
+    rows = '·'.join(sorted({str(r.get('ty')) for r, _ in ok}))[:60]
+    head = f"[청년안심] {c.get('name')}  (청년 8평↑ 형: {rows})"
+    for part in range(0, len(tiles), PER):
+        chunk = tiles[part:part + PER]
+        nrows = (len(chunk) + COLS - 1) // COLS
+        sh = Image.new('RGB', (COLS * TW, 60 + nrows * (TH + CAP)), 'white'); d = ImageDraw.Draw(sh)
+        d.text((12, 12), head + (f'  [{part // PER + 1}]' if len(tiles) > PER else ''), font=F_HEAD, fill='black')
+        for i, (lab, u) in enumerate(chunk):
+            x0, y0 = (i % COLS) * TW, 60 + (i // COLS) * (TH + CAP)
+            im = get(u)
+            if im:
+                t = im.copy(); t.thumbnail((TW - 8, TH - 8)); sh.paste(t, (x0 + (TW - t.width) // 2, y0 + (TH - t.height) // 2))
+            else:
+                d.rectangle([x0 + 4, y0 + 4, x0 + TW - 4, y0 + TH - 4], outline='red', width=3); d.text((x0 + 20, y0 + 20), '받기 실패', font=F_CAP, fill='red')
+            d.rectangle([x0, y0 + TH, x0 + TW, y0 + TH + CAP], fill='#eeeeee')
+            d.text((x0 + 6, y0 + TH + 4), lab[:46], font=F_CAP, fill='black')
+            index.append({'sheet': sheet_no, 'key': 'ya:' + str(c.get('code') or c.get('name')), 'label': lab, 'url': u, 'ok': bool(im)})
+        safe = re.sub(r'[^0-9A-Za-z가-힣]+', '_', c.get('name', ''))[:30]
+        sh.save(os.path.join(OUT, f'{sheet_no:03d}_ya_{safe}.jpg'), 'JPEG', quality=82)
+        sheet_no += 1
 json.dump(index, open(os.path.join(OUT, 'index.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
 print('sheets', sheet_no, 'images', len(index), 'failed', sum(1 for x in index if not x['ok']))
