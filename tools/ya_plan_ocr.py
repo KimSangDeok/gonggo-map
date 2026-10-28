@@ -73,11 +73,13 @@ def read_one(url, ks):
     try:
         r = requests.get(url, headers=UA, timeout=60); r.raise_for_status()
         im = Image.open(io.BytesIO(r.content)).convert('L')
-        if im.width < 2000: im = im.resize((im.width * 2, im.height * 2), Image.LANCZOS)   # 작은 글씨 판독용 2배
+        f = 2 if im.width < 1000 else (1.5 if im.width < 1600 else 1)   # 작은 이미지만 키움(큰 걸 키우면 판독이 몇 배 느려짐)
+        if f != 1: im = im.resize((int(im.width * f), int(im.height * f)), Image.LANCZOS)
         im = ImageOps.autocontrast(im)
         with tempfile.NamedTemporaryFile(suffix='.png', delete=False) as f:
             im.save(f.name); p = f.name
-        texts = [ocr(p, psm) for psm in (6, 11)]   # 두 방식 다 읽고 합침(한쪽만 쓰면 도면 제목 일부를 놓침)
+        texts = [ocr(p, 6)]   # 블록 판독 한 번이면 도면 제목('17.84 A Type')이 대개 다 나옴
+        if parse(texts[0], ks)[1] not in ('type', '전용'): texts.append(ocr(p, 11))   # 못 찾았을 때만 흩어진 글자 판독을 한 번 더
         os.unlink(p)
         m2, how = parse('\n'.join(texts), ks)
         return {'m2': m2, 'how': how, 'nums': [x for x in nums_in('\n'.join(texts)) if 10 <= x <= 200][:30], 'w': r.headers.get('content-length')}
