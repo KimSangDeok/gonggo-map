@@ -1,0 +1,16 @@
+{
+  "name": "공고 지도",
+  "short_name": "공고 지도",
+  "description": "서울 공공임대 공고 지도 — 새 모집공고 알림",
+  "start_url": "./#calendar",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1E5CA6",
+  "lang": "ko",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

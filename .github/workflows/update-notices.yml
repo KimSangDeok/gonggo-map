@@ -19,20 +19,22 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: { python-version: '3.12' }
-      - run: pip install -q requests beautifulsoup4 pdfplumber
+      - run: pip install -q requests beautifulsoup4 pdfplumber pywebpush
       - run: python tools/update_notices.py
       - name: rates (지난 공고 경쟁률 PDF)
         run: python tools/update_rates.py
         continue-on-error: true
-      - name: notify (새 모집공고 → ntfy 휴대폰 푸시 + data/alerts.json 기록)
+      - name: notify (새 모집공고 → 웹 푸시·ntfy + data/alerts.json 기록)
         run: python tools/notify_new.py
         env:
+          VAPID_PRIVATE: ${{ secrets.VAPID_PRIVATE }}
           NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
         continue-on-error: true
       - name: commit
         run: |
           git config user.name 'gonggo-bot'; git config user.email 'gonggo-bot@users.noreply.github.com'
           git add data/notices.json data/lh.json data/ya.json data/rates.json data/sh_files data/alerts.json
+          git add -A data/push
           git diff --cached --quiet && { echo 'no change'; exit 0; }
           git commit -m "data: 공고 갱신 $(date -u +%F)"
           for i in 1 2 3; do git pull --rebase -X theirs origin gh-pages && git push && exit 0; git rebase --abort 2>/dev/null; sleep 15; done

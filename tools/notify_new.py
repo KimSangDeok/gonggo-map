@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 """새 공고 알림 — update_notices.py 직후 실행.
 data/notices.json(SH 게시판)·lh.json(LH 청약플러스 서울)·ya.json(서울시 청년안심 게시판)에서 처음 보는 모집공고만 골라
-① ntfy 휴대폰 푸시(환경변수 NTFY_TOPIC — 저장소 비밀값) ② data/alerts.json 기록(Claude 앱 예약 작업이 읽음).
+① 웹 푸시(사이트에서 구독한 기기 data/push/*.json, 서명 키 VAPID_PRIVATE — 저장소 비밀값) ② ntfy(NTFY_TOPIC — 비밀값, 있으면)
+③ data/alerts.json 기록(Claude 앱 예약 작업이 읽음). 비밀값이 없으면 기록만 함.
 
 보내는 것
 - SH: 모집공고(제목에 모집·공급 공고) 중 행복주택·국민임대·통합공공임대·청년안심·매입임대·전세임대. 장기전세·재개발·영구임대 빼고,
@@ -12,7 +13,7 @@ data/notices.json(SH 게시판)·lh.json(LH 청약플러스 서울)·ya.json(서
       청년안심 공공임대 공고는 SH 게시판에도 올라오므로 SH 쪽으로 보냄(중복 방지)
 첫 실행(alerts.json 없음)은 지금 있는 공고를 '본 것'으로만 기록하고 보내지 않음.
 사용: python tools/notify_new.py [--dry-run] [--test]"""
-import json, os, re, sys, datetime, urllib.request
+import json, os, re, sys, glob, datetime, urllib.request
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 def D(f): return os.path.join(ROOT, 'data', f)
@@ -127,10 +128,51 @@ def ntfy(title, msg, url, prio=3, tags=('house',)):
     req = urllib.request.Request('https://ntfy.sh/', data=json.dumps(body, ensure_ascii=False).encode('utf-8'), headers={'Content-Type': 'application/json'})
     with urllib.request.urlopen(req, timeout=25) as r: r.read()
 
+# ---------- 웹 푸시(직접 발송): 사이트 '이 기기로 알림 받기'로 만든 구독(data/push/*.json)에 VAPID 서명으로 보냄 ----------
+# 브라우저 회사 푸시 서버(구글 FCM·애플·모질라)로 바로 감. 본문은 RFC 8291 로 암호화돼 그 서버도 못 읽음. 개인키는 저장소 비밀값 VAPID_PRIVATE
+VAPID_PRIVATE = os.environ.get('VAPID_PRIVATE', '').strip()
+DEAD = []
+def push_subs():
+    out = []
+    for f in sorted(glob.glob(D(os.path.join('push', '*.json')))):
+        sub = load(f, None)
+        if sub and sub.get('endpoint') and (sub.get('keys') or {}).get('p256dh') and (sub.get('keys') or {}).get('auth'): out.append((f, sub))
+    return out
+def webpush_all(title, msg, url, urgent=False):
+    if not VAPID_PRIVATE: return 0
+    from pywebpush import webpush, WebPushException
+    n = 0
+    for f, sub in push_subs():
+        if f in DEAD: continue
+        try:
+            webpush(subscription_info={'endpoint': sub['endpoint'], 'keys': sub['keys']},
+                    data=json.dumps({'title': title[:120], 'body': msg[:1000], 'url': url or SITE}, ensure_ascii=False),
+                    vapid_private_key=VAPID_PRIVATE, vapid_claims={'sub': 'https://kimsangdeok.github.io'}, ttl=3 * 86400, headers={'Urgency': 'high' if urgent else 'normal'})
+            n += 1
+        except WebPushException as e:
+            code = getattr(getattr(e, 'response', None), 'status_code', None)
+            if code in (404, 410): DEAD.append(f)          # 구독 만료(앱 지움·브라우저 데이터 삭제 등) → 파일 지우고 기록
+            else: raise
+    return n
+
+def notify(title, msg, url, prio=3):
+    """두 경로로 보냄. 돌려주는 값: 보낸 경로 목록"""
+    done, errs = [], []
+    if TOPIC:
+        try: ntfy(title, msg, url, prio); done.append('ntfy')
+        except Exception as e: errs.append('ntfy ' + repr(e)[:120])
+    if VAPID_PRIVATE:
+        try:
+            k = webpush_all(title, msg, url, prio >= 4)
+            if k: done.append('webpush×' + str(k))
+        except Exception as e: errs.append('webpush ' + repr(e)[:120])
+    return done, errs
+
 def main():
     if '--test' in sys.argv:
-        if not TOPIC: print('NTFY_TOPIC 없음'); return
-        ntfy('공공임대 공고 알림 테스트', '이 알림이 보이면 연결 끝. 새 모집공고가 잡히면(매일 09:23·15:23 수집) 이렇게 옵니다.', SITE, 3, ('white_check_mark',)); print('test sent'); return
+        if not (TOPIC or VAPID_PRIVATE): print('NTFY_TOPIC·VAPID_PRIVATE 둘 다 없음'); return
+        done, errs = notify('공공임대 공고 알림 테스트', '이 알림이 보이면 연결 끝. 새 모집공고가 잡히면(매일 09:23·15:23 수집) 이렇게 옵니다.', SITE + '#calendar', 3)
+        print('test', done, errs, 'subs', len(push_subs()), 'dead', [os.path.basename(f) for f in DEAD]); return
     st = load(STATE, None)
     items = collect()
     today = NOW.strftime('%Y-%m-%d')
@@ -144,23 +186,30 @@ def main():
     sent = 0
     for it in new:
         it['at'] = NOW.strftime('%Y-%m-%d %H:%M KST')
-        if it['send'] and TOPIC and not DRY and sent < 8:
+        if it['send'] and (TOPIC or VAPID_PRIVATE) and not DRY and sent < 8:
             msg = it['src'] + ' · 게시 ' + (it['posted'] or '?') + (' · 접수 ' + it['apply'] if it['apply'] else '')
             if it['fit']: msg += '\n' + ('내 조건(청년·8평↑): ' + it['fit']) + (' — ' + it['why'] if it['why'] else '')
-            try: ntfy(it['title'] or it['src'], msg, it['url'], it['prio']); it['pushed'] = True; sent += 1
-            except Exception as e: it['pushed'] = False; it['err'] = repr(e)[:200]
+            done, errs = notify(it['title'] or it['src'], msg, it['url'], it['prio'])
+            it['pushed'] = ', '.join(done) if done else False
+            if errs: it['err'] = ' / '.join(errs)[:240]
+            if done: sent += 1
         st['log'].append({k: it.get(k) for k in ('at', 'key', 'src', 'title', 'url', 'posted', 'apply', 'fit', 'why', 'send', 'pushed', 'err') if it.get(k) not in (None, '')})
-    if len([it for it in new if it['send']]) > 8 and TOPIC and not DRY:
-        try: ntfy('새 공고가 더 있음', '한 번에 ' + str(len(new)) + '건이 새로 잡혀 8건만 따로 보냈습니다. 나머지는 사이트 공고 일정 탭에서 확인.', SITE + '#calendar', 3)
+    if len([it for it in new if it['send']]) > 8 and (TOPIC or VAPID_PRIVATE) and not DRY:
+        try: notify('새 공고가 더 있음', '한 번에 ' + str(len(new)) + '건이 새로 잡혀 8건만 따로 보냈습니다. 나머지는 사이트 공고 일정 탭에서 확인.', SITE + '#calendar', 3)
         except Exception: pass
+    if DEAD and not DRY:
+        for f in DEAD:
+            try: os.remove(f)
+            except Exception: pass
+        st['log'].append({'at': NOW.strftime('%Y-%m-%d %H:%M KST'), 'dead_subs': [os.path.basename(f) for f in DEAD], 'why': '푸시 서버가 404/410(구독 만료) — 사이트에서 다시 구독·등록 필요'})
     # 정리: 지금 목록에 없고 400일 지난 키는 지움, 기록은 최근 300건만
     keys = {it['key'] for it in items}; cut = (NOW - datetime.timedelta(days=400)).strftime('%Y-%m-%d')
     st['seen'] = {k: v for k, v in st['seen'].items() if k in keys or v >= cut}
     st['log'] = st['log'][-300:]
     st['updated'] = NOW.strftime('%Y-%m-%d %H:%M KST')
-    st['about'] = '새 모집공고 알림 기록(tools/notify_new.py). send=알림 대상 여부, pushed=ntfy 발송 여부. 청년안심은 fit(8평 이상·경계·원룸뿐·판정 불가)으로 거름'
+    st['about'] = '새 모집공고 알림 기록(tools/notify_new.py). send=알림 대상 여부, pushed=보낸 경로(ntfy·webpush×기기 수). 청년안심은 fit(8평 이상·경계·원룸뿐·판정 불가)으로 거름'
     if not DRY: json.dump(st, open(STATE, 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
-    print('items', len(items), 'new', len(new), 'to-send', sum(1 for it in new if it['send']), 'pushed', sent, '(dry-run)' if DRY else '')
+    print('items', len(items), 'new', len(new), 'to-send', sum(1 for it in new if it['send']), 'pushed', sent, 'subs', len(push_subs()), '(dry-run)' if DRY else '')
     for it in new: print(' ', 'SEND' if it['send'] else 'skip', it['key'], it['src'], '|', it['title'][:60], '|', it['fit'], it['why'][:60])
 
 if __name__ == '__main__':
