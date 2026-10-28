@@ -51,7 +51,7 @@ except Exception as e:
 src.log('K-apt:', len(K), 'of', len(codes))
 facts.load(SH, K)
 now = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9))).strftime('%Y-%m-%d %H:%M KST')
-F = {(p['name'] + '|' + str(p.get('m2', ''))): facts.facts_for(p['name'], p.get('m2'), p['kind']) for p in PLACES}
+F = {facts.fact_key(p): facts.facts_for(p['name'], p.get('m2'), p['kind']) for p in PLACES}   # 열쇠는 화면 factOf 와 같은 모양(39.0 → '39')
 ok = sum(1 for v in F.values() if v.get('k') or v.get('type') or v.get('types'))
 os.makedirs('data', exist_ok=True)
 if ok >= 40:   # 수집이 크게 실패한 날은 기존 파일을 덮어쓰지 않음

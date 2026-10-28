@@ -48,6 +48,26 @@ def kapt_of(cds, kapts):
 def base(sp):  # '49S' -> '49', '39A' -> '39'
     m = re.match(r'(\d+)', sp); return m.group(1) if m else sp
 
+def fact_key(p):
+    """FACT 열쇠 = 화면(JS) factOf 와 같은 모양. JS 는 39.0 을 '39' 로 쓰는데 파이썬 str 은 '39.0' 이라
+    꿈의숲아이파크(39.0㎡)의 단지 정보가 화면에서 못 찾아져 '단지 정보 없음'으로 나오던 것(2026-10-28 발견)"""
+    v = p.get('m2')
+    if v is None or v == '': return p['name'] + '|'
+    v = float(v)
+    return p['name'] + '|' + (str(int(v)) if v.is_integer() else repr(v))
+
+def is_plan_img(p):   # SH '사업소개'(introbiz) 그림은 조감도·위치도라 평면도로 안 씀 — 신내 글로리움 view640·Place640 (2026-10-28 사진 266장 확인)
+    return bool(p) and '/introbiz/' not in p
+def plan_key(plans, sp, want=None):
+    """SH 형별 평면도 고르기: want(사이트 형 번호)가 있으면 그 번호의 평면도 먼저(형 목록에 그 형이 없어 다른 형으로 매칭된 경우 — 꿈의숲아이파크 39형),
+    그다음 매칭된 형(sp), 그다음 같은 번호(39AS·39BS → 39)"""
+    ok = [k for k, v in (plans or {}).items() if is_plan_img(v)]
+    if want:
+        k = next((k2 for k2 in ok if base(k2) == want), None)
+        if k: return k
+    if sp in ok: return sp
+    return next((k2 for k2 in ok if base(k2) == base(sp)), None)
+
 def kapt_summary(codes):
     ks = [K[c] for c in codes if c in K]
     if not ks: return None
@@ -57,7 +77,10 @@ def kapt_summary(codes):
     o['hh'] = sum(k['hh'] or 0 for k in ks); o['dong'] = sum(k['dong'] or 0 for k in ks)
     def mode(key):
         vals = [k[key] for k in ks if k.get(key) and k[key] not in ('-', '기타')]
-        return max(set(vals), key=vals.count) if vals else None
+        if not vals: return None
+        cnt = sorted({v: vals.count(v) for v in vals}.items(), key=lambda x: (-x[1], x[0]))
+        if len(cnt) == 1: return cnt[0][0]
+        return '·'.join(f'{v} {n}' for v, n in cnt)   # 단지마다 다르면 단지 수와 함께(예: 혼합식 9·계단식 5) — 전엔 많은 쪽 하나만, 동률이면 실행마다 달랐음
     o['heat'] = mode('heat'); o['hall'] = mode('hall'); o['apt'] = mode('apt'); o['str'] = mode('str')   # 주택유형(아파트 등)·구조 — K-apt 등록값
     pk = [(k['pg'] or 0, k['pu'] or 0, k['hh'] or 0, int(k['cars']) if (k.get('cars') or '').isdigit() else None, int(k['ev']) if (k.get('ev') or '').isdigit() else None) for k in ks]
     pk = [p for p in pk if (p[0] + p[1]) > 0 and p[2] > 0]
@@ -143,11 +166,14 @@ def facts_for(name, m2=None, kind='행복주택'):
         exact = [t for t in cands if abs(t[2] - m2) < 0.6]
         pool = exact or cands
         if pool:
-            pool.sort(key=lambda t: (abs(t[2] - m2), 'S' in t[0]))
+            # 면적이 맞는 형들(±0.6㎡) 중에서는 주거약자형(S)보다 일반형 먼저 — 청년 1인은 일반형을 받음
+            # (은뜨락: 공고 39.49㎡가 SH '39AS'(주거약자 21세대)와 같지만 맞는 건 '39'(39.62㎡ 281세대 = 39A·39B 일반형))
+            gen_first = bool(exact)   # 정렬 중에는 리스트가 빈 것처럼 보이므로(pool 이 곧 exact) 미리 계산
+            pool.sort(key=lambda t: ((('S' in t[0]) if gen_first else 0), abs(t[2] - m2), 'S' in t[0]))
             t = pool[0]
             o['type'] = {'sp': t[0], 'cls': t[1], 'ar': t[2], 'hh': t[3], 'rooms': t[4], 'vac': t[5], 'out': t[7], 'ym': t[10], 'exact': bool(exact)}
-            plan = sh['plans'].get(t[0]) or next((v for k2, v in sh['plans'].items() if base(k2) == base(t[0])), None)
-            if plan: o['plan'] = img(plan)
+            pk = plan_key(sh['plans'], t[0], None if exact else str(int(m2)))
+            if pk: o['plan'] = img(sh['plans'][pk]); o['plan_ty'] = base(pk)   # 화면 이름표는 평면도의 형 번호로
             won, ym = near_cost(sh, t[2])
             if won: o['cost'] = {'won': won, 'ym': ym}
     if kind == '국민임대' and shs:
@@ -163,8 +189,8 @@ def facts_for(name, m2=None, kind='행복주택'):
                 won, ym = near_cost(s, t[2])
                 if won: d['cost'].append(won); d['cost_ym'] = ym
                 if not d['plan']:
-                    p = s['plans'].get(t[0]) or next((v for k2, v in s['plans'].items() if base(k2) == b), None)
-                    if p: d['plan'] = img(p)
+                    pk = plan_key(s['plans'], t[0])
+                    if pk: d['plan'] = img(s['plans'][pk])
         for b, d in T.items():
             if d['cost']: d['cost'] = [min(d['cost']), max(d['cost'])]
             else: d.pop('cost')
