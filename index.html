@@ -267,7 +267,7 @@ main section.view{margin-top:0}
   .side.show-detail .detail .nm-iw .iw-f{column-span:all}
 }
 #detail-back{flex:none;border:1px solid var(--line);background:var(--bg);color:var(--fg);border-radius:8px;padding:5px 10px;font:inherit;font-size:13px;cursor:pointer}
-.side .nm-iw{max-height:none;width:auto;max-width:none;min-width:0;border:0;box-shadow:none;border-radius:0;padding:6px 14px 20px}
+.side .nm-iw{max-height:none;width:auto;max-width:none;min-width:0;border:0;box-shadow:none;border-radius:0;padding:6px 14px 20px;overflow:visible;overflow-x:clip;overscroll-behavior:auto}  /* 패널·시트 안에서는 카드가 스크롤 상자가 되면 안 됨 — 팝업용 overflow:auto + overscroll-behavior:contain 이 남아 있으면, 스크롤할 게 없는 카드가 휠·손가락 스크롤을 붙잡고 바깥(#nm-detail)으로 안 넘겨서 패널이 안 내려갔음 */
 .side .nm-iw .iw-h{display:none}
 .lst .grp{position:sticky;top:0;background:color-mix(in srgb,var(--accent-soft) 70%,var(--surface));color:var(--accent-ink);font-size:12px;font-weight:600;padding:6px 12px;letter-spacing:.03em}
 .lst .it{padding:9px 12px;border-bottom:1px solid var(--line);cursor:pointer;font-size:13px;display:grid;grid-template-columns:14px 1fr auto;gap:8px;align-items:start}
