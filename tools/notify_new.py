@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """새 공고 알림 — update_notices.py 직후 실행.
 data/notices.json(SH 게시판)·lh.json(LH 청약플러스 서울)·ya.json(서울시 청년안심 게시판)에서 처음 보는 모집공고만 골라
-① 웹 푸시(사이트에서 구독한 기기 data/push/*.json, 서명 키 VAPID_PRIVATE — 저장소 비밀값) ② ntfy(NTFY_TOPIC — 비밀값, 있으면)
+① 웹 푸시(사이트에서 구독한 기기 data/push/*.json, 서명 키는 저장소 비밀값 PUSH_SEED 에서 유도) ② ntfy(NTFY_TOPIC — 비밀값, 있으면)
 ③ data/alerts.json 기록(Claude 앱 예약 작업이 읽음). 비밀값이 없으면 기록만 함.
 
 보내는 것
@@ -13,7 +13,7 @@ data/notices.json(SH 게시판)·lh.json(LH 청약플러스 서울)·ya.json(서
       청년안심 공공임대 공고는 SH 게시판에도 올라오므로 SH 쪽으로 보냄(중복 방지)
 첫 실행(alerts.json 없음)은 지금 있는 공고를 '본 것'으로만 기록하고 보내지 않음.
 사용: python tools/notify_new.py [--dry-run] [--test]"""
-import json, os, re, sys, glob, datetime, urllib.request
+import json, os, re, sys, glob, base64, datetime, urllib.request
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 def D(f): return os.path.join(ROOT, 'data', f)
@@ -129,8 +129,27 @@ def ntfy(title, msg, url, prio=3, tags=('house',)):
     with urllib.request.urlopen(req, timeout=25) as r: r.read()
 
 # ---------- 웹 푸시(직접 발송): 사이트 '이 기기로 알림 받기'로 만든 구독(data/push/*.json)에 VAPID 서명으로 보냄 ----------
-# 브라우저 회사 푸시 서버(구글 FCM·애플·모질라)로 바로 감. 본문은 RFC 8291 로 암호화돼 그 서버도 못 읽음. 개인키는 저장소 비밀값 VAPID_PRIVATE
-VAPID_PRIVATE = os.environ.get('VAPID_PRIVATE', '').strip()
+# 브라우저 회사 푸시 서버(구글 FCM·애플·모질라)로 바로 감. 본문은 RFC 8291 로 암호화돼 그 서버도 못 읽음
+# 서명 키: 저장소 비밀값 PUSH_SEED(사용자가 정한 긴 무작위 문자열)에서 매번 같은 키를 유도 — 개인키를 사람이 옮길 일이 없음.
+# PBKDF2(60만 회)라 공개키로부터 씨앗을 거꾸로 맞히기도 느림. 공개키는 data/push/vapid_public.txt 에 써서 사이트 구독 버튼이 읽음
+PUSH_SEED = os.environ.get('PUSH_SEED', '').strip()
+PUB_FILE = D(os.path.join('push', 'vapid_public.txt'))
+def _b64u(b): return base64.urlsafe_b64encode(b).rstrip(b'=').decode()
+def vapid_from_seed(seed):
+    import hashlib
+    from cryptography.hazmat.primitives.asymmetric import ec
+    from cryptography.hazmat.primitives import serialization
+    n = 0xFFFFFFFF00000000FFFFFFFFFFFFFFFFBCE6FAADA7179E84F3B9CAC2FC632551   # P-256 차수
+    okm = hashlib.pbkdf2_hmac('sha256', seed.encode('utf-8'), b'gonggo-map/vapid/v1', 600000, dklen=48)
+    d = int.from_bytes(okm, 'big') % (n - 1) + 1
+    pub = ec.derive_private_key(d, ec.SECP256R1()).public_key().public_bytes(serialization.Encoding.X962, serialization.PublicFormat.UncompressedPoint)
+    return _b64u(d.to_bytes(32, 'big')), _b64u(pub)
+VAPID_PRIVATE, VAPID_PUBLIC = vapid_from_seed(PUSH_SEED) if PUSH_SEED else ('', '')
+def write_public():
+    if not VAPID_PUBLIC: return False
+    cur = open(PUB_FILE, encoding='utf-8').read().strip() if os.path.exists(PUB_FILE) else ''
+    if cur == VAPID_PUBLIC: return False
+    os.makedirs(os.path.dirname(PUB_FILE), exist_ok=True); open(PUB_FILE, 'w', encoding='utf-8').write(VAPID_PUBLIC + '\n'); return True
 DEAD = []
 def push_subs():
     out = []
@@ -170,9 +189,12 @@ def notify(title, msg, url, prio=3):
 
 def main():
     if '--test' in sys.argv:
-        if not (TOPIC or VAPID_PRIVATE): print('NTFY_TOPIC·VAPID_PRIVATE 둘 다 없음'); return
+        if not (TOPIC or VAPID_PRIVATE): print('NTFY_TOPIC·PUSH_SEED 둘 다 없음'); return
+        cur = open(PUB_FILE, encoding='utf-8').read().strip() if os.path.exists(PUB_FILE) else ''
+        if VAPID_PUBLIC and cur != VAPID_PUBLIC: print('주의: data/push/vapid_public.txt 가 지금 비밀값의 공개키와 다름 → update-notices 한 번 돌려 갱신하고 다시 구독해야 함')
         done, errs = notify('공공임대 공고 알림 테스트', '이 알림이 보이면 연결 끝. 새 모집공고가 잡히면(매일 09:23·15:23 수집) 이렇게 옵니다.', SITE + '#calendar', 3)
         print('test', done, errs, 'subs', len(push_subs()), 'dead', [os.path.basename(f) for f in DEAD]); return
+    if not DRY and write_public(): print('vapid public key written')
     st = load(STATE, None)
     items = collect()
     today = NOW.strftime('%Y-%m-%d')

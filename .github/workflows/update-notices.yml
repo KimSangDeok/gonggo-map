@@ -27,7 +27,7 @@ jobs:
       - name: notify (새 모집공고 → 웹 푸시·ntfy + data/alerts.json 기록)
         run: python tools/notify_new.py
         env:
-          VAPID_PRIVATE: ${{ secrets.VAPID_PRIVATE }}
+          PUSH_SEED: ${{ secrets.PUSH_SEED }}
           NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
         continue-on-error: true
       - name: commit

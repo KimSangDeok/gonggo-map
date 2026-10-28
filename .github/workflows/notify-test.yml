@@ -14,5 +14,5 @@ jobs:
       - run: pip install -q pywebpush
       - run: python tools/notify_new.py --test
         env:
-          VAPID_PRIVATE: ${{ secrets.VAPID_PRIVATE }}
+          PUSH_SEED: ${{ secrets.PUSH_SEED }}
           NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
