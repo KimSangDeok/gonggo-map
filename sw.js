@@ -9,11 +9,13 @@ self.addEventListener('push', function(e){
     body: d.body || '',
     icon: 'icon-192.png',
     badge: 'badge-96.png',
-    data: { url: d.url || './' }
+    data: { url: d.url || './', key: d.key || '' }
   }));
 });
 self.addEventListener('notificationclick', function(e){
   e.notification.close();
-  var url = (e.notification.data && e.notification.data.url) || './';
+  var d = e.notification.data || {}, url = d.url || './';
+  // 공고 키가 있으면 사이트를 거쳐 '확인'으로 표시한 뒤 공고로 넘어감(사이트 목록의 확인 체크)
+  if (d.key) url = './#calendar&seen=' + encodeURIComponent(d.key) + '&go=' + encodeURIComponent(url);
   e.waitUntil(self.clients.openWindow(url));
 });

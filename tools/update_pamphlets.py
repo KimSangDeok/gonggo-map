@@ -108,6 +108,22 @@ def download(seq, file_seq='1', brd='JI1901'):
                 last = e; time.sleep(3)
     raise last
 
+# 쪽 직접 지정(쪽 그림을 눈으로 확인한 것) — (단지, seq) → {'keep': [...]} 이면 그 쪽만, {'drop': [...]} 이면 그 쪽은 뺌.
+# 여러 단지 묶음 팸플릿은 '히트 + 다음 2쪽' 규칙 때문에 다음 단지 쪽이 끼거나, 머리말이 그림이라 단지를 못 가르는 경우가 있음
+PAGE_FIX = {
+  ('마포더클래시', '249616'): {'drop': [19, 20]},           # 19·20쪽 = '2022 행복주택 1차 상봉태솔(상봉동 105-97)' 배치도·59형 (2026-10-28 확인)
+  ('공덕동 크로시티', '256854'): {'drop': [9]},             # 9쪽 = '2022 행복주택 2차 개포자이프레지던스(개포주공4)' 배치도·39형
+  ('강동리엔파크14단지', '217510'): {'drop': [22]},        # 22쪽 = '2020 행복주택 1차 신정동 행복주택' 배치도(총 101세대)
+  ('천왕연지마을1', '182670'): {'keep': [14, 15, 16, 17]},  # 천왕2지구 도시형(1) 32㎡A 32.31·32㎡B 32.64·35㎡A 35.21 — 10~13쪽 20㎡형(6.2평)은 8평 미만, 23~26쪽은 도시형(2)
+  ('천왕연지마을2', '182670'): {'keep': [26]},             # 천왕2지구 도시형(2) 31㎡ 31.06 — 23~25쪽 19·22㎡형은 8평 미만, 10~17쪽은 도시형(1)
+  ('마곡엠밸리 1~15단지', '170823'): {'drop': [17, 18, 19, 20]},  # 17~20쪽 = 신정4지구(신정숲속마을) 위치도·조감도·39A·39A-S
+}
+def _fix_ok(name, seq, n):
+    f = PAGE_FIX.get((name, str(seq)))
+    if not f: return True
+    if 'keep' in f: return n in f['keep']
+    return n not in f.get('drop', [])
+
 def _cnt(t, keys): return sum(t.count(k) for k in keys)
 TY_RE = re.compile(r'(?<!\d)(\d{2})(?:\.\d+)?\s*(?:㎡|m²|㎡형|형|타입|TYPE|Type|[A-D]\b)')
 def _kind(t):
@@ -156,6 +172,8 @@ def pick_pages(pdf, kw, others=()):
             if theirs[k2] > mine[k2]: end = k2; break
         section = [i for i in range(start, end) if not (theirs[i] > mine[i])]
     cands = [{'i': i, 'kind': _kind(texts[i]), 'tys': _tys(texts[i])} for i in section]
+    for c in cands:   # 목차·공통 유의사항('평면도는 …' 문구 때문에 평면으로 잡히던 쪽)·표지: 형 숫자가 없고 앞 3쪽이거나 목차·유의사항 글자가 있으면 평면도 아님
+        if c['kind'] == 'plan' and not c['tys'] and (c['i'] < 3 or re.search(r'유의사항|목차|CONTENTS', texts[c['i']], re.I)): c['kind'] = 'other'
     plans = [c for c in cands if c['kind'] == 'plan']; sites = [c for c in cands if c['kind'] == 'site']; others = [c for c in cands if c['kind'] == 'other']
     plans.sort(key=lambda c: (0 if c['tys'] else 1, c['i']))
     # 데이터로는 구간 전체(조감도·교통망 포함)를 갖고 있고, 화면에는 plan/site 만 보여준다(kind 로 구분)
@@ -207,6 +225,7 @@ def main():
                 with pdfplumber.open(io.BytesIO(data)) as pdf:
                     others = [k2 for nm2, l2 in PAM.items() for s2, k2 in l2 if s2 == seq and k2 and k2 != kw]
                     sel, hits = pick_pages(pdf, kw, others)
+                    sel = [c for c in sel if _fix_ok(name, seq, c['i'] + 1)]
                     pages = []
                     for c in sel:
                         i = c['i']; key = f'{seq}_p{i + 1}'

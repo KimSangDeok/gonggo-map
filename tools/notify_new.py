@@ -75,12 +75,18 @@ def ya_fit(n, comps):
         if ok: okc.append((c, ok))
         elif anyrow: nac += 1
     if okc:
-        areas = sorted({(ty_exact(r.get('ty')) or ty_num(r.get('ty'))) for _, ok in okc for r, _ in ok} - {None})
+        def area(r): return ty_exact(r.get('ty')) or ty_num(r.get('ty'))
+        def py(v): return f'{float(v) / 3.3058:.1f}'                    # ㎡ → 평(1평 = 3.3058㎡)
+        def span(xs, f): return (f(xs[0]) + ('~' + f(xs[-1]) if len(xs) > 1 else '')) if xs else ''
+        full = sorted({area(r) for _, ok in okc for r, f in ok if f == 1} - {None})    # 전부 8평 이상인 형
+        bord = sorted({area(r) for _, ok in okc for r, f in ok if f == 2} - {None})    # ㎡대 안을 8평 경계가 지나는 형
         border = all(f == 2 for _, ok in okc for _, f in ok)
-        rng = (str(areas[0]) + ('~' + str(areas[-1]) if len(areas) > 1 else '')) if areas else ''
         names = '·'.join(c.get('name', '') for c, _ in okc)
-        return ('경계', f'{names} · 청년형 전용 {rng}㎡대 — 8평 경계(26.45㎡)가 이 ㎡대 안을 지나 공고문 평면도로 확인') if border else \
-               ('8평 이상', f'{names} · 청년형 전용 {rng}㎡')
+        parts = []
+        if full: parts.append(f'청년형 전용 {span(full, str)}㎡({span(full, py)}평)')
+        if bord: parts.append(f'경계 {span(bord, str)}㎡대(약 {span(bord, py)}평 — 8평 = 26.45㎡ 경계가 이 ㎡대 안을 지나 공고문 평면도로 확인)')
+        if not parts: parts.append('청년형 면적 표기 없음 → 공고문 확인')
+        return ('경계' if border else '8평 이상'), names + ' · ' + ' · '.join(parts)
     if cs and nac == len(cs): return '원룸뿐', '청년 자격 형이 전부 8평 미만'
     if cs: return '판정 불가', '서울시 단지정보에 형별 표가 없음 → 공고문 확인'
     return '판정 불가', '제목으로 단지 매칭 안 됨 → 공고문 확인'
@@ -157,7 +163,7 @@ def push_subs():
         sub = load(f, None)
         if sub and sub.get('endpoint') and (sub.get('keys') or {}).get('p256dh') and (sub.get('keys') or {}).get('auth'): out.append((f, sub))
     return out
-def webpush_all(title, msg, url, urgent=False):
+def webpush_all(title, msg, url, urgent=False, key=''):
     if not VAPID_PRIVATE: return 0
     from pywebpush import webpush, WebPushException
     n = 0
@@ -165,7 +171,7 @@ def webpush_all(title, msg, url, urgent=False):
         if f in DEAD: continue
         try:
             webpush(subscription_info={'endpoint': sub['endpoint'], 'keys': sub['keys']},
-                    data=json.dumps({'title': title[:120], 'body': msg[:1000], 'url': url or SITE}, ensure_ascii=False),
+                    data=json.dumps({'title': title[:120], 'body': msg[:1000], 'url': url or SITE, 'key': key}, ensure_ascii=False),   # key: 알림 누르면 사이트 목록에서 확인 처리
                     vapid_private_key=VAPID_PRIVATE, vapid_claims={'sub': 'https://kimsangdeok.github.io'}, ttl=3 * 86400, headers={'Urgency': 'high' if urgent else 'normal'})
             n += 1
         except WebPushException as e:
@@ -174,7 +180,7 @@ def webpush_all(title, msg, url, urgent=False):
             else: raise
     return n
 
-def notify(title, msg, url, prio=3):
+def notify(title, msg, url, prio=3, key=''):
     """두 경로로 보냄. 돌려주는 값: 보낸 경로 목록"""
     done, errs = [], []
     if TOPIC:
@@ -182,7 +188,7 @@ def notify(title, msg, url, prio=3):
         except Exception as e: errs.append('ntfy ' + repr(e)[:120])
     if VAPID_PRIVATE:
         try:
-            k = webpush_all(title, msg, url, prio >= 4)
+            k = webpush_all(title, msg, url, prio >= 4, key)
             if k: done.append('webpush×' + str(k))
         except Exception as e: errs.append('webpush ' + repr(e)[:120])
     return done, errs
@@ -211,7 +217,7 @@ def main():
         if it['send'] and (TOPIC or VAPID_PRIVATE) and not DRY and sent < 8:
             msg = it['src'] + ' · 게시 ' + (it['posted'] or '?') + (' · 접수 ' + it['apply'] if it['apply'] else '')
             if it['fit']: msg += '\n' + ('내 조건(청년·8평↑): ' + it['fit']) + (' — ' + it['why'] if it['why'] else '')
-            done, errs = notify(it['title'] or it['src'], msg, it['url'], it['prio'])
+            done, errs = notify(it['title'] or it['src'], msg, it['url'], it['prio'], it['key'])
             it['pushed'] = ', '.join(done) if done else False
             if errs: it['err'] = ' / '.join(errs)[:240]
             if done: sent += 1

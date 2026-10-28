@@ -453,6 +453,13 @@ html.lb-open,html.lb-open body{overflow:hidden!important;overscroll-behavior:non
 #push-btn,#push-copy,a.push-gh{font:inherit;font-size:14px;font-weight:600;padding:8px 14px;border-radius:8px;border:0;background:var(--accent);color:var(--on-accent);cursor:pointer;text-decoration:none;display:inline-block}
 #push-copy{background:var(--accent-soft);color:var(--accent-ink)}
 #push-btn:disabled{opacity:.5;cursor:default}
+.tab-badge{display:inline-block;min-width:18px;height:18px;line-height:18px;padding:0 5px;margin-left:5px;border-radius:9px;background:var(--bad);color:#fff;font-size:11px;font-weight:700;text-align:center}
+.al-list{list-style:none;margin:0;padding:0}
+.al-row{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-top:1px solid var(--line)}
+.al-row.seen .al-body{opacity:.6}
+.al-chk{flex:0 0 auto;font-size:13px;white-space:nowrap;padding-top:2px}
+.al-body{flex:1 1 auto;min-width:0;overflow-wrap:anywhere}
+#al-all{font:inherit;font-size:13px;padding:6px 12px;border-radius:8px;border:1px solid var(--line);background:var(--accent-soft);color:var(--accent-ink);cursor:pointer}
 #push-reg textarea{width:100%;box-sizing:border-box;font:12px/1.4 var(--font-mono);border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--fg);padding:6px}
 </style>
 </head>
@@ -460,7 +467,7 @@ html.lb-open,html.lb-open body{overflow:hidden!important;overscroll-behavior:non
 <header class="appbar">
   <div class="brand">공고 지도</div>
   <nav class="tabs" aria-label="메뉴">
-    <a href="#map" data-view="map">지도</a><a href="#list" data-view="list">단지</a><a href="#calendar" data-view="calendar">공고 일정</a><a href="#rules" data-view="rules">자격·순위</a><a href="#money" data-view="money">보증금·대출</a><a href="#me" data-view="me">내 조건 🔒</a><a href="#sources" data-view="sources">근거</a>
+    <a href="#map" data-view="map">지도</a><a href="#list" data-view="list">단지</a><a href="#calendar" data-view="calendar">공고 일정<span id="cal-badge" class="tab-badge" hidden></span></a><a href="#rules" data-view="rules">자격·순위</a><a href="#money" data-view="money">보증금·대출</a><a href="#me" data-view="me">내 조건 🔒</a><a href="#sources" data-view="sources">근거</a>
   </nav>
 </header>
 <main>
@@ -628,7 +635,8 @@ html.lb-open,html.lb-open body{overflow:hidden!important;overscroll-behavior:non
   <section class="view" id="view-calendar"><div class="wrap">
     <h2>공고 일정 — 2025·2026 실제, 2027 추정</h2>
     <p class="src" id="live-stamp">자동 갱신 상태 확인 중…</p>
-    <div class="note" id="push-card" style="margin:6px 0 16px"><p><b>새 공고 알림 받기 (이 기기)</b> — 매일 09:23·15:23 공고 수집 때 처음 보는 모집공고가 잡히면 이 기기로 알림이 옵니다(SH·LH 서울 모집공고, 청년안심은 청년형 8평 이상 단지만). 별도 앱 없이 브라우저 표준 웹 푸시로 오고, 알림 내용은 암호화돼 전달됩니다.</p>
+    <div class="note" id="alerts-box" style="margin:6px 0 12px"><p><b>새 공고 알림 목록</b> <span id="alerts-sum" class="src"></span></p><div id="alerts-list"><p class="src">불러오는 중…</p></div></div>
+    <div class="note" id="push-card" style="margin:6px 0 16px"><p><b>새 공고 알림 받기 (이 기기)</b> — 매일 09:23·15:23 공고 수집 때 처음 보는 모집공고가 잡히면 이 기기로 알림이 옵니다(SH·LH 서울 모집공고, 청년안심은 청년형 8평 이상 단지만). 별도 앱 없이 브라우저 표준 웹 푸시로 오고, 알림 내용은 암호화돼 전달됩니다. 알림을 누르면 위 목록에서 '확인'으로 표시됩니다.</p>
       <p><button type="button" id="push-btn">이 기기로 알림 받기</button> <span id="push-st" class="src"></span></p>
       <div id="push-reg" hidden></div></div>
 
@@ -1186,7 +1194,7 @@ function noticeLine(nid){ var n = NOTICES[nid]; var s = noticeStatus(n); return 
 
 // ===== 화면 전환 (해시 라우팅) =====
 var VIEWS = ['map','list','calendar','rules','money','me','sources'];
-function currentView(){ var h = (location.hash || '').replace(/^#/, ''); return VIEWS.indexOf(h) >= 0 ? h : 'map'; }
+function currentView(){ var h = (location.hash || '').replace(/^#/, '').split(/[&?]/)[0]; return VIEWS.indexOf(h) >= 0 ? h : 'map'; }   // '#calendar&seen=…'(알림 눌러 들어옴)도 공고 일정으로
 function showView(v){
   VIEWS.forEach(function(k){ var el = document.getElementById('view-' + k); if (el) el.classList.toggle('active', k === v); });
   document.querySelectorAll('.tabs a').forEach(function(a){ a.classList.toggle('active', a.getAttribute('data-view') === v); });
@@ -2321,6 +2329,48 @@ window.addEventListener('beforeinstallprompt', function(e){ e.preventDefault(); 
         if (sub && btn.dataset.renew) return sub.unsubscribe().then(function(){ return null; });   // 키가 바뀐 옛 구독은 지우고 새로
         return sub; }).then(function(sub){ return sub || r.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: u8(VAPID) }); });
     }).then(function(sub){ st.textContent = '구독됨 ✓'; show(sub); }).catch(function(e){ st.textContent = '안 됨: ' + ((e && e.message) || e); });
+  });
+})();
+
+// ===== 새 공고 알림 목록 + 확인 체크 — data/alerts.json(Actions 기록)을 읽고, 확인 여부는 이 기기 브라우저(localStorage)에 저장 =====
+(function(){
+  var SK = 'kkk-seen';
+  function load(){ try { return JSON.parse(localStorage.getItem(SK) || '{}') || {}; } catch (e) { return {}; } }
+  function save(m){ try { localStorage.setItem(SK, JSON.stringify(m)); } catch (e) {} }
+  var seen = load();
+  function mark(k, on){ if (!k) return; if (on === false) delete seen[k]; else if (!seen[k]) seen[k] = new Date().toISOString().slice(0, 10); save(seen); }
+  var box = document.getElementById('alerts-list'), sum = document.getElementById('alerts-sum'), badge = document.getElementById('cal-badge');
+  var items = [], hideSeen = false; try { hideSeen = localStorage.getItem('kkk-hide-seen') === '1'; } catch (e) {}
+  // 알림을 눌러 들어온 경우(#calendar&seen=KEY&go=URL): 확인 처리 후 공고 페이지로. 넘어가는 곳은 공고 출처(SH·LH·서울시·마이홈)만 — 남이 만든 링크로 엉뚱한 사이트에 보내지 못하게
+  var GO_OK = /^https?:\/\/([a-z0-9-]+\.)*(i-sh\.co\.kr|lh\.or\.kr|seoul\.go\.kr|myhome\.go\.kr|kimsangdeok\.github\.io)(\/|$)/i;
+  function fromHash(){ var h = location.hash || '', m = h.match(/[&?]seen=([^&]+)/); if (!m) return; var k = ''; try { k = decodeURIComponent(m[1]); } catch (e) {} if (/^(sh|lh|ya):[A-Za-z0-9_-]{1,40}$/.test(k)) mark(k); var g = h.match(/[&?]go=([^&]+)/);
+    try { history.replaceState(null, '', location.pathname + location.search + '#calendar'); } catch (e) {}
+    render();
+    if (g) { var u = ''; try { u = decodeURIComponent(g[1]); } catch (e) {} if (GO_OK.test(u)) setTimeout(function(){ location.href = u; }, 250); } }
+  fromHash(); window.addEventListener('hashchange', fromHash);   // 처음 열 때 + 이미 열려 있던 창으로 들어올 때
+  function esc(t){ return String(t == null ? '' : t).replace(/[&<>"]/g, function(c){ return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function render(){
+    if (!box) return;
+    var un = items.filter(function(e){ return !seen[e.key]; });
+    if (badge) { badge.hidden = !un.length; badge.textContent = un.length; }
+    try { if (navigator.setAppBadge) { if (un.length) navigator.setAppBadge(un.length); else navigator.clearAppBadge(); } } catch (e) {}
+    if (sum) sum.textContent = items.length ? '— 확인 안 함 ' + un.length + '건 · 최근 90일 ' + items.length + '건' : '';
+    if (!items.length) { box.innerHTML = '<p class="src">아직 쌓인 새 공고가 없습니다. 매일 09:23·15:23 공고 수집 때 처음 보는 모집공고(SH·LH 서울, 청년안심은 청년형 8평 이상 단지)가 잡히면 여기에 쌓이고, 알림을 켠 기기로 푸시가 갑니다.</p>'; return; }
+    var list = hideSeen ? un : items;
+    box.innerHTML = '<p class="src" style="margin:0 0 6px">확인 표시는 이 기기(브라우저)에만 저장됩니다. 제목을 누르거나 알림을 눌러 열면 자동으로 확인 처리.</p>' +
+      (list.length ? '<ul class="al-list">' + list.map(function(e){ var s = !!seen[e.key];
+        return '<li class="al-row' + (s ? ' seen' : '') + '"><label class="al-chk"><input type="checkbox" data-key="' + esc(e.key) + '"' + (s ? ' checked' : '') + '> 확인</label><div class="al-body"><span class="pill ' + (s ? 'info' : 'warn') + '">' + esc(e.src) + '</span> <a href="' + esc(e.url) + '" target="_blank" rel="noopener" data-key="' + esc(e.key) + '">' + esc(e.title) + '</a><br><small class="k">게시 ' + esc(e.posted || '?') + (e.apply ? ' · 접수 ' + esc(e.apply) : '') + ' · 잡힘 ' + esc(String(e.at || '').replace(' KST', '')) + (e.fit ? ' · 내 조건: ' + esc(e.fit) + (e.why ? ' — ' + esc(e.why) : '') : '') + '</small></div></li>'; }).join('') + '</ul>' : '<p class="src">확인 안 한 공고 없음</p>') +
+      '<p style="margin:8px 0 0"><button type="button" id="al-all">모두 확인</button> <label style="font-size:13px"><input type="checkbox" id="al-hide"' + (hideSeen ? ' checked' : '') + '> 확인한 것 숨기기</label></p>';
+    box.querySelectorAll('input[data-key]').forEach(function(c){ c.addEventListener('change', function(){ mark(c.getAttribute('data-key'), c.checked); render(); }); });
+    box.querySelectorAll('a[data-key]').forEach(function(a){ a.addEventListener('click', function(){ mark(a.getAttribute('data-key')); setTimeout(render, 50); }); });
+    var all = document.getElementById('al-all'); if (all) all.onclick = function(){ items.forEach(function(e){ mark(e.key); }); render(); };
+    var hs = document.getElementById('al-hide'); if (hs) hs.onchange = function(){ hideSeen = hs.checked; try { localStorage.setItem('kkk-hide-seen', hideSeen ? '1' : '0'); } catch (e) {} render(); };
+  }
+  fetch('data/alerts.json?t=' + Date.now(), { cache: 'no-store' }).then(function(r){ return r.ok ? r.json() : null; }).catch(function(){ return null; }).then(function(j){
+    var cut = new Date(Date.now() - 90 * 86400000).toISOString().slice(0, 10), dup = {};
+    items = ((j && j.log) || []).filter(function(e){ if (!(e && e.send && e.key && e.at) || String(e.at).slice(0, 10) < cut || dup[e.key]) return false; dup[e.key] = 1; return true; });
+    items.sort(function(a, b){ return String(b.at).localeCompare(String(a.at)); });
+    render();
   });
 })();
 
