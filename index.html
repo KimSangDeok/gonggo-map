@@ -493,7 +493,7 @@ html.lb-open,html.lb-open body{overflow:hidden!important;overscroll-behavior:non
         <div id="nm-minpy-note" class="minpy-note" style="flex-basis:100%"></div>
         <span class="lg-h">집 구조 <small class="k">— 복층·2층형은 계단·다락이 있는 구조(청년안심 민간 35개 형: 형 이름에 '복층' 26 · '2층형' 9, 매입임대 1개 주택군)</small></span>
         <label><input type="checkbox" id="nm-nodup" checked> 복층·2층형 빼기</label>
-        <span class="lg-h">준공 <small class="k">— 행복주택·국민임대는 사용승인일(K-apt), 청년안심·LH는 입주(예정)일 · 년차 = 올해 − 준공 연도 + 1 · 여러 단지 묶음은 가장 오래된 단지 기준</small></span>
+        <span class="lg-h">준공 <small class="k">— 행복주택·국민임대는 사용승인일(K-apt), 청년안심·LH는 입주(예정)일 · 년차 = 올해 − 준공 연도 + 1 · 여러 단지 묶음은 가장 오래된 단지 기준 · 이 자료들에 없던 5곳은 직접 찾은 사용승인일(출처는 상세)</small></span>
         <label>준공 <select id="nm-built" style="font:inherit;padding:4px 6px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--fg)"><option value="0">전체</option><option value="5">5년차 이내</option><option value="10">10년차 이내</option><option value="15">15년차 이내</option><option value="20">20년차 이내</option></select></label>
         <label><input type="checkbox" id="nm-built-unk" checked> 준공 모름도 보기</label>
         <span class="lg-h">해당 없음 <small class="k">— 고른 평수 미만뿐이거나(8평 미만 원룸 포함) 국민임대 2026 공고에 일반공급이 없는 곳(주거약자만)</small></span>
@@ -1135,10 +1135,21 @@ PLACES.forEach(function(p){
 });
 // ===== 준공(사용승인) 필터: 행복주택·국민임대 = K-apt 사용승인일, 청년안심·LH = 입주(예정)일. 여러 단지 묶음(2014.05~2021.02)은 가장 오래된 해 =====
 var BUILT = { max: 0, unk: true }; try { var _b = JSON.parse(localStorage.getItem('kkk-built') || 'null'); if (_b) BUILT = { max: +_b.max || 0, unk: _b.unk !== false }; } catch(e) {}
+// K-apt(행복·국민임대)·서울시 단지정보(청년안심)에 준공·입주일이 없던 5곳 — 건축물대장 기반 부동산 사이트 등에서 직접 찾아 적음(2026-10-28)
+var BUILT_FIX = {
+  '신정숲속마을': { d: '2016-08-10', how: '사용승인', src: 'KB부동산', url: 'https://kbland.kr/se/c/32157', more: '입주 2016.08 — 부동산지인·선수AI도 같음 · 560세대 7개동' },
+  '신내3-3 도시형생활주택': { d: '2017-09-04', how: '사용승인', src: '당근부동산(우디안3단지, 신내역로1길 142)', url: 'https://realty.daangn.com/complexes/11035808', more: '50세대' },
+  '신내3-4 도시형생활주택': { d: '2018-09-14', how: '준공', src: '올도구 임대주택(신내역로 160)', url: 'https://gonggongapart.com/city/11260/pnu/1126010600108310000', more: '집맵: 사용승인 2018년 · 289세대 3개동(서울시 공동주택 통합정보마당)' },
+  '고려대역 리스트 안암(List anam)': { d: '2024-08-19', how: '사용승인', src: '세이프홈즈(건축물대장 표제부 기준)', url: 'https://safehomes.kr/risk-map/%EC%84%9C%EC%9A%B8%ED%8A%B9%EB%B3%84%EC%8B%9C/%EB%8F%99%EB%8C%80%EB%AC%B8%EA%B5%AC/%EC%A0%9C%EA%B8%B0%EB%8F%99/%EC%95%84%ED%8C%8C%ED%8A%B8/building/%EB%A6%AC%EC%8A%A4%ED%8A%B8%EC%95%88%EC%95%94/1000000000000004202974', more: '299세대 1개동' },
+  '강변역 센텀힐스한강': { d: '2023-04-24', how: '최초 입주 예정', src: '한국청년주택협회(2023.01.27 최초모집공고: 입주예정 2023.04.24~05.08)', url: 'https://www.youthnest.or.kr/housing/190b62da-e42d-4fc0-9ba7-51ef02245744', more: '사용승인일 자체는 못 찾음' }
+};
+function builtFixHtml(name){ var f = BUILT_FIX[name]; if (!f) return ''; var y = +f.d.slice(0, 4), age = new Date().getFullYear() - y + 1;
+  return '<b>' + f.d.replace(/-/g, '.') + '</b> ' + f.how + ' <b>(' + age + '년차)</b> <small class="k">— <a href="' + f.url + '" target="_blank" rel="noopener">' + f.src + '</a>' + (f.more ? ' · ' + f.more : '') + ' · K-apt·서울시 자료엔 없어서 직접 찾음(2026-10-28)</small>'; }
 function builtYear(p){
   if (p.__by !== undefined) return p.__by;
   var t = (p.ya || p.lh) ? ((p.comp && p.comp.movein) || '') : (((factOf(p) || {}).k || {}).built || '');
   var ys = (String(t).match(/(?:19|20)\d{2}/g) || []).map(Number);
+  if (!ys.length && BUILT_FIX[p.name]) ys = [+BUILT_FIX[p.name].d.slice(0, 4)];
   if (!ys.length && HH_EXTRA[p.name]) { var mx = String(HH_EXTRA[p.name].src || '').match(/(20\d{2})\.\d{1,2}\s*입주/); if (mx) ys = [+mx[1]]; }   // 아직 안 지은 단지: 기사 속 입주 예정 연도
   return (p.__by = ys.length ? Math.min.apply(null, ys) : null);
 }
@@ -1566,7 +1577,7 @@ function factParts(p){
   var photos = '<div class="iw-sec"><div class="iw-sh">사진 <small class="k">SH 주택정보 · 전자팸플릿 · 이 형만</small></div>' + ph + '</div>';
   var rows = [];
   var k = f.k;
-  if (noFact) return { photos: photos, info: h + '</div>' };
+  if (noFact) return { photos: photos, info: h + (BUILT_FIX[p.name] ? '<table class="iw-t"><tr><th>준공</th><td>' + builtFixHtml(p.name) + '</td></tr></table>' : '') + '</div>' };
   if (k) {
     var by = parseInt(String(k.built || '').slice(0, 4), 10), age = by ? (new Date().getFullYear() - by + 1) : null;   // 준공 연도 = 1년차
     rows.push(['유형', (k.apt || '<small class="k">K-apt에 주택유형 미기재</small>') + (k.str ? ' · ' + k.str : '') + ' <small class="k">(K-apt 등록값)</small>']);
@@ -1575,7 +1586,8 @@ function factParts(p){
     if (k.park) { var pk = k.park; rows.push(['주차', '세대당 <b>' + pk.per + '대</b>' + (pk.per_rng ? ' (' + pk.per_rng[0] + '~' + pk.per_rng[1] + ')' : '') + ' · 총 ' + pk.t.toLocaleString() + '면 (지하 ' + pk.under + '%)' + (pk.cars ? '<br>등록 차량 ' + pk.cars.toLocaleString() + '대 = 주차면의 <b>' + pk.cars_per + '%</b>' : '') + (pk.ev ? ' · 전기차 ' + pk.ev : '')]); }
     else rows.push(['주차', '<small class="k">K-apt에 주차대수 미등록</small>']);
   } else {
-    rows.push(['유형·준공', '<small class="k">K-apt(공동주택관리정보시스템)에 미등록 → 주택유형·준공연도·동수·주차 정보 없음(아파트가 아닌 도시형생활주택·오피스텔은 K-apt 대상이 아님)</small>']);
+    if (BUILT_FIX[p.name]) rows.push(['준공', builtFixHtml(p.name)]);
+    rows.push([BUILT_FIX[p.name] ? '유형' : '유형·준공', '<small class="k">K-apt(공동주택관리정보시스템)에 미등록 → 주택유형·' + (BUILT_FIX[p.name] ? '' : '준공연도·') + '동수·주차 정보 없음(아파트가 아닌 도시형생활주택·오피스텔은 K-apt 대상이 아님)</small>']);
   }
   if (!f.type && p.kind === '행복주택') rows.push(['이 형', '<small class="k">SH 주택정보에 이 단지 형별 정보 없음 → 공가·퇴거 모름</small>']);
   // SH 형별 표에 이 형이 없어 가장 가까운 다른 형을 잡은 경우(꿈의숲아이파크 39형 → 40형 재개발임대)는 그 형 숫자를 보여 주지 않음
@@ -1812,7 +1824,7 @@ function yaHtml(p){
   var sc = c.scale || {};
   var yaInfo = '<div class="iw-sec"><div class="iw-sh">단지 정보 <small class="k">서울시 단지정보</small></div><table class="iw-t">' +
     '<tr><th>지하철</th><td>' + (c.subway || c.station || '<small class="k">미기재</small>') + '</td></tr>' +
-    '<tr><th>입주</th><td>' + (c.movein ? c.movein + (function(){ var d = new Date(String(c.movein).slice(0, 10) + 'T00:00:00'), y = d.getFullYear(); if (!y || isNaN(y)) return ''; return d > new Date() ? ' <b>(입주 예정)</b>' : ' <b>(입주 ' + (new Date().getFullYear() - y + 1) + '년차)</b>'; })() : '<small class="k">미기재</small>') + (c.first_notice ? ' <small class="k">(최초 공고 ' + c.first_notice + ')</small>' : '') + (c.status && c.status !== '공급상태' ? ' · ' + c.status : '') + '<br><small class="k">준공연도는 서울시 자료에 없음 → 입주(예정)일로 대신. 청년안심주택은 신축이라 입주일 ≈ 준공</small></td></tr>' +
+    '<tr><th>입주</th><td>' + (!c.movein && BUILT_FIX[c.name] ? builtFixHtml(c.name) + '<br>' : '') + (c.movein ? c.movein + (function(){ var d = new Date(String(c.movein).slice(0, 10) + 'T00:00:00'), y = d.getFullYear(); if (!y || isNaN(y)) return ''; return d > new Date() ? ' <b>(입주 예정)</b>' : ' <b>(입주 ' + (new Date().getFullYear() - y + 1) + '년차)</b>'; })() : (BUILT_FIX[c.name] ? '<small class="k">서울시 단지정보엔 입주일 미기재</small>' : '<small class="k">미기재</small>')) + (c.first_notice ? ' <small class="k">(최초 공고 ' + c.first_notice + ')</small>' : '') + (c.status && c.status !== '공급상태' ? ' · ' + c.status : '') + '<br><small class="k">준공연도는 서울시 자료에 없음 → 입주(예정)일로 대신. 청년안심주택은 신축이라 입주일 ≈ 준공</small></td></tr>' +
     '<tr><th>주차</th><td>차량 소유·운행 <b>가능</b> <small class="k">(2026 2차 공고문 14쪽: "단지별로 운영상황이 상이" → 관리사무소 문의) · 공공임대 물량은 자동차 1대당 가액 4,542만 이하(32쪽)<br>주차비: 일반 입주자 = 민영주차장 요금 수준, 장애인·유자녀·생계형 필수 차량 = 월 4~5만 (<a href="https://mediahub.seoul.go.kr/archives/2009549" target="_blank" rel="noopener">서울시 설명자료 2023.11.13</a>)<br>이 단지 주차 대수는 <b>자료 없음</b> — 서울시 단지정보·목록에 항목이 없음</small></td></tr>' +
     '<tr><th>건물</th><td><small class="k">아파트/오피스텔 구분 <b>자료 없음</b> — 서울시 단지 목록(houseType 항목 비어 있음)·상세 페이지 항목에 없고 SH 공고문에도 없음. 모집공고문 첨부의 "건축물 용도"에서 확인</small></td></tr>' +
     '</table></div>';
