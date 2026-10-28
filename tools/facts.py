@@ -174,7 +174,8 @@ def facts_for(name, m2=None, kind='행복주택'):
             o['type'] = {'sp': t[0], 'cls': t[1], 'ar': t[2], 'hh': t[3], 'rooms': t[4], 'vac': t[5], 'out': t[7], 'ym': t[10], 'exact': bool(exact)}
             pk = plan_key(sh['plans'], t[0], None if exact else str(int(m2)))
             if pk: o['plan'] = img(sh['plans'][pk]); o['plan_ty'] = base(pk)   # 화면 이름표는 평면도의 형 번호로
-            won, ym = near_cost(sh, t[2])
+            won, ym = near_cost(sh, m2)                 # 관리비는 공고 면적(내 형)에 가장 가까운 면적 것 — 은뜨락 39.487㎡·꿈의숲아이파크 39.0㎡
+            if not won: won, ym = near_cost(sh, t[2])
             if won: o['cost'] = {'won': won, 'ym': ym}
     if kind == '국민임대' and shs:
         T = {}
