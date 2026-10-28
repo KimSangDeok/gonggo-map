@@ -1,0 +1,33 @@
+name: update-thumbs
+# 사진 띠용 썸네일(data/thumbs, data/thumbs.json) — 원본(수 MB) 대신 띠에 작은 그림을 써서 폰 스크롤 끊김을 줄임.
+# 이미 만든 것은 다시 안 받으므로 매일 돌려도 새 사진만 받음(청년안심 ya.json 은 매일, SH fact.json 은 매달 바뀜)
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '53 1 * * *'       # 매일 10:53 KST (update-notices 09:23 뒤)
+  push:
+    paths: ['tools/make_thumbs.py', '.github/workflows/update-thumbs.yml', 'data/fact.json']
+permissions:
+  contents: write
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.12' }
+      - run: pip install -q requests pillow
+      - run: python tools/make_thumbs.py
+        env: { THUMB_BUDGET_SEC: '1500' }
+      - name: commit
+        run: |
+          git config user.name 'gonggo-bot'; git config user.email 'gonggo-bot@users.noreply.github.com'
+          git add -A data/thumbs data/thumbs.json
+          git diff --cached --quiet && { echo 'no change'; exit 0; }
+          git commit -m "data: 사진 썸네일 갱신 $(date -u +%F)"
+          for i in 1 2 3; do git pull --rebase -X theirs origin gh-pages && git push && exit 0; git rebase --abort 2>/dev/null; sleep 15; done
+          exit 1
