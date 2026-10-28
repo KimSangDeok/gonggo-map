@@ -2,6 +2,11 @@ name: photo-audit
 # 점검용(수동): 사이트에 뜨는 SH 주택정보 사진을 단지별 모아보기 그림으로 만들어 별도 브랜치 photo-audit 에 올림(gh-pages·사이트에는 안 들어감, 확인 뒤 브랜치 삭제)
 on:
   workflow_dispatch:
+    inputs:
+      full_urls:
+        description: '원본 크기로 잘라 볼 이미지 URL(공백 구분, 비우면 생략)'
+        required: false
+        type: string
 permissions:
   contents: write
 jobs:
@@ -15,6 +20,8 @@ jobs:
       - run: sudo apt-get install -y -q fonts-noto-cjk > /dev/null
       - run: pip install -q requests beautifulsoup4 pillow
       - run: python tools/photo_audit.py
+        env:
+          FULL_URLS: ${{ inputs.full_urls }}
       - name: push to photo-audit branch
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

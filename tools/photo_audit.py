@@ -103,5 +103,15 @@ for c in sorted(ya.get('complexes', []), key=lambda c: c.get('name', '')):
         safe = re.sub(r'[^0-9A-Za-z가-힣]+', '_', c.get('name', ''))[:30]
         sh.save(os.path.join(OUT, f'{sheet_no:03d}_ya_{safe}.jpg'), 'JPEG', quality=82)
         sheet_no += 1
+# ---------- 원본 크기로 볼 이미지(FULL_URLS): 긴 소개 그림·여러 형 한 장은 글자를 읽을 수 있게 원본 해상도로 잘라 저장 ----------
+for n, u in enumerate((os.environ.get('FULL_URLS') or '').split()):
+    im = get(u)
+    if not im: print('full fail', u); continue
+    W = min(im.width, 1400)
+    if im.width > W: im = im.resize((W, int(im.height * W / im.width)))
+    step = int(W * 1.1)
+    for k, y in enumerate(range(0, im.height, step)):
+        im.crop((0, y, im.width, min(im.height, y + step))).save(os.path.join(OUT, f'full_{n:02d}_{k:02d}.jpg'), 'JPEG', quality=88)
+    index.append({'full': n, 'url': u, 'w': im.width, 'h': im.height, 'parts': (im.height + step - 1) // step})
 json.dump(index, open(os.path.join(OUT, 'index.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
-print('sheets', sheet_no, 'images', len(index), 'failed', sum(1 for x in index if not x['ok']))
+print('sheets', sheet_no, 'images', len(index), 'failed', sum(1 for x in index if not x.get('ok', True)))
