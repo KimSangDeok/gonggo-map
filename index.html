@@ -261,12 +261,12 @@ main section.view{margin-top:0}
 @keyframes secflash{0%,30%{background:var(--accent-soft);box-shadow:0 0 0 6px var(--accent-soft)}100%{background:transparent;box-shadow:0 0 0 6px transparent}}
 @media (min-width:761px){
   /* PC: 상세는 오른쪽 넓은 패널(지도는 왼쪽에 그대로 — Material '표준 사이드 시트'), 내용은 2단. 넓게 보기 = 패널이 지도 위를 덮고 3단 */
-  #view-map.active.detail-open{grid-template-columns:minmax(0,1fr) min(940px,62vw)}
+  #view-map.active.detail-open{grid-template-columns:minmax(360px,1fr) min(1400px,75vw,calc(100vw - 360px))}
   #view-map.active{position:relative}
   #view-map.detail-wide .side{position:absolute;top:0;right:0;bottom:0;left:0;z-index:5;border-left:0}
   .side.show-detail .lg-body,.side.show-detail #nm-msg{display:none}
   #detail-wide{display:inline-block}
-  .side.show-detail .detail .nm-iw{columns:2;column-gap:30px;column-rule:1px solid var(--line);padding:10px 18px 26px;font-size:14px}
+  .side.show-detail .detail .nm-iw{columns:380px 3;column-gap:30px;column-rule:1px solid var(--line);padding:10px 18px 26px;font-size:14px}
   #view-map.detail-wide .side .detail .nm-iw{columns:380px 4}   /* 넓게 보기: 단 폭 380px 이상으로 들어가는 만큼(최대 4단) — 1280~1440 3단 · 1920 4단, 한 줄 30자 안팎 */
   .side.show-detail .detail .iw-strip{margin-left:0;margin-right:0;padding-left:0;padding-right:0}
   .side.show-detail .detail .nm-iw > *{break-inside:avoid}
@@ -493,6 +493,9 @@ html.lb-open,html.lb-open body{overflow:hidden!important;overscroll-behavior:non
         <div id="nm-minpy-note" class="minpy-note" style="flex-basis:100%"></div>
         <span class="lg-h">집 구조 <small class="k">— 복층·2층형은 계단·다락이 있는 구조(청년안심 민간 35개 형: 형 이름에 '복층' 26 · '2층형' 9, 매입임대 1개 주택군)</small></span>
         <label><input type="checkbox" id="nm-nodup" checked> 복층·2층형 빼기</label>
+        <span class="lg-h">준공 <small class="k">— 행복주택·국민임대는 사용승인일(K-apt), 청년안심·LH는 입주(예정)일 · 년차 = 올해 − 준공 연도 + 1 · 여러 단지 묶음은 가장 오래된 단지 기준</small></span>
+        <label>준공 <select id="nm-built" style="font:inherit;padding:4px 6px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--fg)"><option value="0">전체</option><option value="5">5년차 이내</option><option value="10">10년차 이내</option><option value="15">15년차 이내</option><option value="20">20년차 이내</option></select></label>
+        <label><input type="checkbox" id="nm-built-unk" checked> 준공 모름도 보기</label>
         <span class="lg-h">해당 없음 <small class="k">— 고른 평수 미만뿐이거나(8평 미만 원룸 포함) 국민임대 2026 공고에 일반공급이 없는 곳(주거약자만)</small></span>
         <label><input type="checkbox" data-cat="na"> <span class="dot sq hl" style="--c:#9aa4b2"></span> 해당 없음도 회색으로 보기</label>
       </div>
@@ -600,18 +603,16 @@ html.lb-open,html.lb-open body{overflow:hidden!important;overscroll-behavior:non
   <p class="src">출처: <a href="https://www.i-sh.co.kr/app/lay2/program/S1T294C295/www/brd/m_241/view.do?multi_itm_seqs=1%2C2%2C4%2C8%2C16%2C32%2C64%2C128%2C256&seq=304864">SH 2026 1차 행복주택 공고문</a> 11~16·54~56쪽 · <a href="https://www.i-sh.co.kr/app/lay2/program/S1T294C295/www/brd/m_241/view.do?multi_itm_seqs=1%2C2%2C4%2C8%2C16%2C32%2C64%2C128%2C256&seq=309337">2026 2차 공고문</a> 11~15·51~52쪽. 보증금은 월세로 돌릴 수 있음(SH·서울시 소유 단지 50%까지, 서울리츠 20%까지, 연 2.5%). 예: 천왕이펜하우스8 36㎡(10.9평) 6,552만 → 3,276만 + 월 31.4만.</p>
 
   <h3 style="margin-top:22px">국민임대 — 강서구와 '강서 거주 = 1순위'인 지구</h3>
-  <p class="src" style="margin-bottom:8px">2025 → 2026 공고에 실제로 나온 일반공급 물량. 형 이름(39·49·59)은 SH 공고문의 '신청유형'이고 실제 전용은 카드마다 적음. 39·49형(전용 50㎡(15.1평) 미만)은 소득 50%(1인 70%) 선순위 안에서 해당구·연접구 거주가 1순위, 59형(전용 50㎡(15.1평) 이상)은 소득 70%(1인 90%) 안에서 청약 24회 이상이 1순위(거주지 무관 — 2026 공고문 26~28쪽). 전용 8평(26.45㎡) 이상 조건은 국민임대 전 형이 만족(가장 작은 29형도 전용 29.03~29.27㎡ = 8.8~8.9평, 위 지구들은 39형부터).</p>
+  <p class="src" style="margin-bottom:8px">2025 → 2026 공고에 실제로 나온 일반공급 물량(2026 공고에 일반공급이 없는 면적·지구는 뺌: 마곡엠밸리 1~15단지·상암월드컵8단지 (상암3-8단지)). 형 이름(39·49·59)은 SH 공고문의 '신청유형'이고 실제 전용은 카드마다 적음. 39·49형(전용 50㎡(15.1평) 미만)은 소득 50%(1인 70%) 선순위 안에서 해당구·연접구 거주가 1순위, 59형(전용 50㎡(15.1평) 이상)은 소득 70%(1인 90%) 안에서 청약 24회 이상이 1순위(거주지 무관 — 2026 공고문 26~28쪽). 전용 8평(26.45㎡) 이상 조건은 국민임대 전 형이 만족(가장 작은 29형도 전용 29.03~29.27㎡ = 8.8~8.9평, 위 지구들은 39형부터).</p>
   <div class="grid2">
-    <div class="card"><h3>마곡엠밸리 1~15단지 <span class="pill ok">강서 1순위</span> <a class="map" href="https://map.naver.com/p/search/%EB%A7%88%EA%B3%A1%EC%97%A0%EB%B0%B8%EB%A6%AC">지도</a></h3><p class="src">강서구 마곡동 (마곡서1로·마곡중앙로·공항대로)</p>
-      <div class="kv"><b>49형</b><span><small class="k">전용 49.77㎡(15.1평)</small><br>2025: 29호(공가 5·예비 24) · 5,564~6,467만 · 월 38.0~42.1만<br>2026: 일반 없음(주거약자 6호만)</span><b>59형</b><span><small class="k">전용 59.79㎡(18.1평)</small><br>2025: 40호(예비 40 · 기존 대기 7) · 5,770~7,525만 · 월 37.6~46.5만<br>2026: 없음</span><b>9단지</b><span>49형(전용 49.53㎡ · 15평) 2025: 4호(예비 4 · 기존 대기 10) · 5,799만 · 월 31.9만<br>2026: 일반 없음(주거약자 2호만)</span></div></div>
+    
     <div class="card"><h3>마곡수명산파크 1~7단지 <span class="pill ok">강서 1순위</span> <a class="map" href="https://map.naver.com/p/search/%EB%A7%88%EA%B3%A1%EC%88%98%EB%AA%85%EC%82%B0%ED%8C%8C%ED%81%AC">지도</a></h3><p class="src">강서구 내발산동 (강서로47길·수명로)</p>
-      <div class="kv"><b>39형</b><span><small class="k">전용 39.73㎡(12.0평)</small><br>2025: 18호(예비 18 · 기존 대기 3) · 2,451만 · 월 22.2만<br>2026: 없음</span><b>49형</b><span><small class="k">전용 49.83㎡(15.1평)</small><br>2025: 22호(공가 4·예비 18) · 3,674~3,900만 · 월 26.2~28.7만<br>2026: 없음</span><b>59형</b><span><small class="k">전용 59.76㎡(18.1평)</small><br>2025: 27호(공가 11·예비 16) · 4,002~4,323만 · 월 29.3~32.2만<br>2026: 40호(예비 40) · 4,002~4,323만 · 월 29.3~32.2만</span></div></div>
+      <div class="kv"><b>59형</b><span><small class="k">전용 59.76㎡(18.1평)</small><br>2025: 27호(공가 11·예비 16) · 4,002~4,323만 · 월 29.3~32.2만<br>2026: 40호(예비 40) · 4,002~4,323만 · 월 29.3~32.2만</span></div></div>
     <div class="card"><h3>신정이펜하우스 1~5단지 <span class="pill ok">연접 1순위</span> <a class="map" href="https://map.naver.com/p/search/%EC%8B%A0%EC%A0%95%EC%9D%B4%ED%8E%9C%ED%95%98%EC%9A%B0%EC%8A%A4">지도</a></h3><p class="src">양천구 신정동 (신정이펜1로·2로)</p>
-      <div class="kv"><b>49형</b><span><small class="k">전용 49.92㎡(15.1평)</small><br>2025: 12호(예비 12 · 기존 대기 7) · 4,007~4,987만 · 월 30.4~35.1만<br>2026: 주거약자만</span><b>59형</b><span><small class="k">전용 59.83㎡(18.1평)</small><br>2025: 50호(공가 5·예비 45) · 4,715~5,864만 · 월 34.4~39.4만<br>2026: 58호(공가 14·예비 44) · 4,715~5,864만 · 월 34.4~39.4만</span></div></div>
+      <div class="kv"><b>59형</b><span><small class="k">전용 59.83㎡(18.1평)</small><br>2025: 50호(공가 5·예비 45) · 4,715~5,864만 · 월 34.4~39.4만<br>2026: 58호(공가 14·예비 44) · 4,715~5,864만 · 월 34.4~39.4만</span></div></div>
     <div class="card"><h3>상암월드컵파크 9~12단지 <span class="pill ok">연접 1순위</span> <a class="map" href="https://map.naver.com/p/search/%EC%83%81%EC%95%94%EC%9B%94%EB%93%9C%EC%BB%B5%ED%8C%8C%ED%81%AC">지도</a></h3><p class="src">마포구 상암동 (월드컵북로 501~502)</p>
-      <div class="kv"><b>49형</b><span><small class="k">전용 49.58㎡(15.0평)</small><br>2025: 18호(예비 18 · 기존 대기 6) · 4,740~5,434만 · 월 32.8~33.8만<br>2026: 주거약자만</span><b>59형</b><span><small class="k">전용 59.37㎡(18.0평)</small><br>2025: 29호(공가 5·예비 24) · 5,702~6,509만 · 월 37.8~38.6만<br>2026: 15호(예비 15) · 5,702~6,509만 · 월 37.8~38.6만</span></div></div>
-    <div class="card"><h3>상암월드컵8단지 (상암3-8단지) <span class="pill ok">연접 1순위</span> <a class="map" href="https://map.naver.com/p/search/%EC%83%81%EC%95%94%EC%9B%94%EB%93%9C%EC%BB%B58%EB%8B%A8%EC%A7%80">지도</a></h3><p class="src">마포구 월드컵로42길 12 · 1순위 = 마포·<b>강서</b>·서대문·영등포·용산·은평·중구 거주(2025 공고문 26쪽 1순위 표)</p>
-      <div class="kv"><b>39형</b><span><small class="k">전용 39.76㎡(12.0평)</small><br>2025: 19호(공가 4·예비 15) · 2,878만 · 월 25.4만<br>2026: 없음</span><b>49형</b><span><small class="k">전용 49.62㎡(15.0평)</small><br>2025: 22호(공가 9·예비 13) · 4,285만 · 월 30.8만<br>2026: 없음</span></div></div>
+      <div class="kv"><b>59형</b><span><small class="k">전용 59.37㎡(18.0평)</small><br>2025: 29호(공가 5·예비 24) · 5,702~6,509만 · 월 37.8~38.6만<br>2026: 15호(예비 15) · 5,702~6,509만 · 월 37.8~38.6만</span></div></div>
+    
     <div class="card"><h3>신정숲속마을 (신정4지구) <span class="pill ok">연접 1순위</span> <a class="map" href="https://map.naver.com/p/search/%EC%8B%A0%EC%A0%95%EC%88%B2%EC%86%8D%EB%A7%88%EC%9D%84">지도</a></h3><p class="src">양천구 신정로 110 · 39㎡(12.1평) 한 가지 형만 있는 단지. 1순위 = 양천·<b>강서</b>·구로·영등포 거주</p>
       <div class="kv"><b>39㎡(11.8평)</b><span>2025: 10호(공가 2·예비 8) · 2,832만 · 월 23.7만 · 경쟁률 23.0:1(230명)<br>2026: <b>4호(예비 4 · 기존 대기 2)</b> · 2,832만 · 월 23.7만 · 전용 39.92㎡(12.1평) · 경쟁률 72.8:1(291명)</span><b>전환</b><span>보증금 최대 5,375만이면 월 9.46만, 최소 1,132만이면 월 27.2만 (2026 공고문 20쪽)</span></div></div>
     <div class="card"><h3>천왕·항동 (구로) <span class="pill warn">강서는 2순위</span> <a class="map" href="https://map.naver.com/p/search/%EC%B2%9C%EC%99%95%EC%9D%B4%ED%8E%9C%ED%95%98%EC%9A%B0%EC%8A%A4">지도</a></h3><p class="src">천왕이펜하우스 1~6 · 천왕연지타운 1,2 · 항동하버라인 2,3,4,8</p>
@@ -1132,6 +1133,17 @@ PLACES.forEach(function(p){
     p.ok26 = ok26.map(function(r){ return r[0]; });
   }
 });
+// ===== 준공(사용승인) 필터: 행복주택·국민임대 = K-apt 사용승인일, 청년안심·LH = 입주(예정)일. 여러 단지 묶음(2014.05~2021.02)은 가장 오래된 해 =====
+var BUILT = { max: 0, unk: true }; try { var _b = JSON.parse(localStorage.getItem('kkk-built') || 'null'); if (_b) BUILT = { max: +_b.max || 0, unk: _b.unk !== false }; } catch(e) {}
+function builtYear(p){
+  if (p.__by !== undefined) return p.__by;
+  var t = (p.ya || p.lh) ? ((p.comp && p.comp.movein) || '') : (((factOf(p) || {}).k || {}).built || '');
+  var ys = (String(t).match(/(?:19|20)\d{2}/g) || []).map(Number);
+  if (!ys.length && HH_EXTRA[p.name]) { var mx = String(HH_EXTRA[p.name].src || '').match(/(20\d{2})\.\d{1,2}\s*입주/); if (mx) ys = [+mx[1]]; }   // 아직 안 지은 단지: 기사 속 입주 예정 연도
+  return (p.__by = ys.length ? Math.min.apply(null, ys) : null);
+}
+function builtAge(p){ var y = builtYear(p); return y ? new Date().getFullYear() - y + 1 : null; }   // 년차(준공 연도 = 1년차), 입주 예정이면 0 이하
+function builtOk(p){ if (!BUILT.max) return true; var a = builtAge(p); return a === null ? BUILT.unk : a <= BUILT.max; }
 // 행복주택·국민임대: 면적이 기준 미만 구간이면 해당 없음(구간은 지도 범례 체크박스). 원래 분류는 cat0 에 보관
 function classifyPlaces(){
   PLACES.forEach(function(p){
@@ -1444,28 +1456,41 @@ function termsHtml(keys){
   return keys.map(function(k){ var t = TERMS[k];
     return '<div class="iw-sec"><div class="iw-sh">거주 조건 <small class="k">' + t.label + '</small></div><table class="iw-t"><tr><th>계약·갱신</th><td>' + t.term + '</td></tr><tr><th>최장 거주</th><td><b>' + t.max + '</b></td></tr><tr><th>갱신 조건</th><td>' + t.renew + '</td></tr><tr><th>근거</th><td>' + t.src.map(function(x){ return '<a href="' + x[1] + '" target="_blank" rel="noopener">' + x[0] + '</a>'; }).join(' · ') + '</td></tr></table></div>'; }).join('');
 }
+// 이 카드의 '내 형' — 행복주택: 공고 줄의 형(전용 정수부), 국민임대: 2026 일반공급 면적 중 지금 기준 이상. 그 밖은 null(모름 → 거르지 않음)
+function myTys(p){
+  if (p.kind === '행복주택' && p.m2) return [String(Math.floor(p.m2))];
+  if (p.kind === '국민임대') return (p.ok26 || []).map(function(a){ return parseFloat(a); }).filter(inSel).map(function(a){ return String(Math.floor(a)); });
+  return null;
+}
+// SH 실내 사진 이름에 적힌 형(36형거실 · 거실(29) · 51타입 · (39A'-1) · 49 안방) — tools/facts.py _ty 와 같은 규칙
+function roomTy(t){ var pats = [/(\d{2})\s*형/, /(\d{2})\s*타입/, /\((\d{2})[A-Z]?'?-?\d?\)/, /(?:^|\s)(\d{2})[A-Z]?\d?(?=\s|$)/, /-\s*(\d{2})(?=\s|$)/];
+  for (var i = 0; i < pats.length; i++) { var m = String(t || '').match(pats[i]); if (m && +m[1] >= 15 && +m[1] <= 90) return m[1]; } return null; }
 function factOf(p){ var m = p.m2 == null ? '' : p.m2; return FACT[p.name + '|' + m] || (typeof m === 'number' && m % 1 === 0 ? FACT[p.name + '|' + m + '.0'] : null) || null; }   // '39.0' 열쇠(옛 자료)도 찾음
 function won(n){ return n >= 10000 ? (Math.round(n / 1000) / 10) + '만' : n.toLocaleString() + '원'; }
-function factHtml(p){
+// 상세 순서(모든 종류 같음): 요약 → 사진 → 임대조건 → 형별 물량 → 단지 정보 → 지난 경쟁률 → 거주 조건. SH 단지 자료는 사진·단지 정보 두 칸으로 나눠 씀
+function factHtml(p){ var x = factParts(p); return x.photos + x.info; }
+function factParts(p){
   var f = factOf(p), noFact = !f || (!f.k && !f.type && !f.types);
   if (!f) f = { src: [] };
   var h = '<div class="iw-sec"><div class="iw-sh">단지 정보 <small class="k">' + (noFact ? 'SH 주택정보·K-apt 수집분에 없음' : f.src.join(' · ') + (window.FACT_UPDATED ? ' · 갱신 ' + window.FACT_UPDATED.slice(0, 10) : '')) + '</small></div>';
-  if (noFact) h += '<div class="iw-nophoto"><b>단지 정보 없음</b> — 이 사이트가 매달 받는 SH 주택정보(공가·퇴거·관리비·사진)·K-apt(동·세대·주차) 자료에 이 단지가 아직 안 잡힘. 아래는 전자팸플릿만</div>';
-  // 사진 띠(가로 스크롤, 전부): 실내 각 방(SH 사진유형 07, 이 형 우선) → 전경 → SH 평면도 → 전자팸플릿 평면도·배치도. 없으면 없다고 쓴다.
-  var tiles = [], when = window.FACT_UPDATED ? ' (' + window.FACT_UPDATED.slice(0, 10) + ' 확인)' : '', hidSmall = 0;
+  if (noFact) h += '<div class="iw-nophoto"><b>단지 정보 없음</b> — 이 사이트가 매달 받는 SH 주택정보(공가·퇴거·관리비·사진)·K-apt(동·세대·주차) 자료에 이 단지가 아직 안 잡힘</div>';
+  // 사진 띠: 이 카드의 형(내 형)인 것만 넣음 — 다른 형·주거약자형(S)·고령자·신혼부부형 사진·평면도는 접어 두지도 않고 뺌
+  // 실내(SH, 사진 이름에 형이 적혀 있으면 그 형만) → 전경(단지 전체) → SH 평면도(이 형일 때만) → 팸플릿 평면도(이 형만 · 펼침면은 이 형 반쪽만)·배치도(단지 전체)
+  var tiles = [], when = window.FACT_UPDATED ? ' (' + window.FACT_UPDATED.slice(0, 10) + ' 확인)' : '', hidSmall = 0, hidOther = 0, mine = myTys(p);
   var tyOk = function(t){ var n = parseInt(t, 10); return !n || n < 10 || n > 200 || fitRange(n, n + 1) !== 0; };   // 형 번호(정수 ㎡)가 기준 미만이면 false
-  (f.rooms || []).forEach(function(r){ var m = String(r.t || '').match(/^\s*(\d{2,3})\b/); if (m && !tyOk(m[1])) { hidSmall++; return; } tiles.push({ u: r.u, th: TH(r.u), t: r.t, cls: 'rm' }); });
+  var isMine = function(t){ return !mine || mine.indexOf(String(t)) >= 0; };
+  (f.rooms || []).forEach(function(r){ var ty = roomTy(r.t); if (ty && !isMine(ty)) { hidOther++; return; } if (ty && !tyOk(ty)) { hidSmall++; return; } tiles.push({ u: r.u, th: TH(r.u), t: r.t, cls: 'rm', ty: ty }); });
   (f.photos || []).forEach(function(u){ tiles.push({ u: u, th: TH(u), t: '전경', cls: '' }); });
   var planTy = f.plan_ty || (f.type ? f.type.sp : '');   // 평면도 그림의 형 번호(SH 형 매칭과 다를 수 있음 — 꿈의숲아이파크 39형 그림·40형 통계)
-  if (f.plan) tiles.push({ u: f.plan, th: TH(f.plan), t: (planTy ? planTy + '형 ' : '') + '평면도(SH 주택정보)', cls: 'pl' });
-  var pam = window.PAM && window.PAM.items && window.PAM.items[p.name], base = p.m2 ? String(Math.floor(p.m2)) : null, pamPages = [], pamAll = 0, pamOther = 0, outPages = [], outTiles = [], outNote = '', sNote = '';
+  var shPlan = false;
+  if (f.plan) { if (planTy && !isMine(planTy)) hidOther++; else { shPlan = true; tiles.push({ u: f.plan, th: TH(f.plan), t: (planTy ? planTy + '형 ' : '') + '평면도(SH 주택정보)', cls: 'pl' }); } }
+  var pam = window.PAM && window.PAM.items && window.PAM.items[p.name], pamPages = [], pamPlans = 0;
   if (pam && pam.length) {
-    pam.forEach(function(e){ e.pages.forEach(function(pg){ pamAll++; if (pg.kind !== 'plan' && pg.kind !== 'site') pamOther++; if (pg.kind === 'plan' || pg.kind === 'site') pamPages.push({ img: pg.img, th: pg.th || pg.img, n: pg.n, e: e, kind: pg.kind, tys: pg.tys || [], ex: pg.ex || [], code: pg.code || [], tag: pg.tag || [] }); }); });
+    pam.forEach(function(e){ e.pages.forEach(function(pg){ if (pg.kind === 'plan' || pg.kind === 'site') pamPages.push({ img: pg.img, th: pg.th || pg.img, n: pg.n, e: e, kind: pg.kind, tys: pg.tys || [], ex: pg.ex || [], code: pg.code || [], tag: pg.tag || [], halves: pg.halves }); }); });
     // 공급 유형 글자((기본형)·(주거약자형))는 쪽에 형이 하나·유형 글자도 하나일 때만 믿음 — 범례·각주의 '(주거약자형)'까지 잡혀 틀린 표시가 되던 것(신정숲속마을 19쪽 등)
     var tagOf = function(x){ return x.code.length === 1 && x.tag.length === 1 ? x.tag[0] : ''; };
-    // 형 이름 끝의 S(29AS·39A-S) = 주거약자용 주택(2026년 2차 행복주택 공고 17쪽)
+    // 형 이름 끝의 S(29AS·39A-S) = 주거약자용 주택(2026년 2차 행복주택 공고 17쪽) — 고령자 몫이라 청년 신청 형이 아님
     var isS = function(c){ return /^\d{2,3}[A-Z]*-?S$/.test(c); };
-    // 쪽 전체가 청년 1인이 신청하는 공급 유형이 아니면 그 이름: 형 이름이 전부 S이거나, 형 하나·유형 글자 하나가 주거약자·고령자·장애인·신혼부부
     var supOf = function(x){
       if (x.code.length && x.code.every(isS)) return '주거약자형';
       var t = tagOf(x); return /주거약자|고령자|장애인/.test(t) ? '주거약자형' : (/신혼부부/.test(t) ? '신혼부부형' : '');
@@ -1476,89 +1501,72 @@ function factHtml(p){
       if (x.code.length) return x.code.map(function(c){ return String(parseInt(c, 10)); });
       return null;
     };
-    var sameTy = function(x){ var t = tyNums(x); if (!t || !base) return null; return t.indexOf(base) >= 0 || x.ex.some(function(v){ return Math.abs(parseFloat(v) - p.m2) < 0.5; }); };
-    // 평면도 쪽에 실린 형이 전부 기준 미만이면 뺌(배치도는 둠). 판단은 쪽 글자의 전용면적(29.09) → 형 이름(29A) → 형 번호 순 — 형 번호는 치수 숫자가 섞일 수 있어 마지막
+    // 내 것인가: 배치도 = 단지 전체 → 예. 평면도 = 내 형이고 주거약자형·고령자·신혼부부형이 아님(형을 모르면 둠)
+    // 같은 형의 A·B 평면은 둠 — 같은 공급 유형이면 당첨 후 추첨으로 평면 유형이 갈림(2026년 2차 행복주택 공고 17쪽)
+    var keep = function(x){
+      if (x.kind !== 'plan') return true;
+      if (supOf(x)) return false;
+      var t = tyNums(x); if (!t || !mine) return true;
+      return t.some(isMine) || (!!p.m2 && x.ex.some(function(v){ return Math.abs(parseFloat(v) - p.m2) < 0.5; }));
+    };
+    // 평면도 쪽에 실린 형이 전부 기준 미만이면 뺌. 판단은 전용면적(29.09) → 형 이름(29A) → 형 번호 순
     var pageOk = function(x){
       if (x.kind !== 'plan') return true;
       if (x.ex.length) return x.ex.some(function(v){ return inSel(parseFloat(v)); });
       if (x.code.length) return x.code.some(function(c){ return tyOk(String(parseInt(c, 10))); });
       return !x.tys.length || x.tys.some(tyOk);
     };
-    pamPages = pamPages.filter(function(x){ if (pageOk(x)) return true; hidSmall++; return false; });
-    // 이 카드(공고의 한 형) 집이 아닌 평면도는 띠에서 빼서 접음: 다른 형 번호(44형 등) → 'ty', 같은 형의 주거약자형(S)·신혼부부형 → 's'
-    // 같은 형의 A·B 평면은 띠에 둠 — 같은 공급 유형이면 당첨 후 추첨으로 평면 유형이 갈림(2026년 2차 행복주택 공고 17쪽)
-    pamPages.forEach(function(x){ if (x.kind !== 'plan') return; x.sup = supOf(x); x.same = sameTy(x); x.out = x.same === false ? 'ty' : (x.sup ? 's' : ''); });
-    outPages = pamPages.filter(function(x){ return x.out; });
-    pamPages = pamPages.filter(function(x){ return !x.out; });
-    pamPages.sort(function(a, b){ var ra = (a.kind === 'plan' ? 0 : 2) + (a.same ? -1 : 0), rb = (b.kind === 'plan' ? 0 : 2) + (b.same ? -1 : 0); return ra - rb || a.n - b.n; });
-    var tyFirst = function(x){ return parseInt((tyNums(x) || ['999'])[0], 10); };
-    outPages.sort(function(a, b){ return (a.out === 's' ? 0 : 1) - (b.out === 's' ? 0 : 1) || tyFirst(a) - tyFirst(b) || a.n - b.n; });
+    // 펼침면(두 쪽이 한 그림)에 내 형과 다른 형·S형이 같이 실린 쪽은 내 형 반쪽 그림만(data/pamphlets/*_L·_R, 쪽 그림을 보고 나눈 것)
+    pamPages = pamPages.map(function(x){
+      if (!x.halves || x.halves.length !== 2) return x;
+      var hs = x.halves.map(function(hf){ return { img: hf.img, th: hf.th || hf.img, n: x.n, e: x.e, kind: hf.kind || 'plan', tys: [], ex: hf.ex || [], code: hf.code || [], tag: hf.tag || [] }; });
+      var k = hs.filter(keep);
+      if (k.length === 2) return x;
+      hidOther += 2 - k.length;
+      return k.length ? k[0] : null;
+    }).filter(Boolean);
+    pamPages = pamPages.filter(function(x){ if (!pageOk(x)) { hidSmall++; return false; } if (!keep(x)) { hidOther++; return false; } return true; });
+    pamPages.sort(function(a, b){ return (a.kind === 'plan' ? 0 : 1) - (b.kind === 'plan' ? 0 : 1) || a.n - b.n; });
+    pamPlans = pamPages.filter(function(x){ return x.kind === 'plan'; }).length;
     var py1 = function(v){ return (parseFloat(v) / 3.3058).toFixed(1); };
     var cn = function(c){ return /^\d+$/.test(c) ? c + '형' : c; };   // 숫자만인 형 이름(이든채 31)은 '31형'
-    var pamTile = function(x){
-      var ty = base && x.tys.indexOf(base) >= 0 ? base : (x.tys.filter(tyOk)[0] || x.tys[0] || '');
-      if (x.kind !== 'plan') return { u: x.img, th: x.th, t: '팸플릿 배치도 · ' + x.n + '쪽', s: '배치도 · ' + x.n + '쪽', cls: 'pl' };
-      // 쪽 글자(또는 쪽 그림을 보고 적은 값)의 형 이름(29A)·전용면적(29.09㎡)·공급 유형 — 없으면 형 번호만
+    pamPages.forEach(function(x){
+      if (x.kind !== 'plan') { tiles.push({ u: x.img, th: x.th, t: '팸플릿 배치도 · ' + x.n + '쪽', s: '배치도 · ' + x.n + '쪽', cls: 'pl' }); return; }
+      var ty = (mine && x.tys.filter(isMine)[0]) || x.tys.filter(tyOk)[0] || x.tys[0] || '';
       var lab = x.code.length && x.code.length <= 2 ? x.code.map(cn).join('·') : (x.ex.length === 1 ? Math.floor(parseFloat(x.ex[0])) + '형' : (ty ? ty + '형' : ''));   // 전용면적이 하나면 그 정수부로(35.21㎡ → 35형)
       var exs = x.ex.length && x.ex.length <= 3 ? x.ex.map(function(v){ return (Math.round(parseFloat(v) * 100) / 100) + '㎡(' + py1(v) + '평)'; }).join('·') : '';
-      var tg = x.sup || tagOf(x), sc = x.code.length > 1 && !x.sup ? x.code.filter(isS) : [];   // 펼침면에 일반형·S형이 같이 실린 쪽(29A·29AS)은 S형이 어느 쪽인지 적음
-      return { u: x.img, th: x.th, cls: 'pl',
-        t: '팸플릿 ' + x.n + '쪽 평면도' + (lab ? ' ' + lab : '') + (exs ? ' · 전용 ' + exs : '') + (tg ? ' · ' + tg : '') + (sc.length ? ' · ' + sc.join('·') + '는 주거약자형' : ''),
-        s: '평면 ' + (lab || x.n + '쪽') + (tg ? ' ' + tg : (x.ex.length === 1 ? ' ' + py1(x.ex[0]) + '평' : '')) };
-    };
-    pamPages.forEach(function(x){ tiles.push(pamTile(x)); });
-    outTiles = outPages.map(pamTile);
-    // S형(주거약자형)이 띠나 접힘에 보이면 무슨 집인지 한 줄 — 근거는 이 카드의 공고문 쪽수(1차·2차 쪽 번호가 다름)
-    var kook = p.kind === '국민임대', NT = NOTICES[p.nid] || null;
-    var plansAll = pamPages.concat(outPages).filter(function(x){ return x.kind === 'plan'; });
-    var anyS = plansAll.some(function(x){ return x.sup === '주거약자형' || x.code.some(isS); });
-    var sameS = !!base && plansAll.some(function(x){ return (x.sup === '주거약자형' && x.same !== false) || x.code.some(function(c){ return isS(c) && String(parseInt(c, 10)) === base; }); });
-    var SP = { 'H26-1': ['18', '12~16', '17'], 'H26-2': ['17', '12~15', '16'] }[p.nid];   // [S형 뜻, S형이 실린 공급표, 남는 S형 전환] 쪽
-    if (anyS && NT && (kook || SP)) {
-      var na = '<a href="' + NT.url + '" target="_blank" rel="noopener">' + NT.name + ' 공고문</a>';
-      sNote = '<small class="k iw-phn"><b>S형(주거약자형)</b> — ' + (kook
-        ? '욕실 미닫이문·단차 제거 같은 시설을 갖추고 저층(1~3층)에 지은 주택. 고령자(만 65세 이상)·장애인 등 주거약자 자격이 있어야 신청하고, 일반공급 신청자에게는 공급되지 않음(' + na + ' 16·29쪽)'
-        : '저층(1~3층)에 배정되고 화장실 등에 주거약자 시설이 있는 주택(' + SP[0] + '쪽). 공고에선 S형이 모두 고령자 몫으로 실림(' + SP[1] + '쪽) → 청년이 신청하는 형이 아님' +
-          (sameS ? '. 다만 S형이 남으면 같은 단지·같은 면적 안에서 S 구분 없이 공급 대상을 바꿀 수 있어(' + SP[2] + '쪽) 청년 ' + base + '형 당첨자에게 S형 집이 배정될 수도 있음' : '') + ' — 근거: ' + na) + '</small>';
-    }
-    if (outPages.length) {
-      var oS = outPages.filter(function(x){ return x.out === 's'; }), oT = outPages.filter(function(x){ return x.out === 'ty'; }), tyN = [];
-      oT.forEach(function(x){ (tyNums(x) || []).forEach(function(t){ if (t !== base && tyN.indexOf(t) < 0) tyN.push(t); }); });
-      tyN.sort(function(a, b){ return a - b; });
-      var sup = oS.length ? oS[0].sup : '', tyTxt = tyN.map(function(t){ return t + '형'; }).join('·');
-      var sib = PLACES.filter(function(q){ return q !== p && q.name === p.name && q.m2 && tyN.indexOf(String(Math.floor(q.m2))) >= 0; }).map(function(q){ return Math.floor(q.m2) + '형'; }).filter(function(v, i, a){ return a.indexOf(v) === i; });
-      outNote = '<details class="iw-out"><summary>이 형 아닌 평면도 ' + outPages.length + '장 <small class="k">— ' + [oS.length ? (base ? base + '형 ' : '') + sup + ' ' + oS.length + '장' : '', oT.length ? '다른 형' + (tyTxt ? '(' + tyTxt + ')' : '') + ' ' + oT.length + '장' : ''].filter(Boolean).join(' · ') + '</small></summary>' +
-        '<div class="iw-strip" data-lb="1">' + outTiles.map(function(x){ return '<a href="' + x.u + '" target="_blank" rel="noopener" class="' + x.cls + '" title="' + x.t + '"><img src="' + x.th + '" alt="' + x.t + '" loading="lazy" decoding="async" onerror="this.parentNode.style.display=\'none\'"><span>' + (x.s || x.t) + '</span></a>'; }).join('') + '</div>' +
-        (oT.length && base ? '<small class="k iw-phn">이 카드는 ' + (NT ? NT.name + ' 공고의 ' : '공고의 ') + '청년 ' + base + '형(전용 ' + p.m2 + '㎡ · ' + p.py + ') 줄 — ' + (tyTxt || '다른 형') + ' 평면도는 이 줄의 집이 아님' + (sib.length ? ' (' + sib.join('·') + '은 지도에 따로 있음)' : '') + '</small>' : '') + '</details>';
-    }
+      var tg = tagOf(x);
+      tiles.push({ u: x.img, th: x.th, cls: 'pl',
+        t: '팸플릿 ' + x.n + '쪽 평면도' + (lab ? ' ' + lab : '') + (exs ? ' · 전용 ' + exs : '') + (tg ? ' · ' + tg : ''),
+        s: '평면 ' + (lab || x.n + '쪽') + (tg ? ' ' + tg : (x.ex.length === 1 ? ' ' + py1(x.ex[0]) + '평' : '')) });
+    });
   }
-  var ph = '';
+  var ph = '', nRm = tiles.filter(function(x){ return x.cls === 'rm'; }).length;
   if (tiles.length) {
     ph += '<div class="iw-strip" data-lb="1">' + tiles.map(function(x){ return '<a href="' + x.u + '" target="_blank" rel="noopener" class="' + x.cls + '" title="' + x.t + '"><img src="' + x.th + '" alt="' + x.t + '" loading="lazy" decoding="async" onerror="this.parentNode.style.display=\'none\'"><span>' + (x.s || x.t) + '</span></a>'; }).join('') + '</div>';
-    var rk = f.rooms_k || (f.rooms || []).length, rn = f.rooms_n || rk;
     var parts = [];
-    parts.push(f.rooms && f.rooms.length ? (f.rooms_mine ? '이 형 실내 ' + rk + '장' + (rn > rk ? '(단지 전체 ' + rn + '장)' : '') : (f.rooms_mine === false ? '실내 ' + rk + '장(이 형 사진은 없음, 다른 형·공용부)' : '실내 ' + rn + '장')) : '실내 사진 없음');
+    parts.push(nRm ? (tiles.some(function(x){ return x.cls === 'rm' && x.ty; }) ? '이 형 실내 ' + nRm + '장' : '실내 ' + nRm + '장(SH 사진에 형 표시 없음)') : '이 형 실내 사진 없음');
     parts.push((f.photos || []).length ? '전경 ' + f.photos.length + '장' : '전경 없음');
-    parts.push(f.plan ? 'SH 평면도 1장' : 'SH 평면도 없음');
-    if (window.PAM) parts.push(pam && pam.length ? '팸플릿 평면도·배치도 ' + pamPages.length + '장' + (pamOther ? '(조감도·교통망 등 ' + pamOther + '쪽은 안 보여줌)' : '') + (outPages.length ? ' · 이 형 아닌 평면도 ' + outPages.length + '장은 아래에 접음' : '') : '팸플릿 없음');
-    if (hidSmall) parts.push(belowTxt() + ' 형만 실린 사진·평면도 ' + hidSmall + '장은 뺌');
+    parts.push(shPlan ? 'SH 평면도 1장' : '이 형 SH 평면도 없음');
+    if (window.PAM) parts.push(pam && pam.length ? (pamPlans ? '팸플릿 평면도 ' + pamPlans + '장' : '팸플릿에 이 형 평면도 없음') + (pamPages.length > pamPlans ? ' · 배치도 ' + (pamPages.length - pamPlans) + '장' : '') : '팸플릿 없음');
+    if (hidSmall + hidOther) parts.push('내 형이 아닌 사진·평면도 ' + (hidSmall + hidOther) + '장은 뺌');
     ph += '<small class="k iw-phn">' + tiles.length + '장 · 좌우로 넘김(마우스로 끌어도 됨) · 누르면 크게 보고 두 손가락으로 확대 — ' + parts.join(' · ') + (f.cyber && f.cyber.length ? ' · <a href="' + f.cyber[0][1] + '" target="_blank" rel="noopener">사이버 모델하우스' + (f.cyber[0][0] ? ' ' + f.cyber[0][0] + '형' : '') + '</a>' : '') + '</small>';
   }
-  ph += sNote + outNote;
-  if (!(f.rooms && f.rooms.length)) {
-    if (f.nophoto) ph += '<div class="iw-nophoto"><b>사진 없음</b> — SH 주택정보에 이 단지의 사진(전경·실내)도 평면도도 등록돼 있지 않음' + when + (pamPages.length || outPages.length ? '. 위 <b>전자팸플릿</b>의 평면도·배치도가 SH가 공개한 유일한 그림' : '') + '</div>';
+  if (!nRm && f.rooms && f.rooms.length) ph += '<div class="iw-nophoto"><b>이 형 실내 사진 없음</b> — SH 주택정보의 실내 사진은 다른 형 것뿐이라 뺌' + when + '</div>';
+  else if (!nRm) {
+    if (f.nophoto) ph += '<div class="iw-nophoto"><b>사진 없음</b> — SH 주택정보에 이 단지의 사진(전경·실내)도 평면도도 등록돼 있지 않음' + when + (pamPages.length ? '. 위 <b>전자팸플릿</b>의 평면도·배치도가 SH가 공개한 유일한 그림' : '') + '</div>';
     else if (f.phototypes) ph += '<div class="iw-nophoto"><b>실내(방) 사진 없음</b> — SH 주택정보에 올라온 사진 유형: ' + (f.phototypes.length ? f.phototypes.join('·') : '없음') + (f.phototypes.indexOf('실내 각 방') >= 0 ? ' (실내 유형은 있으나 이미지 0장)' : '') + (f.plan ? ' · 평면도는 있음(위)' : '') + when + '</div>';
   }
   if (pam && pam.length) {
     var tt = function(e){ var t = e.title || e.file || e.seq; return t.length > 28 ? t.slice(0, 28) + '…' : t; };
-    ph += '<small class="k iw-phn">SH 전자팸플릿: ' + pam.map(function(e){ return '<a href="' + e.pdf + '" target="_blank" rel="noopener" title="' + (e.title || '') + '">' + tt(e) + ' (PDF ' + e.total + '쪽)</a>'; }).join(' · ') + (pamPages.length || outPages.length ? '' : ' · 글자가 안 뽑히는 PDF라 평면도 쪽을 못 골라냄 → PDF로 직접') + (pam[0].kw ? ' · 묶음 팸플릿에서 이 단지 쪽만' : '') + ' — <a href="' + window.PAM.list_url + '" target="_blank" rel="noopener">목록</a></small>';
+    ph += '<small class="k iw-phn">SH 전자팸플릿: ' + pam.map(function(e){ return '<a href="' + e.pdf + '" target="_blank" rel="noopener" title="' + (e.title || '') + '">' + tt(e) + ' (PDF ' + e.total + '쪽)</a>'; }).join(' · ') + (pamPages.length || pam.some(function(e){ return e.pages.length; }) ? '' : ' · 글자가 안 뽑히는 PDF라 평면도 쪽을 못 골라냄 → PDF로 직접') + (pam[0].kw ? ' · 묶음 팸플릿에서 이 단지 쪽만' : '') + ' — <a href="' + window.PAM.list_url + '" target="_blank" rel="noopener">목록</a></small>';
   } else if (window.PAM && window.PAM.items) {
     ph += '<div class="iw-nophoto"><b>전자팸플릿 없음</b> — SH 전자팸플릿 목록(' + (window.PAM.count || 572) + '건)에 이 단지 없음</div>';
   }
-  h += ph;
+  var photos = '<div class="iw-sec"><div class="iw-sh">사진 <small class="k">SH 주택정보 · 전자팸플릿 · 이 형만</small></div>' + ph + '</div>';
   var rows = [];
   var k = f.k;
-  if (noFact) { h += '</div>'; return h; }
+  if (noFact) return { photos: photos, info: h + '</div>' };
   if (k) {
     var by = parseInt(String(k.built || '').slice(0, 4), 10), age = by ? (new Date().getFullYear() - by + 1) : null;   // 준공 연도 = 1년차
     rows.push(['유형', (k.apt || '<small class="k">K-apt에 주택유형 미기재</small>') + (k.str ? ' · ' + k.str : '') + ' <small class="k">(K-apt 등록값)</small>']);
@@ -1570,17 +1578,19 @@ function factHtml(p){
     rows.push(['유형·준공', '<small class="k">K-apt(공동주택관리정보시스템)에 미등록 → 주택유형·준공연도·동수·주차 정보 없음(아파트가 아닌 도시형생활주택·오피스텔은 K-apt 대상이 아님)</small>']);
   }
   if (!f.type && p.kind === '행복주택') rows.push(['이 형', '<small class="k">SH 주택정보에 이 단지 형별 정보 없음 → 공가·퇴거 모름</small>']);
-  if (f.type) { var ty = f.type; rows.push(['이 형', ty.sp + '형 ' + m2py(ty.ar) + ' · ' + (ty.rooms ? '방 <b>' + ty.rooms + '개</b>' : '원룸형') + ' · ' + ty.hh + '세대' + (ty.exact ? '' : ' <small class="k">(가장 가까운 형)</small>')]);
+  // SH 형별 표에 이 형이 없어 가장 가까운 다른 형을 잡은 경우(꿈의숲아이파크 39형 → 40형 재개발임대)는 그 형 숫자를 보여 주지 않음
+  if (f.type && !f.type.exact) rows.push(['이 형', '<small class="k">SH 주택정보 형별 표에 이 형(' + Math.floor(p.m2) + '형)이 없음 → 공가·퇴거 모름</small>']);
+  if (f.type && f.type.exact) { var ty = f.type; rows.push(['이 형', ty.sp + '형 ' + m2py(ty.ar) + ' · ' + (ty.rooms ? '방 <b>' + ty.rooms + '개</b>' : '원룸형') + ' · ' + ty.hh + '세대']);
     rows.push(['공가·퇴거', '공가 <b>' + ty.vac + '</b> · 최근 1년 퇴거 <b>' + ty.out + '</b> / ' + ty.hh + '세대 <small class="k">(' + ty.ym + ')</small>']); }
-  if (f.types) { Object.keys(f.types).sort().forEach(function(b){ var d = f.types[b]; rows.push([m2py(b), (d.rooms ? '방 ' + d.rooms + '개 · ' : '') + d.hh.toLocaleString() + '세대 · 공가 <b>' + d.vac + '</b> · 1년 퇴거 <b>' + d.out + '</b>' + (d.cost ? '<br>관리비 ' + won(d.cost[0]) + (d.cost[1] !== d.cost[0] ? '~' + won(d.cost[1]) : '') + '/월' : '') + (d.plan ? ' · <a href="' + d.plan + '" target="_blank" rel="noopener">평면도</a>' : '')]); }); }
-  if (f.cost) rows.push(['관리비', '<b>' + won(f.cost.won) + '</b>/월 <small class="k">(' + f.cost.ym.slice(0,4) + '.' + f.cost.ym.slice(4) + ' 실적, ' + (f.type ? m2py(f.type.ar) : '') + ')</small>']);
+  if (f.types) { Object.keys(f.types).filter(isMine).sort().forEach(function(b){ var d = f.types[b]; rows.push([m2py(b), (d.rooms ? '방 ' + d.rooms + '개 · ' : '') + d.hh.toLocaleString() + '세대 · 공가 <b>' + d.vac + '</b> · 1년 퇴거 <b>' + d.out + '</b>' + (d.cost ? '<br>관리비 ' + won(d.cost[0]) + (d.cost[1] !== d.cost[0] ? '~' + won(d.cost[1]) : '') + '/월' : '') + (d.plan ? ' · <a href="' + d.plan + '" target="_blank" rel="noopener">평면도</a>' : '')]); }); }
+  if (f.cost) rows.push(['관리비', '<b>' + won(f.cost.won) + '</b>/월 <small class="k">(' + f.cost.ym.slice(0,4) + '.' + f.cost.ym.slice(4) + ' 실적, ' + (f.type && f.type.exact ? m2py(f.type.ar) : m2py(p.m2)) + ')</small>']);
   else if (p.kind === '행복주택') rows.push(['관리비', '<small class="k">SH 주택정보에 관리비 실적 없음</small>']);
-  if (f.types) { ['39', '49', '59'].forEach(function(b){ if (!f.types[b]) rows.push([m2py(b), '<small class="k">SH 주택정보에 이 면적 국민임대 없음</small>']); }); }
+  if (f.types) { (mine || ['39', '49', '59']).forEach(function(b){ if (!f.types[b]) rows.push([m2py(b), '<small class="k">SH 주택정보에 이 면적 국민임대 없음</small>']); }); }
   else if (p.kind === '국민임대') rows.push(['면적별', '<small class="k">SH 주택정보에 국민임대 형별 정보 없음</small>']);
   if (f.subway) rows.push(['지하철', f.subway.join(' · ')]);
   else rows.push(['지하철', '<small class="k">SH 주택정보에 역 거리 정보 없음</small>']);
   h += '<table class="iw-t">' + rows.map(function(r){ return '<tr><th>' + r[0] + '</th><td>' + r[1] + '</td></tr>'; }).join('') + '</table></div>';
-  return h;
+  return { photos: photos, info: h };
 }
 function manwon(s){ var m = String(s).match(/(\d+)\s*억/); var eok = m ? +m[1] : 0; var rest = String(s).replace(/^.*억\s*/, '').replace(/[^\d]/g, ''); return eok * 10000 + (rest ? +rest : 0); }
 function fmtMan(n){ n = Math.round(n); return n >= 10000 ? Math.floor(n / 10000) + '억' + (n % 10000 ? ' ' + (n % 10000).toLocaleString() + '만' : '') : n.toLocaleString() + '만'; }
@@ -1617,18 +1627,20 @@ function lhHtml(p){
   var body = (p.na ? '<div class="iw-nophoto" style="border-color:#e0a800;background:#fff8e1;color:#5d4a00"><b>내 조건 밖</b> — ' + p.na + '</div>' : '') + '<table class="iw-t">' +
     '<tr><th>공고</th><td>' + p.notices.slice(0, 2).map(function(n){ return '<a href="' + n.url + '" target="_blank" rel="noopener">' + n.title + '</a> <span class="pill ' + (n.status === '접수중' ? 'ok' : 'info') + '">' + n.status + '</span><br><small class="k">게시 ' + n.posted + ' · 마감 ' + n.deadline + '</small>'; }).join('<br>') + '</td></tr>' +
     (schTxt.length ? '<tr><th>일정</th><td>' + schTxt.join(' · ') + '</td></tr>' : '') +
+    '</table>';
+  var lhInfo = '<div class="iw-sec"><div class="iw-sh">단지 정보 <small class="k">LH 공고 페이지 단지 표</small></div><table class="iw-t">' +
     '<tr><th>단지</th><td>' + [c.hh ? c.hh + '세대' : '', c.m2 ? '전용 ' + c.m2 + '㎡ (' + (String(c.m2).indexOf('~') >= 0 ? String(c.m2).split('~').map(function(x){ return py(x); }).join('~') : py(c.m2)) + ')' : '', c.heat, c.movein ? '입주 ' + c.movein + (function(){ var y = parseInt(String(c.movein).slice(0, 4), 10), now = new Date().getFullYear(); return !y ? '' : (y > now || (y === now && parseInt(String(c.movein).slice(5, 7), 10) > new Date().getMonth() + 1) ? ' <b>(신축 · 입주 예정)</b>' : ' <b>(입주 ' + (now - y + 1) + '년차)</b>'); })() : ''].filter(Boolean).join(' · ') + '</td></tr>' +
     '<tr><th>주차·사진</th><td><small class="k"><b>자료 없음</b> — LH 공고 페이지 단지 표에 주차 대수·사진 항목이 없음 → 공고문 PDF의 단지 개요·평면도 확인</small></td></tr>' +
     '<tr><th>건물</th><td><small class="k">아파트/오피스텔 구분 <b>자료 없음</b> — LH 공고 페이지 단지 표 항목은 세대수·전용·난방·입주뿐. 공고문 PDF의 "주택 개요"에서 확인</small></td></tr>' +
-    '</table>';
+    '</table></div>';
   var rows = (c.rows || []);
   if (rows.length) {
     var fit = lhFit(c);
-    body += '<div class="iw-sec"><div class="iw-sh">주택형 <small class="k">이번 공고 물량 · LH 공고 페이지 표 그대로 · 기준(' + selTxt() + ') 미만은 흐리게</small></div><table class="iw-t iw-k iw-lh"><tr><th>주택형</th><th>전용</th><th>금회 공급</th><th>보증금</th><th>월세</th></tr>' +
-      rows.map(function(r){ var y = /청년|대학생/.test(r.ty), small = lhSmall(r); return '<tr' + (small ? ' class="dim"' : (y ? ' class="y"' : '')) + '><th>' + (y && !small ? '<b>' + r.ty + '</b>' : r.ty) + (small ? '<br><span class="tag">' + (bandOf(r.m2) === 0 ? '8평 미만' : '기준 미만') + '</span>' : '') + '</th><td>' + r.m2 + '㎡' + (py(r.m2) ? '<br><small class="k">' + py(r.m2) + '</small>' : '') + '</td><td>' + r.n + '</td><td>' + lhWon(r.dep) + '</td><td>' + lhWon(r.rent) + '</td></tr>'; }).join('') + '</table>' +
-      notes((fit.ok.length ? '기준(' + selLabel() + ')에 드는 형 ' + fit.ok.map(function(r){ return r.ty + ' ' + r.m2 + '㎡(' + py(r.m2) + ')'; }).join(', ') + ' — 어느 계층(청년/신혼/고령자) 물량인지는 LH 페이지 표에 없어 공고문 확인. ' : '이 공고의 형은 전부 ' + (fit.under8 ? '8평 미만 → 내 조건 밖' : '기준 미만') + '(표는 참고용). ') + '보증금·월세가 "공고문 확인"이면 LH 페이지에도 숫자가 없는 것 → 공고문 PDF 참조. 보증금↔월세 전환 조건(보증금 최소·최대로 했을 때 월세)은 LH 페이지 표에 없어 공고문 확인. 자격·순위는 LH 기준이라 SH와 다름(이 지도는 위치·물량·일정만 자동 수집).') + '</div>';
+    body += '<div class="iw-sec"><div class="iw-sh">형별 물량 <small class="k">주택형 · 이번 공고 물량 · LH 공고 페이지 표 그대로 · 내 조건(' + selTxt() + ') 형만' + (fit.small.length ? ' · 기준 미만 ' + fit.small.length + '개 형은 뺌' : '') + '</small></div>' + (fit.ok.length ? '<table class="iw-t iw-k iw-lh"><tr><th>주택형</th><th>전용</th><th>금회 공급</th><th>보증금</th><th>월세</th></tr>' +
+      fit.ok.map(function(r){ var y = /청년|대학생/.test(r.ty), small = lhSmall(r); return '<tr' + (small ? ' class="dim"' : (y ? ' class="y"' : '')) + '><th>' + (y && !small ? '<b>' + r.ty + '</b>' : r.ty) + (small ? '<br><span class="tag">' + (bandOf(r.m2) === 0 ? '8평 미만' : '기준 미만') + '</span>' : '') + '</th><td>' + r.m2 + '㎡' + (py(r.m2) ? '<br><small class="k">' + py(r.m2) + '</small>' : '') + '</td><td>' + r.n + '</td><td>' + lhWon(r.dep) + '</td><td>' + lhWon(r.rent) + '</td></tr>'; }).join('') + '</table>' : '<div class="iw-nophoto">내 조건(' + selLabel() + ')에 맞는 형 없음</div>') +
+      notes((fit.ok.length ? '기준(' + selLabel() + ')에 드는 형 ' + fit.ok.map(function(r){ return r.ty + ' ' + r.m2 + '㎡(' + py(r.m2) + ')'; }).join(', ') + ' — 어느 계층(청년/신혼/고령자) 물량인지는 LH 페이지 표에 없어 공고문 확인. ' : '이 공고의 형은 전부 ' + (fit.under8 ? '8평 미만 → 내 조건 밖' : '기준 미만') + '. ') + '보증금·월세가 "공고문 확인"이면 LH 페이지에도 숫자가 없는 것 → 공고문 PDF 참조. 보증금↔월세 전환 조건(보증금 최소·최대로 했을 때 월세)은 LH 페이지 표에 없어 공고문 확인. 자격·순위는 LH 기준이라 SH와 다름(이 지도는 위치·물량·일정만 자동 수집).') + '</div>';
   }
-  body += termsHtml(/통합공공임대/.test(n0.type || '') ? 'LH 통합공공임대' : (/행복주택/.test(n0.type || '') ? 'LH 행복주택' : []));
+  body += lhInfo + termsHtml(/통합공공임대/.test(n0.type || '') ? 'LH 통합공공임대' : (/행복주택/.test(n0.type || '') ? 'LH 행복주택' : []));
   var foot = '<div class="iw-f"><small class="k">' + (c.addr || '') + '</small>' + naviHtml(p.name, c.addr, c.lat, c.lng, false) + '</div>';
   return '<div class="nm-iw">' + head + body + foot + '</div>';
 }
@@ -1664,7 +1676,7 @@ function happyRates(p){
       var g = hit[r.danji] || (hit[r.danji] = {}); if (!g[r.kind]) g[r.kind] = r;
     });
     var names = Object.keys(hit);
-    if (!names.length) { if (Object.keys(other).length) trs.push('<tr><th>' + postHead(po) + '</th><td colspan="3" class="k">이 단지는 ' + Object.keys(other).join('·') + ' 청년만 공급 (' + base + '형 없음)</td></tr>'); return; }
+    if (!names.length) { if (Object.keys(other).length) trs.push('<tr><th>' + postHead(po) + '</th><td colspan="3" class="k">이 회차엔 ' + base + '형 청년 공급 없음</td></tr>'); return; }
     seen++;
     names.forEach(function(nm, i){
       var g = hit[nm], all = null, dj = (g['우선'] || g['일반'] || g['예비자'] || {}).danji_rate;
@@ -1682,18 +1694,19 @@ function happyRates(p){
 function kookRates(p){
   var posts = ratePosts('kook'); if (!posts.length) return '';
   var rx = RATE_ALIAS[p.name]; if (!rx) return '';
+  var AR = (myTys(p) || []).filter(function(a){ return ['39', '49', '59'].indexOf(a) >= 0; }); if (!AR.length) return '';   // 내가 신청할 수 있는 면적 열만
   var trs = [];
   posts.forEach(function(po){
     var by = {};
     po.rows.forEach(function(r){ if (!rx.test(r.danji || '') || r.g !== '일반') return; var ar = String(r.ty || '').replace(/[^0-9]/g, ''); var g = by[r.danji] || (by[r.danji] = {}); if (!g[ar]) g[ar] = r; });
     Object.keys(by).forEach(function(nm, i){
       var g = by[nm];
-      trs.push('<tr><th>' + (i ? '' : postHead(po)) + '<br><small class="k">' + nm + '</small></th>' + ['39', '49', '59'].map(function(a){ var r = g[a]; if (!r) return '<td class="k"><small>없음</small></td>'; var x = rateOf(r); return '<td>' + r.n + '호 · ' + (r.sum == null ? '?' : r.sum.toLocaleString()) + '명<br>' + (x ? (x.pdf ? '<b>' + x.v + ':1</b>' : '<span class="calc">' + x.v + ':1</span>') : '<span class="k">경쟁률 미기재</span>') + '</td>'; }).join('') + '</tr>');
+      trs.push('<tr><th>' + (i ? '' : postHead(po)) + '<br><small class="k">' + nm + '</small></th>' + AR.map(function(a){ var r = g[a]; if (!r) return '<td class="k"><small>없음</small></td>'; var x = rateOf(r); return '<td>' + r.n + '호 · ' + (r.sum == null ? '?' : r.sum.toLocaleString()) + '명<br>' + (x ? (x.pdf ? '<b>' + x.v + ':1</b>' : '<span class="calc">' + x.v + ':1</span>') : '<span class="k">경쟁률 미기재</span>') + '</td>'; }).join('') + '</tr>');
     });
   });
   if (!trs.length) return '<div class="iw-sec"><div class="iw-sh">지난 공고 경쟁률</div><small class="k">SH 국민임대 결과 PDF ' + posts.length + '건에 이 지구의 일반공급 행 없음(주거약자만 공급됐거나 미공급)</small></div>';
   return '<div class="iw-sec"><div class="iw-sh">지난 공고 경쟁률 <small class="k">일반공급(주거약자 제외) · 선순위 접수 결과 · 호수 → 신청자 → 경쟁률</small></div>' +
-    '<table class="iw-t iw-k iw-r k4"><tr><th>공고 · PDF의 단지명</th>' + ['39', '49', '59'].map(function(a){ var real = ((KOOK_ROWS[p.name] || []).filter(function(r){ return String(r[0]).split('.')[0] === a; })[0] || [])[0]; return '<th>' + a + '형<br><small>' + (real ? '전용 ' + real + ' · ' + py(real) : a + '㎡대 · ' + py(+a).replace('평', '') + '~' + py(+a + 0.99)) + '</small></th>'; }).join('') + '</tr>' + trs.join('') + '</table>' +
+    '<table class="iw-t iw-k iw-r' + (AR.length === 3 ? ' k4' : '') + '"><tr><th>공고 · PDF의 단지명</th>' + AR.map(function(a){ var real = ((KOOK_ROWS[p.name] || []).filter(function(r){ return String(r[0]).split('.')[0] === a; })[0] || [])[0]; return '<th>' + a + '형<br><small>' + (real ? '전용 ' + real + ' · ' + py(real) : a + '㎡대 · ' + py(+a).replace('평', '') + '~' + py(+a + 0.99)) + '</small></th>'; }).join('') + '</tr>' + trs.join('') + '</table>' +
     notes('"없음" = 그 회차 결과표에 이 지구의 그 면적 일반공급 행이 없음(그 면적은 공급 안 했거나 주거약자만). 국민임대는 1순위(선순위) 접수에서 신청자가 모집의 200%를 넘으면 그걸로 마감이라, 이 숫자가 사실상 최종 경쟁률(SH 게시물 본문). 경쟁률은 SH PDF 그대로(굵은 값). 공고 이름을 누르면 SH 결과 게시물' + (window.RATES.updated ? ' · 수집 ' + window.RATES.updated.slice(0, 10) : '') + '.') + '</div>';
 }
 function ratesHtml(p){ try { return p.kind === '국민임대' ? kookRates(p) : happyRates(p); } catch(e) { console.error(e); return ''; } }
@@ -1735,6 +1748,27 @@ function yaSplit(c){
     if (f === 0) return out.small.push(x); x.border = (f === 2); if (x.border) { x.bpy = bndIn(n, n + 1); x.bm2 = n; } out.ok.push(x); }); });
   return out;
 }
+// ===== 평면도 한 장(또는 형별로 잘라 낸 한 칸)이 내 형인지: 서울시 형별 표(입주현황)의 형과 맞춰 봄 =====
+// 형 이름 비교용 코드: '39A형' → '39A', '32.94(B-1)' → 'B-1', 'A-15.33' → 'A', '46타입' → '46' (소수점 면적·형·타입·TYPE·㎡ 뺌)
+function yaCode(t){ return String(t || '').toUpperCase().replace(/\d{2,3}\.\d{1,2}/g, ' ').replace(/[()（）]/g, ' ').replace(/형|타입|TYPE|㎡|M²|M2/g, ' ').replace(/^[\s\-·]+|[\s\-·]+$/g, '').replace(/\s+/g, ''); }
+// 도면 전용면적 m 과 표 한 줄의 차이(작을수록 잘 맞음 · 안 맞으면 null): 소수점 면적이면 |차이|(0.6 미만만), 정수 코드(30A 등)면 그 ㎡대 안 0.3 · 바로 아래 0.5 안 0.7
+// → 가장 잘 맞는 줄(들)만 봄: 30.03㎡ 도면은 30.03 신혼부부 줄과 맞고 30.01 청년 줄은 덜 맞음
+function yaGap(m, r){ var e = tyExact(r.ty); if (e) { var d = Math.abs(m - e); return d < 0.6 ? d : null; } var n = yaTyNum(r.ty); if (!n) return null; return (m >= n && m < n + 1) ? 0.3 : ((m >= n - 0.5 && m < n) ? 0.7 : null); }
+// 1 내 형(청년 자격 · 기준 이상 형과 맞음) · 0 남의 형(신혼부부 전용·복층 등 청년 자격 없는 형하고만 맞음) · null 표에 맞는 형 없음
+// good = 기준 이상인 면적(㎡) 또는 형 번호(how '형'), label = 도면·잘라 낸 칸의 형 이름
+function yaPlanWho(sp, good, label, how){
+  var ok = sp.ok, ny = sp.other.concat(sp.dup), all = ok.concat(ny), isOk = function(r){ return ok.indexOf(r) >= 0; };
+  var lc = yaCode(label);
+  if (lc) { if (ok.some(function(r){ return yaCode(r.ty0 || r.ty) === lc; })) return 1; if (ny.some(function(r){ return yaCode(r.ty0 || r.ty) === lc; })) return 0; }
+  var res = good.map(function(m){
+    if (how === '형') { var hit = all.filter(function(r){ return yaTyNum(r.ty0 || r.ty) === m; }); return hit.length ? (hit.some(isOk) ? 1 : 0) : null; }
+    var best = null, top = [];
+    all.forEach(function(r){ var g = yaGap(m, r); if (g == null) return; if (best == null || g < best - 1e-9) { best = g; top = [r]; } else if (Math.abs(g - best) < 1e-9) top.push(r); });
+    return best == null ? null : (top.some(isOk) ? 1 : 0);
+  });
+  if (res.indexOf(1) >= 0) return 1;
+  return (res.length && res.every(function(v){ return v === 0; })) ? 0 : null;
+}
 function yaFitReason(c){   // 해당 없음 사유(짧게) 또는 ''
   var sp = yaSplit(c); if (sp.ok.length) return '';
   if (!(sp.small.length || sp.other.length || sp.share.length || sp.unknown.length || sp.dup.length)) return '';
@@ -1749,7 +1783,7 @@ function yaFitReason(c){   // 해당 없음 사유(짧게) 또는 ''
 function yaMoney(c, sp, ge, tyLabel){
   // 보증금·월세 최소/최대: 입주현황 표(형별 기준 조건) 중 내 조건(청년 자격 · 8평 이상) 행에서만 고름. 어떤 형의 값인지 같이 적음.
   var split = yaSplit(c), all = split.ok;
-  if (!all.length && (split.small.length || split.other.length || split.share.length || split.unknown.length || split.dup.length)) return '<div class="iw-sec"><div class="iw-sh">임대조건 <small class="k">민간임대</small></div><small class="k">내 조건(청년 · ' + selLabel() + ')에 맞는 형 없음 → 최소·최대 안 냄(금액은 아래 접힌 표에 그대로).</small></div>';
+  if (!all.length && (split.small.length || split.other.length || split.share.length || split.unknown.length || split.dup.length)) return '<div class="iw-sec"><div class="iw-sh">임대조건 <small class="k">민간임대</small></div><small class="k">내 조건(청년 · ' + selLabel() + ')에 맞는 형 없음 → 최소·최대 안 냄.</small></div>';
   var who = function(rs){ var g = {}; rs.forEach(function(r){ var k = r.kind + ' ' + (r.room || ''); (g[k] = g[k] || []).push(tyLabel(r.ty) || (tyExact(r.ty) ? tyExact(r.ty) + '㎡(' + py(tyExact(r.ty)) + ')' : String(r.ty || ''))); }); return Object.keys(g).map(function(k){ return k + ' ' + g[k].filter(function(v, i, a){ return a.indexOf(v) === i; }).join('·'); }).join(', '); };
   var ext = function(key){ var rs = all.filter(function(r){ return r[key] != null; }); if (!rs.length) return null; var lo = Math.min.apply(null, rs.map(function(r){ return r[key]; })), hi = Math.max.apply(null, rs.map(function(r){ return r[key]; }));
     return { lo: lo, hi: hi, loWho: who(rs.filter(function(r){ return r[key] === lo; })), hiWho: who(rs.filter(function(r){ return r[key] === hi; })) }; };
@@ -1776,66 +1810,90 @@ function yaHtml(p){
   var sp0 = yaSplit(c), border0 = sp0.ok.length && sp0.ok.every(function(r){ return r.border; });
   var head = '<div class="iw-h"><b>' + p.name + '</b><span class="pill info">청년안심주택</span>' + (p.na ? '<span class="pill warn">내 조건 밖</span>' : (border0 ? '<span class="pill info">' + sp0.ok.map(function(r){ return r.bpy + '평 경계(' + r.bm2 + '㎡대)'; }).filter(function(v, i, a){ return a.indexOf(v) === i; }).join(' · ') + '</span>' : '')) + '<button type="button" class="iw-x" onclick="nmInfo.close()" aria-label="닫기">×</button></div>';
   var sc = c.scale || {};
-  var body = (p.na ? '<div class="iw-nophoto" style="border-color:#e0a800;background:#fff8e1;color:#5d4a00"><b>내 조건 밖</b> — ' + p.na + '. 단지 정보는 참고용으로 둠.</div>' : '') + '<table class="iw-t">' +
-    '<tr><th>규모</th><td>' + (sc.total != null ? '<b>총 ' + sc.total + '세대</b> · 공공임대 <b>' + (sc.pub == null ? '미기재' : sc.pub) + '</b> · 민간임대 ' + (sc.priv == null ? '미기재' : sc.priv) : (c.scale_tot ? '총 ' + c.scale_tot + '세대 (공공·민간 구분 없음)' : '<small class="k">세대수 미기재</small>')) + '</td></tr>' +
+  var yaInfo = '<div class="iw-sec"><div class="iw-sh">단지 정보 <small class="k">서울시 단지정보</small></div><table class="iw-t">' +
     '<tr><th>지하철</th><td>' + (c.subway || c.station || '<small class="k">미기재</small>') + '</td></tr>' +
     '<tr><th>입주</th><td>' + (c.movein ? c.movein + (function(){ var d = new Date(String(c.movein).slice(0, 10) + 'T00:00:00'), y = d.getFullYear(); if (!y || isNaN(y)) return ''; return d > new Date() ? ' <b>(입주 예정)</b>' : ' <b>(입주 ' + (new Date().getFullYear() - y + 1) + '년차)</b>'; })() : '<small class="k">미기재</small>') + (c.first_notice ? ' <small class="k">(최초 공고 ' + c.first_notice + ')</small>' : '') + (c.status && c.status !== '공급상태' ? ' · ' + c.status : '') + '<br><small class="k">준공연도는 서울시 자료에 없음 → 입주(예정)일로 대신. 청년안심주택은 신축이라 입주일 ≈ 준공</small></td></tr>' +
     '<tr><th>주차</th><td>차량 소유·운행 <b>가능</b> <small class="k">(2026 2차 공고문 14쪽: "단지별로 운영상황이 상이" → 관리사무소 문의) · 공공임대 물량은 자동차 1대당 가액 4,542만 이하(32쪽)<br>주차비: 일반 입주자 = 민영주차장 요금 수준, 장애인·유자녀·생계형 필수 차량 = 월 4~5만 (<a href="https://mediahub.seoul.go.kr/archives/2009549" target="_blank" rel="noopener">서울시 설명자료 2023.11.13</a>)<br>이 단지 주차 대수는 <b>자료 없음</b> — 서울시 단지정보·목록에 항목이 없음</small></td></tr>' +
     '<tr><th>건물</th><td><small class="k">아파트/오피스텔 구분 <b>자료 없음</b> — 서울시 단지 목록(houseType 항목 비어 있음)·상세 페이지 항목에 없고 SH 공고문에도 없음. 모집공고문 첨부의 "건축물 용도"에서 확인</small></td></tr>' +
+    '</table></div>';
+  var body = (p.na ? '<div class="iw-nophoto" style="border-color:#e0a800;background:#fff8e1;color:#5d4a00"><b>내 조건 밖</b> — ' + p.na + '. 단지 정보는 참고용으로 둠.</div>' : '') + '<table class="iw-t">' +
+    '<tr><th>규모</th><td>' + (sc.total != null ? '<b>총 ' + sc.total + '세대</b> · 공공임대 <b>' + (sc.pub == null ? '미기재' : sc.pub) + '</b> · 민간임대 ' + (sc.priv == null ? '미기재' : sc.priv) : (c.scale_tot ? '총 ' + c.scale_tot + '세대 (공공·민간 구분 없음)' : '<small class="k">세대수 미기재</small>')) + '</td></tr>' +
     '<tr><th>공고</th><td>' + (ns.length ? ns.slice(0, 3).map(function(n){ return '<a href="' + n.url + '" target="_blank" rel="noopener">' + n.title + '</a> <small class="k">' + n.kind + (n.stage === '추가' ? '·추가' : '') + ' · 게시 ' + n.posted + (n.apply ? ' · 청약 ' + n.apply : '') + '</small>'; }).join('<br>') : '<small class="k">서울시 공고 게시판 최근 30건에 이 단지 공고 없음</small>') + '</td></tr>' +
     '</table>';
   // 사진: 서울시 단지정보 상세 페이지 이미지(대표 · 평면도). 투시도(조감도)는 데이터로만
   var ph = (c.photos || []).slice(), persp = ph.filter(function(x){ return x.k === 'persp'; }).length, mains = ph.filter(function(x){ return x.k === 'main'; }), plans = ph.filter(function(x){ return x.k === 'plan'; });
   if (!ph.length && c.img) mains = [{ u: c.img, t: '대표 사진', k: 'main' }];
   var OCR = (window.YA_PLANS && window.YA_PLANS.items) || {}, FX = (window.YA_FIX && window.YA_FIX.plans) || {}, nPh = 0;
-  var pOk = [], pSmall = [], pUnk = [], pShare = [], pDup = [], rooms = [];
+  var pOk = [], pSmall = [], pUnk = [], pShare = [], pDup = [], pNy = [], rooms = [], nCut = 0, nWait = 0, cutOut = 0;
   var m2s = function(ms){ return ms.map(function(m){ return m + '㎡(' + py(m) + ')'; }).join('·'); };
+  var uq = function(v, i, a){ return a.indexOf(v) === i; };
+  var spP = yaSplit(c), hasRows = !!(spP.ok.length + spP.small.length + spP.other.length + spP.share.length + spP.unknown.length + spP.dup.length);
+  // 평면도(또는 여러 형 한 장에서 잘라 낸 한 칸) 하나 → 'ok' 내 형 · 'small' 기준 미만 · 'share' 셰어형 · 'dup' 복층 · 'ny' 남의 형(청년 자격 없는 형) · 'unk' 면적 모름
+  var judge = function(x, ms, how, lab0, labRaw){
+    if (!ms.length) return 'unk';
+    if (how === '셰어') { x.lab = '셰어형 ' + lab0 + '집 전체 ' + m2s(ms); return 'share'; }
+    if (how === '복층' && NO_DUP) { x.lab = '복층 ' + lab0 + m2s(ms); return 'dup'; }
+    var good;
+    if (how === '형') {   // 도면에 면적 글자가 없어 형 번호(정수 ㎡대)만 — 기준선이 그 ㎡대 안을 지나면 '경계'
+      var fr = ms.map(function(n){ return fitRange(n, n + 1); }); good = ms.filter(function(n, i){ return fr[i]; });
+      x.lab = '평면도 ' + lab0 + '(' + (good.length ? good : ms).filter(uq).map(function(n){ return n + '㎡대'; }).join('·') + ', 도면에 면적 글자 없음)';
+      if (!good.length) return 'small';
+      if (fr.indexOf(1) < 0) x.lab += ' — 8평 경계';
+    } else {
+      good = ms.filter(inSel); x.lab = '평면도 ' + lab0 + m2s(good.length ? good : ms);
+      if (!good.length) return 'small';
+    }
+    if (!hasRows) return 'ok';   // 서울시 형별 표가 없으면 면적만으로
+    var w = yaPlanWho(spP, good, labRaw, how);
+    if (w === 1) return 'ok';
+    if (w === 0 || !spP.ok.length) return 'ny';   // 신혼부부 전용 등 남의 형 — 또는 이 단지엔 내 형이 아예 없음
+    x.lab += ' · 형별 표에 없는 면적'; return 'ok';   // 표에 없는 형(공공임대 형 등) — 남의 것인지 모름 → 둠
+  };
+  var bin = { small: pSmall, share: pShare, dup: pDup, ny: pNy, unk: pUnk };
   // 평면도마다 전용면적: 사람이 확인한 값(data/ya_fix.json) → 없으면 글자 판독(data/ya_plans.json)
   plans.forEach(function(x){
     var fo = FX[x.u], lab0 = fo && fo.label ? fo.label + ' ' : '';
-    if (fo && fo.how === '실내') { x.lab = fo.label || '실내 사진'; x.k = 'room'; return rooms.push(x); }
-    var ms = fo ? (fo.m2 || []).slice() : (OCR[x.u] && OCR[x.u].m2 ? OCR[x.u].m2.filter(function(m){ return m >= 10 && m <= 120; }).map(function(m){ return Math.round(m * 100) / 100; }).filter(function(v, i, a){ return a.indexOf(v) === i; }) : []);
-    if (!ms.length) return pUnk.push(x);
-    if (fo && fo.how === '셰어') { x.lab = '셰어형 ' + lab0 + '집 전체 ' + m2s(ms); return pShare.push(x); }
-    if (fo && fo.how === '복층' && NO_DUP) { x.lab = '복층 ' + lab0 + m2s(ms); return pDup.push(x); }
-    if (fo && fo.how === '형') {   // 도면에 면적 글자가 없어 형 번호(정수 ㎡대)만 — 기준선이 그 ㎡대 안을 지나면 '경계'
-      var fr = ms.map(function(n){ return fitRange(n, n + 1); }), tag = ms.filter(function(v, i, a){ return a.indexOf(v) === i; }).map(function(n){ return n + '㎡대'; }).join('·') + ', 도면에 면적 글자 없음';
-      x.lab = '평면도 ' + lab0 + '(' + tag + ')';
-      if (fr.indexOf(1) >= 0) return pOk.push(x);
-      if (fr.indexOf(2) >= 0) { x.lab += ' — 8평 경계'; return pOk.push(x); }
-      return pSmall.push(x);
+    if (fo && fo.crops && fo.crops.length) {   // 한 장에 여러 형 → 사람이 적어 둔 형별 영역으로 잘라 낸 그림(tools/make_thumbs.py)만, 내 형 칸만 넣음
+      var tc = (window.THUMBS && window.THUMBS[x.u] && window.THUMBS[x.u].crops) || []; nCut++;
+      fo.crops.forEach(function(cr, i){
+        var y = { u: x.u, k: cr.k === 'room' ? 'room' : 'plan', cut: tc[i] }, v = judge(y, cr.m2 || [], cr.how || (fo.how === '형' ? '형' : ''), cr.label + ' ', cr.label);
+        if (v !== 'ok') return cutOut++;
+        if (!y.cut) return nWait++;   // 잘라 낸 그림이 아직 없음(다음 썸네일 갱신 때 생김) — 통째 그림은 남의 형이 섞여 있어 안 넣음
+        if (y.k === 'room') { var hw = cr.how || fo.how; y.lab = '실내 사진 ' + String(cr.label || '').replace(/\s*실내$/, '') + ' ' + (hw === '형' ? (cr.m2 || []).map(function(n){ return n + '㎡대'; }).join('·') : m2s(cr.m2 || [])); rooms.push(y); } else pOk.push(y);
+      });
+      return;
     }
-    var good = ms.filter(inSel); if (good.length) { x.lab = '평면도 ' + lab0 + m2s(good); pOk.push(x); } else { x.lab = '평면도 ' + lab0 + m2s(ms); pSmall.push(x); } });
-  var tile = function(x, lab){ return '<a href="' + x.u + '" target="_blank" rel="noopener" class="' + (x.k === 'plan' ? 'pl' : '') + '" title="' + lab + '"><img src="' + TH(x.u) + '" alt="' + lab + '" loading="lazy" decoding="async" referrerpolicy="no-referrer" onerror="this.parentNode.style.display=\'none\'"><span>' + lab + '</span></a>'; };
+    if (fo && fo.how === '실내') { x.lab = fo.label || '실내 사진'; x.k = 'room'; return rooms.push(x); }
+    var ms = fo ? (fo.m2 || []).slice() : (OCR[x.u] && OCR[x.u].m2 ? OCR[x.u].m2.filter(function(m){ return m >= 10 && m <= 120; }).map(function(m){ return Math.round(m * 100) / 100; }).filter(uq) : []);
+    var v = judge(x, ms, fo ? fo.how : '', lab0, fo ? fo.label : '');
+    if (v === 'ok') pOk.push(x); else bin[v].push(x); });
+  var tile = function(x, lab){ var href = x.cut ? x.cut.f : x.u, src = x.cut ? x.cut.t : TH(x.u); return '<a href="' + href + '" target="_blank" rel="noopener" class="' + (x.k === 'plan' ? 'pl' : '') + '" title="' + lab + '"><img src="' + src + '" alt="' + lab + '" loading="lazy" decoding="async" referrerpolicy="no-referrer" onerror="this.parentNode.style.display=\'none\'"><span>' + lab + '</span></a>'; };
   var mainLab = function(x){ return /실제\s*전경/.test(x.t || '') ? '실제 전경' : (/상세소개/.test(x.t || '') ? '단지 소개' : '사진 ' + (++nPh)); };
   var strip = mains.map(function(x){ return tile(x, mainLab(x)); }).concat(rooms.map(function(x){ return tile(x, x.lab); })).concat(pOk.map(function(x){ return tile(x, x.lab); }));
-  var folded = function(arr, title, why){ if (!arr.length) return ''; var n = 0; return '<details class="iw-out"><summary>' + title + ' ' + arr.length + '장 <small class="k">— ' + why + '</small></summary><div class="iw-strip" data-lb="1">' + arr.map(function(x){ return tile(x, x.lab || ('평면도 ' + (++n))); }).join('') + '</div></details>'; };
-  body += (strip.length || plans.length) ? '<div class="iw-sec"><div class="iw-sh">사진 <small class="k">서울시 단지정보 · 단지 사진 ' + mains.length + '장 · 평면도 ' + plans.length + '장 중 ' + selLabel() + ' 형 ' + pOk.length + '장(평면도의 전용면적 기준 — ' + (function(){ var nf = plans.filter(function(x){ return FX[x.u]; }).length, by = '사람이 도면을 열어 확인' + (window.YA_FIX ? '(' + window.YA_FIX.updated + ')' : ''), ocr = '글자 판독' + (window.YA_PLANS ? '(' + window.YA_PLANS.updated.slice(0, 10) + ')' : ''); return !nf ? ocr : (nf >= plans.length ? '전부 ' + by : nf + '장은 ' + by + ', 나머지는 ' + ocr); })() + ')' + (persp ? ' · 투시도(조감도) ' + persp + '장은 데이터로만' : '') + '</small></div>' +
+  var hidPl = pSmall.length + pShare.length + pDup.length + pUnk.length + pNy.length;   // 내 형이 아닌 평면도(기준 미만·셰어형·복층·면적 모름·청년 자격 없는 형) — 화면에 안 넣음
+  body += (strip.length || plans.length) ? '<div class="iw-sec"><div class="iw-sh">사진 <small class="k">서울시 단지정보 · 단지 사진 ' + mains.length + '장 · 내 형(청년 · ' + selLabel() + ') 평면도 ' + pOk.length + '장' + (hidPl ? '(내 형이 아닌 평면도 ' + hidPl + '장은 뺌' + (pNy.length ? ' — 그중 ' + pNy.length + '장은 신혼부부 전용 등 청년 자격 없는 형' : '') + ')' : '') + (nCut ? ' · 여러 형이 한 장에 든 그림 ' + nCut + '장은 내 형 칸만 잘라 넣음' + (cutOut ? '(남의 형 ' + cutOut + '칸 뺌)' : '') : '') + ' — 평면도의 전용면적 기준: ' + (function(){ var nf = plans.filter(function(x){ return FX[x.u]; }).length, by = '사람이 도면을 열어 확인' + (window.YA_FIX ? '(' + window.YA_FIX.updated + ')' : ''), ocr = '글자 판독' + (window.YA_PLANS ? '(' + window.YA_PLANS.updated.slice(0, 10) + ')' : ''); return !nf ? ocr : (nf >= plans.length ? '전부 ' + by : nf + '장은 ' + by + ', 나머지는 ' + ocr); })() + '</small></div>' +
       (strip.length ? '<div class="iw-strip" data-lb="1">' + strip.join('') + '</div>' : '') +
-      folded(pSmall, belowTxt() + ' 형 평면도', '도면에서 읽은 전용면적이 기준 미만 · 데이터로만') +
-      folded(pShare, '셰어형 평면도', '표의 ㎡는 집 전체 — 내 몫은 방 하나라 8평 기준에 못 넣음') +
-      folded(pDup, '복층·2층형 평면도', '지도 범례의 "복층 빼기"가 켜져 있음') +
-      folded(pUnk, '면적을 못 읽은 평면도', window.YA_PLANS ? '도면 글자 판독(OCR)으로 전용면적을 못 찾음 — 기준 이상인지 모름' : '도면 글자 판독 결과(data/ya_plans.json)가 아직 없음') +
+      (nWait ? '<div class="iw-nophoto">내 형 칸 ' + nWait + '개는 잘라 낸 그림을 만드는 중(하루 한 번 썸네일 갱신 때 생김) — 통째 그림엔 남의 형이 섞여 있어 안 넣음</div>' : '') +
+      (pOk.length || nWait ? '' : '<div class="iw-nophoto">내 형(청년 · ' + selLabel() + ') 평면도 없음</div>') +
       (rooms.length ? '' : '<div class="iw-nophoto">실내(방) 사진은 서울시 단지정보에 없음 — 평면도로 대신</div>') + '</div>'
     : '<div class="iw-nophoto"><b>사진 없음</b> — 서울시 단지정보 상세 페이지에 이미지가 없음</div>';
   var rows = c.rows || {}, sp = rows.special || [], ge = rows.general || [];
   var tyLabel = function(ty){ var t = String(ty || ''); var e = tyExact(t); if (e) t = t.replace(/[-\s]*\d{2,3}\.\d{1,2}/, '').replace(/\(\s*\)/g, '').replace(/^\s+|\s+$/g, ''); return t; };   // 'A-15.33' → 'A'
   body += yaMoney(c, sp, ge, tyLabel);
-  var fixed = {}; sp.concat(ge).forEach(function(r){ if (r.tyFix) fixed[r.ty0] = r.tyFix; });
+  var fixed = {}; yaSplit(c).ok.forEach(function(r){ if (r.tyFix) fixed[r.ty0] = r.tyFix; });   // 내 형 중 형 이름 숫자 ≠ 전용면적인 것만
   if (Object.keys(fixed).length) body += '<div class="iw-nophoto" style="border-color:#90caf9;background:#f3f8fe;color:#1d3f66"><b>형 이름 숫자 ≠ 전용면적</b> — ' + Object.keys(fixed).map(function(k){ return k + ' → 전용 <b>' + fixed[k] + '㎡(' + py(fixed[k]) + ')</b>'; }).join(' · ') + '. 서울시 단지정보 평면도 표의 전용면적(사람이 도면을 열어 확인' + (window.YA_FIX ? ', ' + window.YA_FIX.updated : '') + ')으로 내 조건을 판정함. 형 이름만으로는 전용면적을 알 수 없음(실사용·공급면적 기준 이름이거나 소수점이 없음)</div>';
   if (sp.length || ge.length) {
     var tr = function(r, kind){ var y = /청년/.test(r.who || ''); return '<tr' + (y ? ' class="y"' : '') + '><th>' + kind + '<br><small class="k">' + (r.who || '').split(/,\s*/).join('<br>') + '</small></th><td>' + (r.room || '') + ' <b>' + tyLabel(r.ty) + '</b><br><small>' + (yaTyNum(r.ty) ? tyArea(r.ty) : '<span class="k">면적 미기재</span>') + '</small></td><td>' + (r.n == null ? '<small class="k">미기재</small>' : r.n) + '</td><td>' + yaWon(r.dep) + '<br><small>월 ' + (r.rent == null ? '미기재' : Math.round(r.rent / 10000) + '만') + '</small>' + (r.fix ? '<br><small class="k">† 서울시 표엔 ' + (r.fix.k === 'both' ? yaWon(r.fix.raw) + '·월 ' + Math.round(r.fix.raw2 / 10000).toLocaleString() + '만' : r.fix.k === 'dep' ? yaWon(r.fix.raw) : '월 ' + Math.round(r.fix.raw / 10000).toLocaleString() + '만') + '</small>' : '') + '</td></tr>'; };
     var split = yaSplit(c), outN = split.small.length + split.other.length + split.share.length + split.unknown.length + split.dup.length;
     var hdr = '<tr><th>공급</th><th>형 · 전용</th><th>세대</th><th>보증금 · 월세</th></tr>';
     var trB = function(r){ return tr(r, r.kind + (r.border ? '<br><span class="tag">' + r.bpy + '평 경계</span>' : '')); };
-    body += '<div class="iw-sec"><div class="iw-sh">입주현황 <small class="k">서울시 단지정보 표 · 민간임대 형별 기준 조건 · <b>내 조건(청년 · ' + selLabel() + ')</b>만 펼침</small></div>' +
+    body += '<div class="iw-sec"><div class="iw-sh">형별 물량 <small class="k">입주현황 · 서울시 단지정보 표 · 민간임대 형별 기준 조건 · <b>내 조건(청년 · ' + selLabel() + ')</b> 형만' + (outN ? ' · 내 조건 밖 ' + outN + '개 형은 뺌' : '') + '</small></div>' +
       (split.ok.length ? '<table class="iw-t iw-k iw-ya">' + hdr + split.ok.map(trB).join('') + '</table>' + (function(){ var fx = [].concat((c.rows || {}).special || [], (c.rows || {}).general || []).filter(function(r){ return r.fix; }); if (!fx.length) return ''; var f = fx[0].fix; return '<small class="k" style="display:block;margin-top:4px">† 서울시 단지정보 표의 자릿수 오기 ' + fx.length + '칸을 고쳐 적음 — 같은 단지 목록의 ' + (f.k === 'rent' ? '월세 범위(' + Math.round(f.lo / 10000) + '만~' + Math.round(f.hi / 10000) + '만)' : '보증금 범위(' + yaWon(f.lo) + '~' + yaWon(f.hi) + ')') + '와 다른 형의 보증금/월세 비율로 보면 0이 하나(또는 둘) 더 붙거나 빠진 값. 계약 전 사업자 공고문으로 확인</small>'; })() : '<div class="iw-nophoto">내 조건에 맞는 형 없음' + (p.na ? '(사유는 맨 위)' : ' — ' + (yaFitReason(c) || '형별 표 없음')) + '</div>') +
-      (outN ? '<details class="iw-out"><summary>내 조건 밖 ' + outN + '개 형 <small class="k">— ' + [split.small.filter(function(r){ return r.under8; }).length ? '8평 미만 ' + split.small.filter(function(r){ return r.under8; }).length : '', split.small.filter(function(r){ return !r.under8; }).length ? '기준 미만 ' + split.small.filter(function(r){ return !r.under8; }).length : '', split.dup.length ? '복층·2층형 ' + split.dup.length : '', split.share.length ? '셰어형(방 하나만 전용) ' + split.share.length : '', split.other.length ? '청년 자격 아님(' + split.other.map(function(r){ return r.who; }).filter(function(v, i, a){ return a.indexOf(v) === i; }).join('·') + ') ' + split.other.length : '', split.unknown.length ? '면적 미기재 ' + split.unknown.length : ''].filter(Boolean).join(' · ') + ' · 데이터로만 보관</small></summary><table class="iw-t iw-k iw-ya iw-dim">' + hdr + split.small.concat(split.dup, split.share, split.other, split.unknown).map(function(r){ return tr(r, r.kind); }).join('') + '</table></details>' : '') +
       notes('지금 기준: ' + selTxt() + ' (1평 = 3.3058㎡ → 8평 26.45㎡ · 9평 29.75㎡ · 10평 33.06㎡, 지도 범례 \'최소 평형\'에서 고름). "N평 경계" = 서울시 표가 정수 코드(26A 등)라 그 ㎡대 안으로 경계선이 지나가서(26㎡대 = 8평선 · 29㎡대 = 9평선 · 33㎡대 = 10평선) 어느 쪽인지 모름 → 사업자 공고문 평면도 확인. 표 한 줄 = 한 형의 기준 조건(보증금·월세는 위 임대조건 참고). 전용면적: 형 이름에 소수점 면적이 있으면 그 값, 정수 코드(17A)면 "17㎡대"(정수부)로 적고 평은 그 범위 — 정확한 ㎡는 사업자 공고문 평면도. 공공임대 물량(' + (sc.pub == null ? '미기재' : sc.pub) + '세대)은 이 표가 아니라 SH 청년안심주택(공공임대) 공고(연 2회)로만 모집 · 시세 30~50%.') + '</div>';
   } else {
-    body += '<div class="iw-nophoto">입주현황 표 없음 — 서울시 단지정보에 형·보증금·월세가 등록돼 있지 않음</div>';
+    body += '<div class="iw-sec"><div class="iw-sh">형별 물량</div><div class="iw-nophoto">입주현황 표 없음 — 서울시 단지정보에 형·보증금·월세가 등록돼 있지 않음</div></div>';
   }
-  body += termsHtml((sc.pub ? ['청년안심주택(공공임대)'] : []).concat(['청년안심주택(민간임대)']));
+  body += yaInfo + termsHtml((sc.pub ? ['청년안심주택(공공임대)'] : []).concat(['청년안심주택(민간임대)']));
   var foot = '<div class="iw-f"><small class="k">' + (c.addr || '') + (c.phone ? ' · ' + c.phone : '') + '</small>' +
     '<div style="display:flex;gap:6px;flex-wrap:wrap"><a class="iw-btn" style="flex:1" href="https://soco.seoul.go.kr/youth/pgm/home/yohome/view.do?menuNo=400002&homeCode=' + c.code + '" target="_blank" rel="noopener">서울시 단지정보</a>' + (c.homepage ? '<a class="iw-btn" style="flex:1;background:#455a64" href="' + c.homepage + '" target="_blank" rel="noopener">사업자 홈페이지</a>' : '') + '</div>' + naviHtml(c.name, c.addr, c.lat, c.lng, false) + '</div>';
   return '<div class="nm-iw">' + head + body + foot + '</div>';
@@ -1855,9 +1913,11 @@ function nmHtml(p, approx){
       '<tr><th>보증금</th><td><b>' + p.dep + '</b> <small class="k">월세 ' + p.rent + ' 조합 (아래 임대조건 참고)</small></td></tr>' +
       '<tr><th>내 순위</th><td>' + rankPill(p.rank) + '</td></tr>' +
       '<tr><th>공고</th><td><a href="' + n.url + '" target="_blank" rel="noopener">' + n.name + '</a><br><small>' + s.text + '</small></td></tr>' +
-      '</table>' + moneyHtml(p, n);
+      '</table>';
+    var fp = factParts(p);
+    body += fp.photos + moneyHtml(p, n) + fp.info + ratesHtml(p) + termsHtml('행복주택');
   } else {
-    var rows = KOOK_ROWS[p.name] || [], s25 = noticeStatus(NOTICES.K25), s26 = noticeStatus(NOTICES.K26);
+    var mineK = myTys(p) || [], rows = (KOOK_ROWS[p.name] || []).filter(function(r){ return mineK.indexOf(String(Math.floor(parseFloat(r[0])))) >= 0; }), s25 = noticeStatus(NOTICES.K25), s26 = noticeStatus(NOTICES.K26);   // 내가 신청할 수 있는 면적(2026 일반공급 · 기준 이상)만
     // 빈 칸 금지: 금액이 없으면 왜 없는지 적는다(공급 없음 / 주거약자만 / 미정리)
     var kcell = function(c, nid){
       if (/정리 안 함/.test(c)) return '<small class="k">금액 미정리(접수 끝난 공고) · <a href="' + NOTICES[nid].url + '" target="_blank" rel="noopener">공고문 표</a></small>';
@@ -1866,33 +1926,36 @@ function nmHtml(p, approx){
       if (!/월\s*[\d.]+(?:~[\d.]+)?만/.test(c)) c += '<br><small class="k">월세: 공고 표에서 미정리</small>';
       return c;
     };
+    var fpK = factParts(p);
     body = (p.na ? '<div class="iw-nophoto" style="border-color:#e0a800;background:#fff8e1;color:#5d4a00"><b>' + (p.na0 ? '지금 공고엔 해당 없음' : '기준 미만') + '</b> — ' + p.na + '</div>' : '') +
-      '<table class="iw-t iw-k"><tr><th></th><th>2025 공고</th><th>2026 공고</th></tr>' +
-      (rows.length ? rows.map(function(r){ return '<tr><th>' + r[0].replace(/^(\d+(?:\.\d+)?)㎡$/, function(_, n){ return n + '㎡<br><small class="k">' + py(n) + '</small>'; }) + '</th><td>' + kcell(r[1], 'K25') + '</td><td>' + kcell(r[2], 'K26') + '</td></tr>'; }).join('') : '<tr><td colspan="3"><small class="k">이 지구는 2025·2026 공고 표에서 정리한 금액 없음</small></td></tr>') + '</table>' +
-      '<small class="k" style="display:block;margin-top:4px">금액 범위(예: 4,002~4,323만)는 공고 표의 최저~최고 · 월세는 1인 가구 기준</small>' +
-      kookConvHtml(p) +
       '<table class="iw-t iw-t2">' +
       '<tr><th>세대</th><td>' + hhHtml(p) + '</td></tr>' +
       '<tr><th>내 순위</th><td>' + rankPill(p.rank) + '</td></tr>' +
       '<tr><th>공고</th><td><a href="' + NOTICES.K25.url + '" target="_blank" rel="noopener">2025 국민임대</a> · ' + s25.text + '<br><a href="' + NOTICES.K26.url + '" target="_blank" rel="noopener">2026 국민임대</a> · ' + s26.text + '</td></tr>' +
-      '</table>';
+      '</table>' + fpK.photos + kookConvHtml(p) +
+      '<div class="iw-sec"><div class="iw-sh">형별 물량 <small class="k">2025·2026 공고문 단지표 · 내가 신청할 수 있는 면적(2026 일반공급 · 기준 이상)만</small></div>' +
+      '<table class="iw-t iw-k"><tr><th></th><th>2025 공고</th><th>2026 공고</th></tr>' +
+      (rows.length ? rows.map(function(r){ return '<tr><th>' + r[0].replace(/^(\d+(?:\.\d+)?)㎡$/, function(_, n){ return n + '㎡<br><small class="k">' + py(n) + '</small>'; }) + '</th><td>' + kcell(r[1], 'K25') + '</td><td>' + kcell(r[2], 'K26') + '</td></tr>'; }).join('') : '<tr><td colspan="3"><small class="k">2026 공고에 이 지구의 내가 신청할 수 있는 면적(일반공급 · 기준 이상) 없음</small></td></tr>') + '</table>' +
+      '<small class="k" style="display:block;margin-top:4px">금액 범위(예: 4,002~4,323만)는 공고 표의 최저~최고 · 월세는 1인 가구 기준</small></div>' +
+      fpK.info + ratesHtml(p) + termsHtml('국민임대');
   }
-  body += termsHtml(p.kind === '국민임대' ? '국민임대' : '행복주택') + ratesHtml(p) + factHtml(p);
   var foot = '<div class="iw-f"><small class="k">' + (p.addr || '') + (approx ? ' · 동 중심 근사' : '') + '</small>' + naviHtml(p.name, p.addr, p.ll && p.ll[0], p.ll && p.ll[1], approx || !p.ll) + '</div>';
   return '<div class="nm-iw">' + head + body + foot + '</div>';
 }
 function kookConvHtml(p){
   var c = KOOK_CONV.items && KOOK_CONV.items[p.name];
-  if (!c || !Object.keys(c).length) return '<div class="iw-nophoto">보증금↔월세 전환표 없음 — 2026 공고문 「임대금액 전환안내」(16~21쪽)에 이 지구가 없음</div>';
+  if (!c || !Object.keys(c).length) return '<div class="iw-sec"><div class="iw-sh">임대조건</div><div class="iw-nophoto">보증금↔월세 전환표 없음 — 2026 공고문 「임대금액 전환안내」(16~21쪽)에 이 지구가 없음</div></div>';
   var man = function(v){ return fmtMan(Math.round(v / 10000)); }, mon = function(v){ return (Math.round(v / 1000) / 10) + '만'; };
   var rng = function(a, f){ return a[0] === a[1] ? f(a[0]) : f(a[0]) + '~' + f(a[1]); };
-  var rows = Object.keys(c).sort(function(a, b){ return +a - +b; }).map(function(ty){ var x = c[ty];
+  var mineK = myTys(p) || [], tys = Object.keys(c).filter(function(t){ return mineK.indexOf(String(t)) >= 0; });
+  if (!tys.length) return '';
+  var rows = tys.sort(function(a, b){ return +a - +b; }).map(function(ty){ var x = c[ty];
     var real = ((KOOK_ROWS[p.name] || []).filter(function(r){ return String(r[0]).split('.')[0].replace('㎡', '') === String(ty); })[0] || [])[0], m2 = real ? parseFloat(real) : +ty;
-    return '<tr class="sub"><th colspan="3">' + ty + '형 · 전용 ' + m2 + '㎡ (' + py(m2) + ')' + (inSel(m2) ? '' : ' <span class="tag">기준 미만</span>') + '</th></tr>' +
+    return '<tr class="sub"><th colspan="3">' + ty + '형 · 전용 ' + m2 + '㎡ (' + py(m2) + ')</th></tr>' +
       '<tr><th>보증금 최대로</th><td>' + rng(x.plus.dep, man) + '</td><td>월 <b>' + rng(x.plus.rent, mon) + '</b> <span class="tag">최소</span></td></tr>' +
       '<tr><th>공고 그대로</th><td>' + rng(x.base.dep, man) + '</td><td>월 ' + rng(x.base.rent, mon) + '</td></tr>' +
       '<tr><th>보증금 최소로</th><td><b>' + rng(x.minus.dep, man) + '</b></td><td>월 ' + rng(x.minus.rent, mon) + ' <span class="tag">최대</span></td></tr>'; }).join('');
-  return '<div class="iw-sec"><div class="iw-sh">보증금 ↔ 월세 전환 <small class="k">2026 공고문 16~21쪽 「임대금액 전환안내」 표 그대로</small></div><table class="iw-t iw-k iw-cv"><tr><th></th><th>보증금</th><th>그때 월세</th></tr>' + rows + '</table>' +
+  return '<div class="iw-sec"><div class="iw-sh">임대조건 <small class="k">보증금 ↔ 월세 전환 · 2026 공고문 16~21쪽 「임대금액 전환안내」 표 그대로</small></div><table class="iw-t iw-k iw-cv"><tr><th></th><th>보증금</th><th>그때 월세</th></tr>' + rows + '</table>' +
     notes('보증금 최대로 = 월세를 보증금으로 최대 전환한 값(월세가 가장 낮음). 보증금 최소로 = 보증금을 월세로 최대 전환한 값(월세가 가장 높음). 계약은 공고 그대로 하고, 계약 뒤 주거안심종합센터에 전환 신청(공고문 16쪽). 범위는 같은 면적 안 단지·동별 최저~최고.') + '</div>';
 }
 
@@ -1971,7 +2034,7 @@ function nmMeasure(html){   // 팝업 HTML을 화면 밖에서 그려 높이만 
 }
 function nmFocusMarker(mk){
   nmSelect(mk);
-  var pos = mk.getPosition(), Z = 15;
+  var pos = mk.getPosition(), Z = (nmMap.getZoom && nmMap.getZoom()) || 15;   // 줌은 지금 보던 그대로 — 단지가 시트·패널에 안 가리게 옮기기만
   document.querySelectorAll('.lst .it').forEach(function(it){ it.classList.toggle('on', it.__mk === mk); });
   var mapH = document.getElementById('nmap').getBoundingClientRect().height || 600;
   if (sheet.mobile()) {
@@ -1979,7 +2042,7 @@ function nmFocusMarker(mk){
     nmInfo.close(); window.__detailMk = mk; showDetail(mk.__p, mk.__approx); sheet.go(2);
     var sideH = Math.round(sheet.visH());   // 시트가 transform 으로 밀려 있어 getBoundingClientRect 높이는 최대 높이 — 보이는 높이로
     var c0 = new naver.maps.LatLng(latPlusPx(pos.lat(), Math.round(sideH / 2), Z), pos.lng());
-    nmMap.setZoom(Z, false); nmMap.setCenter(c0);
+    nmMap.setCenter(c0);
     return true;
   }
   // PC: 팝업 대신 오른쪽 넓은 패널(2단)에 상세 — 단지 카드 159개 평균 높이 1,558px(620px 팝업 한 단)라, 1440×900에서 팝업(최대 750px)은 화면 2.1개를 안에서 스크롤하고 지도의 52%를 가렸음(2026-10-28 실측). 지도는 패널 왼쪽에 가리는 것 없이 남고 마커는 그 가운데로
@@ -1988,19 +2051,19 @@ function nmFocusMarker(mk){
     var vm = document.getElementById('view-map'); vm.classList.add('detail-open'); vm.classList.toggle('detail-wide', DET_WIDE);
     var wb = document.getElementById('detail-wide'); if (wb) wb.textContent = DET_WIDE ? '지도 보기 ⤡' : '넓게 보기 ⤢';
     try { nmMap.autoResize(); } catch(e) {}
-    try { nmMap.morph(pos, Z); } catch(e) { nmMap.setCenter(pos); nmMap.setZoom(Z, false); }
+    try { nmMap.panTo(pos); } catch(e) { nmMap.setCenter(pos); }
     return true;
   }
   var html = nmHtml(mk.__p, mk.__approx), h = nmMeasure(html);
   nmInfo.setContent(html); nmInfo.open(nmMap, mk);
   var markerY = Math.min(mapH - 30, Math.max(mapH / 2, h + 24));          // 팝업이 짧으면 가운데, 길면 마커를 아래로
   var center = new naver.maps.LatLng(latPlusPx(pos.lat(), -Math.round(markerY - mapH / 2), Z), pos.lng());   // 중심을 마커보다 북쪽에 → 마커가 화면 아래쪽, 팝업은 그 위
-  try { nmMap.morph(center, Z); } catch(e) { nmMap.setCenter(center); nmMap.setZoom(Z, false); }
+  try { nmMap.panTo(center); } catch(e) { nmMap.setCenter(center); }
   // morph 가 끝난 뒤: 줌 애니메이션 중 열려 크기가 0으로 잡힌 경우만 같은 내용으로 다시 열어 크기 보정(이동 없음), 위치 검증
   var fix = function(){
     if (nmSelected !== mk) return;
     try { var el = document.querySelector('.nm-iw'); if (el && nmInfo.getMap() && (!el.parentElement.style.width || el.parentElement.style.width === '0px')) nmInfo.open(nmMap, mk); } catch(e) {}
-    try { var c = nmMap.getCenter(); if (nmMap.getZoom() !== Z || Math.abs(c.lat() - center.lat()) > 0.002 || Math.abs(c.lng() - center.lng()) > 0.002) { nmMap.setZoom(Z, false); nmMap.setCenter(center); } } catch(e) {}
+    try { var c = nmMap.getCenter(); if (nmMap.getZoom() === Z && (Math.abs(c.lat() - center.lat()) > 0.002 || Math.abs(c.lng() - center.lng()) > 0.002)) nmMap.setCenter(center); } catch(e) {}
   };
   try { if (naver.maps.Event.once) naver.maps.Event.once(nmMap, 'idle', fix); } catch(e) {}
   setTimeout(fix, 1100);
@@ -2018,7 +2081,7 @@ function nmInit(){
   nmInfo = new naver.maps.InfoWindow({ borderWidth: 0, backgroundColor: 'transparent', disableAnchor: true, disableAutoPan: true, pixelOffset: new naver.maps.Point(0, -6) });  // autoPan 끔: 이동은 nmFocusMarker 가 한 번만
   var status = document.getElementById('nm-status'), list = document.getElementById('nm-list');
   // 폰: 바닥 시트가 아래 절반을 덮으므로 보이는 위쪽 절반에 서울이 오도록 중심을 남쪽으로 내림
-  if (sheet.mobile()) { nmMap.setZoom(10); setTimeout(function(){ try { nmMap.panBy(new naver.maps.Point(0, Math.round(document.getElementById('side').getBoundingClientRect().height / 2))); } catch(e) {} }, 400); }
+  if (sheet.mobile()) { nmMap.setZoom(10); setTimeout(function(){ try { nmMap.panBy(new naver.maps.Point(0, Math.round(sheet.visH() / 2))); } catch(e) {} }, 400); }
   var sel = document.getElementById('nm-notice');
   buildNoticeSelect();
   sel.addEventListener('change', function(){ applyFilter(); });
@@ -2122,7 +2185,7 @@ function nmInit(){
     var names = { pri: '행복 강서·동대문', gen: '행복 그 외', kook: '국민임대', ya: '청년안심', lh: 'LH' }, ks = Object.keys(names), onK = ks.filter(function(k){ return on[k]; });
     var vis = Array.prototype.filter.call(document.querySelectorAll('.lst .it'), function(it){ return it.style.display !== 'none'; }).length;
     var sel = document.getElementById('nm-notice');
-    el.innerHTML = '<b>' + (onK.length === ks.length ? '종류 전체' : (onK.length ? onK.map(function(k){ return names[k]; }).join('·') : '종류 없음')) + '</b> · ' + selLabel() + ' · ' + (NO_DUP ? '복층 빼기' : '복층 포함') + (on.na ? ' · 해당 없음 보임' : '') + (sel && sel.value ? ' · ' + sel.options[sel.selectedIndex].text.replace(/\s*\(.*$/, '') : '') + ' · <b>' + vis + '곳</b>';
+    el.innerHTML = '<b>' + (onK.length === ks.length ? '종류 전체' : (onK.length ? onK.map(function(k){ return names[k]; }).join('·') : '종류 없음')) + '</b> · ' + selLabel() + ' · ' + (NO_DUP ? '복층 빼기' : '복층 포함') + (on.na ? ' · 해당 없음 보임' : '') + (BUILT.max ? ' · 준공 ' + BUILT.max + '년차 이내' + (BUILT.unk ? '' : '(모름 뺌)') : '') + (sel && sel.value ? ' · ' + sel.options[sel.selectedIndex].text.replace(/\s*\(.*$/, '') : '') + ' · <b>' + vis + '곳</b>';
   }
   window.lgSummary = lgSummary;
   var lgBtn = document.getElementById('lg-toggle');
@@ -2130,13 +2193,17 @@ function nmInit(){
   function applyFilter(){
     var on = {}; document.querySelectorAll('.nmbar input[data-cat]').forEach(function(c){ on[c.dataset.cat] = c.checked; });
     var nid = document.getElementById('nm-notice').value;
-    function vis(p){ return on[p.cat] && (!nid || p.nid === nid || (p.kind === '국민임대' && nid === 'K26')); }
+    function vis(p){ return on[p.cat] && (!nid || p.nid === nid || (p.kind === '국민임대' && nid === 'K26')) && builtOk(p); }
     nmMarkers.forEach(function(mk){ mk.setMap(vis(mk.__p) ? nmMap : null); });
-    document.querySelectorAll('.lst .it').forEach(function(el){ el.style.display = (on[el.dataset.cat] && (!nid || el.getAttribute('data-nid') === nid)) ? '' : 'none'; });
+    document.querySelectorAll('.lst .it').forEach(function(el){ el.style.display = (on[el.dataset.cat] && (!nid || el.getAttribute('data-nid') === nid) && (!el.__mk || builtOk(el.__mk.__p))) ? '' : 'none'; });
     document.querySelectorAll('.lst .grp').forEach(function(el){ el.style.display = on[el.dataset.cat] ? '' : 'none'; });
     lgSummary();
   }
   document.querySelectorAll('.nmbar input[data-cat]').forEach(function(c){ c.addEventListener('change', applyFilter); });
+  var bSel = document.getElementById('nm-built'), bUnk = document.getElementById('nm-built-unk');
+  if (bSel) { bSel.value = String(BUILT.max); bUnk.checked = BUILT.unk;
+    var bSave = function(){ BUILT = { max: +bSel.value || 0, unk: bUnk.checked }; try { localStorage.setItem('kkk-built', JSON.stringify(BUILT)); } catch(e) {} applyFilter(); };
+    bSel.addEventListener('change', bSave); bUnk.addEventListener('change', bSave); }
   // ===== 최소 전용 평수 바꾸기: 분류 다시 → 마커 색·목록 묶음·공고 표 다시 그림 =====
   function minPyNote(){
     var hp = PLACES.filter(function(p){ return p.kind === '행복주택'; }), out = hp.filter(function(p){ return !inSel(p.m2); });
@@ -2169,6 +2236,10 @@ function nmInit(){
   var dupBox = document.getElementById('nm-nodup'); if (dupBox) { dupBox.checked = NO_DUP; dupBox.addEventListener('change', function(){ NO_DUP = dupBox.checked; try { localStorage.setItem('kkk-nodup', NO_DUP ? '1' : '0'); } catch(e) {} refreshMinPy(); }); }
   lgSummary();
   naver.maps.Event.addListener(nmMap, 'click', function(){ nmInfo.close(); });
+  // 상세가 열린 채 지도를 손으로 움직이면(끌기·두 손가락·휠) 상세를 접음 — PC: 목록으로(지도 넓게), 폰: 시트를 단지 이름만 보이게. 마커 클릭으로 지도가 저절로 움직이는 건 해당 없음
+  var foldDetail = function(){ var det = document.getElementById('nm-detail'); if (!det || det.hidden) return; if (sheet.mobile()) { if (sheet.state() >= 2) sheet.go(1); } else hideDetail(); };
+  ['dragstart', 'pinchstart'].forEach(function(ev){ try { naver.maps.Event.addListener(nmMap, ev, foldDetail); } catch(e) {} });
+  var nmEl = document.getElementById('nmap'); if (nmEl) nmEl.addEventListener('wheel', foldDetail, { passive: true });
 }
 
 // ===== 내 조건 (암호화 파일 me.enc) =====
@@ -2298,10 +2369,9 @@ function applyLive(){
     });
     var main = ns.filter(function(n){ return n.fit !== 0; }), out = ns.filter(function(n){ return n.fit === 0; });
     var head = document.getElementById('ya-head'); if (head) head.innerHTML = '서울시 청년안심주택 공고 <small>(자동 수집 · 최근 ' + ns.length + '건 중 내 조건 가능성 ' + main.length + '건, ' + (PY_MIN === 8 ? '원룸뿐이라' : belowTxt() + '뿐이라') + ' 제외 ' + out.length + '건 · 단지 ' + comps.length + '곳 지도 표시)</small>';
-    var row = function(n){ return '<tr' + (n.fit === 0 ? ' class="dim"' : '') + '><td><span class="pill ' + (n.kind === '공공임대' ? 'ok' : 'info') + '">' + n.kind + (n.stage === '추가' ? ' 추가' : '') + '</span></td><td><a href="' + n.url + '" target="_blank" rel="noopener">' + n.title + '</a></td><td>' + n.fitHtml + '</td><td class="num">' + n.posted + '</td><td class="num">' + (n.apply || '<small class="k">미기재</small>') + '</td><td>' + (n.org || '<small class="k">미기재</small>') + '</td></tr>'; };
+    var row = function(n){ return '<tr><td><span class="pill ' + (n.kind === '공공임대' ? 'ok' : 'info') + '">' + n.kind + (n.stage === '추가' ? ' 추가' : '') + '</span></td><td><a href="' + n.url + '" target="_blank" rel="noopener">' + n.title + '</a></td><td>' + n.fitHtml + '</td><td class="num">' + n.posted + '</td><td class="num">' + (n.apply || '<small class="k">미기재</small>') + '</td><td>' + (n.org || '<small class="k">미기재</small>') + '</td></tr>'; };
     var thead = '<thead><tr><th>구분</th><th>공고명</th><th>내 조건 (청년 · ' + selLabel() + ')</th><th>게시일</th><th>청약신청일</th><th>담당·사업자</th></tr></thead>';
     box.innerHTML = '<div class="tbl"><table class="stack">' + thead + '<tbody>' + main.map(row).join('') + '</tbody></table></div>' +
-      (out.length ? '<details class="more" style="margin-top:8px"><summary>내 조건 밖 공고 ' + out.length + '건 — 청년 자격 형이 전부 ' + belowTxt() + '인 단지의 공고 (데이터로만 보관)</summary><div class="body"><div class="tbl"><table class="stack">' + thead + '<tbody>' + out.map(row).join('') + '</tbody></table></div></div></details>' : '') +
       '<p class="src">갱신 ' + j.updated + ' · 출처 <a href="' + j.source + '" target="_blank" rel="noopener">서울시 청년안심주택 모집공고 게시판</a>. 내 조건 판정은 서울시 단지정보 입주현황 표의 청년 자격 형 전용면적 기준(지금 기준: ' + selTxt() + ' · 지도 범례에서 변경). 공공임대는 SH 인터넷청약에서 접수(연 2회, 시세 30~50%), 민간임대는 사업자별 접수(특별공급 소득 120% 이하 / 일반공급 소득 무관, 시세 75~85%). 건물 유형(아파트/오피스텔 등)은 <b>표기 못 함</b> — 서울시 단지 목록 JSON의 houseType·totFloor 항목이 전부 비어 있고(2026-10-28 확인), 단지 상세 페이지 항목(주소·주택명·지하철역·규모·시행사·시공사·최초모집공고일·입주(예정)일·대표전화·홈페이지)에도 없음. 각 공고의 모집공고문(첨부)에서 "건축물 용도"를 직접 봐야 함.</p>';
     var heads = ['구분','공고명','내 조건','게시일','청약신청일','담당·사업자']; box.querySelectorAll('tbody tr').forEach(function(tr){ Array.prototype.forEach.call(tr.children, function(td, i){ td.setAttribute('data-label', heads[i]); }); });
   };
@@ -2344,7 +2414,7 @@ function applyLive(){
     var leftover = open.reduce(function(a, g){ return a + (g.n - g.rate.r1); }, 0), r2fill = open.every(function(g){ return g.rate.r1 + g.rate.r2 >= g.n; });
     var sum = function(arr){ return arr.reduce(function(a, g){ return a + g.n; }, 0); };
     var gus = {}; ok.forEach(function(g){ gus[g.gu] = (gus[g.gu] || 0) + g.n; });
-    var html = '<div class="note" style="margin:10px 0 6px"><p><b><a href="' + j.notice_url + '" target="_blank" rel="noopener">2026 1차 공고</a></b> (게시 ' + j.posted + ' · 접수 ' + j.apply + ' · ' + j.result + ') — 849호 전용면적(주택목록 호실별): ' + ['8평 미만'].concat(PY_BANDS.map(function(b){ return b.name; })).map(function(k){ return k + ' ' + (unitBand[k] || 0); }).join(' · ') + '호. 신청은 주택형 단위, 호실은 무작위 배정(공고문 32·38쪽)이라 <b>주택형 안 호실이 전부 ' + selLabel() + '인 곳만 셈: ' + okN + '호(' + Math.round(okN / totalN * 100) + '%, ' + ok.length + '개 주택군)</b>' + (part.length ? ' · ' + belowTxt() + ' 호실이 섞인 주택형 ' + part.length + '개(그중 ' + selLabel() + ' 호실 ' + part.reduce(function(a, g){ return a + g.__ins; }, 0) + '호)는 아래 따로' : '') + '. ' +
+    var html = '<div class="note" style="margin:10px 0 6px"><p><b><a href="' + j.notice_url + '" target="_blank" rel="noopener">2026 1차 공고</a></b> (게시 ' + j.posted + ' · 접수 ' + j.apply + ' · ' + j.result + ') — 849호 전용면적(주택목록 호실별): ' + ['8평 미만'].concat(PY_BANDS.map(function(b){ return b.name; })).map(function(k){ return k + ' ' + (unitBand[k] || 0); }).join(' · ') + '호. 신청은 주택형 단위, 호실은 무작위 배정(공고문 32·38쪽)이라 <b>주택형 안 호실이 전부 ' + selLabel() + '인 곳만 셈: ' + okN + '호(' + Math.round(okN / totalN * 100) + '%, ' + ok.length + '개 주택군)</b>' + (part.length ? ' · ' + belowTxt() + ' 호실이 섞인 주택형 ' + part.length + '개는 무작위 배정이라 뺌' : '') + '. ' +
       '<b>결과(<a href="' + j.rates_url + '" target="_blank" rel="noopener">최종 경쟁률 PDF</a>): ' + selLabel() + ' ' + okN + '호 중 ' + sum(fills) + '호는 1순위 신청자만으로 마감</b>, 2순위까지 내려온 건 ' + open.length + '개 주택군 ' + sum(open) + '호 중 1순위가 가져가고 남은 <b>' + leftover + '호</b>' + (r2fill ? ' — 그 ' + leftover + '호도 전부 2순위에서 마감(2순위 신청자 수 ≥ 남은 호수) → <b>3순위는 0호</b>' : '') + '. 구별 ' + selLabel() + ' 호수: ' + Object.keys(gus).sort(function(a, b){ return gus[b] - gus[a]; }).map(function(g){ return g + ' ' + gus[g]; }).join(' · ') + '.</p>' +
       '<p><b>건물 유형(' + selLabel() + ' ' + okN + '호, 공고문 "1. 공급주택" 표의 유형 열):</b> ' + (function(){ var b = {}; ok.forEach(function(g){ var k = g.bld || '공고문 표에 없음'; b[k] = (b[k] || 0) + g.n; }); return Object.keys(b).sort(function(x, y){ return b[y] - b[x]; }).map(function(k){ return k + ' ' + b[k] + '호'; }).join(' · '); })() + '. 승강기 있는 집 ' + ok.filter(function(g){ return g.lift === '있음'; }).reduce(function(a, g){ return a + g.n; }, 0) + '호 / 없는 집 ' + ok.filter(function(g){ return g.lift === '없음'; }).reduce(function(a, g){ return a + g.n; }, 0) + '호.' + (ok.some(function(g){ return /아파트/.test(g.bld || ''); }) ? '' : ' 이번 공고의 ' + selLabel() + ' 집 중 아파트는 0호(SH가 사들인 도시형생활주택·다세대·오피스텔·다가구).') + '</p></div>';
     var row = function(g){ var r = g.rate; return '<tr><td class="nw">' + g.gu + '</td><td><b>' + (g.name === '-' ? '(이름 없음)' : g.name) + '</b> ' + g.ty + (g.sex !== '-' ? ' · ' + g.sex : '') + '<br><small class="k">' + g.addr.replace(/^서울특별시\s*/, '') + ' · ' + g.sec + (g.star ? '(전세형*)' : '') + '</small></td><td class="nw">' + (g.bld ? '<b>' + g.bld + '</b>' : '<small class="k">공고문 공급주택 표에 없음</small>') + '<br><small>' + (g.tot ? '건물 총 ' + g.tot : '총 세대수 미기재') + ' · ' + g.struct + '</small><br><small>' + (g.lift ? '승강기 ' + g.lift : '승강기 미기재') + ' · ' + (g.park ? '주차 ' + g.park.replace(/\s+/g, ' ') : '주차 미기재') + '</small></td><td class="num">' + g.m2_min + (g.m2_max !== g.m2_min ? '~' + g.m2_max : '') + '㎡<br><small class="k">' + py(g.m2_min) + (g.m2_max !== g.m2_min ? '~' + py(g.m2_max) : '') + '</small>' + (g.__s === 'part' ? '<br><small class="k">' + bandBreak(g) + '</small>' : '') + '</td><td class="num">' + g.n + '</td><td class="num">' + won(g.p23.dep) + (g.p23.dep_hi !== g.p23.dep ? '~' + won(g.p23.dep_hi) : '') + '<br><small>월 ' + rentT(g.p23.rent) + (g.p23.rent_hi !== g.p23.rent ? '~' + rentT(g.p23.rent_hi) : '') + '</small></td><td class="num">' + (function(){ var c = conv(g, g.p23); if (!c) return '<small class="k">계산 불가</small>'; return '최대 ' + won(c.hiDep) + ' · 월 <b>' + rentT(c.hiRent) + '</b><br>최소 ' + won(c.loDep) + ' · 월 ' + rentT(c.loRent); })() + '</td><td class="num">' + won(g.p1.dep) + '<br><small>월 ' + rentT(g.p1.rent) + '</small></td><td class="num">' + (r ? r.r1 + ' / ' + r.r2 + ' / ' + r.r3 + '<br>' + (r.r1_fills ? '<span class="pill warn">1순위에서 마감</span>' : '<span class="pill ok">1순위 뒤 ' + (g.n - r.r1) + '호 남음</span>' + (r.r1 + r.r2 >= g.n ? ' <span class="pill warn">2순위에서 마감</span>' : ' <span class="pill ok">3순위까지</span>')) : '<small class="k">경쟁률 매칭 안 됨</small>') + '</td></tr>'; };
@@ -2353,7 +2423,6 @@ function applyLive(){
     var mine = ok.filter(function(g){ return /강서구|동대문구/.test(g.gu); });
     html += '<details class="more" style="margin-top:8px"><summary>강서구·동대문구의 ' + selLabel() + ' 집 ' + mine.length + '개 주택군 ' + sum(mine) + '호 (결과 포함)</summary><div class="body">' + (mine.length ? '<div class="tbl"><table class="stack wide">' + thead + '<tbody>' + mine.map(row).join('') + '</tbody></table></div>' : '<p class="src">없음</p>') + '</div></details>';
     html += '<details class="more" style="margin-top:8px"><summary>' + selLabel() + ' 전체 ' + ok.length + '개 주택군 ' + okN + '호 (데이터 전부)</summary><div class="body"><div class="tbl"><table class="stack wide">' + thead + '<tbody>' + ok.map(row).join('') + '</tbody></table></div></div></details>';
-    if (part.length) html += '<details class="more" style="margin-top:8px"><summary>' + belowTxt() + ' 호실이 섞인 주택형 ' + part.length + '개 — 무작위 배정이라 ' + belowTxt() + ' 호실이 걸릴 수 있어 위 집계에서 뺌</summary><div class="body"><div class="tbl"><table class="stack wide">' + thead + '<tbody>' + part.map(row).join('') + '</tbody></table></div></div></details>';
     html += '<p class="src">출처: ' + j.source + ' · 전용면적은 주택목록의 "전용면적(㎡)" 열(주택형 코드와 다름). 보증금·월세는 청년 기준(대학생·취업준비생 열은 제외), 한 주택군에 여러 호가 있으면 최소~최대. 건물 유형·승강기·주차장은 공고문 3~20쪽 "1. 공급주택" 표(151개 건물, 호수 합계 849 = 주택목록과 일치)에서 도로명 주소로 연결(표기가 다른 4개 주택군은 지번으로). 주택군 ' + all.length + '개 중 경쟁률 PDF와 호수가 다르게 묶인 3개(송파 이름 없는 집 29B, 성북 서도휴빌 103~105동)는 경쟁률 쪽 묶음을 그대로 붙였음. 보증금 최대·최소: 공고문 21쪽 상호전환 — 월세를 보증금으로 최대 60%(신규공급·주택명 앞 * 전세형은 80%, 20쪽) 전환(연 6.7%: 낮출 월세 × 12 ÷ 0.067 = 추가 보증금), 보증금을 월세로 최대 60% 전환(연 2.5%: 낮출 보증금 × 0.025 ÷ 12 = 추가 월세). 계약은 기본 조건으로 하고 계약 뒤 전환. 지금 기준: ' + selTxt() + '(지도 범례에서 변경).</p>';
     box.innerHTML = html;
     var heads = ['구','집','건물','전용','호수','2~3순위','보증금 최대·최소 → 월세','1순위','신청자']; box.querySelectorAll('tbody tr').forEach(function(tr){ Array.prototype.forEach.call(tr.children, function(td, i){ td.setAttribute('data-label', heads[i]); }); });
@@ -2369,13 +2438,15 @@ function applyLive(){
     renderLhLive(j);
   });
   window.renderLhLive = function(j){
-    var box = document.getElementById('lh-live'); if (!box) return; var items = j.items;
+    var box = document.getElementById('lh-live'); if (!box) return;
+    var outLh = function(x){ var cs = x.complexes || []; if (!cs.length) return false; var ok = 0, sm = 0; cs.forEach(function(c){ var f = lhFit(c); ok += f.ok.length; sm += f.small.length; }); return !ok && sm > 0; };   // 형이 전부 기준 미만 = 내 것 아님
+    var items = j.items.filter(function(x){ return !outLh(x); }), lhOut = j.items.length - items.length;
     var openN = items.filter(function(x){ return x.status === '접수중' || x.status === '공고중'; }).length;
-    var head = document.getElementById('lh-head'); if (head) head.innerHTML = '서울 LH 공고 <small>(자동 수집 · 최근 150일 ' + items.length + '건, 지금 접수 중 ' + openN + '건)</small>';
+    var head = document.getElementById('lh-head'); if (head) head.innerHTML = '서울 LH 공고 <small>(자동 수집 · 최근 150일 ' + j.items.length + '건 중 내 조건 밖 ' + lhOut + '건 뺌, 지금 접수 중 ' + openN + '건)</small>';
     var brief = document.getElementById('lh-brief'); if (brief) brief.innerHTML = '· LH 서울 접수 중 <b>' + openN + '건</b> <a href="#calendar">(공고 일정 탭)</a>';
     var lhFitHtml = function(x){ var cs = x.complexes || []; if (!cs.length) return '<span class="pill info">단지표 없음</span><br><small class="k">LH 페이지에 주택형 표 없음 → 공고문</small>';
       var ok = [], small = []; cs.forEach(function(c){ var f = lhFit(c); f.ok.forEach(function(r){ ok.push(r); }); f.small.forEach(function(r){ small.push(r); }); });
-      if (ok.length) return '<span class="pill ok">' + selLabel() + ' 형 있음</span><br><small class="k">' + ok.map(function(r){ return r.ty.split(' ')[0] + ' ' + r.m2 + '㎡(' + py(r.m2) + ')'; }).filter(function(v, i, a){ return a.indexOf(v) === i; }).join(' · ') + (small.length ? ' · 그 외 ' + small.length + '개 형은 ' + belowTxt() : '') + '</small>';
+      if (ok.length) return '<span class="pill ok">' + selLabel() + ' 형 있음</span><br><small class="k">' + ok.map(function(r){ return r.ty.split(' ')[0] + ' ' + r.m2 + '㎡(' + py(r.m2) + ')'; }).filter(function(v, i, a){ return a.indexOf(v) === i; }).join(' · ') + '</small>';
       if (small.length) return '<span class="pill warn">내 조건 밖</span><br><small class="k">전부 ' + (small.every(function(r){ return bandOf(r.m2) === 0; }) ? '8평 미만' : belowTxt()) + ': ' + small.map(function(r){ return r.ty.split(' ')[0] + ' ' + r.m2 + '㎡(' + py(r.m2) + ')'; }).filter(function(v, i, a){ return a.indexOf(v) === i; }).join(' · ') + '</small>';
       return '<span class="pill info">면적 미기재</span>'; };
     box.innerHTML = '<div class="tbl"><table class="stack"><thead><tr><th>유형</th><th>공고명</th><th>내 조건 (' + selLabel() + ')</th><th>지역</th><th>게시일</th><th>마감일</th><th>상태</th></tr></thead><tbody>' +
