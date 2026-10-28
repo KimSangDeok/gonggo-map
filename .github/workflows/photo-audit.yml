@@ -1,9 +1,9 @@
 name: photo-audit
-# 점검용(수동): 사이트에 뜨는 SH 주택정보 사진을 단지별 모아보기 그림으로 만들어 아티팩트로 올림. 저장소에는 커밋 안 함
+# 점검용(수동): 사이트에 뜨는 SH 주택정보 사진을 단지별 모아보기 그림으로 만들어 별도 브랜치 photo-audit 에 올림(gh-pages·사이트에는 안 들어감, 확인 뒤 브랜치 삭제)
 on:
   workflow_dispatch:
 permissions:
-  contents: read
+  contents: write
 jobs:
   run:
     runs-on: ubuntu-latest
@@ -15,8 +15,12 @@ jobs:
       - run: sudo apt-get install -y -q fonts-noto-cjk > /dev/null
       - run: pip install -q requests beautifulsoup4 pillow
       - run: python tools/photo_audit.py
-      - uses: actions/upload-artifact@v4
-        with:
-          name: photo-audit
-          path: audit_out
-          retention-days: 3
+      - name: push to photo-audit branch
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cd audit_out
+          git init -q -b photo-audit
+          git config user.name 'gonggo-bot'; git config user.email 'gonggo-bot@users.noreply.github.com'
+          git add -A && git commit -qm "photo audit $(date -u +%FT%TZ)"
+          git push -qf "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" photo-audit
