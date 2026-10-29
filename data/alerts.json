@@ -42,6 +42,6 @@
    "init": 35
   }
  ],
- "updated": "2026-10-28 22:15 KST",
+ "updated": "2026-10-29 15:03 KST",
  "about": "새 모집공고 알림 기록(tools/notify_new.py). send=알림 대상 여부, pushed=보낸 경로(ntfy·webpush×기기 수). 청년안심은 fit(8평 이상·경계·원룸뿐·판정 불가)으로 거름"
 }
