@@ -34,14 +34,121 @@
   "ya:6681": "2026-10-28",
   "ya:6680": "2026-10-28",
   "ya:6679": "2026-10-28",
-  "ya:6678": "2026-10-28"
+  "ya:6678": "2026-10-28",
+  "ya:6717": "2026-10-29",
+  "ya:6716": "2026-10-29",
+  "ya:6715": "2026-10-29",
+  "ya:6714": "2026-10-29",
+  "ya:6711": "2026-10-29",
+  "ya:6710": "2026-10-29",
+  "ya:6709": "2026-10-29",
+  "ya:6708": "2026-10-29"
  },
  "log": [
   {
    "at": "2026-10-28 15:16 KST",
    "init": 35
+  },
+  {
+   "at": "2026-10-29 22:22 KST",
+   "key": "ya:6717",
+   "src": "청년안심 민간임대",
+   "title": "[민간임대] 연신내역 루미노816 추가모집공고",
+   "url": "https://soco.seoul.go.kr/youth/bbs/BMSR00015/view.do?boardId=6717&menuNo=400008",
+   "posted": "2026-10-29",
+   "apply": "2026-11-02",
+   "fit": "8평 이상",
+   "why": "연신내역 루미노 816 · 청년형 전용 35.14~39.03㎡(10.6~11.8평)",
+   "send": true,
+   "pushed": "webpush×1"
+  },
+  {
+   "at": "2026-10-29 22:22 KST",
+   "key": "ya:6716",
+   "src": "청년안심 민간임대",
+   "title": "[민간임대] 미아사거리역 미아 헤리츠타워 추가모집공고",
+   "url": "https://soco.seoul.go.kr/youth/bbs/BMSR00015/view.do?boardId=6716&menuNo=400008",
+   "posted": "2026-10-29",
+   "apply": "2026-11-02",
+   "fit": "원룸뿐",
+   "why": "청년 자격 형이 전부 8평 미만",
+   "send": false
+  },
+  {
+   "at": "2026-10-29 22:22 KST",
+   "key": "ya:6715",
+   "src": "청년안심 민간임대",
+   "title": "[민간임대] 개봉역 에드가개봉 추가모집공고",
+   "url": "https://soco.seoul.go.kr/youth/bbs/BMSR00015/view.do?boardId=6715&menuNo=400008",
+   "posted": "2026-10-29",
+   "apply": "2026-11-02",
+   "fit": "원룸뿐",
+   "why": "청년 자격 형이 전부 8평 미만",
+   "send": false
+  },
+  {
+   "at": "2026-10-29 22:22 KST",
+   "key": "ya:6714",
+   "src": "청년안심 민간임대",
+   "title": "[민간임대] 강변역 비바힐스강변 추가모집공고",
+   "url": "https://soco.seoul.go.kr/youth/bbs/BMSR00015/view.do?boardId=6714&menuNo=400008",
+   "posted": "2026-10-29",
+   "apply": "2026-11-02",
+   "fit": "8평 이상",
+   "why": "강변역 비바힐스 강변 · 청년형 전용 32㎡(9.7평)",
+   "send": true,
+   "pushed": "webpush×1"
+  },
+  {
+   "at": "2026-10-29 22:22 KST",
+   "key": "ya:6711",
+   "src": "청년안심 민간임대",
+   "title": "[민간임대] 영등포구청역 포레나당산 추가모집공고",
+   "url": "https://soco.seoul.go.kr/youth/bbs/BMSR00015/view.do?boardId=6711&menuNo=400008",
+   "posted": "2026-10-29",
+   "apply": "2026-11-02",
+   "fit": "원룸뿐",
+   "why": "청년 자격 형이 전부 8평 미만",
+   "send": false
+  },
+  {
+   "at": "2026-10-29 22:22 KST",
+   "key": "ya:6710",
+   "src": "청년안심 민간임대",
+   "title": "[민간임대] 태릉입구역 이니티움 추가모집공고",
+   "url": "https://soco.seoul.go.kr/youth/bbs/BMSR00015/view.do?boardId=6710&menuNo=400008",
+   "posted": "2026-10-29",
+   "apply": "2026-11-02",
+   "fit": "원룸뿐",
+   "why": "청년 자격 형이 전부 8평 미만",
+   "send": false
+  },
+  {
+   "at": "2026-10-29 22:22 KST",
+   "key": "ya:6709",
+   "src": "청년안심 민간임대",
+   "title": "[민간임대] 노량진역 한강더퍼스트타워 추가모집공고",
+   "url": "https://soco.seoul.go.kr/youth/bbs/BMSR00015/view.do?boardId=6709&menuNo=400008",
+   "posted": "2026-10-29",
+   "apply": "2026-11-02",
+   "fit": "원룸뿐",
+   "why": "청년 자격 형이 전부 8평 미만",
+   "send": false
+  },
+  {
+   "at": "2026-10-29 22:22 KST",
+   "key": "ya:6708",
+   "src": "청년안심 민간임대",
+   "title": "[민간임대] 노량진역 더써밋타워 추가모집공고",
+   "url": "https://soco.seoul.go.kr/youth/bbs/BMSR00015/view.do?boardId=6708&menuNo=400008",
+   "posted": "2026-10-29",
+   "apply": "2026-11-02",
+   "fit": "8평 이상",
+   "why": "노량진역 더써밋타워 · 청년형 전용 33.56~34.72㎡(10.2~10.5평)",
+   "send": true,
+   "pushed": "webpush×1"
   }
  ],
- "updated": "2026-10-29 15:03 KST",
+ "updated": "2026-10-29 22:22 KST",
  "about": "새 모집공고 알림 기록(tools/notify_new.py). send=알림 대상 여부, pushed=보낸 경로(ntfy·webpush×기기 수). 청년안심은 fit(8평 이상·경계·원룸뿐·판정 불가)으로 거름"
 }
