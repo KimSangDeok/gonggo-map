@@ -15,7 +15,7 @@ self.addEventListener('push', function(e){
 self.addEventListener('notificationclick', function(e){
   e.notification.close();
   var d = e.notification.data || {}, url = d.url || './';
-  // 공고 키가 있으면 사이트를 거쳐 '확인'으로 표시한 뒤 공고로 넘어감(사이트 목록의 확인 체크)
-  if (d.key) url = './#calendar&seen=' + encodeURIComponent(d.key) + '&go=' + encodeURIComponent(url);
+  // 공고 키가 있으면 사이트 지도에서 그 공고 단지를 보여 주고 '확인'으로 표시(공고 원문은 사이트의 '공고문 ↗') — 2026-11-02부터
+  if (d.key) url = './#map&seen=' + encodeURIComponent(d.key) + '&nt=' + encodeURIComponent(d.key);
   e.waitUntil(self.clients.openWindow(url));
 });
