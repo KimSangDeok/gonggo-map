@@ -1,26 +1,18 @@
 [
  {
-  "url": "https://www.i-sh.co.kr/app/lay2/program/S48T582C583/www/brd/m_134/list.do?page=1&srchWord=상암&srchTp=&itm_seq_1=0&multi_itm_seq=0",
+  "url": "https://www.i-sh.co.kr/app/lay2/program/S1T294C295/www/brd/m_241/view.do?multi_itm_seqs=1%2C2%2C4%2C8%2C16%2C32%2C64%2C128%2C256&seq=312053",
   "post": "",
   "status": 200,
   "type": "text/html; charset=UTF-8",
-  "bytes": 119358,
-  "file": "www_i_sh_co_kr_app_lay2_program_S48T582C583_www_brd_m_134_list_do_page_1_srchWor_3def0e.html"
+  "bytes": 148097,
+  "file": "www_i_sh_co_kr_app_lay2_program_S1T294C295_www_brd_m_241_view_do_multi_itm_seqs__c14ee3.html"
  },
  {
-  "url": "https://www.i-sh.co.kr/app/lay2/program/S48T582C583/www/brd/m_134/list.do?page=1&srchWord=상암&srchTp=0&itm_seq_1=0&multi_itm_seq=0",
+  "url": "https://www.i-sh.co.kr/app/com/file/innoFD.do?brdId=GS0401&seq=312053&fileTp=A&fileSeq=1",
   "post": "",
   "status": 200,
-  "type": "text/html; charset=UTF-8",
-  "bytes": 117552,
-  "file": "www_i_sh_co_kr_app_lay2_program_S48T582C583_www_brd_m_134_list_do_page_1_srchWor_e2e75d.html"
- },
- {
-  "url": "https://www.i-sh.co.kr/app/lay2/program/S48T582C583/www/brd/m_134/list.do?page=1&srchWord=월드컵&srchTp=0&itm_seq_1=0&multi_itm_seq=0",
-  "post": "",
-  "status": 200,
-  "type": "text/html; charset=UTF-8",
-  "bytes": 114758,
-  "file": "www_i_sh_co_kr_app_lay2_program_S48T582C583_www_brd_m_134_list_do_page_1_srchWor_1ec33a.html"
+  "type": "application/octet-stream;charset=UTF-8",
+  "bytes": 795380,
+  "file": "www_i_sh_co_kr_app_com_file_innoFD_do_brdId_GS0401_seq_312053_fileTp_A_fileSeq_1_9af4a3.pdf"
  }
 ]
