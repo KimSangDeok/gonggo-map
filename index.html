@@ -240,7 +240,9 @@ main section.view{margin-top:0}
 .mapbox{height:100%;min-height:0}
 #nmap{height:100%;background:var(--line)}
 .side{display:flex;flex-direction:column;min-height:0;min-width:0;border-left:1px solid var(--line);background:var(--surface)}
-.side .nmbar label{min-width:0;max-width:100%;white-space:normal}   /* 긴 설명이 붙은 체크(접수 끝난 곳 빼기 등)가 한 줄로 안 접혀 범례에 가로 스크롤이 생기던 것(2026-11-02) — 자리가 모자랄 때만 줄바꿈 */
+.side .nmbar label{min-width:0;max-width:100%;white-space:normal;word-break:keep-all}
+.side .nmbar label:has(#nm-live){display:block;flex:1 1 100%}   /* 설명이 긴 체크는 글처럼 이어서 줄바꿈(두 칸으로 갈라지지 않게) */
+.bt-it{display:inline-flex;align-items:center;white-space:nowrap}   /* 건물 종류 체크와 ⓘ 를 한 덩어리로(ⓘ 만 다음 줄로 떨어지지 않게) */   /* 긴 설명이 붙은 체크(접수 끝난 곳 빼기 등)가 한 줄로 안 접혀 범례에 가로 스크롤이 생기던 것(2026-11-02) — 자리가 모자랄 때만 줄바꿈 */
 #nm-notice{max-width:100%;min-width:0;width:100%;text-overflow:ellipsis}
 .side .nmbar label:has(#nm-notice){flex:1 1 100%}
 #view-map.active{max-width:100vw;overflow:hidden}
@@ -443,7 +445,7 @@ html.lb-open,html.lb-open body{overflow:hidden!important;overscroll-behavior:non
 /* 건물 종류 필터 · ⓘ 작은 창 · 목록 꼬리표 */
 .bt-row{flex-basis:100%;display:flex;flex-wrap:wrap;align-items:center;gap:4px 2px}
 .bt-row label{display:inline-flex;align-items:center;gap:4px;margin-right:0!important}
-.bt-row label.zero{opacity:.55}
+.bt-row .zero{opacity:.55}
 .bt-n{font-size:11.5px;color:var(--muted);font-variant-numeric:tabular-nums}
 .bt-n::before{content:'('}.bt-n::after{content:')'}
 .bt-pre{font:inherit;font-size:12.5px;font-weight:600;padding:3px 10px;border-radius:999px;border:1px solid var(--line);background:var(--bg);color:var(--fg);cursor:pointer;margin-right:4px}
@@ -529,6 +531,7 @@ td .bt-i,.iw-t .bt-i{width:20px;height:20px;line-height:18px;font-size:11.5px;ma
   .lg-sum button{flex:none;min-height:34px;padding:0 12px;border:1px solid var(--line);border-radius:999px;background:var(--bg);color:var(--fg);font:inherit;font-size:13px;font-weight:600;cursor:pointer}
   .side:not(.lg-open) .lg-body{display:none}
   .side.lg-open .lg-body{max-height:62vh;overflow:auto;overscroll-behavior:contain;border-bottom:2px solid var(--line)}
+  .side.full.lg-open .lg-body,.side.full.lg-open .lg-body .nmbar{touch-action:pan-y}   /* 시트 전체 + 필터 펼침: 필터 안을 손가락으로 위아래 스크롤(.nmbar 의 touch-action:none 은 접힌 시트를 끄는 면이라 그대로) — 범례가 길어져 아래 '건물 종류'·'기기 동기화'에 손이 안 닿던 것(2026-11-02) */
   .side .nm-iw{font-size:14.5px}
   .side .iw-t{font-size:14.5px}
   .side .iw-k th,.side .iw-k td{font-size:13.5px}
@@ -591,7 +594,7 @@ td .bt-i,.iw-t .bt-i{width:20px;height:20px;line-height:18px;font-size:11.5px;ma
         <label>준공 <select id="nm-built" style="font:inherit;padding:4px 6px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--fg)"><option value="0">전체</option><option value="5">5년차 이내</option><option value="10">10년차 이내</option><option value="15">15년차 이내</option><option value="20">20년차 이내</option></select></label>
         <label><input type="checkbox" id="nm-built-unk" checked> 준공 모름도 보기</label>
         <span class="lg-h">건물 종류 <small class="k">— 건축물대장 주용도(서울시 부동산정보조회 일사편리 2026-11-02 조회) · 매입임대 1차는 공고문 '1. 공급주택' 표 · ⓘ 누르면 뜻·법 근거 · 여러 종류가 섞인 건물(아파트+도시형 등)은 그 종류가 다 체크돼 있어야 보임 · 숫자 = 다른 필터를 통과한 곳 중 그 종류가 들어간 곳</small></span>
-        <div class="bt-row" id="nm-bt"><div class="bt-pre-row"><button type="button" class="bt-pre" data-pre="ao">아파트·오피스텔만</button><button type="button" class="bt-pre" data-pre="all">전부</button></div><label><input type="checkbox" data-bt="apt" checked> 아파트 <span class="bt-n" data-n="apt"></span></label><button type="button" class="bt-i" data-bt="apt" aria-label="아파트 뜻">ⓘ</button><label><input type="checkbox" data-bt="opst" checked> 오피스텔 <span class="bt-n" data-n="opst"></span></label><button type="button" class="bt-i" data-bt="opst" aria-label="오피스텔 뜻">ⓘ</button><label><input type="checkbox" data-bt="dosi" checked> 도시형생활주택 <span class="bt-n" data-n="dosi"></span></label><button type="button" class="bt-i" data-bt="dosi" aria-label="도시형생활주택 뜻">ⓘ</button><label><input type="checkbox" data-bt="dase" checked> 다세대주택 <span class="bt-n" data-n="dase"></span></label><button type="button" class="bt-i" data-bt="dase" aria-label="다세대주택 뜻">ⓘ</button><label><input type="checkbox" data-bt="yeon" checked> 연립주택 <span class="bt-n" data-n="yeon"></span></label><button type="button" class="bt-i" data-bt="yeon" aria-label="연립주택 뜻">ⓘ</button><label><input type="checkbox" data-bt="dagu" checked> 다가구주택 <span class="bt-n" data-n="dagu"></span></label><button type="button" class="bt-i" data-bt="dagu" aria-label="다가구주택 뜻">ⓘ</button><label><input type="checkbox" data-bt="gisuk" checked> 기숙사 <span class="bt-n" data-n="gisuk"></span></label><button type="button" class="bt-i" data-bt="gisuk" aria-label="기숙사 뜻">ⓘ</button><label><input type="checkbox" data-bt="unk" checked> 종류 모름 <span class="bt-n" data-n="unk"></span></label><button type="button" class="bt-i" data-bt="unk" aria-label="종류 모름 뜻">ⓘ</button></div>
+        <div class="bt-row" id="nm-bt"><div class="bt-pre-row"><button type="button" class="bt-pre" data-pre="ao">아파트·오피스텔만</button><button type="button" class="bt-pre" data-pre="all">전부</button></div><span class="bt-it"><label><input type="checkbox" data-bt="apt" checked> 아파트 <span class="bt-n" data-n="apt"></span></label><button type="button" class="bt-i" data-bt="apt" aria-label="아파트 뜻">ⓘ</button></span><span class="bt-it"><label><input type="checkbox" data-bt="opst" checked> 오피스텔 <span class="bt-n" data-n="opst"></span></label><button type="button" class="bt-i" data-bt="opst" aria-label="오피스텔 뜻">ⓘ</button></span><span class="bt-it"><label><input type="checkbox" data-bt="dosi" checked> 도시형생활주택 <span class="bt-n" data-n="dosi"></span></label><button type="button" class="bt-i" data-bt="dosi" aria-label="도시형생활주택 뜻">ⓘ</button></span><span class="bt-it"><label><input type="checkbox" data-bt="dase" checked> 다세대주택 <span class="bt-n" data-n="dase"></span></label><button type="button" class="bt-i" data-bt="dase" aria-label="다세대주택 뜻">ⓘ</button></span><span class="bt-it"><label><input type="checkbox" data-bt="yeon" checked> 연립주택 <span class="bt-n" data-n="yeon"></span></label><button type="button" class="bt-i" data-bt="yeon" aria-label="연립주택 뜻">ⓘ</button></span><span class="bt-it"><label><input type="checkbox" data-bt="dagu" checked> 다가구주택 <span class="bt-n" data-n="dagu"></span></label><button type="button" class="bt-i" data-bt="dagu" aria-label="다가구주택 뜻">ⓘ</button></span><span class="bt-it"><label><input type="checkbox" data-bt="gisuk" checked> 기숙사 <span class="bt-n" data-n="gisuk"></span></label><button type="button" class="bt-i" data-bt="gisuk" aria-label="기숙사 뜻">ⓘ</button></span><span class="bt-it"><label><input type="checkbox" data-bt="unk" checked> 종류 모름 <span class="bt-n" data-n="unk"></span></label><button type="button" class="bt-i" data-bt="unk" aria-label="종류 모름 뜻">ⓘ</button></span></div>
         <span class="lg-h">해당 없음 <small class="k">— 고른 평수 미만뿐이거나(8평 미만 원룸 포함) 국민임대 2026 공고에 일반공급이 없는 곳(주거약자만)</small></span>
         <label><input type="checkbox" data-cat="na"> <span class="dot sq hl" style="--c:#9aa4b2"></span> 해당 없음도 회색으로 보기</label>
       </div>
@@ -2605,7 +2608,7 @@ function nmInit(){
     var lgSync = function(){ var open = MQ.matches ? sideEl.classList.contains('lg-open') : !sideEl.classList.contains('lg-closed'); lgBtn.textContent = open ? '필터 접기 ▴' : (MQ.matches ? '필터 바꾸기 ▾' : '필터 펼치기 ▾'); lgBtn.setAttribute('aria-expanded', open ? 'true' : 'false'); };
     lgBtn.addEventListener('click', function(e){ e.stopPropagation();
       if (!MQ.matches) { var closed = !sideEl.classList.contains('lg-closed'); sideEl.classList.toggle('lg-closed', closed); try { localStorage.setItem('kkk-lg-pc', closed ? 'closed' : 'open'); } catch(e2) {} lgSync(); return; }
-      var open = !sideEl.classList.contains('lg-open'); sideEl.classList.toggle('lg-open', open); lgSync(); if (open && sheet.state() < 2) sheet.go(3); else sheet.refit(); });
+      var open = !sideEl.classList.contains('lg-open'); sideEl.classList.toggle('lg-open', open); lgSync(); if (open) sheet.go(3); else sheet.refit(); });   // 필터를 펼치면 늘 시트 전체로(반 높이면 필터 아래쪽이 화면 밖이라 못 닿음)
     if (MQ.addEventListener) MQ.addEventListener('change', lgSync); lgSync();
   }
   function applyFilter(){
@@ -2614,7 +2617,7 @@ function nmInit(){
     function vis0(p){ return on[p.cat] && (!nid || (p.nids || [p.nid]).indexOf(nid) >= 0) && builtOk(p) && (!LIVE || nrLive(p)); }
     var btN = {}; BT_KINDS.forEach(function(x){ btN[x.k] = 0; });
     nmMarkers.forEach(function(mk){ var p = mk.__p, v0 = !!vis0(p); if (v0) btKeys(p).forEach(function(k){ btN[k]++; }); var v = v0 && btOk(p); mk.__vis = v; mk.setMap(v ? nmMap : null); });
-    document.querySelectorAll('#nm-bt .bt-n').forEach(function(el){ var n = btN[el.dataset.n] || 0; el.textContent = n; el.parentNode.classList.toggle('zero', !n); });   // 다른 필터를 통과한 단지 중 그 종류가 들어간 곳 수
+    document.querySelectorAll('#nm-bt .bt-n').forEach(function(el){ var n = btN[el.dataset.n] || 0; el.textContent = n; (el.closest('.bt-it') || el.parentNode).classList.toggle('zero', !n); });   // 다른 필터를 통과한 단지 중 그 종류가 들어간 곳 수
     var shown = {};
     document.querySelectorAll('.lst .it').forEach(function(el){ var v = el.__mk ? el.__mk.__vis : !!on[el.dataset.cat]; el.style.display = v ? '' : 'none'; if (v) shown[el.dataset.cat] = (shown[el.dataset.cat] || 0) + 1; });
     document.querySelectorAll('.lst .grp').forEach(function(el){ el.style.display = shown[el.dataset.cat] ? '' : 'none'; });   // 보이는 단지가 없는 묶음 제목은 숨김
