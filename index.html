@@ -807,6 +807,28 @@ h1,h2,h3{letter-spacing:-.02em}
 .pr-legend{display:inline-block;margin-top:6px;padding:5px 11px;border-radius:999px;background:rgba(255,255,255,.94);color:#4B5462;font:500 12.5px/1.35 var(--font-body);box-shadow:0 1px 4px rgba(21,24,29,.16);pointer-events:none;max-width:calc(100% - 24px)}
 .pr-legend b{color:#15181D;font-weight:700}   /* 지도는 늘 밝은 색이라 어두운 모드에서도 같은 색 */
 @media (max-width:760px){.pr-legend{margin-left:12px;font-size:12px}}
+/* 넓은 PC(1600px 이상): 상세 필터 글자·체크·단추 크게 — 2200px 이상은 필터 칸도 넓게 */
+@media (min-width:1600px){
+  .side.flt-open .lg-body .nmbar{font-size:16px;row-gap:10px;column-gap:4px;padding:12px 24px 16px}
+  .side.flt-open .lg-body .lg-h{font-size:17px;margin-top:16px}
+  .side.flt-open .lg-body .lg-h small,.side.flt-open .lg-body small.k,.side.flt-open .lg-body .src{font-size:14px}
+  .side.flt-open .lg-body input[type=checkbox],.side.flt-open .lg-body input[type=radio]{width:19px;height:19px;margin:0 7px 0 0;flex:none}
+  .side.flt-open .lg-body label{line-height:1.5}
+  .side.flt-open .lg-body .lg-all button{font-size:14px;padding:4px 13px}
+  .side.flt-open .lg-body .bt-i{width:26px;height:26px;line-height:24px;font-size:14px}
+  .side.flt-open .lg-body select{font-size:16px!important;min-height:40px;padding:4px 10px!important;border-radius:10px!important}
+  .side.flt-open .lg-body .bt-row{gap:8px 6px}
+  .side.flt-open .lg-body .burd-q{gap:8px}
+  .side.flt-open .lg-body .burd-q button{min-height:78px;padding:10px 14px;font-size:14px}
+  .side.flt-open .lg-body .burd-q button b{font-size:15px}
+  .side.flt-open .lg-body .burd-q button span{font-size:17px}
+  .side.flt-open .lg-body .sync-bar,.side.flt-open .lg-body .sync-bar *{font-size:15px}
+  .side.flt-open .lg-body .bt-n,.side.flt-open .lg-body #lh-brief,.side.flt-open .lg-body .minpy-note{font-size:14px!important}
+}
+@media (min-width:2200px){
+  #view-map.active.flt-open:not(.detail-open){grid-template-columns:min(1320px,58vw) minmax(420px,1fr)}
+  .side.flt-open:not(.show-detail):not(.tab-notice){grid-template-columns:minmax(540px,44%) minmax(0,1fr)}
+}
 /* 월부담 팝업 · 구간 단추 */
 .burd-pop{width:min(380px,calc(100vw - 12px))}
 .burd-pop .bp-h{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:15px;margin-bottom:10px}
