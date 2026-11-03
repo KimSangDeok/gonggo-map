@@ -327,6 +327,7 @@ def hi_fetch(cd):
 # ---------------- K-apt ----------------
 KAPT = 'https://www.k-apt.go.kr'
 _kapt_tok = None
+KAPT_FULL = {}   # {kaptCode: None → 받은 뒤 resultMap_kapt 전체}
 def kapt_init():
     global _kapt_tok
     r = S.get(KAPT + '/web/main/index.do', timeout=40)
@@ -337,7 +338,8 @@ def kapt_fetch(code):
     r = S.post(KAPT + '/kaptinfo/getKaptInfo_detail.do', data={'kaptCode': code, '_csrf': _kapt_tok}, timeout=40,
                headers={'X-Requested-With': 'XMLHttpRequest', 'Referer': KAPT + '/web/main/index.do'})
     d = r.json(); k = d.get('resultMap_kapt') or {}; car = d.get('getKaptdfCarInfo') or {}
-    return {'nm': k.get('kaptName'), 'use': k.get('kaptUsedate'), 'dong': k.get('kaptDongCnt'), 'hh': k.get('kaptdaTCnt'), 'heat': k.get('codeHeat'), 'hall': k.get('codeHall'), 'str': k.get('codeStr'),
+    if code in KAPT_FULL: KAPT_FULL[code] = k   # 주소가 동 단위뿐인 단지: 상세 전체(도로명주소·좌표 칸 이름 확인용)
+    return {'addr': k.get('doroJuso') or '', 'jibun': k.get('kaptAddr') or '', 'nm': k.get('kaptName'), 'use': k.get('kaptUsedate'), 'dong': k.get('kaptDongCnt'), 'hh': k.get('kaptdaTCnt'), 'heat': k.get('codeHeat'), 'hall': k.get('codeHall'), 'str': k.get('codeStr'),
             'pg': k.get('kaptdPcnt'), 'pu': k.get('kaptdPcntu'), 'cars': car.get('carTot'), 'ev': car.get('carTotEl'), 'elev': k.get('kaptdEcntTotal'), 'cctv': k.get('kaptdCccnt'), 'sale': k.get('codeSale'), 'apt': k.get('codeApt'), 'ctl': k.get('codeCtl')}
 
 # ---------------- 서울시 청년안심주택 (soco.seoul.go.kr/youth) ----------------

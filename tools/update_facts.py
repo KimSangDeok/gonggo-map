@@ -39,6 +39,17 @@ for cds_, kapts in facts.MAP.values():
         for cd in cds_:
             k = SH.get(cd, {}).get('kapt')
             if k and k not in facts.BAD_KAPT: codes.add(k)
+# 주소가 동 단위뿐인 단지(SH 공고에 '마포구 염리동'처럼만 나옴): SH 주택정보 검색 결과 전체와 K-apt 상세 전체를 남겨 도로명주소·좌표로 바로잡음
+DONG = {}
+for p in PLACES:
+    if re.search(r'\d', p.get('addr') or ''): continue
+    nm = p['name']; cds_, kapts = facts.MAP.get(nm, ([], None))
+    try: res = src.hi_post('/main/selectSearchList.do', {'keyword': re.sub(r'\s', '', nm)})
+    except Exception as e: res = {}; src.log('dong search fail', nm, repr(e))
+    hits = [x for k in ('result1', 'result2', 'result5') for x in (res.get(k) or []) if str(x.get('biznsCd')) in cds_ or not cds_]
+    DONG[nm] = {'addr': p.get('addr'), 'cds': cds_, 'kapts': kapts or [], 'sh': hits[:4]}
+    for c in (kapts or []): src.KAPT_FULL[c] = None
+    time.sleep(0.3)
 K = {}
 try:
     src.kapt_init()
@@ -56,7 +67,8 @@ ok = sum(1 for v in F.values() if v.get('k') or v.get('type') or v.get('types'))
 os.makedirs('data', exist_ok=True)
 if ok >= 40:   # 수집이 크게 실패한 날은 기존 파일을 덮어쓰지 않음
     json.dump({'updated': now, 'n': ok, 'fact': F, 'log': src.LOG[-30:]}, open('data/fact.json', 'w', encoding='utf-8'), ensure_ascii=False, separators=(',', ':'))
-    json.dump({'updated': now, 'sh': SH, 'kapt': K}, open('data/raw.json', 'w', encoding='utf-8'), ensure_ascii=False, separators=(',', ':'))
+    for nm, v in DONG.items(): v['kapt_full'] = {c: src.KAPT_FULL.get(c) for c in v['kapts']}
+    json.dump({'updated': now, 'sh': SH, 'kapt': K, 'dong': DONG}, open('data/raw.json', 'w', encoding='utf-8'), ensure_ascii=False, separators=(',', ':'))
     print('fact ok', ok)
 else:
     print('fact too few', ok); sys.exit(1)
