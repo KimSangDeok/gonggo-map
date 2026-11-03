@@ -2765,7 +2765,6 @@ function nmInit(){
     its.sort(function(a, b){ return ((b.__mk && b.__mk.__p.m2) || 0) - ((a.__mk && a.__mk.__p.m2) || 0); });
     var ref = g.nextSibling; while (ref && ref.className === 'it' && ref.dataset.cat === 'gen') ref = ref.nextSibling; its.forEach(function(it){ list.insertBefore(it, ref); });
   }
-  var CAT_NAMES = { pri: '행복 강서·동대문', gen: '행복 그 외', kook: '국민임대', ya: '청년안심', lh: 'LH', mi: '매입임대' };
   function catsOn(){ var on = {}; document.querySelectorAll('.nmbar input[data-cat]').forEach(function(c){ on[c.dataset.cat] = c.checked; }); return on; }
   function liveOk(p){ return !LIVE || nrLive(p) || (EXP_ON && !!expOf(p)); }
   window.liveOk = liveOk;
@@ -2788,7 +2787,8 @@ function nmInit(){
     document.getElementById('side').classList.toggle('live-on', LIVE);
   }
   // 요약 줄 = 보이는 곳 수 + 기본값과 다른 상세 필터만 칩으로(× 로 하나씩 해제) + 초기화. 빠른 필터는 칩 자체가 켜짐 표시
-  function lgSummary(){
+  function lgSummary(){   // 초기화 중(단지 자료가 먼저 와서 applyFilter 가 일찍 불려도) 쓸 수 있게 이름표는 함수 안에
+    var CAT_NAMES = { pri: '행복 강서·동대문', gen: '행복 그 외', kook: '국민임대', ya: '청년안심', lh: 'LH', mi: '매입임대' };
     var el = document.getElementById('lg-sum-txt'); if (!el) return;
     var on = catsOn(), vis = Array.prototype.filter.call(document.querySelectorAll('.lst .it'), function(it){ return it.style.display !== 'none'; }).length;
     var chips = [], x = function(t, act){ chips.push('<span class="af-c">' + t + '<button type="button" data-af="' + act + '" aria-label="' + t + ' 해제">×</button></span>'); };
