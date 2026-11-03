@@ -829,6 +829,8 @@ h1,h2,h3{letter-spacing:-.02em}
   #view-map.active.flt-open:not(.detail-open){grid-template-columns:min(1320px,58vw) minmax(420px,1fr)}
   .side.flt-open:not(.show-detail):not(.tab-notice){grid-template-columns:minmax(540px,44%) minmax(0,1fr)}
 }
+/* 단지 상세 카드는 늘 밝은 카드(흰 바탕·짙은 글자) — 어두운 모드에서도 카드 안 색 변수는 밝은 값으로(전엔 '제일 쌈' 줄이 어두운 초록 바탕에 짙은 글자라 안 보였음) */
+.nm-iw{--bg:#F3F5F8;--surface:#FFFFFF;--fg:#1B2330;--muted:#5E6A78;--line:#D8DEE6;--accent:#1E5CA6;--accent-soft:#E4ECF8;--accent-ink:#163F72;--on-accent:#FFFFFF;--ok:#1E7F4F;--ok-soft:#E1F2E8;--warn:#A46A14;--warn-soft:#FBF0DA;--bad:#B23A3A;--bad-soft:#F8E2E2;color-scheme:light}
 /* (A) 2200px 이상: 상세가 열려도 필터 칸 유지(필터 540 + 목록 400 + 상세 440) */
 @media (min-width:2200px){
   #view-map.active.detail-open.flt-open:not(.detail-wide){grid-template-columns:1380px minmax(0,1fr)}
@@ -2405,20 +2407,7 @@ var sheet = (function(){
     side.addEventListener('pointerdown', dragStart); side.addEventListener('pointermove', dragMove);
     side.addEventListener('pointerup', dragEnd); side.addEventListener('pointercancel', dragEnd);
     side.addEventListener('click', function(e){ if (st.moved) { e.stopPropagation(); e.preventDefault(); st.moved = false; } }, true);
-    // 4) 전체 높이: 목록·상세가 맨 위일 때 아래로 끌면 시트를 내림 — 위로 밀거나 중간이면 안 내용 스크롤(손가락이 처음 움직일 때 정함)
-    var tp = null;
-    side.addEventListener('touchstart', function(e){ tp = null; if (!mobile() || state !== 3 || e.touches.length !== 1) return;
-      if (e.target.closest('select,input,textarea,.handle,.detail-bar,.lg-sum,.qf-row,.det-nav,.iw-strip')) return;
-      var sc = e.target.closest('.lst,.detail,.nlist,.lg-body'); if (!sc) return;
-      var y = e.touches[0].clientY; tp = { sc: sc, y0: y, y: y, top: sc.scrollTop <= 0, on: false, h: curH, ly: y, lt: e.timeStamp, v: 0 }; }, { passive: true });
-    side.addEventListener('touchmove', function(e){ if (!tp || e.touches.length !== 1) return; var y = e.touches[0].clientY;
-      if (!tp.on) { if (!tp.top || tp.sc.scrollTop > 0 || y - tp.y0 <= 0) { tp = null; return; } tp.on = true; tp.y = y; side.classList.add('dragging'); }
-      e.preventDefault(); setH(tp.h - (y - tp.y));
-      var dt = e.timeStamp - tp.lt; if (dt > 0) { tp.v = 0.7 * ((tp.ly - y) / dt) + 0.3 * tp.v; tp.ly = y; tp.lt = e.timeStamp; } }, { passive: false });
-    var tEnd = function(){ if (!tp) return; var o = tp; tp = null; if (!o.on) return; side.classList.remove('dragging'); var mv = curH - o.h;
-      if (Math.abs(mv) > 6) { st.moved = true; setTimeout(function(){ st.moved = false; }, 350); }
-      go(mv < -60 || o.v < -0.35 ? 2 : 3); };
-    side.addEventListener('touchend', tEnd, { passive: true }); side.addEventListener('touchcancel', tEnd, { passive: true });
+    // (뺌 2026-11-03) 전체 높이에서 목록·상세 맨 위에서 끌어 내리기 — 손가락이 처음 1px만 아래로 움직여도 '창 내리기'로 잡아 그 손짓의 스크롤을 통째로 막아서(스크롤 씹힘) 없앰. 창 내리기는 손잡이·상세 머리줄로
     window.addEventListener('resize', function(){ if (mobile()) go(state); else { side.style.removeProperty('transform'); side.classList.add('full'); } });
     setTimeout(function(){ if (mobile()) { go(2); if (side.classList.contains('tab-notice') && window.setSideTab) setSideTab('list'); } else side.classList.add('full'); }, 0);
   }
