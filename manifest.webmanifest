@@ -2,7 +2,7 @@
   "name": "공고 지도",
   "short_name": "공고 지도",
   "description": "서울 공공임대 공고 지도 — 새 모집공고 알림",
-  "start_url": "./#calendar",
+  "start_url": "./#map",
   "scope": "./",
   "display": "standalone",
   "background_color": "#ffffff",
