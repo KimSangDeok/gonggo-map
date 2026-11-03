@@ -559,6 +559,8 @@ td .bt-i,.iw-t .bt-i{width:20px;height:20px;line-height:18px;font-size:11.5px;ma
 .lst .it .dot.plan{width:auto;min-width:30px;height:16px;white-space:nowrap;border-radius:4px;text-align:center}
 .lst .it[data-cat="plan"]{grid-template-columns:auto 1fr auto}   /* '예정' 배지가 14px 칸을 넘어 이름과 겹치던 것 */
 .pill.plan{background:#FFE0B2;color:#8a3b00}
+.pill.exp{background:#FFF6CC;color:#6d5200;border:1px dashed #E0A800}
+.nl-later{border-bottom:1px solid var(--line)}.nl-later>summary{cursor:pointer;padding:9px 12px;font-size:12.5px;color:var(--accent-ink);font-weight:600}.nl-later .nc{cursor:default}
 .gu-pop{position:fixed;z-index:3000;background:var(--surface);color:var(--fg);border:1px solid var(--line);border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.22);padding:10px 12px 12px;font-size:13px;width:min(440px,calc(100vw - 12px));max-height:88vh;overflow:auto}
 .gu-pre{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 8px}
 .gu-pre button,.gu-foot button{border:1px solid var(--line);border-radius:999px;background:var(--bg);color:var(--fg);font:inherit;font-weight:600;padding:6px 12px;cursor:pointer}
@@ -698,7 +700,7 @@ td .bt-i,.iw-t .bt-i{width:20px;height:20px;line-height:18px;font-size:11.5px;ma
       <div class="qf-row" id="qf-row" role="group" aria-label="빠른 필터">
         <button type="button" class="qf-c" id="qf-live" aria-pressed="false" title="지금 접수 중·접수 예정인 공고의 단지만"><i class="qf-sw live"></i>접수 끝난 곳 빼기 <span class="qf-n"></span></button>
         <button type="button" class="qf-c" id="qf-plan" aria-pressed="true" hidden title="SH·LH가 공급계획으로 미리 발표했고 아직 공고 전인 곳도 남김(지도: 주황 '예정' 마커)"><i class="qf-sw plan"></i>공고 예정(기관 발표) <span class="qf-n"></span></button>
-        <button type="button" class="qf-c" id="qf-exp" aria-pressed="true" hidden title="기관 발표는 없지만 지난 공고 날짜로 90일 안에 공고가 뜰 것으로 짐작한 곳도 남김(지도: 노란 점선 테두리)"><i class="qf-sw exp"></i>공고 예상(추정) <span class="qf-n"></span></button>
+        <button type="button" class="qf-c" id="qf-exp" aria-pressed="true" hidden title="기관 발표는 없지만 지난 공고 날짜로 90일 안에 공고가 뜰 것으로 짐작한 곳도 남김(지도: 노란 점선 테두리)"><i class="qf-sw exp"></i><span class="qf-l">공고 예상(추정)</span> <span class="qf-n"></span></button>
         <span class="qf-seg" id="qf-py" role="group" aria-label="최소 평형(전용)"><button type="button" data-py="8" aria-pressed="true" title="전용 26.45㎡ 이상">8평↑</button><button type="button" data-py="9" aria-pressed="false" title="전용 29.75㎡ 이상">9평↑</button><button type="button" data-py="10" aria-pressed="false" title="전용 33.06㎡ 이상">10평↑</button></span>
         <button type="button" class="qf-c" id="qf-gu" aria-pressed="false" aria-haspopup="dialog" title="서울 구를 골라 그 구의 단지만"><span class="qf-l">구 전체</span> <span class="qf-n"></span> ▾</button>
         <button type="button" class="qf-c" id="qf-pk" aria-pressed="false" title="세대당 주차면 1대 이상">주차 넉넉만 <span class="qf-n"></span></button>
@@ -1500,7 +1502,7 @@ function nmFlag(p){   // 접수 중·예정 공고가 있는 단지: 마커 위 
   var md = function(d){ return d ? (d.getMonth() + 1) + '/' + d.getDate() : ''; }, open = rs.filter(function(r){ return nrState(r) === 'open'; });
   if (open.length) { var r = open.reduce(function(a, x){ return (x.a1 && (!a.a1 || x.a1 < a.a1)) ? x : a; }, open[0]); return '<span class="nm-flag">접수 중' + (r.a1 ? ' ~' + md(r.a1) : '') + '</span>'; }
   var r2 = rs.reduce(function(a, x){ return (x.a0 && (!a.a0 || x.a0 < a.a0)) ? x : a; }, rs[0]); return '<span class="nm-flag soon">접수 ' + (r2.a0 ? md(r2.a0) + '~' : '예정') + '</span>'; }
-function mkWrap(inner, p){ var f = nmFlag(p); return '<div class="nm-mkw">' + inner + pkMk(p) + (f || planFlag(p)) + '</div>'; }
+function mkWrap(inner, p){ var f = nmFlag(p), e = expMk(p) ? expOf(p) : null; return '<div class="nm-mkw"' + (e ? ' title="공고 예상(추정): ' + e.name + ' — ' + e.when + '"' : '') + '>' + inner + pkMk(p) + (f || planFlag(p)) + '</div>'; }
 function pkSel(p){ if (!PK_BADGE) return ''; var lv = pkLevel(p); return lv === 'unk' ? '' : '<i class="pk-s ' + lv + '">P ' + PK_SHORT[lv] + ' ' + pkNum(pkOf(p).per) + '</i>'; }
 function pkRefreshIcons(){ (window.nmMarkers || []).forEach(function(mk){ if (mk === nmSelected || !mk.__icon || !mk.setIcon) return; try { mk.setIcon(mk.__icon()); } catch(e) {} }); }
 function pkBadge(p, sh){ var lv = pkLevel(p); return '<span class="pk-tag ' + lv + '"><i>P</i>' + (sh ? PK_SHORT[lv] : (lv === 'unk' ? '주차 모름' : '주차 ' + PK_NAME[lv])) + '</span> <button type="button" class="bt-i" data-bt="pk-' + lv + '" aria-label="주차 기준 설명">ⓘ</button>'; }
@@ -1641,6 +1643,8 @@ function expActive(){ var n = Object.keys(NREG).length; if (EXP_CACHE.n === n) r
   var a = EXPECT.filter(function(e){ var f = nrDate(e.from), t = nrDate(e.to, true); if (!f || !t || now > new Date(t.getTime() + 7 * day) || f - now > 90 * day) return false; var lo = new Date(f.getTime() - 40 * day);
     return !Object.keys(NREG).some(function(id){ var r = NREG[id], d = nrDate(r.posted), nm = String(r.name || ''); return d && d >= lo && e.re.test(nm) && !/예비|당첨|발표|게시|안내|결과|경쟁률|서류|민간임대/.test(nm); }); });
   EXP_CACHE = { n: n, a: a }; return a; }
+function expWhens(){ var w = []; expActive().forEach(function(e){ if (w.indexOf(e.when) < 0) w.push(e.when); }); return w.join('·'); }
+function expRange(e){ var f = nrDate(e.from), t = nrDate(e.to); return f && t ? (f.getMonth() + 1) + '.' + f.getDate() + '~' + (t.getMonth() + 1) + '.' + t.getDate() : ''; }
 function expOf(p){ var g = expProg(p); if (!g) return null; var a = expActive(); for (var i = 0; i < a.length; i++) if (a[i].prog === g) return a[i]; return null; }
 function expMk(p){ return LIVE && EXP_ON && p.cat !== 'na' && !nrLive(p) && !!expOf(p); }   // 지도: 접수 끝난 곳 빼기 + 공고 예정도 보기일 때만 점선 테두리
 function expNote(p){ var e = expOf(p); if (!e) return ''; return '<div class="exp-note"><b>다음 공고(추정): ' + e.name + ' — ' + e.when + '</b><br><small class="k">근거: ' + (e.url ? '<a href="' + e.url + '" target="_blank" rel="noopener">' + e.basis + '</a>' : e.basis) + ' (공고 일정 탭) · 어느 단지가 들어갈지는 공고가 떠야 확정</small></div>'; }
@@ -2543,16 +2547,28 @@ function noticeListHtml(){
   var planSec = function(){ var ps = window.PLAN_ITEMS || []; if (!ps.length) return '';
     return '<div class="grp">공고 예정 — SH·LH가 미리 발표한 공급계획(아직 공고 전) ' + ps.length + '건</div>' + ps.map(function(x){ var st = x.st, mk = planMarker(x.id);
       return '<div class="nc" data-id="' + hesc(x.id) + '" role="button" tabindex="0"><div class="nc-top"><span class="pill plan">' + (st.od ? '계획 시기 지남' : '공고 예정') + '</span><small class="k">' + hesc(x.src + ' ' + x.type) + '</small><a class="nc-link" href="' + x.url + '" target="_blank" rel="noopener">공급계획 ↗</a></div><b>' + hesc(planTitle(x)) + '</b><small class="k">' + [st.pd.txt + ' 공급 예정' + (st.od ? '(지났는데 아직 공고 없음)' : ''), x.hh ? x.hh + '호' : '', x.m2 ? '전용 ' + x.m2 + '㎡(' + py(x.m2) + ')' : (x.prog === 'yapub' ? '57㎡ 이하 매입형' : ''), x.src + ' ' + planBasis(x)].filter(Boolean).join(' · ') + '</small><small>' + (mk ? '누르면 지도에서 위치' + (mk.__approx ? '(동 단위 대략)' : '') : '<span class="k">위치 미공개 — 지도엔 없음</span>') + '</small></div>'; }).join(''); };
+  var expSec = function(){ var now = new Date(), act = expActive(), later = EXPECT.filter(function(e){ var f = nrDate(e.from); return f && f - now > 90 * 864e5; });
+    if (!act.length && !later.length) return '';
+    var cnt = function(e){ return (window.nmMarkers || []).filter(function(m){ var p = m.__p; return p.cat !== 'na' && !nrLive(p) && expProg(p) === e.prog; }).length; };
+    var one = function(e, on){ var n = on ? cnt(e) : 0, rg = expRange(e);
+      return '<div class="nc exp"' + (on ? ' data-id="EXP:' + hesc(e.prog) + '" role="button" tabindex="0"' : '') + '><div class="nc-top"><span class="pill exp">공고 예상 ' + hesc(e.when) + '</span><small class="k">추정 · 기관 발표 아님</small>' + (e.url ? '<a class="nc-link" href="' + e.url + '" target="_blank" rel="noopener">근거 ↗</a>' : '') + '</div><b>' + hesc(e.name) + '</b>' +
+        '<small class="k">' + [rg ? rg + ' 사이로 짐작' : '', '근거: ' + hesc(e.basis)].filter(Boolean).join(' · ') + '</small><small>' + (on ? (n ? '지도 내 조건 <b>' + n + '곳</b> — 누르면 지도에 노란 점선으로' : '<span class="k">지도에 해당 단지 없음</span>') : '<span class="k">90일 넘게 남음 — 가까워지면 지도에 노란 점선으로 표시</span>') + '</small></div>'; };
+    return (act.length ? '<div class="grp">공고 예상(추정) — 지난 공고 날짜로 짐작한 다음 공고 ' + act.length + '건</div>' + act.map(function(e){ return one(e, true); }).join('') : '') +
+      (later.length ? '<details class="nl-later"><summary>그다음 공고 예상(추정) ' + later.length + '건 — ' + later.map(function(e){ return e.when; }).filter(function(w, i, a){ return a.indexOf(w) === i; }).join(' · ') + '</summary>' + later.map(function(e){ return one(e, false); }).join('') + '</details>' : ''); };
   var sec = function(k, t){ return by[k].length ? '<div class="grp">' + t + ' ' + by[k].length + '건</div>' + by[k].map(card).join('') : ''; };
   return '<p class="src nl-head">지도 <b>공고</b> 탭과 <b>공고 일정</b> 탭은 <b>같은 목록</b> — SH(행복·국민·매입임대)·서울시 청년안심·LH 공고 중 내 조건 공고를 접수 상태로 묶음. <b>🔔</b> = 2026-10-28 알림을 켠 뒤 새로 올라와 알림을 보낸 공고' + ((A.items || []).length ? ' ' + A.items.length + '건' + (unseen ? '(<b>확인 안 함 ' + unseen + '</b>)' : '') : '') + ' · 접수 기간은 공고문 일정·서울시 게시판 본문 청약신청 시각·LH 공고 일정. 공고를 누르면 지도에서 그 공고 단지만(목록 위 ✕로 해제).</p>' +
-    sec('open', '접수 중') + sec('soon', '접수 예정') + planSec() + sec('ended', '접수 끝') + sec('none', '접수 일정 모름') +
+    sec('open', '접수 중') + sec('soon', '접수 예정') + planSec() + expSec() + sec('ended', '접수 끝') + sec('none', '접수 일정 모름') +
     (outN ? '<p class="src nl-foot">내 조건 밖 공고 ' + outN + '건은 뺌 — 지도에 올라간 단지가 전부 \'해당 없음\'(청년 자격 형이 ' + belowTxt() + '뿐 등)인 공고</p>' : '') +
     (unseen ? '<p class="nl-foot"><button type="button" class="al-all">🔔 알림 공고 모두 확인</button></p>' : '');
 }
 window.renderNoticePanel = function(){
   ['nm-notices', 'alerts-list'].forEach(function(bid){ var box = document.getElementById(bid); if (!box) return; var cal = bid === 'alerts-list';
     box.innerHTML = noticeListHtml();
-    box.querySelectorAll('.nc').forEach(function(el){ var go = function(e){ if (e.target.closest('a,label,input')) return; var k = el.dataset.key, id = el.dataset.id; if (k && window.ALERTS) window.ALERTS.mark(k, true);
+    box.querySelectorAll('.nc').forEach(function(el){ var go = function(e){ if (e.target.closest('a,label,input')) return; var k = el.dataset.key, id = el.dataset.id; if (!id) return; if (k && window.ALERTS) window.ALERTS.mark(k, true);
+        if (/^EXP:/.test(id)) { var prog = id.slice(4), goEx = function(){ if (window.setSideTab) setSideTab('list'); if (!LIVE) { var lv = document.getElementById('nm-live'); if (lv) lv.click(); } if (!EXP_ON) { EXP_ON = true; PREF.set('exp', true); }
+            if (window.__applyFilter) window.__applyFilter(); if (window.pkRefreshIcons) pkRefreshIcons(); var ms = nmMarkers.filter(function(m){ return m.__vis && expMk(m.__p) && expProg(m.__p) === prog; });
+            if (ms.length) { try { var bd = new naver.maps.LatLngBounds(ms[0].getPosition(), ms[0].getPosition()); ms.forEach(function(m){ bd.extend(m.getPosition()); }); nmMap.fitBounds(bd, { top: 60, right: 60, bottom: 60, left: 60 }); } catch (er) {} } };
+          if (cal) { location.hash = 'map'; setTimeout(goEx, 200); } else goEx(); return; }
         if (/^PL:/.test(id)) { var goPl = function(){ var mk = planMarker(id); if (!mk) return; if (window.setSideTab) setSideTab('list'); nmFocusMarker(mk); }; if (cal) { location.hash = 'map'; setTimeout(goPl, 200); } else goPl(); return; }
         if (/^AL:/.test(id) || !window.mapNotice) { var a = el.querySelector('.nc-link'); if (a) window.open(a.href, '_blank', 'noopener'); return; }
         if (cal) { location.hash = 'map'; setTimeout(function(){ window.mapNotice(id); }, 150); } else window.mapNotice(id); };
@@ -2943,7 +2959,7 @@ function nmInit(){
   function qfSync(cur){
     var set = function(id, pr, n){ var b = document.getElementById(id); if (!b) return; b.setAttribute('aria-pressed', pr ? 'true' : 'false'); var e = b.querySelector('.qf-n'); if (e) e.textContent = n; };
     set('qf-live', LIVE, (LIVE ? cur : qfCount({ live: true })) + '곳');
-    var ex = document.getElementById('qf-exp'); if (ex) { ex.hidden = !LIVE; if (LIVE) set('qf-exp', EXP_ON, '+' + (qfCount({ exp: true }) - qfCount({ exp: false })) + '곳'); }
+    var ex = document.getElementById('qf-exp'); if (ex) { ex.hidden = !LIVE; if (LIVE) { set('qf-exp', EXP_ON, '+' + (qfCount({ exp: true }) - qfCount({ exp: false })) + '곳'); var wh = expWhens(); ex.querySelector('.qf-l').textContent = '공고 예상' + (wh ? ' ' + wh : '') + '(추정)'; } }
     var pl = document.getElementById('qf-plan'); if (pl) { pl.hidden = !LIVE; if (LIVE) set('qf-plan', PLAN_ON, '+' + (qfCount({ plan: true }) - qfCount({ plan: false })) + '곳'); }
     document.querySelectorAll('#qf-py button').forEach(function(b){ b.setAttribute('aria-pressed', +b.dataset.py === PY_MIN ? 'true' : 'false'); });
     var gb = document.getElementById('qf-gu'); if (gb) { gb.setAttribute('aria-pressed', GU_ON.length ? 'true' : 'false'); gb.querySelector('.qf-l').textContent = guDesc(2); gb.querySelector('.qf-n').textContent = GU_ON.length ? cur + '곳' : ''; }
