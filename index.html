@@ -540,7 +540,31 @@ td .bt-i,.iw-t .bt-i{width:20px;height:20px;line-height:18px;font-size:11.5px;ma
 .qf-sw.exp{outline:2px dashed #F9A825;outline-offset:1px}
 .qf-row .bt-i{flex:none}
 .side.show-detail .qf-row,.side.tab-notice .qf-row{display:none!important}
-.af-c{display:inline-flex;align-items:center;gap:2px;margin:2px 4px 2px 0;padding:1px 2px 1px 9px;border:1px solid var(--line);border-radius:999px;background:var(--surface);font-size:12.5px;line-height:1.5;white-space:nowrap;vertical-align:middle}
+.af-c{display:inline-flex;align-items:center;gap:2px;margin:0 4px 0 0;padding:1px 2px 1px 9px;border:1px solid var(--line);border-radius:999px;background:var(--surface);font-size:12.5px;line-height:1.5;white-space:normal}
+.lg-sum #lg-sum-txt{display:flex;flex-wrap:wrap;align-items:center;gap:4px 0}   /* 켠 필터 칩이 길면 줄바꿈(ⓘ·상세 필터 버튼과 겹치던 것) */
+.lg-sum #lg-sum-txt > b{margin-right:6px}
+/* 공고를 골라 지도로 왔을 때: 그 공고 단지는 필터와 상관없이 다 보임 — 지금 필터 밖은 흐리게 + '지금 필터 밖' */
+.nm-mkw .nm-mk.out{opacity:.5;filter:saturate(.3)}
+.lst .it.out{opacity:.62}
+.lst .it.out:not([data-cat="na"]) > div:not(.num) > b::after{content:"지금 필터 밖";margin-left:6px;padding:0 6px;border:1px dashed var(--line);border-radius:999px;font-size:11px;font-weight:700;color:var(--muted);vertical-align:middle}
+@media (min-width:761px){
+  /* 상세 필터를 펼치면: 패널을 넓게(단지 상세 75vw보다 조금 좁은 64vw) + [상세 필터 | 단지 목록] 두 단 — 필터·목록 둘 다 패널 높이 전부를 써서 작은 칸 안 스크롤이 없음 */
+  #view-map.active.flt-open:not(.detail-open){grid-template-columns:minmax(360px,1fr) min(1150px,64vw,calc(100vw - 360px))}
+  .side.flt-open:not(.show-detail):not(.tab-notice){display:grid;grid-template-columns:minmax(400px,44%) minmax(0,1fr);grid-template-rows:auto auto auto auto auto auto minmax(0,1fr);grid-template-areas:"tabs tabs" "qf qf" "sum sum" "body msg" "body sel" "body empty" "body list"}
+  .side.flt-open:not(.show-detail):not(.tab-notice) > *{grid-column:1/-1}
+  .side.flt-open:not(.show-detail):not(.tab-notice) > .side-tabs{grid-area:tabs}
+  .side.flt-open:not(.show-detail):not(.tab-notice) > .qf-row{grid-area:qf}
+  .side.flt-open:not(.show-detail):not(.tab-notice) > .lg-sum{grid-area:sum}
+  .side.flt-open:not(.show-detail):not(.tab-notice) > .lg-body{grid-area:body;min-height:0;max-height:none;overflow-y:auto;border-bottom:0;border-right:2px solid var(--line);background:color-mix(in srgb,var(--accent-soft) 35%,var(--surface))}
+  .side.flt-open:not(.show-detail):not(.tab-notice) > #nm-msg{grid-area:msg}
+  .side.flt-open:not(.show-detail):not(.tab-notice) > #nm-selnote{grid-area:sel}
+  .side.flt-open:not(.show-detail):not(.tab-notice) > #nm-empty{grid-area:empty}
+  .side.flt-open:not(.show-detail):not(.tab-notice) > .lst{grid-area:list;min-height:0;overflow-y:auto}
+  .side.flt-open .lg-body .nmbar{font-size:14px;row-gap:3px;padding:6px 16px 8px}
+  .side.flt-open .lg-body .lg-h{font-size:14.5px;margin-top:5px}
+  .side.flt-open .lg-body .lg-h.inl{flex-basis:auto;margin-right:6px}
+  .side.flt-open .lg-body #lh-brief:not(:empty){flex-basis:100%}   /* 준공·그 밖: 제목 옆에 바로 칸 — 노트북에서 필터 단이 스크롤 없이 들어가게 */
+}
 .af-c button{border:0;background:none;color:var(--muted);font-size:15px;line-height:1;cursor:pointer;padding:2px 6px}
 .af-reset{border:0;background:none;color:var(--accent);text-decoration:underline;font:inherit;font-size:12.5px;cursor:pointer;padding:2px 4px}
 .lg-hide{display:none!important}
@@ -654,14 +678,14 @@ td .bt-i,.iw-t .bt-i{width:20px;height:20px;line-height:18px;font-size:11.5px;ma
         <label title="전용 29.75㎡ 이상"><input type="radio" name="pymin" value="9"> 9평 이상 <small class="k">29.75㎡~</small></label>
         <label title="전용 33.06㎡ 이상"><input type="radio" name="pymin" value="10"> 10평 이상 <small class="k">33.06㎡~</small></label>
         <div id="nm-minpy-note" class="minpy-note" style="flex-basis:100%"></div></div>
-        <span class="lg-h">준공 <button type="button" class="bt-i" data-bt="sec-built" aria-label="준공 설명">ⓘ</button></span>
+        <span class="lg-h inl">준공 <button type="button" class="bt-i" data-bt="sec-built" aria-label="준공 설명">ⓘ</button></span>
         <label>준공 <select id="nm-built" style="font:inherit;padding:4px 6px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--fg)"><option value="0">전체</option><option value="5">5년차 이내</option><option value="10">10년차 이내</option><option value="15">15년차 이내</option><option value="20">20년차 이내</option></select></label>
         <label><input type="checkbox" id="nm-built-unk" checked> 준공 모름도 보기</label>
         <span class="lg-h">건물 종류 <button type="button" class="bt-i" data-bt="sec-bt" aria-label="건물 종류 설명">ⓘ</button></span>
         <div class="bt-row" id="nm-bt"><span class="bt-it"><label><input type="checkbox" data-bt="apt" checked> <svg class="bt-ico" viewBox="0 0 20 20" aria-hidden="true"><g class="geo"><path class="cl" d="M10 13.8L13.5 15.5L13.5 5.5L10 3.8Z"/><path class="cr" d="M13.5 15.5L18 13.2L18 3.2L13.5 5.5Z"/><path class="ct" d="M13.5 5.5L18 3.2L14.5 1.5L10 3.8Z"/><path class="w1" d="M15.1 14.1l1.4 -0.7v-1.2l-1.4 0.7zM12.4 14.4l-1.4 -0.7v-1.2l1.4 0.7zM15.1 11.7l1.4 -0.7v-1.2l-1.4 0.7zM12.4 12l-1.4 -0.7v-1.2l1.4 0.7zM15.1 9.3l1.4 -0.7v-1.2l-1.4 0.7zM12.4 7.2l-1.4 -0.7v-1.2l1.4 0.7z"/><path class="w1" d="M12.4 9.6l-1.4 -0.7v-1.2l1.4 0.7zM15.1 6.9l1.4 -0.7v-1.2l-1.4 0.7z"/><path class="cl" d="M5 17.2L8.5 19L8.5 5L5 3.2Z"/><path class="cr" d="M8.5 19L13 16.8L13 2.8L8.5 5Z"/><path class="ct" d="M8.5 5L13 2.8L9.5 1L5 3.2Z"/><path class="w1" d="M10.1 17.6l1.4 -0.7v-1.3l-1.4 0.7zM7.5 17.8l-1.4 -0.7v-1.3l1.4 0.7zM10.1 15l1.4 -0.7v-1.3l-1.4 0.7zM7.5 15.2l-1.4 -0.7v-1.3l1.4 0.7zM10.1 12.4l1.4 -0.7v-1.3l-1.4 0.7zM7.5 10l-1.4 -0.7v-1.3l1.4 0.7zM10.1 7.2l1.4 -0.7v-1.3l-1.4 0.7zM7.5 7.4l-1.4 -0.7v-1.3l1.4 0.7z"/><path class="w1" d="M7.5 12.6l-1.4 -0.7v-1.3l1.4 0.7zM10.1 9.8l1.4 -0.7v-1.3l-1.4 0.7z"/></g></svg> 아파트 <span class="bt-n" data-n="apt"></span></label><button type="button" class="bt-i" data-bt="apt" aria-label="아파트 뜻">ⓘ</button></span><span class="bt-it"><label><input type="checkbox" data-bt="opst" checked> <svg class="bt-ico" viewBox="0 0 20 20" aria-hidden="true"><g class="geo"><path class="cl" d="M4.5 16.5L9.5 19L9.5 16.4L4.5 13.9Z"/><path class="cr" d="M9.5 19L15.5 16L15.5 13.4L9.5 16.4Z"/><path class="ct" d="M9.5 16.4L15.5 13.4L10.5 10.9L4.5 13.9Z"/><path class="sl" d="M4.5 13.9L9.5 16.4L9.5 4L4.5 1.5Z"/><path class="sr" d="M9.5 16.4L15.5 13.4L15.5 1L9.5 4Z"/><path class="st" d="M9.5 4L15.5 1L10.5 -1.5L4.5 1.5Z"/></g></svg> 오피스텔 <span class="bt-n" data-n="opst"></span></label><button type="button" class="bt-i" data-bt="opst" aria-label="오피스텔 뜻">ⓘ</button></span><span class="bt-it"><label><input type="checkbox" data-bt="dosi" checked> <svg class="bt-ico" viewBox="0 0 20 20" aria-hidden="true"><g class="geo"><path class="pl" d="M5 16.8L9.5 19L9.5 16L5 13.8Z"/><path class="pr" d="M9.5 19L15 16.2L15 13.2L9.5 16Z"/><path class="cl" d="M5 13.8L9.5 16L9.5 5L5 2.8Z"/><path class="cr" d="M9.5 16L15 13.2L15 2.2L9.5 5Z"/><path class="ct" d="M9.5 5L15 2.2L10.5 0L5 2.8Z"/><path class="w1" d="M10.6 14.7l1.1 -0.6v-1.2l-1.1 0.6zM12.8 13.6l1.1 -0.6v-1.2l-1.1 0.6zM7.8 14.4l-1.1 -0.6v-1.2l1.1 0.6zM10.6 12l1.1 -0.6v-1.2l-1.1 0.6zM12.8 10.9l1.1 -0.6v-1.2l-1.1 0.6zM7.8 11.7l-1.1 -0.6v-1.2l1.1 0.6zM10.6 9.3l1.1 -0.6v-1.2l-1.1 0.6zM12.8 8.2l1.1 -0.6v-1.2l-1.1 0.6zM12.8 5.5l1.1 -0.6v-1.2l-1.1 0.6zM7.8 6.3l-1.1 -0.6v-1.2l1.1 0.6z"/><path class="w1" d="M7.8 9l-1.1 -0.6v-1.2l1.1 0.6zM10.6 6.6l1.1 -0.6v-1.2l-1.1 0.6z"/></g></svg> 도시형생활주택 <span class="bt-n" data-n="dosi"></span></label><button type="button" class="bt-i" data-bt="dosi" aria-label="도시형생활주택 뜻">ⓘ</button></span><span class="bt-it"><label><input type="checkbox" data-bt="dase" checked> <svg class="bt-ico" viewBox="0 0 20 20" aria-hidden="true"><g class="geo"><path class="pl" d="M4 16L9 18.5L9 15.9L4 13.4Z"/><path class="pr" d="M9 18.5L16 15L16 12.4L9 15.9Z"/><path class="rl" d="M4 13.4L9 15.9L9 7.9L4 5.4Z"/><path class="rr" d="M9 15.9L16 12.4L16 4.4L9 7.9Z"/><path class="rt" d="M9 7.9L16 4.4L11 1.9L4 5.4Z"/><path class="wl" d="M10.4 14l1.4 -0.7v-1.6l-1.4 0.7zM13.2 12.6l1.4 -0.7v-1.6l-1.4 0.7zM7.2 13.8l-1.4 -0.7v-1.6l1.4 0.7zM10.4 10l1.4 -0.7v-1.6l-1.4 0.7zM13.2 8.6l1.4 -0.7v-1.6l-1.4 0.7zM7.2 9.8l-1.4 -0.7v-1.6l1.4 0.7z"/></g></svg> 다세대주택 <span class="bt-n" data-n="dase"></span></label><button type="button" class="bt-i" data-bt="dase" aria-label="다세대주택 뜻">ⓘ</button></span><span class="bt-it"><label><input type="checkbox" data-bt="yeon" checked> <svg class="bt-ico" viewBox="0 0 20 20" aria-hidden="true"><g class="geo"><path class="rl" d="M1.5 15.5L5.5 17.5L5.5 10.5L1.5 8.5Z"/><path class="rr" d="M5.5 17.5L18.5 11L18.5 4L5.5 10.5Z"/><path class="rt" d="M5.5 10.5L18.5 4L14.5 2L1.5 8.5Z"/><path class="wl" d="M7 15.8l1.4 -0.7v-1.5l-1.4 0.7zM9.9 14.3l1.4 -0.7v-1.5l-1.4 0.7zM15.6 11.4l1.4 -0.7v-1.5l-1.4 0.7zM4.2 15.9l-1.4 -0.7v-1.5l1.4 0.7zM7 12.3l1.4 -0.7v-1.5l-1.4 0.7zM9.9 10.8l1.4 -0.7v-1.5l-1.4 0.7zM12.7 9.4l1.4 -0.7v-1.5l-1.4 0.7zM4.2 12.4l-1.4 -0.7v-1.5l1.4 0.7z"/><path class="wl" d="M12.7 12.9l1.4 -0.7v-1.5l-1.4 0.7zM15.6 7.9l1.4 -0.7v-1.5l-1.4 0.7z"/></g></svg> 연립주택 <span class="bt-n" data-n="yeon"></span></label><button type="button" class="bt-i" data-bt="yeon" aria-label="연립주택 뜻">ⓘ</button></span><span class="bt-it"><label><input type="checkbox" data-bt="dagu" checked> <svg class="bt-ico" viewBox="0 0 20 20" aria-hidden="true"><g class="geo"><path class="rl" d="M3 15.5L9 18.5L9 11.5L3 8.5Z"/><path class="rr" d="M9 18.5L16 15L16 8L9 11.5Z"/><path class="rl" d="M9 11.5L3 8.5L6 6.5Z"/><path class="fr" d="M9 12.3L17 8.3L13.5 2.8L5.5 6.8Z"/></g></svg> 다가구주택 <span class="bt-n" data-n="dagu"></span></label><button type="button" class="bt-i" data-bt="dagu" aria-label="다가구주택 뜻">ⓘ</button></span><span class="bt-it"><label><input type="checkbox" data-bt="gisuk" checked> <svg class="bt-ico" viewBox="0 0 20 20" aria-hidden="true"><g class="geo"><path class="kl" d="M3.5 16L8.5 18.5L8.5 8.5L3.5 6Z"/><path class="kr" d="M8.5 18.5L17.5 14L17.5 4L8.5 8.5Z"/><path class="kt" d="M8.5 8.5L17.5 4L12.5 1.5L3.5 6Z"/><path class="w1" d="M10.5 16.6l1.5 -0.8v-1.4l-1.5 0.8zM14 14.8l1.5 -0.8v-1.4l-1.5 0.8zM6.8 16.7l-1.5 -0.8v-1.4l1.5 0.8zM10.5 13.4l1.5 -0.8v-1.4l-1.5 0.8zM14 11.6l1.5 -0.8v-1.4l-1.5 0.8zM6.8 13.5l-1.5 -0.8v-1.4l1.5 0.8zM10.5 10.2l1.5 -0.8v-1.4l-1.5 0.8zM14 8.4l1.5 -0.8v-1.4l-1.5 0.8z"/><path class="w1" d="M6.8 10.3l-1.5 -0.8v-1.4l1.5 0.8z"/></g><rect class="ic" x="11.2" y="13.6" width="7" height="4.4" rx="1.4"/><path class="icl" d="M12.6 12.6h4.2"/></svg> 기숙사 <span class="bt-n" data-n="gisuk"></span></label><button type="button" class="bt-i" data-bt="gisuk" aria-label="기숙사 뜻">ⓘ</button></span><span class="bt-it"><label><input type="checkbox" data-bt="unk" checked> <svg class="bt-ico" viewBox="0 0 20 20" aria-hidden="true"><g class="geo"><path class="xl" d="M4 16L9 18.5L9 7.5L4 5Z"/><path class="xr" d="M9 18.5L15 15.5L15 4.5L9 7.5Z"/><path class="xt" d="M9 7.5L15 4.5L10 2L4 5Z"/></g><text class="qi" x="11.6" y="14.4" text-anchor="middle">?</text></svg> 종류 모름 <span class="bt-n" data-n="unk"></span></label><button type="button" class="bt-i" data-bt="unk" aria-label="종류 모름 뜻">ⓘ</button></span></div>
         <span class="lg-h">주차 <small class="k">세대당 주차면</small> <button type="button" class="bt-i" data-bt="sec-pk" aria-label="주차 설명">ⓘ</button></span>
         <div class="bt-row" id="nm-pk"><span class="bt-it"><label><input type="checkbox" data-pk="ok" checked> <span class="pk-dot ok"></span> 넉넉 <small class="k">1대 이상</small> <span class="bt-n" data-pn="ok"></span></label><button type="button" class="bt-i" data-bt="pk-ok" aria-label="넉넉 기준">ⓘ</button></span><span class="bt-it"><label><input type="checkbox" data-pk="mid" checked> <span class="pk-dot mid"></span> 보통 <small class="k">0.7~1대</small> <span class="bt-n" data-pn="mid"></span></label><button type="button" class="bt-i" data-bt="pk-mid" aria-label="보통 기준">ⓘ</button></span><span class="bt-it"><label><input type="checkbox" data-pk="low" checked> <span class="pk-dot low"></span> 부족 <small class="k">0.7대 미만</small> <span class="bt-n" data-pn="low"></span></label><button type="button" class="bt-i" data-bt="pk-low" aria-label="부족 기준">ⓘ</button></span><span class="bt-it"><label><input type="checkbox" data-pk="unk" checked> <span class="pk-dot unk"></span> 주차 모름 <span class="bt-n" data-pn="unk"></span></label><button type="button" class="bt-i" data-bt="pk-unk" aria-label="주차 모름 기준">ⓘ</button></span></div>
-        <span class="lg-h">그 밖</span>
+        <span class="lg-h inl">그 밖</span>
         <label><input type="checkbox" id="nm-nodup" checked> 복층·2층형 빼기</label><button type="button" class="bt-i" data-bt="sec-dup" aria-label="복층·2층형 설명">ⓘ</button>
         <label><input type="checkbox" data-cat="na"> <span class="dot sq hl" style="--c:#9aa4b2"></span> 해당 없음도 회색으로 보기</label><button type="button" class="bt-i" data-bt="sec-na" aria-label="해당 없음 설명">ⓘ</button>
       </div>
@@ -1906,7 +1930,7 @@ function nmGeocode(addr, cb){
 }
 function nmColor(p){ return p.cat === 'kook' ? '#6A1B9A' : p.cat === 'na' ? '#9aa4b2' : '#D32F2F'; }
 function nmCls(p){ var sm = p.cat === 'gen' && p.sz === 'small'; return (sm ? ' sm' : '') + (p.cat === 'kook' || p.cat === 'na' ? ' sq' : '') + (p.cat === 'gen' || p.cat === 'na' ? ' hl' : ''); }
-function nmIcon(p, approx){ var size = (p.cat === 'gen' && p.sz === 'small') ? 14 : 20; return { content: mkWrap('<div class="nm-mk' + nmCls(p) + (approx ? ' ap' : '') + (nrLive(p) ? ' live' : '') + (expMk(p) ? ' exp' : '') + '" style="--c:' + nmColor(p) + '" title="' + p.name + '"></div>', p), anchor: new naver.maps.Point(size/2, size/2) }; }
+function nmIcon(p, approx){ var size = (p.cat === 'gen' && p.sz === 'small') ? 14 : 20; return { content: mkWrap('<div class="nm-mk' + nmCls(p) + (approx ? ' ap' : '') + (nrLive(p) ? ' live' : '') + (expMk(p) ? ' exp' : '') + (p.__out ? ' out' : '') + '" style="--c:' + nmColor(p) + '" title="' + p.name + '"></div>', p), anchor: new naver.maps.Point(size/2, size/2) }; }
 // 긴 주석 글을 문장 단위로 줄바꿈한 목록으로(가독성). '3.3058㎡' 같은 소수점은 안 끊음
 function notes(txt){ var parts = String(txt).split(/(?<=\.[)”"’]?)\s+(?=\S)/).map(function(x){ return x.trim().replace(/^[·•]\s*/, ''); }).filter(Boolean); return '<ul class="iw-fn">' + parts.map(function(x){ return '<li>' + x + '</li>'; }).join('') + '</ul>'; }
 // 거주 조건(계약 기간·최장 거주·갱신 조건) 섹션 — 유형 키 여러 개면 나란히
@@ -2636,7 +2660,7 @@ function nmInit(){
       var lf = p.__classify();   // 전부 기준 평수 미만(대학생 원룸 등) → 해당 없음(기본 숨김)
       var lcolOf = function(){ return p.cat === 'na' ? '#9aa4b2' : '#37474F'; }, lcol = lcolOf();
       function place(pos, approx){
-        var iconOf = function(){ return { content: mkWrap('<div class="nm-mk lh' + (approx ? ' ap' : '') + (p.cat === 'na' ? ' na' : '') + (nrLive(p) ? ' live' : '') + (expMk(p) ? ' exp' : '') + '" style="--c:' + lcolOf() + '" title="' + p.name + '">LH</div>', p), anchor: new naver.maps.Point(12, 11) }; };
+        var iconOf = function(){ return { content: mkWrap('<div class="nm-mk lh' + (approx ? ' ap' : '') + (p.cat === 'na' ? ' na' : '') + (nrLive(p) ? ' live' : '') + (expMk(p) ? ' exp' : '') + (p.__out ? ' out' : '') + '" style="--c:' + lcolOf() + '" title="' + p.name + '">LH</div>', p), anchor: new naver.maps.Point(12, 11) }; };
         var mk = new naver.maps.Marker({ map: nmMap, position: new naver.maps.LatLng(pos[0], pos[1]), icon: iconOf(), zIndex: p.cat === 'na' ? 5 : (nrLive(p) ? 30 : 12) });
         mk.__p = p; mk.__approx = approx; nmMarkers.push(mk); mk.__icon = iconOf; var k = keyOf(p.name); (nmIndex[k] = nmIndex[k] || []).push(mk);
         naver.maps.Event.addListener(mk, 'click', function(){ nmFocusMarker(mk); });
@@ -2666,7 +2690,7 @@ function nmInit(){
       p.__classify();   // 청년 자격 형이 전부 기준 평수 미만(원룸)이거나 없는 단지 → 해당 없음(기본 숨김)
       var split = yaSplit(c);
       var ns = yaNoticesFor(c), hasPub = c.scale && c.scale.pub, colOf = function(){ return p.cat === 'na' ? '#9aa4b2' : '#00897B'; }, col = colOf();
-      var iconOf = function(){ return { content: mkWrap('<div class="nm-mk ya' + (ns.length ? ' on' : '') + (p.cat === 'na' ? ' na' : '') + (nrLive(p) ? ' live' : '') + (expMk(p) ? ' exp' : '') + '" style="--c:' + colOf() + '" title="' + c.name + '"></div>', p), anchor: new naver.maps.Point(9, 9) }; };
+      var iconOf = function(){ return { content: mkWrap('<div class="nm-mk ya' + (ns.length ? ' on' : '') + (p.cat === 'na' ? ' na' : '') + (nrLive(p) ? ' live' : '') + (expMk(p) ? ' exp' : '') + (p.__out ? ' out' : '') + '" style="--c:' + colOf() + '" title="' + c.name + '"></div>', p), anchor: new naver.maps.Point(9, 9) }; };
       var mk = new naver.maps.Marker({ map: nmMap, position: new naver.maps.LatLng(c.lat, c.lng), icon: iconOf(), zIndex: p.cat === 'na' ? 5 : (nrLive(p) ? 30 : 9) });
       mk.__p = p; mk.__approx = false; nmMarkers.push(mk); mk.__icon = iconOf; var k = keyOf(c.name); (nmIndex[k] = nmIndex[k] || []).push(mk);
       naver.maps.Event.addListener(mk, 'click', function(){ nmFocusMarker(mk); });
@@ -2689,7 +2713,7 @@ function nmInit(){
   function miMarker(p, pt){
     p.ll = pt; p.__classify();
     var colOf = function(){ return p.cat === 'na' ? '#9aa4b2' : '#E65100'; };
-    var iconOf = function(){ return { content: mkWrap('<div class="nm-mk lh mi' + (p.cat === 'na' ? ' na' : '') + (nrLive(p) ? ' live' : '') + (expMk(p) ? ' exp' : '') + '" style="--c:' + colOf() + '" title="' + p.name + '">매</div>', p), anchor: new naver.maps.Point(12, 11) }; };
+    var iconOf = function(){ return { content: mkWrap('<div class="nm-mk lh mi' + (p.cat === 'na' ? ' na' : '') + (nrLive(p) ? ' live' : '') + (expMk(p) ? ' exp' : '') + (p.__out ? ' out' : '') + '" style="--c:' + colOf() + '" title="' + p.name + '">매</div>', p), anchor: new naver.maps.Point(12, 11) }; };
     var mk = new naver.maps.Marker({ map: nmMap, position: new naver.maps.LatLng(pt[0], pt[1]), icon: iconOf(), zIndex: p.cat === 'na' ? 5 : (nrLive(p) ? 30 : 8) });
     mk.__p = p; mk.__approx = false; nmMarkers.push(mk); mk.__icon = iconOf; var k = keyOf(p.name); (nmIndex[k] = nmIndex[k] || []).push(mk);
     naver.maps.Event.addListener(mk, 'click', function(){ nmFocusMarker(mk); });
@@ -2795,7 +2819,8 @@ function nmInit(){
     Object.keys(CAT_NAMES).forEach(function(k){ if (on[k] === false) x(CAT_NAMES[k] + ' 숨김', 'cat:' + k); });
     if (on.na) x('해당 없음 보임', 'cat:na');
     if (BUILT.max) x('준공 ' + BUILT.max + '년차 이내' + (BUILT.unk ? '' : '(모름 뺌)'), 'built');
-    var allBt = BT_KINDS.every(function(k){ return BT_ON[k.k]; }); if (!allBt && !btIsAo()) x('건물 ' + BT_KINDS.filter(function(k){ return !BT_ON[k.k]; }).map(function(k){ return k.name; }).join('·') + ' 뺌', 'bt');
+    var allBt = BT_KINDS.every(function(k){ return BT_ON[k.k]; }), onBt = BT_KINDS.filter(function(k){ return BT_ON[k.k]; }), offBt = BT_KINDS.filter(function(k){ return !BT_ON[k.k]; });
+    if (!allBt && !btIsAo()) x('건물 ' + (onBt.length <= offBt.length ? (onBt.length ? onBt.map(function(k){ return k.name; }).join('·') + '만' : '종류 없음') : offBt.map(function(k){ return k.name; }).join('·') + ' 뺌'), 'bt');
     var allPk = PK_KINDS.every(function(k){ return PK_ON[k.k]; }); if (!allPk && !pkOnlyOk()) x('주차 ' + PK_KINDS.filter(function(k){ return PK_ON[k.k]; }).map(function(k){ return PK_SHORT[k.k]; }).join('·') + '만', 'pk');
     if (!NO_DUP) x('복층·2층형 포함', 'dup');
     var dirty = chips.length || LIVE || !EXP_ON || PY_MIN !== 8 || !allBt || !allPk;
@@ -2840,7 +2865,8 @@ function nmInit(){
     // 처음엔 화면 세로가 짧으면(노트북 — 사이드바 800px 미만) 접어서 목록부터 보이게, 한 번 누르면 그 선택을 기억
     var lgPref = null; try { lgPref = localStorage.getItem('kkk-lg-pc2'); } catch(e) {}
     if (lgPref !== 'open') sideEl.classList.add('lg-closed');   // 2026-11-03: 빠른 필터가 늘 보이므로 상세 필터는 기본 접힘
-    var lgSync = function(){ var open = MQ.matches ? sideEl.classList.contains('lg-open') : !sideEl.classList.contains('lg-closed'); lgBtn.textContent = open ? '상세 필터 접기 ▴' : '상세 필터 ▾'; lgBtn.setAttribute('aria-expanded', open ? 'true' : 'false'); };
+    var lgSync = function(){ var open = MQ.matches ? sideEl.classList.contains('lg-open') : !sideEl.classList.contains('lg-closed'), wide = !MQ.matches && open, vmEl = document.getElementById('view-map'), was = sideEl.classList.contains('flt-open');
+      sideEl.classList.toggle('flt-open', wide); if (vmEl) vmEl.classList.toggle('flt-open', wide); if (was !== wide) setTimeout(function(){ try { if (window.nmMap) nmMap.autoResize(); } catch(e3) {} }, 60); lgBtn.textContent = open ? '상세 필터 접기 ▴' : '상세 필터 ▾'; lgBtn.setAttribute('aria-expanded', open ? 'true' : 'false'); };
     lgBtn.addEventListener('click', function(e){ e.stopPropagation();
       if (!MQ.matches) { var closed = !sideEl.classList.contains('lg-closed'); sideEl.classList.toggle('lg-closed', closed); try { localStorage.setItem('kkk-lg-pc2', closed ? 'closed' : 'open'); } catch(e2) {} lgSync(); return; }
       var open = !sideEl.classList.contains('lg-open'); sideEl.classList.toggle('lg-open', open); lgSync(); if (open) sheet.go(3); else sheet.refit(); });   // 필터를 펼치면 늘 시트 전체로(반 높이면 필터 아래쪽이 화면 밖이라 못 닿음)
@@ -2849,15 +2875,19 @@ function nmInit(){
   function applyFilter(){
     var on = {}; document.querySelectorAll('.nmbar input[data-cat]').forEach(function(c){ on[c.dataset.cat] = c.checked; });
     var nid = document.getElementById('nm-notice').value;
-    function vis0(p){ return on[p.cat] && (!nid || (p.nids || [p.nid]).indexOf(nid) >= 0) && builtOk(p) && liveOk(p); }
+    function vis0(p){ return on[p.cat] && builtOk(p) && liveOk(p); }
+    function inN(p){ return !nid || (p.nids || [p.nid]).indexOf(nid) >= 0; }   // 공고를 골랐으면(공고 탭·공고 일정·알림에서 '지도에서') 그 공고 단지는 필터와 상관없이 다 보임 — 지금 필터 밖은 p.__out(흐리게)
     var btN = {}, pkN = {}; BT_KINDS.forEach(function(x){ btN[x.k] = 0; }); PK_KINDS.forEach(function(x){ pkN[x.k] = 0; });
-    nmMarkers.forEach(function(mk){ var p = mk.__p, v0 = !!vis0(p), bo = v0 && btOk(p), po = v0 && pkOk(p); if (po) btKeys(p).forEach(function(k){ btN[k]++; }); if (bo) pkN[pkLevel(p)]++; var v = bo && po; mk.__vis = v; mk.setMap(v ? nmMap : null); });
+    nmMarkers.forEach(function(mk){ var p = mk.__p, n0 = inN(p), v0 = n0 && !!vis0(p), bo = v0 && btOk(p), po = v0 && pkOk(p); if (po) btKeys(p).forEach(function(k){ btN[k]++; }); if (bo) pkN[pkLevel(p)]++;
+      var ok = bo && po, v = nid ? n0 : ok, out = !!nid && n0 && !ok;
+      if (!!p.__out !== out) { p.__out = out; if (mk !== nmSelected && mk.__icon && mk.setIcon) { try { mk.setIcon(mk.__icon()); } catch(e) {} } }
+      mk.__vis = v; mk.setMap(v ? nmMap : null); });
     document.querySelectorAll('#nm-pk .bt-n').forEach(function(el){ var n = pkN[el.dataset.pn] || 0; el.textContent = n; (el.closest('.bt-it') || el.parentNode).classList.toggle('zero', !n); });
     var btAll = {}; nmMarkers.forEach(function(mk){ if (mk.__p.cat !== 'na') btKeys(mk.__p).forEach(function(k){ btAll[k] = (btAll[k] || 0) + 1; }); });   // 내 조건 단지에 한 곳도 없는 종류(기숙사 등)는 칸을 숨김(켜져 있을 때만)
     document.querySelectorAll('#nm-bt .bt-it').forEach(function(it){ var c = it.querySelector('input[data-bt]'); if (c) it.classList.toggle('none', nmMarkers.length > 0 && !btAll[c.dataset.bt] && c.checked); });
     document.querySelectorAll('#nm-bt .bt-n').forEach(function(el){ var n = btN[el.dataset.n] || 0; el.textContent = n; (el.closest('.bt-it') || el.parentNode).classList.toggle('zero', !n); });   // 다른 필터를 통과한 단지 중 그 종류가 들어간 곳 수
     var shown = {};
-    document.querySelectorAll('.lst .it').forEach(function(el){ var v = el.__mk ? el.__mk.__vis : !!on[el.dataset.cat]; el.style.display = v ? '' : 'none'; if (v) shown[el.dataset.cat] = (shown[el.dataset.cat] || 0) + 1; });
+    document.querySelectorAll('.lst .it').forEach(function(el){ var v = el.__mk ? el.__mk.__vis : !!on[el.dataset.cat]; el.style.display = v ? '' : 'none'; el.classList.toggle('out', !!(el.__mk && el.__mk.__p.__out)); if (v) shown[el.dataset.cat] = (shown[el.dataset.cat] || 0) + 1; });
     document.querySelectorAll('.lst .grp').forEach(function(el){ el.style.display = shown[el.dataset.cat] ? '' : 'none'; });   // 보이는 단지가 없는 묶음 제목은 숨김
     selNote(nid); if (window.renderNoticePanel) window.renderNoticePanel();   // 공고 카드의 '지금 필터로 보이는 곳' 숫자도 같이
     var em = document.getElementById('nm-empty'); if (em) { var nv = Object.keys(shown).reduce(function(a, k){ return a + shown[k]; }, 0); em.hidden = !!nv || !nmMarkers.length; em.innerHTML = LIVE ? '<b>지금 접수 중·접수 예정' + (EXP_ON ? '·공고 예정' : '') + '인 단지가 없음</b> — 위 \'접수 끝난 곳 빼기\'를 끄면 전부 보임' : '조건에 맞는 단지가 없음 — 필터를 바꿔 보세요'; }
@@ -2865,8 +2895,8 @@ function nmInit(){
   }
   // 고른 공고 띠: 무슨 공고인지·접수 상태·지도에 몇 곳 · ✕로 해제
   function selNote(nid){ var el = document.getElementById('nm-selnote'); if (!el) return; if (!nid || !NREG[nid]) { el.hidden = true; el.innerHTML = ''; return; }
-    var r = NREG[nid], ms = nrMarkers(nid), vn = ms.filter(function(m){ return m.__vis; }).length;
-    el.hidden = false; el.innerHTML = '<div>' + nrPill(r) + ' <b>' + hesc(r.name) + '</b><br><small class="k">' + nrApplyTxt(r) + (r.result ? ' · 발표 ' + r.result : '') + ' · 지도 ' + vn + '곳' + (ms.length > vn ? ' (안 보이는 ' + (ms.length - vn) + '곳: 해당 없음·필터)' : '') + (ms.length ? '' : ' — 이 공고는 지도에 올릴 단지 자료가 없음') + ' · <a href="' + r.url + '" target="_blank" rel="noopener">공고문 ↗</a></small></div><button type="button" id="nm-selnote-x" aria-label="공고 고르기 해제">✕ 전체</button>';
+    var r = NREG[nid], ms = nrMarkers(nid), vn = ms.filter(function(m){ return m.__vis; }).length, oF = ms.filter(function(m){ return m.__p.__out && m.__p.cat !== 'na'; }).length, oN = ms.filter(function(m){ return m.__p.cat === 'na'; }).length;
+    el.hidden = false; el.innerHTML = '<div>' + nrPill(r) + ' <b>' + hesc(r.name) + '</b><br><small class="k">' + nrApplyTxt(r) + (r.result ? ' · 발표 ' + r.result : '') + ' · 지도 ' + vn + '곳' + (oF || oN ? ' — ' + [oF ? '지금 필터 밖 ' + oF + '곳(흐리게)' : '', oN ? '내 조건 밖 ' + oN + '곳(회색)' : ''].filter(Boolean).join(' · ') + ' · 이 공고를 보는 동안은 필터와 상관없이 다 보여 줌' : '') + (ms.length ? '' : ' — 이 공고는 지도에 올릴 단지 자료가 없음') + ' · <a href="' + r.url + '" target="_blank" rel="noopener">공고문 ↗</a></small></div><button type="button" id="nm-selnote-x" aria-label="공고 고르기 해제">✕ 전체</button>';
     document.getElementById('nm-selnote-x').onclick = function(){ document.getElementById('nm-notice').value = ''; applyFilter(); }; }
   var liveBox = document.getElementById('nm-live'); if (liveBox) { liveBox.checked = LIVE; liveBox.addEventListener('change', function(){ LIVE = liveBox.checked; PREF.set('live', LIVE); try { localStorage.setItem('kkk-live', LIVE ? '1' : '0'); } catch(e) {} applyFilter(); pkRefreshIcons(); }); }
   // 사이드바 탭: 단지 목록 | 공고 — 공고를 누르면 지도·목록이 그 공고 단지만
@@ -2877,7 +2907,9 @@ function nmInit(){
   if (tabs) tabs.addEventListener('click', function(e){ var b = e.target.closest('button[data-tab]'); if (!b) return; e.stopPropagation(); if (document.getElementById('side').classList.contains('show-detail')) hideDetail(); setSideTab(b.dataset.tab); if (sheet.mobile() && sheet.state() < 2) sheet.go(2); });
   window.mapNotice = function(id){
     if (!id || !NREG[id]) return 0;
-    var sel = document.getElementById('nm-notice'); if (![].some.call(sel.options, function(o){ return o.value === id; })) buildNoticeSelect(); sel.value = id;
+    var sel = document.getElementById('nm-notice'), has = function(){ return [].some.call(sel.options, function(o){ return o.value === id; }); }; if (!has()) buildNoticeSelect();
+    if (!has()) { var o = document.createElement('option'); o.value = id; o.textContent = NREG[id].name + ' — ' + nrStateTxt(NREG[id]) + ' (내 조건 밖)'; sel.appendChild(o); }   // 내 조건 밖 공고(목록에선 뺌)도 눌러서 왔으면 그 공고로 — 예전엔 선택이 안 먹어 전체가 보였음
+    sel.value = id;
     if (document.getElementById('side').classList.contains('show-detail')) hideDetail();
     setSideTab('list'); applyFilter();
     var ms = nrMarkers(id).filter(function(mk){ return mk.__vis; });
