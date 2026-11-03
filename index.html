@@ -792,11 +792,11 @@ h1,h2,h3{letter-spacing:-.02em}
 }
 /* 지도 핀: 월세 알약(겹치면 점으로) · 1순위 파랑 · 접수 중 초록 */
 .nm-pr{display:none}
-.nm-mkw.pr-on{display:inline-flex;align-items:center;gap:5px;height:26px;padding:0 9px 0 6px;border-radius:999px;background:#fff;color:#15181D;font:700 13px/1 var(--font-body);letter-spacing:-.01em;white-space:nowrap;box-shadow:0 0 0 1px rgba(21,24,29,.12),0 2px 6px rgba(21,24,29,.22);transform:translate(-1px,-3px)}
+.nm-mkw.pr-on{display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 11px 0 8px;border-radius:999px;background:#fff;color:#15181D;font:700 14.5px/1 var(--font-body);letter-spacing:-.01em;white-space:nowrap;box-shadow:0 0 0 1px rgba(21,24,29,.14),0 2px 7px rgba(21,24,29,.26);transform:translate(-4px,-5px)}
 .nm-mkw.pr-on .nm-pr{display:inline}
-.nm-mkw.pr-on .nm-mk{width:10px!important;height:10px!important;min-width:0!important;padding:0!important;border:0!important;outline:0!important;box-shadow:none!important;transform:none!important;font-size:0!important;line-height:0!important;flex:none;background:var(--c)!important}
-.nm-mkw.pr-on .nm-mk.ya{width:9px!important;height:9px!important;border-radius:2px!important;transform:rotate(45deg)!important}
-.nm-mkw.pr-on .nm-mk.hl{background:#fff!important;box-shadow:inset 0 0 0 2.5px var(--c)!important}
+.nm-mkw.pr-on .nm-mk{width:13px!important;height:13px!important;min-width:0!important;padding:0!important;border:0!important;outline:0!important;box-shadow:none!important;transform:none!important;font-size:0!important;line-height:0!important;flex:none;background:var(--c)!important}
+.nm-mkw.pr-on .nm-mk.ya{width:11px!important;height:11px!important;border-radius:2px!important;transform:rotate(45deg)!important}
+.nm-mkw.pr-on .nm-mk.hl{background:#fff!important;box-shadow:inset 0 0 0 3px var(--c)!important}
 .nm-mkw.pr-on .nm-mk.lh{border-radius:2px!important}
 .nm-mkw.pr-on .pk-b{display:none}
 .nm-mkw.pr-on.pr-pri{background:#1E5CA6;color:#fff;box-shadow:0 0 0 1px rgba(21,24,29,.10),0 2px 6px rgba(21,24,29,.28)}
@@ -804,18 +804,21 @@ h1,h2,h3{letter-spacing:-.02em}
 .nm-mkw.pr-on.pr-pri .nm-mk,.nm-mkw.pr-on.pr-live .nm-mk{background:#fff!important;box-shadow:none!important}
 .nm-flag{background:#12805A;color:#fff;border-color:#fff}.nm-flag::after{border-top-color:#12805A}
 .nm-flag.soon{background:#E5F5EE;color:#0D6B4A}.nm-flag.soon::after{border-top-color:#E5F5EE}
-/* 알약이 아닌 핀 = 작은 점(조용하게) — 'LH'·'매' 글자는 알약일 때만, 공고 예상 점선은 목록·상세에서 */
-.nm-mkw:not(.pr-on) .nm-mk{transform:scale(.72);box-shadow:0 0 0 2px #fff,0 1px 4px rgba(0,0,0,.35)}
-.nm-mkw:not(.pr-on) .nm-mk.hl{box-shadow:inset 0 0 0 4.5px var(--c),0 0 0 2px #fff,0 1px 4px rgba(0,0,0,.35)}
-.nm-mkw:not(.pr-on) .nm-mk.ya{transform:rotate(45deg) scale(.72);box-shadow:inset 0 0 0 3.5px var(--c),0 0 0 2px #fff,0 1px 4px rgba(0,0,0,.35)}
-.nm-mkw:not(.pr-on) .nm-mk.lh{font-size:0;transform:scale(.6)}
-.nm-mkw:not(.pr-on) .nm-mk.lh.live{transform:scale(.75)}
-.nm-mkw:not(.pr-on)::before{content:'';position:absolute;inset:-9px}   /* 점은 작게, 누르는 자리는 넓게(약 32px) */
+/* 겹쳐서 묶인 핀: 숨기고, 묶음 대표에 숫자 배지 */
+.nm-mkw.pr-hid{visibility:hidden}
+.nm-mkw[data-n]::after{content:attr(data-n);position:absolute;top:-9px;right:-11px;min-width:19px;height:19px;padding:0 5px;box-sizing:border-box;border-radius:10px;background:#15181D;color:#fff;font:800 11.5px/19px var(--font-body);text-align:center;box-shadow:0 0 0 2px #fff;pointer-events:none;z-index:2}
+.nm-mkw.pr-on[data-n]::after{top:-15px;right:-7px}   /* 알약은 글자 위로 비켜서 */
+/* 알약이 아닌 핀 = 색 점(20px) — 'LH'·'매' 글자는 알약일 때만, 공고 예상 점선은 목록·상세에서 */
+.nm-mkw:not(.pr-on) .nm-mk{transform:none;box-shadow:0 0 0 2px #fff,0 1px 5px rgba(0,0,0,.4)}
+.nm-mkw:not(.pr-on) .nm-mk.hl{box-shadow:inset 0 0 0 4.5px var(--c),0 0 0 2px #fff,0 1px 5px rgba(0,0,0,.4)}
+.nm-mkw:not(.pr-on) .nm-mk.ya{transform:rotate(45deg);box-shadow:inset 0 0 0 3.5px var(--c),0 0 0 2px #fff,0 1px 5px rgba(0,0,0,.4)}
+.nm-mkw:not(.pr-on) .nm-mk.lh{font-size:0;transform:scale(.84)}
+.nm-mkw:not(.pr-on) .nm-mk.lh.live{transform:scale(.95)}
+.nm-mkw:not(.pr-on)::before{content:'';position:absolute;inset:-7px}   /* 누르는 자리는 점보다 넓게(약 34px) */
 .nm-mkw:not(.pr-on) .nm-mk.exp{outline:0}
-.nm-mkw:not(.pr-on) .nm-mk.live{transform:scale(.9);box-shadow:0 0 0 2.5px #fff,0 0 0 5px #12805A,0 2px 6px rgba(0,0,0,.4)}
-.nm-mkw:not(.pr-on) .nm-mk.ya.live{transform:rotate(45deg) scale(.9);box-shadow:inset 0 0 0 3.5px var(--c),0 0 0 2.5px #fff,0 0 0 5px #12805A,0 2px 6px rgba(0,0,0,.4)}
-.nm-mkw:not(.pr-on) .nm-mk.plan{transform:scale(.92)}
-.nm-mkw:not(.pr-on) .pk-b{transform:scale(.8)}
+.nm-mkw:not(.pr-on) .nm-mk.live{transform:scale(1.1);box-shadow:0 0 0 2.5px #fff,0 0 0 5px #12805A,0 2px 6px rgba(0,0,0,.4)}
+.nm-mkw:not(.pr-on) .nm-mk.ya.live{transform:rotate(45deg) scale(1.1);box-shadow:inset 0 0 0 3.5px var(--c),0 0 0 2.5px #fff,0 0 0 5px #12805A,0 2px 6px rgba(0,0,0,.4)}
+.nm-mkw:not(.pr-on) .nm-mk.plan{transform:none}
 /* 폰 시트 머리: 손잡이만(누르면 펼치기·접기) · 분절 단추 낮게 */
 @media (max-width:760px){
   .lst .grp{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:8px 20px 6px}
@@ -1662,30 +1665,58 @@ function nmFlag(p){   // 접수 중·예정 공고가 있는 단지: 마커 위 
   var r2 = rs.reduce(function(a, x){ return (x.a0 && (!a.a0 || x.a0 < a.a0)) ? x : a; }, rs[0]); return '<span class="nm-flag soon">접수 ' + (r2.a0 ? md(r2.a0) + '~' : '예정') + '</span>'; }
 var MKID = 0;
 function mkWrap(inner, p){ var f = nmFlag(p), e = expMk(p) ? expOf(p) : null, lv = nrLive(p); if (!p.__mkid) p.__mkid = 'm' + (++MKID);
-  return '<div class="nm-mkw' + (p.cat === 'pri' ? ' pr-pri' : '') + (lv ? ' pr-live' : '') + '" data-mk="' + p.__mkid + '"' + (e ? ' title="공고 예상(추정): ' + e.name + ' — ' + e.when + '"' : '') + '>' + inner + (p.__pr ? '<span class="nm-pr">' + p.__pr + '</span>' : '') + pkMk(p) + (f || planFlag(p)) + '</div>'; }
+  return '<div class="nm-mkw' + (p.cat === 'pri' ? ' pr-pri' : '') + (lv ? ' pr-live' : '') + '" data-mk="' + p.__mkid + '"' + (e ? ' title="공고 예상(추정): ' + e.name + ' — ' + e.when + '"' : '') + '>' + inner + (p.__pr ? '<span class="nm-pr">월 ' + p.__pr + '</span>' : '') + pkMk(p) + (f || planFlag(p)) + '</div>'; }
 // B+ 지도 핀: 목록 줄 오른쪽 월세('월 26.6만', '월 51~61만')를 핀 글자로 → 화면에서 서로 겹치지 않는 핀만 알약(우선: 접수 중 > 1순위 > 월세 낮은 곳), 나머지는 점
 function prParse(it){ var n = it.querySelector('.num'); if (!n) return ''; var m = n.textContent.replace(/\s+/g, ' ').match(/월\s*([\d.]+)(?:\s*~\s*([\d.]+))?\s*만/); if (!m) return ''; return m[2] ? (Math.round(+m[1]) + '만~') : (m[1] + '만'); }
-function prW(t){ var w = 0; for (var i = 0; i < t.length; i++) { var c = t.charCodeAt(i); w += (c >= 48 && c <= 57) ? 7.6 : (c === 46 ? 3.6 : (c === 126 ? 8 : (c === 32 ? 3.5 : 13))); } return w + 31; }
+function prW(t){ var w = 0; for (var i = 0; i < t.length; i++) { var c = t.charCodeAt(i); w += (c >= 48 && c <= 57) ? 8.5 : (c === 46 ? 4 : (c === 126 ? 9 : (c === 32 ? 4 : 14.5))); } return w + 38; }
 function prLayout(){
   if (!window.nmMap || !nmMap.getCenter || !nmMap.getZoom) return;
   var el = document.getElementById('nmap'); if (!el) return; var W = el.clientWidth, H = el.clientHeight; if (!W || !H) return;
   var c = nmMap.getCenter(), z = nmMap.getZoom(), sc = 256 * Math.pow(2, z);
   var px = function(lat, lng){ var s = Math.sin(lat * Math.PI / 180); return [(lng + 180) / 360 * sc, (0.5 - Math.log((1 + s) / (1 - s)) / (4 * Math.PI)) * sc]; }, c0 = px(c.lat(), c.lng());
-  var cand = [];
-  (window.nmMarkers || []).forEach(function(mk){ var p = mk.__p; if (!mk.__vis || !p.__pr || p.__out || p.cat === 'na' || mk === window.nmSelected) return;
+  var all = [];
+  (window.nmMarkers || []).forEach(function(mk){ var p = mk.__p; mk.__cl = null; if (!p || !p.__mkid || !mk.__vis || mk === window.nmSelected) return;
     var pos = mk.getPosition(); if (!pos) return; var q = px(pos.lat(), pos.lng()), x = q[0] - c0[0] + W / 2, y = q[1] - c0[1] + H / 2;
-    if (x < -60 || y < -30 || x > W + 60 || y > H + 30) return; var lv = nrLive(p);
-    cand.push({ id: p.__mkid, x: x, y: y, w: prW(p.__pr), f: lv && nmFlag(p) ? 1 : 0, k: lv ? 0 : (p.cat === 'pri' ? 1 : 2), r: parseFloat(p.__pr) || 999 }); });
-  cand.sort(function(a, b){ return a.k - b.k || a.r - b.r; });
-  var placed = [], on = {};
-  cand.forEach(function(o){ var r = { l: o.x - 12, t: o.y - 16, r: o.x - 12 + o.w, b: o.y + 12 };
-    if (o.f) { var cx = o.x - 12 + o.w / 2; r.t = o.y - 46; r.l = Math.min(r.l, cx - 48); r.r = Math.max(r.r, cx + 48); }   // 위 깃발('접수 중 ~11/6')까지 한 덩어리
-    for (var i = 0; i < placed.length; i++) { var q = placed[i]; if (!(r.l > q.r + 4 || r.r < q.l - 4 || r.t > q.b + 2 || r.b < q.t - 2)) return; }
-    placed.push(r); on[o.id] = o.k === 0 ? 70 : 60; });
-  document.querySelectorAll('#nmap .nm-mkw[data-mk]').forEach(function(w){ w.classList.toggle('pr-on', !!on[w.dataset.mk]); });
-  (window.nmMarkers || []).forEach(function(mk){ var p = mk.__p; if (!p || mk === window.nmSelected || !mk.setZIndex || !mk.getZIndex) return; var z = mk.getZIndex();
-    var zt = on[p.__mkid]; if (zt) { if (z !== zt) { if (z !== 60 && z !== 70) mk.__z0 = z; try { mk.setZIndex(zt); } catch(e) {} } } else if (z === 60 || z === 70) { try { mk.setZIndex(mk.__z0 != null ? mk.__z0 : 10); } catch(e) {} } });
-  window.__prOn = Object.keys(on).length;
+    if (x < -60 || y < -40 || x > W + 60 || y > H + 40) return; var lv = nrLive(p);
+    all.push({ mk: mk, id: p.__mkid, x: x, y: y, lv: lv, pl: !!p.planOnly, pr: !!(p.__pr && !p.__out && p.cat !== 'na'), w: p.__pr ? prW('월 ' + p.__pr) : 0, f: lv && nmFlag(p) ? 1 : 0,
+      k: lv ? 0 : (p.cat === 'pri' ? 1 : (p.cat === 'na' || p.__out ? 4 : 2)), r: parseFloat(p.__pr) || 999 }); });
+  all.sort(function(a, b){ return a.k - b.k || a.r - b.r; });
+  var hit = function(r, q, g){ return !(r.l > q.r + g || r.r < q.l - g || r.t > q.b + g || r.b < q.t - g); };
+  // 1) 월세 알약: 화면에서 서로 안 겹치는 것만(접수 중 > 1순위 > 월세 낮은 순)
+  var pills = [], st = {}, zt = {};
+  all.forEach(function(o){ if (!o.pr) return; var r = { l: o.x - 15, t: o.y - 17, r: o.x - 15 + o.w, b: o.y + 15 };
+    if (o.f) { var cx = o.x - 15 + o.w / 2; r.t = o.y - 54; r.l = Math.min(r.l, cx - 50); r.r = Math.max(r.r, cx + 50); }   // 위 깃발('접수 중 ~11/6')까지 한 덩어리
+    for (var i = 0; i < pills.length; i++) if (hit(r, pills[i].b, 3)) return;
+    pills.push({ o: o, b: r, m: [o.mk] }); st[o.id] = 'pill'; zt[o.id] = o.lv ? 70 : 60; });
+  // 2) 나머지 = 점. 알약·다른 점과 겹치면 그 묶음에 넣고 숨김 → 묶음 대표에 숫자(겹친 곳 수). 접수 중은 안 숨김
+  var reps = [];
+  all.forEach(function(o){ if (st[o.id]) return;
+    var r = o.pl ? { l: o.x - 20, t: o.y - 12, r: o.x + 28, b: o.y + 12 } : { l: o.x - 12, t: o.y - 12, r: o.x + 12, b: o.y + 12 };
+    if (!o.lv) { var g = null, i;
+      for (i = 0; i < pills.length && !g; i++) if (hit(r, pills[i].b, -2)) g = pills[i];
+      for (i = 0; i < reps.length && !g; i++) if (hit(r, reps[i].b, -2)) g = reps[i];
+      if (g) { g.m.push(o.mk); st[o.id] = 'hid'; return; } }
+    reps.push({ o: o, b: r, m: [o.mk] }); st[o.id] = 'dot'; });
+  var n = {}; pills.concat(reps).forEach(function(g){ if (g.m.length > 1) { n[g.o.id] = g.m.length; g.o.mk.__cl = g.m; if (!zt[g.o.id]) zt[g.o.id] = 50; } });
+  document.querySelectorAll('#nmap .nm-mkw[data-mk]').forEach(function(w){ var id = w.dataset.mk, sv = st[id];
+    w.classList.toggle('pr-on', sv === 'pill'); w.classList.toggle('pr-hid', sv === 'hid');
+    if (n[id]) w.setAttribute('data-n', n[id]); else w.removeAttribute('data-n'); });
+  (window.nmMarkers || []).forEach(function(mk){ var p = mk.__p; if (!p || mk === window.nmSelected || !mk.setZIndex || !mk.getZIndex) return; var zc = mk.getZIndex(), t = zt[p.__mkid];
+    if (t) { if (zc !== t) { if (zc !== 50 && zc !== 60 && zc !== 70) mk.__z0 = zc; try { mk.setZIndex(t); } catch(e) {} } } else if (zc === 50 || zc === 60 || zc === 70) { try { mk.setZIndex(mk.__z0 != null ? mk.__z0 : 10); } catch(e) {} } });
+  window.__prRep = {}; pills.forEach(function(g){ window.__prRep[g.o.id] = 1; });
+  window.__prOn = pills.length; window.__clN = Object.keys(n).length; window.__hidN = Object.keys(st).filter(function(k){ return st[k] === 'hid'; }).length;
+}
+// 묶음(숫자) 핀을 누르면 안에 든 단지가 갈라질 만큼 확대(최대 18) — 18에서도 겹치면(같은 건물) 그 단지 상세
+function nmMkClick(mk){
+  var cl = mk.__cl, z = (nmMap.getZoom && nmMap.getZoom()) || 15;
+  if (!cl || cl.length < 2 || z >= 18) return nmFocusMarker(mk);
+  var la = 0, ln = 0; cl.forEach(function(m){ var q = m.getPosition(); la += q.lat(); ln += q.lng(); }); la /= cl.length; ln /= cl.length;
+  var sc = 256 * Math.pow(2, z), d = 0, cs = Math.cos(la * Math.PI / 180);
+  cl.forEach(function(m){ var q = m.getPosition(), dx = (q.lng() - ln) / 360 * sc, dy = (q.lat() - la) / 360 * sc / cs; d = Math.max(d, Math.sqrt(dx * dx + dy * dy)); });
+  var need = window.__prRep && window.__prRep[mk.__p.__mkid] ? 64 : 28;   // 알약 묶음은 알약 너비만큼 벌어져야 갈라짐
+  var nz = Math.min(18, z + Math.max(1, Math.ceil(Math.log(need / Math.max(d, 0.5)) / Math.LN2)));
+  var c1 = new naver.maps.LatLng(sheet.mobile() ? latPlusPx(la, Math.round(sheet.visH() / 2), nz) : la, ln);
+  try { if (nmMap.morph) nmMap.morph(c1, nz); else { nmMap.setZoom(nz); nmMap.setCenter(c1); } } catch(e) { try { nmMap.setZoom(nz); nmMap.setCenter(c1); } catch(x) {} }
 }
 window.prLayout = prLayout;
 window.prRefresh = function(){
@@ -2973,7 +3004,7 @@ function nmInit(){
     groups.ya = '청년안심주택 — 청년 자격 형이 ' + selLabel() + '인 단지만 · 공고 있는 곳 먼저'; groups.mi = '매입임대 — 호실이 전부 ' + selLabel() + '인 주택형이 있는 집 (SH 청년 매입임대 2026 1차 · 특화형)'; groups.na = '해당 없음 — ' + belowTxt() + '뿐 · 국민임대 일반공급 없음(주거약자만)'; }
   groupTxt();
   var groupEl = {};
-  ['plan','pri','gen','kook','lh','ya','mi','na'].forEach(function(k){ var g = document.createElement('div'); g.className = 'grp'; g.textContent = groups[k]; g.dataset.cat = k; list.appendChild(g); groupEl[k] = g; });
+  ['pri','gen','kook','lh','ya','mi','plan','na'].forEach(function(k){ var g = document.createElement('div'); g.className = 'grp'; g.textContent = groups[k]; g.dataset.cat = k; list.appendChild(g); groupEl[k] = g; });
   var lhAdded = {};
   window.nmAddLH = function(j){
     var items = (j && j.items || []).slice().sort(function(a, b){ return (b.posted || '').localeCompare(a.posted || ''); });
@@ -2991,7 +3022,7 @@ function nmInit(){
         var iconOf = function(){ return { content: mkWrap('<div class="nm-mk lh' + (approx ? ' ap' : '') + (p.cat === 'na' ? ' na' : '') + (nrLive(p) ? ' live' : '') + (expMk(p) ? ' exp' : '') + (p.__out ? ' out' : '') + '" style="--c:' + lcolOf() + '" title="' + p.name + '">LH</div>', p), anchor: new naver.maps.Point(12, 11) }; };
         var mk = new naver.maps.Marker({ map: nmMap, position: new naver.maps.LatLng(pos[0], pos[1]), icon: iconOf(), zIndex: p.cat === 'na' ? 5 : (nrLive(p) ? 30 : 12) });
         mk.__p = p; mk.__approx = approx; nmMarkers.push(mk); mk.__icon = iconOf; var k = keyOf(p.name); (nmIndex[k] = nmIndex[k] || []).push(mk);
-        naver.maps.Event.addListener(mk, 'click', function(){ nmFocusMarker(mk); });
+        naver.maps.Event.addListener(mk, 'click', function(){ nmMkClick(mk); });
         var open = p.notices.some(function(n){ return n.status === '접수중' || n.status === '공고중'; });
         var youth = (c.rows || []).filter(function(r){ return /청년|대학생/.test(r.ty); });
         var it = document.createElement('div'); it.className = 'it'; it.setAttribute('data-key', k); it.setAttribute('data-nid', 'LH');
@@ -3020,7 +3051,7 @@ function nmInit(){
         var iconOf = function(){ var st = p.plan.st || {}; return { content: mkWrap('<div class="nm-mk plan' + (st.od ? ' od' : '') + (p.__out ? ' out' : '') + '" title="' + hesc(p.name) + '">예정</div>', p), anchor: new naver.maps.Point(18, 10) }; };
         var mk = new naver.maps.Marker({ map: nmMap, position: new naver.maps.LatLng(pt[0], pt[1]), icon: iconOf(), zIndex: 26 });
         mk.__p = p; mk.__approx = approx; nmMarkers.push(mk); mk.__icon = iconOf; var k = keyOf(p.name); (nmIndex[k] = nmIndex[k] || []).push(mk);
-        naver.maps.Event.addListener(mk, 'click', function(){ nmFocusMarker(mk); });
+        naver.maps.Event.addListener(mk, 'click', function(){ nmMkClick(mk); });
         var it = document.createElement('div'); it.className = 'it'; it.setAttribute('data-key', k); it.setAttribute('data-nid', 'PL');
         it.__render = function(){ var st = x.st || {}; it.dataset.cat = 'plan'; it.innerHTML = '<span class="dot plan" style="margin-top:3px">예정</span><div><b>' + hesc(p.name) + ' <span class="pill plan" style="font-size:11px;padding:0 7px">' + (st.pd ? planTxt(st) : '공고 예정') + '</span></b><small>' + hesc(x.src + ' ' + x.type) + (x.kind ? ' · ' + hesc(x.kind) : '') + (x.hh ? ' · ' + hesc(x.hh) + '호' : '') + (x.m2 ? ' · 전용 ' + hesc(x.m2) + '㎡(' + py(x.m2) + ')' : (x.prog === 'yapub' ? ' · 전용 57㎡(17.2평) 이하' : '')) + (x.movein ? ' · 입주 ' + hesc(x.movein) : '') + ' · ' + hesc(x.src + ' ' + planBasis(x)) + (approx ? ' · 위치 대략(동 단위)' : '') + '</small></div><div class="num"></div>'; };
         it.__render(); it.__mk = mk; it.addEventListener('click', function(){ nmFocusMarker(mk); });
@@ -3045,7 +3076,7 @@ function nmInit(){
       var iconOf = function(){ return { content: mkWrap('<div class="nm-mk ya' + (ns.length ? ' on' : '') + (p.cat === 'na' ? ' na' : '') + (nrLive(p) ? ' live' : '') + (expMk(p) ? ' exp' : '') + (p.__out ? ' out' : '') + '" style="--c:' + colOf() + '" title="' + c.name + '"></div>', p), anchor: new naver.maps.Point(9, 9) }; };
       var mk = new naver.maps.Marker({ map: nmMap, position: new naver.maps.LatLng(c.lat, c.lng), icon: iconOf(), zIndex: p.cat === 'na' ? 5 : (nrLive(p) ? 30 : 9) });
       mk.__p = p; mk.__approx = false; nmMarkers.push(mk); mk.__icon = iconOf; var k = keyOf(c.name); (nmIndex[k] = nmIndex[k] || []).push(mk);
-      naver.maps.Event.addListener(mk, 'click', function(){ nmFocusMarker(mk); });
+      naver.maps.Event.addListener(mk, 'click', function(){ nmMkClick(mk); });
       var it = document.createElement('div'); it.className = 'it'; it.setAttribute('data-key', k); it.setAttribute('data-nid', 'YA'); it.dataset.open = ns.length ? '1' : '0';
       it.__render = function(){ var split = yaSplit(c), col = colOf(); it.dataset.cat = p.cat;
       var okTys = split.ok.map(function(r){ return tyExact(r.ty) || yaTyNum(r.ty); }).filter(Boolean).sort(function(a, b){ return a - b; });
@@ -3068,7 +3099,7 @@ function nmInit(){
     var iconOf = function(){ return { content: mkWrap('<div class="nm-mk lh mi' + (p.cat === 'na' ? ' na' : '') + (nrLive(p) ? ' live' : '') + (expMk(p) ? ' exp' : '') + (p.__out ? ' out' : '') + '" style="--c:' + colOf() + '" title="' + p.name + '">매</div>', p), anchor: new naver.maps.Point(12, 11) }; };
     var mk = new naver.maps.Marker({ map: nmMap, position: new naver.maps.LatLng(pt[0], pt[1]), icon: iconOf(), zIndex: p.cat === 'na' ? 5 : (nrLive(p) ? 30 : 8) });
     mk.__p = p; mk.__approx = false; nmMarkers.push(mk); mk.__icon = iconOf; var k = keyOf(p.name); (nmIndex[k] = nmIndex[k] || []).push(mk);
-    naver.maps.Event.addListener(mk, 'click', function(){ nmFocusMarker(mk); });
+    naver.maps.Event.addListener(mk, 'click', function(){ nmMkClick(mk); });
     var it = document.createElement('div'); it.className = 'it'; it.setAttribute('data-key', k); it.setAttribute('data-nid', p.nid);
     it.__render = function(){ it.dataset.cat = p.cat; var ok = miOkOf(p), r = NREG[p.nid], live = nrLive(p);
       var m2 = []; ok.forEach(function(x){ (x.m2s || [x.m2 || x.m2_min]).forEach(function(v){ m2.push(v); }); });
@@ -3122,7 +3153,7 @@ function nmInit(){
         var mk = new naver.maps.Marker({ map: nmMap, position: new naver.maps.LatLng(pos[0], pos[1]), icon: nmIcon(p, approx), zIndex: nrLive(p) ? 30 : (p.pick ? 20 : 10) });
         mk.__p = p; mk.__approx = approx; nmMarkers.push(mk); mk.__icon = function(){ return nmIcon(p, approx); };
         var k = keyOf(p.name); (nmIndex[k] = nmIndex[k] || []).push(mk);
-        naver.maps.Event.addListener(mk, 'click', function(){ nmFocusMarker(mk); });
+        naver.maps.Event.addListener(mk, 'click', function(){ nmMkClick(mk); });
         var it = document.createElement('div'); it.className = 'it'; it.setAttribute('data-key', k);
         it.setAttribute('data-nid', p.nid);
         it.__render = function(){ it.dataset.cat = p.cat; it.innerHTML = '<span class="dot' + nmCls(p) + '" style="--c:' + nmColor(p) + ';margin-top:3px"></span><div><b>' + p.name + ' <span class="pill ' + (p.cat === 'na' ? 'warn' : 'info') + '" style="font-size:11px;padding:0 7px">' + (p.cat === 'na' ? (p.kind === '행복주택' ? naPill(p) : (p.na0 ? '지금 해당 없음' : '기준 미만')) : p.kind === '국민임대' ? '26년 국민임대 ' + (p.ok26 || []).map(function(a){ return a.replace(/^(\d+)㎡$/, function(_, n){ return n + '㎡(' + py(n) + ')'; }); }).join('·') : NOTICES[p.nid].short) + '</span></b><small>' + (p.kind === '행복주택' ? p.m2 + '㎡ ' + p.py + ' · ' + hhShort(p) + ' · 공가 ' + p.vac + (p.wait ? ' · 예비 ' + p.wait : '') + ' · ' + p.rank : hhShort(p) + ' · ' + p.rank) + btTag(p) + pkTag(p) + stTag(p) + '</small></div><div class="num">' + (p.kind === '행복주택' ? '<b class="n1">월 ' + p.rent + '</b><small class="n2">보증 ' + p.dep + '</small>' : '') + '</div>'; };
