@@ -554,6 +554,7 @@ td .bt-i,.iw-t .bt-i{width:20px;height:20px;line-height:18px;font-size:11.5px;ma
 .st-tag.plan{color:#E65100}
 .dot.plan{width:auto;height:16px;padding:0 4px;border-radius:4px;border:2px solid #EF6C00;color:#E65100;background:#fff;font:800 9px/12px var(--font-body);flex:none}
 .lst .it .dot.plan{width:auto;min-width:30px;height:16px;white-space:nowrap;border-radius:4px;text-align:center}
+.lst .it[data-cat="plan"]{grid-template-columns:auto 1fr auto}   /* '예정' 배지가 14px 칸을 넘어 이름과 겹치던 것 */
 .pill.plan{background:#FFE0B2;color:#8a3b00}
 .pl-note{margin:0 0 10px;padding:8px 10px;border:1.5px solid #EF6C00;border-radius:10px;background:color-mix(in srgb,#FFE0B2 30%,transparent);font-size:13px;line-height:1.5}
 .lst .it.out{opacity:.62}
@@ -1647,7 +1648,9 @@ function planHtml(p, approx){ var x = p.plan, st = x.st || {};
     ['위치', hesc(p.addr || '') + (approx ? '<br><small class="k">기관이 지구 이름만 밝혀 동 단위로 찍음(정확한 위치 아님)</small>' : '')],
     ['내 조건', x.prog === 'yapub' ? '공고가 떠야 형·전용면적·임대료를 알 수 있음 — 57㎡ 이하 매입형이라 8평(26.45㎡) 이상 청년형이 있을지는 공고에서 확인' : (x.m2 ? '전용 ' + hesc(x.m2) + '㎡(' + py(x.m2) + ') — 청년 몫이 있는지는 공고문에서 확인' : '공고문에서 확인')],
     ['출처', '<a href="' + x.url + '" target="_blank" rel="noopener">' + (x.src === 'SH' ? 'SH 인터넷청약 청약 공급계획(' + hesc(x.type) + ')' : 'LH 청약플러스 공급계획(임대주택)') + ' ↗</a>']].filter(Boolean);
-  return '<div class="nm-iw"><div class="pl-note"><b>공고 예정 — 기관이 미리 발표한 공급계획</b> (아직 공고 전 · 추정 아님)</div><div class="iw-sec"><table class="iw-t">' + rows.map(function(r){ return '<tr><th>' + r[0] + '</th><td>' + r[1] + '</td></tr>'; }).join('') + '</table></div></div>'; }
+  var pt = nmCache[p.addr] || null;   // 지도에 찍은 좌표(주소 변환 결과) → 네이버지도 앱은 그 자리에 핀, PC는 주소 검색
+  var foot = '<div class="iw-f"><small class="k">' + hesc(p.addr || '') + (approx ? ' · 동 단위(대략)' : '') + '</small>' + naviHtml(p.name, p.addr, pt && pt[0], pt && pt[1], approx || !pt) + '</div>';
+  return '<div class="nm-iw"><div class="iw-sec" style="margin-top:0;padding-top:0;border-top:0"><div class="pl-note"><b>공고 예정 — 기관이 미리 발표한 공급계획</b> (아직 공고 전 · 추정 아님)</div><table class="iw-t">' + rows.map(function(r){ return '<tr><th>' + r[0] + '</th><td>' + r[1] + '</td></tr>'; }).join('') + '</table>' + foot + '</div></div>'; }
 function nrDate(s, endOfDay){ var m = String(s || '').match(/(\d{4})-(\d{2})-(\d{2})(?:[T ](\d{1,2}):(\d{2}))?/); if (!m) return null; return new Date(+m[1], +m[2] - 1, +m[3], m[4] != null ? +m[4] : (endOfDay ? 23 : 0), m[5] != null ? +m[5] : (endOfDay ? 59 : 0)); }
 function nrPut(o){ var r = NREG[o.id] || (NREG[o.id] = {}); for (var k in o) r[k] = o[k]; return r; }
 function nrState(r){ var now = new Date(); if (r && r.a1) { if (r.a0 && now < r.a0) return 'soon'; return now <= r.a1 ? 'open' : 'ended'; } return (r && r.st) || 'none'; }
