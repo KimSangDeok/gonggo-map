@@ -262,13 +262,14 @@ main section.view{margin-top:0}
 .iw-sec.flash{animation:secflash 1.6s ease-out}
 @keyframes secflash{0%,30%{background:var(--accent-soft);box-shadow:0 0 0 6px var(--accent-soft)}100%{background:transparent;box-shadow:0 0 0 6px transparent}}
 @media (min-width:761px){
+  #view-map.active{grid-template-columns:minmax(0,1fr) clamp(380px,34vw,600px)}   /* 목록 패널: 노트북(1366~1536)도 넓게 — 380px 고정이던 것(2026-11-03) */
   /* PC: 상세는 오른쪽 넓은 패널(지도는 왼쪽에 그대로 — Material '표준 사이드 시트'), 내용은 2단. 넓게 보기 = 패널이 지도 위를 덮고 3단 */
   #view-map.active.detail-open{grid-template-columns:minmax(360px,1fr) min(1400px,75vw,calc(100vw - 360px))}
   #view-map.active{position:relative}
   #view-map.detail-wide .side{position:absolute;top:0;right:0;bottom:0;left:0;z-index:5;border-left:0}
   .side.show-detail .lg-body,.side.show-detail #nm-msg{display:none}
   #detail-wide{display:inline-block}
-  .side.show-detail .detail .nm-iw{columns:380px 3;column-gap:30px;column-rule:1px solid var(--line);padding:10px 18px 26px;font-size:14px}
+  .side.show-detail .detail .nm-iw{columns:380px 3;column-gap:30px;column-rule:2px solid color-mix(in srgb,var(--fg) 24%,transparent);padding:10px 18px 26px;font-size:14px}
   #view-map.detail-wide .side .detail .nm-iw{columns:380px 4}   /* 넓게 보기: 단 폭 380px 이상으로 들어가는 만큼(최대 4단) — 1280~1440 3단 · 1920 4단, 한 줄 30자 안팎 */
   .side.show-detail .detail .iw-strip{margin-left:0;margin-right:0;padding-left:0;padding-right:0}
   .side.show-detail .detail .nm-iw > *{break-inside:avoid}
@@ -322,8 +323,8 @@ table.stack tr.dim td{color:#8a94a3}
 .iw-h b{font-size:15px;line-height:1.3}
 .iw-x{position:absolute;right:-6px;top:-4px;width:26px;height:26px;border:0;background:transparent;color:#5f6b7a;font-size:20px;line-height:1;cursor:pointer}
 .iw-t{border-collapse:collapse;width:100%;font-size:13px;line-height:1.45}
-.iw-t th{color:#5f6b7a;font-weight:500;text-align:left;padding:3px 10px 3px 0;white-space:nowrap;vertical-align:top;width:50px}
-.iw-t td{padding:3px 0;vertical-align:top}
+.iw-t th{color:#5f6b7a;font-weight:500;text-align:left;padding:5px 10px 5px 0;white-space:nowrap;vertical-align:top;width:50px}
+.iw-t td{padding:5px 0;vertical-align:top}
 .iw-t td .pill{white-space:normal;line-height:1.35;padding:3px 9px}
 .iw-k th,.iw-k td{border-bottom:1px solid #eef1f5;padding:5px 8px 5px 0;font-size:12.5px;line-height:1.4;vertical-align:top}
 .iw-k th{width:34px;padding-right:6px}
@@ -350,7 +351,9 @@ table.stack tr.dim td{color:#8a94a3}
 .iw-r td.k,.iw-r td .k{color:#8a94a3}
 .nm-iw{max-height:calc(100dvh - 150px);overflow:auto;overflow-x:hidden;overscroll-behavior:contain;word-break:keep-all}
 .nm-iw table{max-width:100%}
-.iw-sec{margin-top:10px;padding-top:8px;border-top:1px solid #e5e9ef}
+.iw-sec{margin-top:12px;padding-top:10px;border-top:2px solid color-mix(in srgb,var(--fg) 30%,transparent)}
+.iw-t tr+tr>th,.iw-t tr+tr>td{border-top:1px solid color-mix(in srgb,var(--fg) 14%,transparent)}
+.iw-m tr+tr:not(.sub2)>th,.iw-m tr+tr:not(.sub2)>td{border-top:1px solid color-mix(in srgb,var(--fg) 12%,transparent)}
 .iw-sh{font-weight:700;font-size:13px;margin-bottom:6px}.iw-sh small{font-weight:500;font-size:11px;margin-left:4px}
 .iw-ph{display:flex;gap:6px;margin:6px 0 8px}
 .iw-ph a{flex:1;min-width:0;height:74px;border-radius:8px;overflow:hidden;background:#eef1f5;position:relative;display:block}
@@ -461,7 +464,16 @@ td .bt-i,.iw-t .bt-i{width:20px;height:20px;line-height:18px;font-size:11.5px;ma
 .bt-pop-x{border:0;background:none;color:var(--muted);font-size:16px;cursor:pointer;padding:2px 4px}
 /* 건물 종류 그림(입체): bt_svg.css()가 채움 — 재료별 면 색을 밝은/어두운 화면 따로 */
 .bt-svg{display:block;width:100%;height:auto;margin:6px 0 2px;color:var(--fg);font-family:var(--font-body);background:color-mix(in srgb,var(--bg) 60%,var(--surface));border-radius:8px}.bt-svg,.bt-ico{--b-gt:#D3E4C8;--b-gl:#B4CBA4;--b-gr:#98B588;--b-ct:#FBFCFD;--b-cl:#E3E8EE;--b-cr:#C0CAD6;--b-rt:#E8B49B;--b-rl:#C87656;--b-rr:#A0573E;--b-kt:#FBF3E1;--b-kl:#EEDDB9;--b-kr:#D1BA8E;--b-st:#D3E3F6;--b-sl:#97BBE7;--b-sr:#6690CB;--b-ft:#7E3F32;--b-fr:#9B5546;--b-pl:#5A646F;--b-pr:#464F5A;--b-vt:#E46A5F;--b-vl:#D2554A;--b-vr:#AF4339;--b-xt:rgba(120,135,155,.10);--b-xl:rgba(120,135,155,.16);--b-xr:rgba(120,135,155,.24);--b-w0:rgba(255,255,255,.0);--b-w1:#7DA5D9;--b-w2:#5E8BC8;--b-wl:#D9E8F8;--b-ta:#7DB672;--b-tb:#5D9852;--b-tk:#8B6B4B;--b-aw:#D9893A;--b-dr:#5A3B2E;--b-ol:rgba(22,32,48,.42);--b-sh:rgba(22,32,48,.15);--b-mu:rgba(255,255,255,.6)}@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .bt-svg,:root:not([data-theme="light"]) .bt-ico{--b-gt:#2D3E2F;--b-gl:#243327;--b-gr:#1B291F;--b-ct:#CAD2DC;--b-cl:#A8B3C0;--b-cr:#7D8998;--b-rt:#BA856F;--b-rl:#995A44;--b-rr:#764332;--b-kt:#D9CFB7;--b-kl:#C1AF8C;--b-kr:#9A8868;--b-st:#9DB6D5;--b-sl:#6C92C3;--b-sr:#4A6DA0;--b-ft:#5F3128;--b-fr:#7D4337;--b-pl:#151A21;--b-pr:#0F1318;--b-vt:#C4574D;--b-vl:#AD463D;--b-vr:#8D3830;--b-xt:rgba(160,175,195,.08);--b-xl:rgba(160,175,195,.12);--b-xr:rgba(160,175,195,.18);--b-w0:rgba(255,255,255,.0);--b-w1:#2E4766;--b-w2:#F1C76B;--b-wl:#33506F;--b-ta:#467C44;--b-tb:#346034;--b-tk:#6A523C;--b-aw:#C97A2E;--b-dr:#2A1C16;--b-ol:rgba(0,0,0,.55);--b-sh:rgba(0,0,0,.30);--b-mu:rgba(255,255,255,.3)}}:root[data-theme="dark"] .bt-svg,:root[data-theme="dark"] .bt-ico{--b-gt:#2D3E2F;--b-gl:#243327;--b-gr:#1B291F;--b-ct:#CAD2DC;--b-cl:#A8B3C0;--b-cr:#7D8998;--b-rt:#BA856F;--b-rl:#995A44;--b-rr:#764332;--b-kt:#D9CFB7;--b-kl:#C1AF8C;--b-kr:#9A8868;--b-st:#9DB6D5;--b-sl:#6C92C3;--b-sr:#4A6DA0;--b-ft:#5F3128;--b-fr:#7D4337;--b-pl:#151A21;--b-pr:#0F1318;--b-vt:#C4574D;--b-vl:#AD463D;--b-vr:#8D3830;--b-xt:rgba(160,175,195,.08);--b-xl:rgba(160,175,195,.12);--b-xr:rgba(160,175,195,.18);--b-w0:rgba(255,255,255,.0);--b-w1:#2E4766;--b-w2:#F1C76B;--b-wl:#33506F;--b-ta:#467C44;--b-tb:#346034;--b-tk:#6A523C;--b-aw:#C97A2E;--b-dr:#2A1C16;--b-ol:rgba(0,0,0,.55);--b-sh:rgba(0,0,0,.30);--b-mu:rgba(255,255,255,.3)}.bt-svg .geo path,.bt-ico .geo path{stroke:var(--b-ol);stroke-width:.45;stroke-linejoin:round}.bt-ico .geo path{stroke-width:.4}.bt-svg .gt,.bt-ico .gt{fill:var(--b-gt)}.bt-svg .gl,.bt-ico .gl{fill:var(--b-gl)}.bt-svg .gr,.bt-ico .gr{fill:var(--b-gr)}.bt-svg .ct,.bt-ico .ct{fill:var(--b-ct)}.bt-svg .cl,.bt-ico .cl{fill:var(--b-cl)}.bt-svg .cr,.bt-ico .cr{fill:var(--b-cr)}.bt-svg .rt,.bt-ico .rt{fill:var(--b-rt)}.bt-svg .rl,.bt-ico .rl{fill:var(--b-rl)}.bt-svg .rr,.bt-ico .rr{fill:var(--b-rr)}.bt-svg .kt,.bt-ico .kt{fill:var(--b-kt)}.bt-svg .kl,.bt-ico .kl{fill:var(--b-kl)}.bt-svg .kr,.bt-ico .kr{fill:var(--b-kr)}.bt-svg .st,.bt-ico .st{fill:var(--b-st)}.bt-svg .sl,.bt-ico .sl{fill:var(--b-sl)}.bt-svg .sr,.bt-ico .sr{fill:var(--b-sr)}.bt-svg .ft,.bt-ico .ft{fill:var(--b-ft)}.bt-svg .fr,.bt-ico .fr{fill:var(--b-fr)}.bt-svg .pl,.bt-ico .pl{fill:var(--b-pl)}.bt-svg .pr,.bt-ico .pr{fill:var(--b-pr)}.bt-svg .vt,.bt-ico .vt{fill:var(--b-vt)}.bt-svg .vl,.bt-ico .vl{fill:var(--b-vl)}.bt-svg .vr,.bt-ico .vr{fill:var(--b-vr)}.bt-svg .xt,.bt-ico .xt{fill:var(--b-xt)}.bt-svg .xl,.bt-ico .xl{fill:var(--b-xl)}.bt-svg .xr,.bt-ico .xr{fill:var(--b-xr)}.bt-svg .w0,.bt-ico .w0{fill:var(--b-w0)}.bt-svg .w1,.bt-ico .w1{fill:var(--b-w1)}.bt-svg .w2,.bt-ico .w2{fill:var(--b-w2)}.bt-svg .wl,.bt-ico .wl{fill:var(--b-wl)}.bt-svg .ta,.bt-ico .ta{fill:var(--b-ta)}.bt-svg .tb,.bt-ico .tb{fill:var(--b-tb)}.bt-svg .aw,.bt-ico .aw{fill:var(--b-aw)}.bt-svg .dr,.bt-ico .dr{fill:var(--b-dr)}.bt-svg .sh,.bt-ico .sh{fill:var(--b-sh)}.bt-svg .w0,.bt-svg .w1,.bt-svg .w2,.bt-svg .wl,.bt-ico .w1,.bt-ico .wl,.bt-svg .sh,.bt-svg .aw{stroke:none!important}.bt-svg .tk{fill:none;stroke:var(--b-tk)!important;stroke-width:1.2!important;stroke-linecap:round}.bt-svg .ta,.bt-svg .tb{stroke:var(--b-ol);stroke-width:.4}.bt-svg .mu{fill:none;stroke:var(--b-mu)!important;stroke-width:.5!important}.bt-svg .fsh{fill:none;stroke:var(--surface)!important;stroke-width:2.4!important;stroke-opacity:.75;stroke-linecap:round}.bt-svg .fs{fill:none;stroke:var(--warn)!important;stroke-width:1.1!important;stroke-linecap:round}.bt-svg .xl,.bt-svg .xr,.bt-svg .xt,.bt-ico .xl,.bt-ico .xr,.bt-ico .xt{stroke:currentColor!important;stroke-width:.9!important;stroke-dasharray:2.4 1.8;stroke-opacity:.75}.bt-ico .xl,.bt-ico .xr,.bt-ico .xt{stroke-width:.6!important;stroke-dasharray:1.4 1}.bt-svg .a{fill:none;stroke:var(--warn);stroke-width:1.3}.bt-svg .at{fill:var(--warn);font-size:10px;font-weight:700}.bt-svg .t{fill:currentColor;font-size:10.5px;font-weight:500}.bt-svg .tm{fill:var(--muted);font-size:9.5px}.bt-svg .ic,.bt-ico .ic{fill:var(--warn);stroke:none}.bt-svg .icl,.bt-ico .icl{fill:none;stroke:var(--warn);stroke-width:1.3;stroke-linecap:round}.bt-svg .ps{fill:var(--accent);stroke:none}.bt-svg .pst{fill:var(--on-accent);font-size:10px;font-weight:700}.bt-svg .q{fill:var(--muted);font-size:24px;font-weight:700}.bt-ico{width:18px;height:18px;flex:none;color:var(--fg);vertical-align:-4px}.bt-ico .qi{fill:currentColor;font-size:7px;font-weight:700}
-.pk-tag{font-size:11.5px;padding:0 5px;border-radius:4px;white-space:nowrap;background:color-mix(in srgb,var(--line) 55%,transparent)}
+.pk-tag{display:inline-flex;align-items:center;gap:4px;font-size:12.5px;font-weight:700;line-height:1.55;padding:0 8px 0 2px;border-radius:999px;white-space:nowrap;vertical-align:1px;background:color-mix(in srgb,var(--line) 60%,transparent)}
+.pk-tag i{font-style:normal;display:inline-block;width:16px;height:16px;border-radius:50%;font:800 10px/16px var(--font-body);text-align:center;color:#fff;background:var(--muted)}
+.pk-tag.ok i{background:var(--ok)}.pk-tag.mid i{background:var(--warn)}.pk-tag.low i{background:var(--bad)}
+.nm-mkw{position:relative;display:inline-block;line-height:0}
+.pk-b{position:absolute;right:-11px;top:-11px;width:17px;height:17px;border-radius:50%;font:800 10.5px/17px var(--font-body);font-style:normal;text-align:center;color:#fff;border:1.5px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,.55);pointer-events:none}
+.pk-b.ok{background:#2E7D32}.pk-b.mid{background:#F9A825;color:#1b1b1b}.pk-b.low{background:#C62828}
+.pk-b.inl{position:static;display:inline-block;vertical-align:-4px;margin:0 2px}
+.nm-sel b .pk-s{font-style:normal;font-size:12px;font-weight:800;margin-left:6px;padding:1px 7px;border-radius:999px;color:#fff;background:#78909C}
+.nm-sel b .pk-s.ok{background:#2E7D32}.nm-sel b .pk-s.mid{background:#F9A825;color:#1b1b1b}.nm-sel b .pk-s.low{background:#C62828}
+.iw-loan td{white-space:nowrap}.iw-loan tr.best th,.iw-loan tr.best td{background:var(--ok-soft)}.iw-loan tr.best th{font-weight:700}
 .pk-tag.ok{background:var(--ok-soft);color:var(--ok)}.pk-tag.mid{background:var(--warn-soft);color:var(--warn)}.pk-tag.low{background:var(--bad-soft);color:var(--bad)}
 .pk-dot{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:2px;vertical-align:-1px;background:var(--muted)}.pk-dot.ok{background:var(--ok)}.pk-dot.mid{background:var(--warn)}.pk-dot.low{background:var(--bad)}
 .bt-tag{font-size:11.5px;padding:0 5px;border-radius:4px;background:color-mix(in srgb,var(--line) 55%,transparent);white-space:nowrap}
@@ -602,6 +614,7 @@ td .bt-i,.iw-t .bt-i{width:20px;height:20px;line-height:18px;font-size:11.5px;ma
         <div class="bt-row" id="nm-bt"><div class="bt-pre-row"><button type="button" class="bt-pre" data-pre="ao">아파트·오피스텔만</button><button type="button" class="bt-pre" data-pre="all">전부</button></div><span class="bt-it"><label><input type="checkbox" data-bt="apt" checked> <svg class="bt-ico" viewBox="0 0 20 20" aria-hidden="true"><g class="geo"><path class="cl" d="M10 13.8L13.5 15.5L13.5 5.5L10 3.8Z"/><path class="cr" d="M13.5 15.5L18 13.2L18 3.2L13.5 5.5Z"/><path class="ct" d="M13.5 5.5L18 3.2L14.5 1.5L10 3.8Z"/><path class="w1" d="M15.1 14.1l1.4 -0.7v-1.2l-1.4 0.7zM12.4 14.4l-1.4 -0.7v-1.2l1.4 0.7zM15.1 11.7l1.4 -0.7v-1.2l-1.4 0.7zM12.4 12l-1.4 -0.7v-1.2l1.4 0.7zM15.1 9.3l1.4 -0.7v-1.2l-1.4 0.7zM12.4 7.2l-1.4 -0.7v-1.2l1.4 0.7z"/><path class="w1" d="M12.4 9.6l-1.4 -0.7v-1.2l1.4 0.7zM15.1 6.9l1.4 -0.7v-1.2l-1.4 0.7z"/><path class="cl" d="M5 17.2L8.5 19L8.5 5L5 3.2Z"/><path class="cr" d="M8.5 19L13 16.8L13 2.8L8.5 5Z"/><path class="ct" d="M8.5 5L13 2.8L9.5 1L5 3.2Z"/><path class="w1" d="M10.1 17.6l1.4 -0.7v-1.3l-1.4 0.7zM7.5 17.8l-1.4 -0.7v-1.3l1.4 0.7zM10.1 15l1.4 -0.7v-1.3l-1.4 0.7zM7.5 15.2l-1.4 -0.7v-1.3l1.4 0.7zM10.1 12.4l1.4 -0.7v-1.3l-1.4 0.7zM7.5 10l-1.4 -0.7v-1.3l1.4 0.7zM10.1 7.2l1.4 -0.7v-1.3l-1.4 0.7zM7.5 7.4l-1.4 -0.7v-1.3l1.4 0.7z"/><path class="w1" d="M7.5 12.6l-1.4 -0.7v-1.3l1.4 0.7zM10.1 9.8l1.4 -0.7v-1.3l-1.4 0.7z"/></g></svg> 아파트 <span class="bt-n" data-n="apt"></span></label><button type="button" class="bt-i" data-bt="apt" aria-label="아파트 뜻">ⓘ</button></span><span class="bt-it"><label><input type="checkbox" data-bt="opst" checked> <svg class="bt-ico" viewBox="0 0 20 20" aria-hidden="true"><g class="geo"><path class="cl" d="M4.5 16.5L9.5 19L9.5 16.4L4.5 13.9Z"/><path class="cr" d="M9.5 19L15.5 16L15.5 13.4L9.5 16.4Z"/><path class="ct" d="M9.5 16.4L15.5 13.4L10.5 10.9L4.5 13.9Z"/><path class="sl" d="M4.5 13.9L9.5 16.4L9.5 4L4.5 1.5Z"/><path class="sr" d="M9.5 16.4L15.5 13.4L15.5 1L9.5 4Z"/><path class="st" d="M9.5 4L15.5 1L10.5 -1.5L4.5 1.5Z"/></g></svg> 오피스텔 <span class="bt-n" data-n="opst"></span></label><button type="button" class="bt-i" data-bt="opst" aria-label="오피스텔 뜻">ⓘ</button></span><span class="bt-it"><label><input type="checkbox" data-bt="dosi" checked> <svg class="bt-ico" viewBox="0 0 20 20" aria-hidden="true"><g class="geo"><path class="pl" d="M5 16.8L9.5 19L9.5 16L5 13.8Z"/><path class="pr" d="M9.5 19L15 16.2L15 13.2L9.5 16Z"/><path class="cl" d="M5 13.8L9.5 16L9.5 5L5 2.8Z"/><path class="cr" d="M9.5 16L15 13.2L15 2.2L9.5 5Z"/><path class="ct" d="M9.5 5L15 2.2L10.5 0L5 2.8Z"/><path class="w1" d="M10.6 14.7l1.1 -0.6v-1.2l-1.1 0.6zM12.8 13.6l1.1 -0.6v-1.2l-1.1 0.6zM7.8 14.4l-1.1 -0.6v-1.2l1.1 0.6zM10.6 12l1.1 -0.6v-1.2l-1.1 0.6zM12.8 10.9l1.1 -0.6v-1.2l-1.1 0.6zM7.8 11.7l-1.1 -0.6v-1.2l1.1 0.6zM10.6 9.3l1.1 -0.6v-1.2l-1.1 0.6zM12.8 8.2l1.1 -0.6v-1.2l-1.1 0.6zM12.8 5.5l1.1 -0.6v-1.2l-1.1 0.6zM7.8 6.3l-1.1 -0.6v-1.2l1.1 0.6z"/><path class="w1" d="M7.8 9l-1.1 -0.6v-1.2l1.1 0.6zM10.6 6.6l1.1 -0.6v-1.2l-1.1 0.6z"/></g></svg> 도시형생활주택 <span class="bt-n" data-n="dosi"></span></label><button type="button" class="bt-i" data-bt="dosi" aria-label="도시형생활주택 뜻">ⓘ</button></span><span class="bt-it"><label><input type="checkbox" data-bt="dase" checked> <svg class="bt-ico" viewBox="0 0 20 20" aria-hidden="true"><g class="geo"><path class="pl" d="M4 16L9 18.5L9 15.9L4 13.4Z"/><path class="pr" d="M9 18.5L16 15L16 12.4L9 15.9Z"/><path class="rl" d="M4 13.4L9 15.9L9 7.9L4 5.4Z"/><path class="rr" d="M9 15.9L16 12.4L16 4.4L9 7.9Z"/><path class="rt" d="M9 7.9L16 4.4L11 1.9L4 5.4Z"/><path class="wl" d="M10.4 14l1.4 -0.7v-1.6l-1.4 0.7zM13.2 12.6l1.4 -0.7v-1.6l-1.4 0.7zM7.2 13.8l-1.4 -0.7v-1.6l1.4 0.7zM10.4 10l1.4 -0.7v-1.6l-1.4 0.7zM13.2 8.6l1.4 -0.7v-1.6l-1.4 0.7zM7.2 9.8l-1.4 -0.7v-1.6l1.4 0.7z"/></g></svg> 다세대주택 <span class="bt-n" data-n="dase"></span></label><button type="button" class="bt-i" data-bt="dase" aria-label="다세대주택 뜻">ⓘ</button></span><span class="bt-it"><label><input type="checkbox" data-bt="yeon" checked> <svg class="bt-ico" viewBox="0 0 20 20" aria-hidden="true"><g class="geo"><path class="rl" d="M1.5 15.5L5.5 17.5L5.5 10.5L1.5 8.5Z"/><path class="rr" d="M5.5 17.5L18.5 11L18.5 4L5.5 10.5Z"/><path class="rt" d="M5.5 10.5L18.5 4L14.5 2L1.5 8.5Z"/><path class="wl" d="M7 15.8l1.4 -0.7v-1.5l-1.4 0.7zM9.9 14.3l1.4 -0.7v-1.5l-1.4 0.7zM15.6 11.4l1.4 -0.7v-1.5l-1.4 0.7zM4.2 15.9l-1.4 -0.7v-1.5l1.4 0.7zM7 12.3l1.4 -0.7v-1.5l-1.4 0.7zM9.9 10.8l1.4 -0.7v-1.5l-1.4 0.7zM12.7 9.4l1.4 -0.7v-1.5l-1.4 0.7zM4.2 12.4l-1.4 -0.7v-1.5l1.4 0.7z"/><path class="wl" d="M12.7 12.9l1.4 -0.7v-1.5l-1.4 0.7zM15.6 7.9l1.4 -0.7v-1.5l-1.4 0.7z"/></g></svg> 연립주택 <span class="bt-n" data-n="yeon"></span></label><button type="button" class="bt-i" data-bt="yeon" aria-label="연립주택 뜻">ⓘ</button></span><span class="bt-it"><label><input type="checkbox" data-bt="dagu" checked> <svg class="bt-ico" viewBox="0 0 20 20" aria-hidden="true"><g class="geo"><path class="rl" d="M3 15.5L9 18.5L9 11.5L3 8.5Z"/><path class="rr" d="M9 18.5L16 15L16 8L9 11.5Z"/><path class="rl" d="M9 11.5L3 8.5L6 6.5Z"/><path class="fr" d="M9 12.3L17 8.3L13.5 2.8L5.5 6.8Z"/></g></svg> 다가구주택 <span class="bt-n" data-n="dagu"></span></label><button type="button" class="bt-i" data-bt="dagu" aria-label="다가구주택 뜻">ⓘ</button></span><span class="bt-it"><label><input type="checkbox" data-bt="gisuk" checked> <svg class="bt-ico" viewBox="0 0 20 20" aria-hidden="true"><g class="geo"><path class="kl" d="M3.5 16L8.5 18.5L8.5 8.5L3.5 6Z"/><path class="kr" d="M8.5 18.5L17.5 14L17.5 4L8.5 8.5Z"/><path class="kt" d="M8.5 8.5L17.5 4L12.5 1.5L3.5 6Z"/><path class="w1" d="M10.5 16.6l1.5 -0.8v-1.4l-1.5 0.8zM14 14.8l1.5 -0.8v-1.4l-1.5 0.8zM6.8 16.7l-1.5 -0.8v-1.4l1.5 0.8zM10.5 13.4l1.5 -0.8v-1.4l-1.5 0.8zM14 11.6l1.5 -0.8v-1.4l-1.5 0.8zM6.8 13.5l-1.5 -0.8v-1.4l1.5 0.8zM10.5 10.2l1.5 -0.8v-1.4l-1.5 0.8zM14 8.4l1.5 -0.8v-1.4l-1.5 0.8z"/><path class="w1" d="M6.8 10.3l-1.5 -0.8v-1.4l1.5 0.8z"/></g><rect class="ic" x="11.2" y="13.6" width="7" height="4.4" rx="1.4"/><path class="icl" d="M12.6 12.6h4.2"/></svg> 기숙사 <span class="bt-n" data-n="gisuk"></span></label><button type="button" class="bt-i" data-bt="gisuk" aria-label="기숙사 뜻">ⓘ</button></span><span class="bt-it"><label><input type="checkbox" data-bt="unk" checked> <svg class="bt-ico" viewBox="0 0 20 20" aria-hidden="true"><g class="geo"><path class="xl" d="M4 16L9 18.5L9 7.5L4 5Z"/><path class="xr" d="M9 18.5L15 15.5L15 4.5L9 7.5Z"/><path class="xt" d="M9 7.5L15 4.5L10 2L4 5Z"/></g><text class="qi" x="11.6" y="14.4" text-anchor="middle">?</text></svg> 종류 모름 <span class="bt-n" data-n="unk"></span></label><button type="button" class="bt-i" data-bt="unk" aria-label="종류 모름 뜻">ⓘ</button></span></div>
         <span class="lg-h">주차 <small class="k">— 세대당 주차면 = 주차 대수 ÷ 세대·호수(아파트 단지 K-apt · 그 밖 건축물대장 표제부, 일사편리 2026-11-02 조회) · 넉넉 = 아파트 일반 기준 '세대당 1대'(주택건설기준 등에 관한 규정 제27조) 채움 · 2대째는 어디든 보장 아님 · ⓘ 기준·근거</small></span>
         <div class="bt-row" id="nm-pk"><div class="bt-pre-row"><button type="button" class="bt-pre" data-pre="ok">넉넉만(1세대 1대)</button><button type="button" class="bt-pre" data-pre="okmid">보통 이상</button><button type="button" class="bt-pre" data-pre="all">전부</button></div><span class="bt-it"><label><input type="checkbox" data-pk="ok" checked> <span class="pk-dot ok"></span> 넉넉 <small class="k">1대 이상</small> <span class="bt-n" data-pn="ok"></span></label><button type="button" class="bt-i" data-bt="pk-ok" aria-label="넉넉 기준">ⓘ</button></span><span class="bt-it"><label><input type="checkbox" data-pk="mid" checked> <span class="pk-dot mid"></span> 보통 <small class="k">0.7~1대</small> <span class="bt-n" data-pn="mid"></span></label><button type="button" class="bt-i" data-bt="pk-mid" aria-label="보통 기준">ⓘ</button></span><span class="bt-it"><label><input type="checkbox" data-pk="low" checked> <span class="pk-dot low"></span> 부족 <small class="k">0.7대 미만</small> <span class="bt-n" data-pn="low"></span></label><button type="button" class="bt-i" data-bt="pk-low" aria-label="부족 기준">ⓘ</button></span><span class="bt-it"><label><input type="checkbox" data-pk="unk" checked> <span class="pk-dot unk"></span> 주차 모름 <span class="bt-n" data-pn="unk"></span></label><button type="button" class="bt-i" data-bt="pk-unk" aria-label="주차 모름 기준">ⓘ</button></span></div>
+        <label style="flex:1 1 100%"><input type="checkbox" id="nm-pkbadge" checked> 지도 마커에 주차 배지 <i class="pk-b ok inl">P</i> 보기 <small class="k">— 초록 넉넉 · 노랑 보통 · 빨강 부족 · 배지 없음 = 모름 · 마커를 누르면 이름표에 세대당 대수</small></label>
         <span class="lg-h">해당 없음 <small class="k">— 고른 평수 미만뿐이거나(8평 미만 원룸 포함) 국민임대 2026 공고에 일반공급이 없는 곳(주거약자만)</small></span>
         <label><input type="checkbox" data-cat="na"> <span class="dot sq hl" style="--c:#9aa4b2"></span> 해당 없음도 회색으로 보기</label>
       </div>
@@ -939,7 +952,7 @@ td .bt-i,.iw-t .bt-i{width:20px;height:20px;line-height:18px;font-size:11.5px;ma
 
   <section class="view" id="view-money"><div class="wrap">
     <h2>보증금과 대출</h2>
-
+<div class="note"><p><b>현실적으로 가능한 대출 (2026-11 기준)</b></p><ul><li><b>LH·SH 공공임대</b>(행복주택·국민임대·매입임대·청년안심 공공임대)는 서울시 청년 임차보증금 이자지원 대상이 아님 — "공공임대주택은 지원 불가"(<a href="https://www.seoulhousing.kr/html/0504003.do" target="_blank" rel="noopener">서울주거포털</a>) → <b>청년 버팀목 전세자금</b>이 사실상 하나뿐.</li><li>청년 버팀목: 보증금의 <b>80%</b>, 최대 <b>1.5억</b> · 기본금리 연소득 2천만 이하 2.2% · 2천만 초과~4천만 이하 <b>2.5%</b> · 4천만 초과 2.9%(변동, <a href="https://kbthink.com/loan-guide/beotimok-youth.html" target="_blank" rel="noopener">KB 2026.8.31</a>) · 계약금(보증금 5% 이상) 먼저 · 한도는 소득·신용도에 따라 줄 수 있음 → 기금 취급은행 사전 상담.</li><li>예: 보증금 7,272만 → 대출 5,817만 · 내 돈 1,455만 · 연 2.5%면 이자 월 12.1만.</li><li>행복주택은 월세→보증금 전환이율(연 6.0%)이 대출 금리보다 높아 <b>보증금을 최대로 올리고 대출</b>을 쓰는 쪽이 매달 덜 냄.</li><li><b>청년안심주택 민간임대</b>만 서울시 이자지원 가능: 보증금의 90%·최대 2억, 서울시가 연 2.0%p 지원(본인 부담 최저 1%), 하나은행, 생애 1회, 연소득 5천만 이하(2026.6.5부터)·보증금 3억·월세 90만 이하(<a href="https://mediahub.seoul.go.kr/archives/2018213" target="_blank" rel="noopener">서울시 2026.5.19</a>).</li><li>단지마다 대출액·내 돈·월 이자·월 부담(월세+이자)은 지도에서 단지를 누르면 <b>"대출 쓰면"</b>에.</li></ul></div>
   <div class="grid2">
     <div class="card"><h3>청년 버팀목 전세자금대출</h3>
       <ul>
@@ -1365,8 +1378,13 @@ function pkOf(p){
 function pkLevel(p){ var r = pkOf(p); return !r ? 'unk' : r.per >= 1 ? 'ok' : r.per >= 0.7 ? 'mid' : 'low'; }
 function pkOk(p){ return !!PK_ON[pkLevel(p)]; }
 function pkNum(v){ return (Math.round(v * 100) / 100).toString(); }
-function pkTag(p){ var lv = pkLevel(p); if (lv === 'unk') return ''; return ' · <span class="pk-tag ' + lv + '">주차 ' + PK_NAME[lv] + ' ' + pkNum(pkOf(p).per) + '</span>'; }
-function pkBadge(p, sh){ var lv = pkLevel(p); return '<span class="pk-tag ' + lv + '">' + (sh ? PK_SHORT[lv] : (lv === 'unk' ? '주차 모름' : '주차 ' + PK_NAME[lv])) + '</span> <button type="button" class="bt-i" data-bt="pk-' + lv + '" aria-label="주차 기준 설명">ⓘ</button>'; }
+function pkTag(p){ var lv = pkLevel(p); if (lv === 'unk') return ''; return ' · <span class="pk-tag ' + lv + '" title="세대당 주차면"><i>P</i>' + PK_SHORT[lv] + ' ' + pkNum(pkOf(p).per) + '</span>'; }
+var PK_BADGE = PREF.get('pkbadge', true) !== false;   // 지도 마커 오른쪽 위 P 배지(초록 넉넉·노랑 보통·빨강 부족, 모름은 없음)
+function pkMk(p){ if (!PK_BADGE) return ''; var lv = pkLevel(p); return lv === 'unk' ? '' : '<i class="pk-b ' + lv + '">P</i>'; }
+function mkWrap(inner, p){ return '<div class="nm-mkw">' + inner + pkMk(p) + '</div>'; }
+function pkSel(p){ var lv = pkLevel(p); return lv === 'unk' ? '' : '<i class="pk-s ' + lv + '">P ' + PK_SHORT[lv] + ' ' + pkNum(pkOf(p).per) + '</i>'; }
+function pkRefreshIcons(){ (window.nmMarkers || []).forEach(function(mk){ if (mk === nmSelected || !mk.__icon || !mk.setIcon) return; try { mk.setIcon(mk.__icon()); } catch(e) {} }); }
+function pkBadge(p, sh){ var lv = pkLevel(p); return '<span class="pk-tag ' + lv + '"><i>P</i>' + (sh ? PK_SHORT[lv] : (lv === 'unk' ? '주차 모름' : '주차 ' + PK_NAME[lv])) + '</span> <button type="button" class="bt-i" data-bt="pk-' + lv + '" aria-label="주차 기준 설명">ⓘ</button>'; }
 function pkHtml(p){   // 상세 '주차' 줄: 등급 · 세대당 대수 = 주차면 ÷ 세대·호 · 근거
   var r = pkOf(p);
   if (!r) return pkBadge(p, 1) + '<br><small class="k">' + hesc((PARK.why || {})[pkKey(p)] || '건축물대장·K-apt에서 주차 대수를 못 찾음') + '</small>';
@@ -1377,6 +1395,45 @@ function pkHtml(p){   // 상세 '주차' 줄: 등급 · 세대당 대수 = 주�
   return pkBadge(p, 1) + ' 세대당 <b>' + pkNum(r.per) + '대</b> = 주차 ' + r.t + '면' + (r.t ? ' (' + (mech ? '기계식 ' + mech + ' · ' : '') + '자주식 ' + (r.t - mech) + ')' : '') + ' ÷ ' + r.hh + (r.fm ? '가구' : r.floor ? '호(대장 층별 용도의 호수 합)' : '세대·호') +
     (mech && mech / r.t >= 0.3 ? '<br><small>기계식이 <b>' + Math.round(mech / r.t * 100) + '%</b> — 기계식은 차 크기·높이 제한이 있어 SUV 등은 못 댈 수 있음</small>' : '') +
     '<br><small class="k">근거: 건축물대장 ' + (r.src === 'recap' ? '총괄표제부' : '표제부' + (r.n > 1 ? ' ' + r.n + '동 합계' : '')) + ' — <a href="https://kras.seoul.go.kr/land_info/info/baseInfo/baseInfo.do" target="_blank" rel="noopener">서울시 부동산정보조회(일사편리)</a> ' + (PARK.updated || '') + ' 조회 · 고유번호 ' + r.pnu + (r.mixed ? ' · 주차면에 ' + hesc(r.mixed) + ' 몫도 들어 있음' : '') + '</small>';
+}
+// ===== 대출 쓰면 — 청년 버팀목 전세자금(주택도시기금): 보증금의 80%·최대 1.5억 · 기본금리 연 2.5%(연소득 2천만 초과~4천만 이하 구간, KB 2026.8.31 기준·변동) =====
+// LH·SH 공공임대는 서울시 청년 임차보증금 이자지원 대상이 아님(서울주거포털 "공공임대주택은 지원 불가") → 버팀목 기준. 청년안심 민간임대만 서울시 이자지원(90%·최대 2억·시 2.0%p 지원·본인 최저 1%)도 가능
+var LOAN = { rate: 2.5, ltv: 0.8, cap: 150000000 };
+function loanCalc(dep, rent){ var L = Math.floor(Math.min(dep * LOAN.ltv, LOAN.cap) / 10000) * 10000, it = L * LOAN.rate / 100 / 12; return { L: L, own: dep - L, it: it, tot: (rent || 0) + it }; }
+function loanSec(opts, note, sub){
+  opts = (opts || []).filter(function(o){ return o && o.dep > 0 && o.rent != null; }); if (!opts.length) return '';
+  var rs = opts.map(function(o){ var r = { label: o.label, dep: o.dep, rent: o.rent, c: loanCalc(o.dep, o.rent) }; if (o.base && o.base < o.dep) { var L0 = loanCalc(o.base, 0).L, it0 = L0 * LOAN.rate / 100 / 12; r.alt = { L: L0, own: o.dep - L0, it: it0, tot: o.rent + it0 }; } return r; });
+  var best = rs.reduce(function(a, x){ return x.c.tot < a.c.tot ? x : a; }, rs[0]);
+  var m = function(w){ return man1(w / 10000) + '만'; };
+  return '<div class="iw-sec"><div class="iw-sh">대출 쓰면 <small class="k">' + (sub || '청년 버팀목 전세자금 · 보증금의 80%(최대 1.5억) · 연 2.5% 가정') + '</small></div>' +
+    '<table class="iw-m iw-loan"><tr><th></th><th>대출</th><th>내 돈</th><th>월 이자</th><th>월 부담</th></tr>' +
+    rs.map(function(x){ return '<tr' + (x === best && rs.length > 1 ? ' class="best"' : '') + '><th>' + x.label + (x === best && rs.length > 1 ? ' <span class="tag">제일 쌈</span>' : '') + '</th><td>' + fmtMan(x.c.L / 10000) + '</td><td>' + fmtMan(x.c.own / 10000) + '</td><td>' + m(x.c.it) + '</td><td><b>' + m(x.c.tot) + '</b></td></tr>' +
+      (x.alt ? '<tr class="sub2"><td colspan="5"><small class="k">↳ 늘린 보증금 몫 대출(증액)이 안 되면: 대출 ' + fmtMan(x.alt.L / 10000) + ' · 내 돈 <b>' + fmtMan(x.alt.own / 10000) + '</b> · 월 이자 ' + m(x.alt.it) + ' · 월 부담 ' + m(x.alt.tot) + '</small></td></tr>' : ''); }).join('') + '</table>' +
+    notes('월 부담 = 월세 + 대출 이자(관리비 빼고). 내 돈 = 보증금 − 대출. 금리는 연소득 2천만 이하 2.2% · 2천만 초과~4천만 이하 <b>2.5%</b> · 4천만 초과 2.9%(<a href="https://kbthink.com/loan-guide/beotimok-youth.html" target="_blank" rel="noopener">KB 2026.8.31</a>, 변동). 계약금(보증금 5% 이상)은 먼저 내야 하고, 한도는 소득·신용도에 따라 줄 수 있어 기금 취급은행 사전 상담. 2년마다 연장 때 10% 안 갚으면 연 0.2%p 가산. ' + (note || '')) + '</div>';
+}
+var LOAN_PUB = 'LH·SH 공공임대는 서울시 청년 임차보증금 이자지원 대상이 아님(<a href="https://www.seoulhousing.kr/html/0504003.do" target="_blank" rel="noopener">서울주거포털</a> "공공임대주택은 지원 불가").';
+function happyLoan(p){
+  var dep = manwon(p.dep) * 10000, rent = parseFloat(p.rent) * 10000, c = p.conv; if (!dep || isNaN(rent)) return '';
+  var o = [{ label: '공고 기준', dep: dep, rent: rent }];
+  if (c) { o.unshift({ label: '보증금 최대로', dep: c.up[0] * 1000, rent: c.up[1], base: dep }); o.push({ label: '보증금 최소로', dep: c.down[0] * 1000, rent: c.down[1] }); }
+  return loanSec(o, (c ? '월세→보증금 전환이율(연 6.0%)이 대출 금리보다 높아 보증금을 올리고 대출을 쓰는 쪽이 매달 덜 냄. 다만 전환은 <b>계약 체결 뒤</b> 신청(2026 2차 행복주택 공고문 17쪽)이라 처음 대출은 공고 기준 보증금으로 나옴 → 늘린 보증금 몫 대출(증액)이 되는지 은행에 먼저 확인. ' : '') + LOAN_PUB);
+}
+function kookLoan(p){
+  var c = KOOK_CONV.items && KOOK_CONV.items[p.name]; if (!c) return '';
+  var mineK = myTys(p) || [], tys = Object.keys(c).filter(function(t){ return mineK.indexOf(String(t)) >= 0; }).sort(function(a, b){ return +a - +b; }); if (!tys.length) return '';
+  var x = c[tys[0]];
+  return loanSec([{ label: '보증금 최대로', dep: x.plus.dep[0], rent: x.plus.rent[0], base: x.base.dep[0] }, { label: '공고 그대로', dep: x.base.dep[0], rent: x.base.rent[0] }, { label: '보증금 최소로', dep: x.minus.dep[0], rent: x.minus.rent[0] }],
+    tys[0] + '형 · 전환표 범위의 낮은 쪽 값으로 계산. 계약은 공고 그대로 하고 <b>계약 뒤</b> 전환 신청(2026 국민임대 공고문 16쪽) → 처음 대출은 공고 그대로 보증금 기준, 늘린 몫 대출(증액)은 은행 확인. ' + LOAN_PUB, '청년 버팀목 · 보증금의 80%(최대 1.5억) · 연 2.5% 가정 · ' + tys[0] + '형');
+}
+function yaLoan(p){
+  var c = p.comp; if (!c) return ''; var all = yaSplit(c).ok.filter(function(x){ return x.dep != null && x.rent != null; }); if (!all.length) return '';
+  var lo = all.reduce(function(a, x){ return x.dep < a.dep ? x : a; }, all[0]), hi = all.reduce(function(a, x){ return x.dep > a.dep ? x : a; }, all[0]);
+  var two = hi !== lo && hi.dep !== lo.dep, o = [{ label: two ? '보증금 가장 낮은 형' : '내 조건 형', dep: lo.dep, rent: lo.rent }]; if (two) o.push({ label: '보증금 가장 높은 형', dep: hi.dep, rent: hi.rent });
+  return loanSec(o, '민간임대는 <b>서울시 청년 임차보증금 이자지원</b>도 가능 — 보증금의 90%·최대 2억, 서울시가 연 2.0%p 지원(본인 부담 최저 1%), 하나은행, 생애 1회, 연소득 5천만 이하·보증금 3억·월세 90만 이하(<a href="https://mediahub.seoul.go.kr/archives/2018213" target="_blank" rel="noopener">서울시 2026.5.19</a>, <a href="https://www.seoulhousing.kr/html/0504003.do" target="_blank" rel="noopener">서울주거포털</a>) — 은행 금리에서 2%p를 빼므로 버팀목보다 낮을 수 있음.');
+}
+function miLoan(ok){
+  var gs = (ok || []).filter(function(g){ return g.p23 && g.p23.dep; }).slice(0, 4); if (!gs.length) return '';
+  return loanSec(gs.map(function(g){ return { label: g.ty + (g.p23.dep_hi && g.p23.dep_hi !== g.p23.dep ? ' (낮은 쪽)' : ''), dep: g.p23.dep, rent: g.p23.rent }; }), '2~3순위 보증금 기준. ' + LOAN_PUB);
 }
 function pkSyncBoxes(){ document.querySelectorAll('#nm-pk input[data-pk]').forEach(function(c){ c.checked = !!PK_ON[c.dataset.pk]; });
   var m = PK_KINDS.every(function(x){ return PK_ON[x.k]; }) ? 'all' : (PK_ON.ok && !PK_ON.mid && !PK_ON.low && !PK_ON.unk) ? 'ok' : (PK_ON.ok && PK_ON.mid && !PK_ON.low && !PK_ON.unk) ? 'okmid' : '';
@@ -1494,6 +1551,7 @@ PREF.onApply('built', function(){ var v = PREF.get('built') || {}; BUILT = { max
 PREF.onApply('live', function(){ LIVE = PREF.get('live', false) === true; var b = document.getElementById('nm-live'); if (b) b.checked = LIVE; if (window.__applyFilter) window.__applyFilter(); });
 PREF.onApply('cats', function(){ catsFromPref(); if (window.__applyFilter) window.__applyFilter(); });
 PREF.onApply('btype', function(){ BT_ON = Object.assign({}, BT_ALL, PREF.get('btype') || {}); btSyncBoxes(); if (window.__applyFilter) window.__applyFilter(); });
+PREF.onApply('pkbadge', function(){ PK_BADGE = PREF.get('pkbadge', true) !== false; var b = document.getElementById('nm-pkbadge'); if (b) b.checked = PK_BADGE; pkRefreshIcons(); });
 PREF.onApply('park', function(){ PK_ON = Object.assign({}, PK_ALL, PREF.get('park') || {}); pkSyncBoxes(); if (window.__applyFilter) window.__applyFilter(); });
 // 건물 종류 ⓘ 작은 창 — 범례·상세 어디서 눌러도 같은 창(법 정의·실제로 다른 점·출처·이 지도에 몇 곳)
 (function(){
@@ -1774,7 +1832,7 @@ function nmGeocode(addr, cb){
 }
 function nmColor(p){ return p.cat === 'kook' ? '#6A1B9A' : p.cat === 'na' ? '#9aa4b2' : '#D32F2F'; }
 function nmCls(p){ var sm = p.cat === 'gen' && p.sz === 'small'; return (sm ? ' sm' : '') + (p.cat === 'kook' || p.cat === 'na' ? ' sq' : '') + (p.cat === 'gen' || p.cat === 'na' ? ' hl' : ''); }
-function nmIcon(p, approx){ var size = (p.cat === 'gen' && p.sz === 'small') ? 14 : 20; return { content: '<div class="nm-mk' + nmCls(p) + (approx ? ' ap' : '') + (nrLive(p) ? ' live' : '') + '" style="--c:' + nmColor(p) + '" title="' + p.name + '"></div>', anchor: new naver.maps.Point(size/2, size/2) }; }
+function nmIcon(p, approx){ var size = (p.cat === 'gen' && p.sz === 'small') ? 14 : 20; return { content: mkWrap('<div class="nm-mk' + nmCls(p) + (approx ? ' ap' : '') + (nrLive(p) ? ' live' : '') + '" style="--c:' + nmColor(p) + '" title="' + p.name + '"></div>', p), anchor: new naver.maps.Point(size/2, size/2) }; }
 // 긴 주석 글을 문장 단위로 줄바꿈한 목록으로(가독성). '3.3058㎡' 같은 소수점은 안 끊음
 function notes(txt){ var parts = String(txt).split(/(?<=\.[)”"’]?)\s+(?=\S)/).map(function(x){ return x.trim().replace(/^[·•]\s*/, ''); }).filter(Boolean); return '<ul class="iw-fn">' + parts.map(function(x){ return '<li>' + x + '</li>'; }).join('') + '</ul>'; }
 // 거주 조건(계약 기간·최장 거주·갱신 조건) 섹션 — 유형 키 여러 개면 나란히
@@ -2208,7 +2266,7 @@ function yaHtml(p){
     : '<div class="iw-nophoto"><b>사진 없음</b> — 서울시 단지정보 상세 페이지에 이미지가 없음</div>';
   var rows = c.rows || {}, sp = rows.special || [], ge = rows.general || [];
   var tyLabel = function(ty){ var t = String(ty || ''); var e = tyExact(t); if (e) t = t.replace(/[-\s]*\d{2,3}\.\d{1,2}/, '').replace(/\(\s*\)/g, '').replace(/^\s+|\s+$/g, ''); return t; };   // 'A-15.33' → 'A'
-  body += yaMoney(c, sp, ge, tyLabel);
+  body += yaMoney(c, sp, ge, tyLabel) + yaLoan(p);
   var fixed = {}; yaSplit(c).ok.forEach(function(r){ if (r.tyFix) fixed[r.ty0] = r.tyFix; });   // 내 형 중 형 이름 숫자 ≠ 전용면적인 것만
   if (Object.keys(fixed).length) body += '<div class="iw-nophoto" style="border-color:#90caf9;background:#f3f8fe;color:#1d3f66"><b>형 이름 숫자 ≠ 전용면적</b> — ' + Object.keys(fixed).map(function(k){ return k + ' → 전용 <b>' + fixed[k] + '㎡(' + py(fixed[k]) + ')</b>'; }).join(' · ') + '. 서울시 단지정보 평면도 표의 전용면적(사람이 도면을 열어 확인' + (window.YA_FIX ? ', ' + window.YA_FIX.updated : '') + ')으로 내 조건을 판정함. 형 이름만으로는 전용면적을 알 수 없음(실사용·공급면적 기준 이름이거나 소수점이 없음)</div>';
   if (sp.length || ge.length) {
@@ -2241,6 +2299,7 @@ function miHtml(p){
     body += '<div class="iw-sec"><div class="iw-sh">임대조건 <small class="k">공고문 ' + u.page + '쪽 · 보증금↔월세 상호전환</small></div><table class="iw-m iw-pair"><tr><th></th><th>보증금</th><th>그때 월세</th></tr>' +
       '<tr><th>기본 임대</th><td><b>' + won(u.dep) + '</b> <span class="tag">최소</span></td><td>월 <b>' + rentT(u.rent) + '</b> <span class="tag">최대</span></td></tr>' +
       '<tr><th>보증금 최대</th><td><b>' + won(u.dep_max) + '</b> <span class="tag">최대</span></td><td>월 <b>' + rentT(u.rent_min) + '</b> <span class="tag">최소</span></td></tr></table>' + notes(n.conv + '. ' + n.loan + '. 관리비 ' + u.mc + '.') + '</div>';
+    body += loanSec([{ label: '기본 임대', dep: u.dep, rent: u.rent }, { label: '보증금 최대', dep: u.dep_max, rent: u.rent_min, base: u.dep }], '보증금을 늘리는 전환은 계약 조건으로 하는지 계약 뒤 신청인지 운영기관에 확인 — 늘린 몫 대출(증액)은 은행 확인. ' + LOAN_PUB);
     body += '<div class="iw-sec"><div class="iw-sh">형별 물량 <small class="k">공고문 ' + u.page + '쪽</small></div><table class="iw-t">' + p.units.map(function(x){ return '<tr><th>' + x.ho + '</th><td>' + x.room + ' · 전용 <b>' + x.m2 + '㎡(' + py(x.m2) + ')</b> · ' + x.n + '세대 모집<br><small class="k">입주 ' + x.movein + '</small></td></tr>'; }).join('') + '</table></div>';
     body += '<div class="iw-sec"><div class="iw-sh">자격·선정 <small class="k">공고문 3~4쪽</small></div><table class="iw-t"><tr><th>대상</th><td><small>' + n.who + '</small></td></tr><tr><th>소득</th><td><small>' + n.income + '</small></td></tr><tr><th>자산</th><td><small>' + n.asset + '</small></td></tr><tr><th>선정</th><td><small>' + n.select + '</small></td></tr></table></div>';
     body += '<div class="iw-sec"><div class="iw-sh">단지 정보 <small class="k">공고문 2쪽</small></div><table class="iw-t"><tr><th>교통</th><td>' + u.subway + '</td></tr><tr><th>시설</th><td><small>' + u.fac + '</small></td></tr><tr><th>주차</th><td>' + pkHtml(p) + '</td></tr><tr><th>제공 품목</th><td><small>' + u.items + '</small></td></tr><tr><th>난방</th><td><small>' + u.heat + '</small></td></tr></table></div>';
@@ -2253,6 +2312,7 @@ function miHtml(p){
       '<tr><th>건물</th><td>' + (g0.tot ? '건물 총 ' + g0.tot : '총 세대수 미기재') + '<br><small>' + (g0.lift ? '승강기 ' + g0.lift : '승강기 미기재') + ' · ' + (g0.park ? '주차 ' + g0.park.replace(/\s+/g, ' ') : '주차 미기재') + ' <span class="k">(공고문 "1. 공급주택" 표)</span></small></td></tr></table>';
     body += '<div class="iw-sec"><div class="iw-sh">임대조건 · 형별 물량 <small class="k">내 조건(' + selLabel() + ') 주택형 ' + ok.length + '개 · 주택목록 호실별 전용면적</small></div>' + (ok.length ? '<table class="iw-t iw-k"><tr><th>주택형</th><th>전용 · 호수</th><th>2~3순위 보증금 · 월세</th></tr>' + ok.map(function(g){ return '<tr><th>' + g.ty + (g.sex && g.sex !== '-' ? '<br><small class="k">' + g.sex + '</small>' : '') + '</th><td>' + g.m2_min + (g.m2_max !== g.m2_min ? '~' + g.m2_max : '') + '㎡<br><small class="k">' + py(g.m2_min) + (g.m2_max !== g.m2_min ? '~' + py(g.m2_max) : '') + ' · ' + g.n + '호 · ' + g.struct + (g.bld ? ' · ' + g.bld : '') + '</small></td><td>' + (g.p23 ? won(g.p23.dep) + '<br><small>월 ' + rentT(g.p23.rent) + '</small>' : '<small class="k">미기재</small>') + '</td></tr>'; }).join('') + '</table>' : '<div class="iw-nophoto">내 조건 주택형 없음</div>') +
       notes('신청은 주택형 단위, 호실은 무작위 배정(공고문 32·38쪽) → 주택형 안 호실이 전부 기준 이상인 것만 넣음' + (p.groups.length > ok.length ? ' — 이 집의 다른 주택형 ' + (p.groups.length - ok.length) + '개는 기준 미만 호실이 섞여 뺌' : '') + '. 2~3순위 = 시세 50%, 1순위(수급자·차상위·한부모) = 시세 30%(공고문 2쪽).') + '</div>';
+    body += miLoan(ok);
     var rr = ok.filter(function(g){ return g.rate; });
     if (rr.length) body += '<div class="iw-sec"><div class="iw-sh">지난 경쟁률 <small class="k">2026 1차 최종 경쟁률 PDF</small></div><table class="iw-t">' + rr.map(function(g){ var t = g.rate; return '<tr><th>' + g.ty + '</th><td>' + t.n + '호 · 신청 1순위 ' + t.r1 + ' / 2순위 ' + t.r2 + ' / 3순위 ' + t.r3 + ' (' + t.rate + ':1)<br><small' + (t.r1_fills ? ' class="k"' : '') + '>' + (t.r1_fills ? '1순위 신청자만으로 마감 → 2·3순위엔 안 내려옴' : '1순위가 가져가고 ' + (t.n - t.r1) + '호가 2순위로') + '</small></td></tr>'; }).join('') + '</table></div>';
     body += termsHtml('청년 매입임대');
@@ -2312,7 +2372,7 @@ function nmHtml(p, approx){
       '<tr><th>공고</th><td><a href="' + n.url + '" target="_blank" rel="noopener">' + n.name + '</a><br><small>' + s.text + '</small></td></tr>' +
       '</table>';
     var fp = factParts(p);
-    body += fp.photos + moneyHtml(p, n) + fp.info + ratesHtml(p) + termsHtml('행복주택');
+    body += fp.photos + moneyHtml(p, n) + happyLoan(p) + fp.info + ratesHtml(p) + termsHtml('행복주택');
   } else {
     var mineK = myTys(p) || [], rows = (KOOK_ROWS[p.name] || []).filter(function(r){ return mineK.indexOf(String(Math.floor(parseFloat(r[0])))) >= 0; }), s25 = noticeStatus(NOTICES.K25), s26 = noticeStatus(NOTICES.K26);   // 내가 신청할 수 있는 면적(2026 일반공급 · 기준 이상)만
     // 빈 칸 금지: 금액이 없으면 왜 없는지 적는다(공급 없음 / 주거약자만 / 미정리)
@@ -2330,7 +2390,7 @@ function nmHtml(p, approx){
       '<tr><th>건물 종류</th><td>' + btHtml(p) + '</td></tr>' +
       '<tr><th>내 순위</th><td>' + rankPill(p.rank) + '</td></tr>' +
       '<tr><th>공고</th><td><a href="' + NOTICES.K25.url + '" target="_blank" rel="noopener">2025 국민임대</a> · ' + s25.text + '<br><a href="' + NOTICES.K26.url + '" target="_blank" rel="noopener">2026 국민임대</a> · ' + s26.text + '</td></tr>' +
-      '</table>' + fpK.photos + kookConvHtml(p) +
+      '</table>' + fpK.photos + kookConvHtml(p) + kookLoan(p) +
       '<div class="iw-sec"><div class="iw-sh">형별 물량 <small class="k">2025·2026 공고문 단지표 · 내가 신청할 수 있는 면적(2026 일반공급 · 기준 이상)만</small></div>' +
       '<table class="iw-t iw-k"><tr><th></th><th>2025 공고</th><th>2026 공고</th></tr>' +
       (rows.length ? rows.map(function(r){ return '<tr><th>' + r[0].replace(/^(\d+(?:\.\d+)?)㎡$/, function(_, n){ return n + '㎡<br><small class="k">' + py(n) + '</small>'; }) + '</th><td>' + kcell(r[1], 'K25') + '</td><td>' + kcell(r[2], 'K26') + '</td></tr>'; }).join('') : '<tr><td colspan="3"><small class="k">2026 공고에 이 지구의 내가 신청할 수 있는 면적(일반공급 · 기준 이상) 없음</small></td></tr>') + '</table>' +
@@ -2396,9 +2456,9 @@ function yaFixTypos(j){
 function keyOf(name){ return name.replace(/\s*\(.*?\)/g, '').replace(/\s+/g, ''); }
 var nmSelected = null;
 function nmSelect(mk){
-  if (nmSelected && nmSelected !== mk) { try { nmSelected.setIcon(nmIcon(nmSelected.__p, nmSelected.__approx)); nmSelected.setZIndex(nmSelected.__p.pick ? 20 : 10); } catch(e) {} }
+  if (nmSelected && nmSelected !== mk) { try { nmSelected.setIcon(nmSelected.__icon ? nmSelected.__icon() : nmIcon(nmSelected.__p, nmSelected.__approx)); nmSelected.setZIndex(nmSelected.__p.pick ? 20 : 10); } catch(e) {} }
   nmSelected = mk;
-  try { mk.setIcon({ content: '<div class="nm-sel' + nmCls(mk.__p) + '" style="--c:' + nmColor(mk.__p) + '"><b>' + mk.__p.name + '</b></div>', anchor: new naver.maps.Point(13, 13) }); mk.setZIndex(100); } catch(e) {}
+  try { mk.setIcon({ content: '<div class="nm-sel' + nmCls(mk.__p) + '" style="--c:' + nmColor(mk.__p) + '"><b>' + mk.__p.name + pkSel(mk.__p) + '</b></div>', anchor: new naver.maps.Point(13, 13) }); mk.setZIndex(100); } catch(e) {}
 }
 function showDetail(p, approx){
   var d = document.getElementById('nm-detail'), l = document.getElementById('nm-list'); if (!d) return;
@@ -2502,7 +2562,7 @@ function nmInit(){
       var lf = p.__classify();   // 전부 기준 평수 미만(대학생 원룸 등) → 해당 없음(기본 숨김)
       var lcolOf = function(){ return p.cat === 'na' ? '#9aa4b2' : '#37474F'; }, lcol = lcolOf();
       function place(pos, approx){
-        var iconOf = function(){ return { content: '<div class="nm-mk lh' + (approx ? ' ap' : '') + (p.cat === 'na' ? ' na' : '') + (nrLive(p) ? ' live' : '') + '" style="--c:' + lcolOf() + '" title="' + p.name + '">LH</div>', anchor: new naver.maps.Point(12, 11) }; };
+        var iconOf = function(){ return { content: mkWrap('<div class="nm-mk lh' + (approx ? ' ap' : '') + (p.cat === 'na' ? ' na' : '') + (nrLive(p) ? ' live' : '') + '" style="--c:' + lcolOf() + '" title="' + p.name + '">LH</div>', p), anchor: new naver.maps.Point(12, 11) }; };
         var mk = new naver.maps.Marker({ map: nmMap, position: new naver.maps.LatLng(pos[0], pos[1]), icon: iconOf(), zIndex: p.cat === 'na' ? 5 : 12 });
         mk.__p = p; mk.__approx = approx; nmMarkers.push(mk); mk.__icon = iconOf; var k = keyOf(p.name); (nmIndex[k] = nmIndex[k] || []).push(mk);
         naver.maps.Event.addListener(mk, 'click', function(){ nmFocusMarker(mk); });
@@ -2532,7 +2592,7 @@ function nmInit(){
       p.__classify();   // 청년 자격 형이 전부 기준 평수 미만(원룸)이거나 없는 단지 → 해당 없음(기본 숨김)
       var split = yaSplit(c);
       var ns = yaNoticesFor(c), hasPub = c.scale && c.scale.pub, colOf = function(){ return p.cat === 'na' ? '#9aa4b2' : '#00897B'; }, col = colOf();
-      var iconOf = function(){ return { content: '<div class="nm-mk ya' + (ns.length ? ' on' : '') + (p.cat === 'na' ? ' na' : '') + (nrLive(p) ? ' live' : '') + '" style="--c:' + colOf() + '" title="' + c.name + '"></div>', anchor: new naver.maps.Point(9, 9) }; };
+      var iconOf = function(){ return { content: mkWrap('<div class="nm-mk ya' + (ns.length ? ' on' : '') + (p.cat === 'na' ? ' na' : '') + (nrLive(p) ? ' live' : '') + '" style="--c:' + colOf() + '" title="' + c.name + '"></div>', p), anchor: new naver.maps.Point(9, 9) }; };
       var mk = new naver.maps.Marker({ map: nmMap, position: new naver.maps.LatLng(c.lat, c.lng), icon: iconOf(), zIndex: p.cat === 'na' ? 5 : 9 });
       mk.__p = p; mk.__approx = false; nmMarkers.push(mk); mk.__icon = iconOf; var k = keyOf(c.name); (nmIndex[k] = nmIndex[k] || []).push(mk);
       naver.maps.Event.addListener(mk, 'click', function(){ nmFocusMarker(mk); });
@@ -2555,7 +2615,7 @@ function nmInit(){
   function miMarker(p, pt){
     p.ll = pt; p.__classify();
     var colOf = function(){ return p.cat === 'na' ? '#9aa4b2' : '#E65100'; };
-    var iconOf = function(){ return { content: '<div class="nm-mk lh mi' + (p.cat === 'na' ? ' na' : '') + (nrLive(p) ? ' live' : '') + '" style="--c:' + colOf() + '" title="' + p.name + '">매</div>', anchor: new naver.maps.Point(12, 11) }; };
+    var iconOf = function(){ return { content: mkWrap('<div class="nm-mk lh mi' + (p.cat === 'na' ? ' na' : '') + (nrLive(p) ? ' live' : '') + '" style="--c:' + colOf() + '" title="' + p.name + '">매</div>', p), anchor: new naver.maps.Point(12, 11) }; };
     var mk = new naver.maps.Marker({ map: nmMap, position: new naver.maps.LatLng(pt[0], pt[1]), icon: iconOf(), zIndex: p.cat === 'na' ? 5 : (nrLive(p) ? 15 : 8) });
     mk.__p = p; mk.__approx = false; nmMarkers.push(mk); mk.__icon = iconOf; var k = keyOf(p.name); (nmIndex[k] = nmIndex[k] || []).push(mk);
     naver.maps.Event.addListener(mk, 'click', function(){ nmFocusMarker(mk); });
@@ -2701,6 +2761,7 @@ function nmInit(){
   document.querySelectorAll('#nm-bt .bt-pre').forEach(function(b){ b.addEventListener('click', function(e){ e.stopPropagation(); var ao = b.dataset.pre === 'ao'; BT_KINDS.forEach(function(x){ BT_ON[x.k] = ao ? (x.k === 'apt' || x.k === 'opst' || (x.k === 'unk' && BT_ON.unk)) : true; }); PREF.set('btype', Object.assign({}, BT_ON)); btSyncBoxes(); applyFilter(); }); });
   // 주차 체크 + '넉넉만'·'보통 이상'·'전부' — PREF 'park'
   pkSyncBoxes();
+  var pkbEl = document.getElementById('nm-pkbadge'); if (pkbEl) { pkbEl.checked = PK_BADGE; pkbEl.addEventListener('change', function(){ PK_BADGE = pkbEl.checked; PREF.set('pkbadge', PK_BADGE); pkRefreshIcons(); }); }
   document.querySelectorAll('#nm-pk input[data-pk]').forEach(function(c){ c.addEventListener('change', function(){ PK_ON[c.dataset.pk] = c.checked; PREF.set('park', Object.assign({}, PK_ON)); pkSyncBoxes(); applyFilter(); }); });
   document.querySelectorAll('#nm-pk .bt-pre').forEach(function(b){ b.addEventListener('click', function(e){ e.stopPropagation(); var m = b.dataset.pre; PK_KINDS.forEach(function(x){ PK_ON[x.k] = m === 'all' ? true : m === 'ok' ? x.k === 'ok' : (x.k === 'ok' || x.k === 'mid'); }); PREF.set('park', Object.assign({}, PK_ON)); pkSyncBoxes(); applyFilter(); }); });
   var bSel = document.getElementById('nm-built'), bUnk = document.getElementById('nm-built-unk');
