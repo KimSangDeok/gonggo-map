@@ -3296,7 +3296,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
 // 쓰려면 이 저장소 Contents 읽기·쓰기만 되는 GitHub 토큰(fine-grained)이 기기마다 한 번 필요 — 토큰은 그 기기 브라우저에만, 저장소 파일엔 체크 상태만(개인정보 없음)
 (function(){
   var REPO = 'KimSangDeok/gonggo-map', BR = 'prefs', FILE = 'prefs.json', API = 'https://api.github.com/repos/' + REPO + '/contents/' + FILE, TK = 'kkk-sync-tok';
-  var NEW_TOKEN = 'https://github.com/settings/personal-access-tokens/new?name=' + encodeURIComponent('gonggo-map 기기 동기화') + '&description=' + encodeURIComponent('공고 지도 체크·필터를 폰·PC끼리 맞춤 — gonggo-map 저장소 prefs 가지 prefs.json 읽기·쓰기') + '&target_name=KimSangDeok&expires_in=366&contents=write';
+  var NEW_TOKEN = 'https://github.com/settings/personal-access-tokens/new?name=' + encodeURIComponent('gonggo-map 기기 동기화') + '&description=' + encodeURIComponent('공고 지도 체크·필터를 폰·PC끼리 맞춤 — gonggo-map 저장소 prefs 가지 prefs.json 읽기·쓰기') + '&target_name=KimSangDeok&expires_in=365&contents=write';   // 이 계정 허용 최대 365일(366일이면 GitHub가 경고)
   var tok = null; try { tok = localStorage.getItem(TK); } catch(e) {}
   if (!tok && window.__syncTokFromLink) tok = window.__syncTokFromLink;   // 연결 링크(QR)로 들어옴 — 스크립트 맨 앞에서 이미 저장·주소창 정리
   var sha = null, etag = null, lastIn = 0, lastOut = 0, busy = false, again = false, dirty = false, err = '', deb = null, lastTry = 0;
@@ -3342,7 +3342,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
     var what = '<p class="k" style="font-size:13px">맞춰지는 것: 단지 종류·최소 평형·복층·준공·건물 종류·접수 끝난 곳 빼기 체크, 공고 🔔 확인 표시. 기기마다 따로인 것: 필터 접기·넓게 보기(화면 크기에 따라 다름), 내 조건 🔒 암호. 같은 체크를 두 기기에서 바꾸면 나중에 바꾼 쪽이 이김.</p>';
     if (!tok) {
       b.innerHTML = head + '<p>폰·PC 2대에서 체크·필터·확인 표시를 똑같이 쓰려면, 이 사이트 저장소(GitHub)에 설정 파일 하나(<code>prefs</code> 가지의 <code>prefs.json</code>)를 두고 기기마다 읽고 씁니다. 쓰려면 <b>이 저장소 파일 쓰기 권한만 있는 GitHub 토큰</b>이 한 번 필요합니다(브라우저만으로는 다른 기기와 나눌 저장 공간이 없음).</p>' + what +
-        '<ol class="sd-steps"><li><a class="sd-btn" href="' + NEW_TOKEN + '" target="_blank" rel="noopener">GitHub 토큰 만들기 ↗</a><br><small>이름·기간(366일)·권한(Contents 읽기·쓰기)은 미리 채워져 열림 → <b>Repository access</b>에서 <b>Only select repositories → gonggo-map</b> 고르기 → 맨 아래 <b>Generate token</b> → 나온 <code>github_pat_…</code> 복사</small></li>' +
+        '<ol class="sd-steps"><li><a class="sd-btn" href="' + NEW_TOKEN + '" target="_blank" rel="noopener">GitHub 토큰 만들기 ↗</a><br><small>이름·기간(365일 — 이 계정 최대)·권한(Contents 읽기·쓰기)은 미리 채워져 열림 → <b>Repository access</b>에서 <b>Only select repositories → gonggo-map</b> 고르기 → 맨 아래 <b>Generate token</b> → 나온 <code>github_pat_…</code> 복사</small></li>' +
         '<li>여기 붙여넣기<div class="sd-row"><input type="password" id="sd-tok" placeholder="github_pat_…" autocomplete="off" spellcheck="false"><button type="button" id="sd-save" class="sd-btn">연결</button></div><small class="k">토큰은 이 기기 브라우저에만 저장(GitHub 말고 다른 데로 안 감). 다른 기기는 연결한 뒤 이 창에 나오는 QR·링크로 한 번에.</small></li></ol>' + (err ? '<p class="bad">⚠ ' + hesc(err) + '</p>' : '');
     } else {
       b.innerHTML = head + '<p><b>' + hesc(stTxt()) + '</b></p>' + what +
