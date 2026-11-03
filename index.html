@@ -830,7 +830,7 @@ h1,h2,h3{letter-spacing:-.02em}
 .nm-iw{--bg:#F3F5F8;--surface:#FFFFFF;--fg:#1B2330;--muted:#5E6A78;--line:#D8DEE6;--accent:#1E5CA6;--accent-soft:#E4ECF8;--accent-ink:#163F72;--on-accent:#FFFFFF;--ok:#1E7F4F;--ok-soft:#E1F2E8;--warn:#A46A14;--warn-soft:#FBF0DA;--bad:#B23A3A;--bad-soft:#F8E2E2;color-scheme:light}
 /* ===== PC 상세 필터(2026-11-03): 필터 칸 + 지도 — 목록은 숨김(필터 고르는 동안 지도 핀이 바로 바뀜), 아래 'n곳 보기'로 닫고 목록 ===== */
 @media (min-width:761px){
-  #view-map.active.flt-open:not(.detail-open){grid-template-columns:minmax(420px,520px) minmax(0,1fr)!important}
+  #view-map.active.flt-open:not(.detail-open){grid-template-columns:minmax(340px,400px) minmax(0,1fr)!important}   /* 목록 칸과 같은 폭 — 열고 닫아도 지도 칸 그대로(흔들림 없음) */
   .side.flt-open:not(.show-detail):not(.tab-notice){grid-template-columns:minmax(0,1fr)!important;grid-template-rows:auto auto auto auto auto auto minmax(0,1fr)!important;grid-template-areas:"tabs" "qf" "sum" "msg" "sel" "empty" "body"!important}
   .side.flt-open:not(.show-detail):not(.tab-notice) > .lst,.side.flt-open:not(.show-detail):not(.tab-notice) > #nm-empty,.side.flt-open:not(.show-detail):not(.tab-notice) > .side-tabs{display:none!important}
   .side.flt-open:not(.show-detail):not(.tab-notice) > .lg-body{border-right:0!important;background:var(--surface)!important}
@@ -839,9 +839,8 @@ h1,h2,h3{letter-spacing:-.02em}
   .side.flt-open .lg-apply button:hover{background:#174C8C}
 }
 @media (min-width:1600px){
-  #view-map.active.flt-open:not(.detail-open){grid-template-columns:560px minmax(0,1fr)!important}
-  #view-map.active.detail-open.flt-open:not(.detail-wide){grid-template-columns:1000px minmax(0,1fr)!important}
-  #view-map.detail-open:not(.detail-wide) .side.show-detail.flt-open{grid-template-columns:560px 440px!important}
+  #view-map.active.detail-open.flt-open:not(.detail-wide){grid-template-columns:840px minmax(0,1fr)!important}   /* 목록+상세와 같은 폭 */
+  #view-map.detail-open:not(.detail-wide) .side.show-detail.flt-open{grid-template-columns:400px 440px!important}
   #view-map.detail-open:not(.detail-wide) .side.show-detail.flt-open > *{grid-column:1!important}
   #view-map.detail-open:not(.detail-wide) .side.show-detail.flt-open > #nm-list,#view-map.detail-open:not(.detail-wide) .side.show-detail.flt-open > .side-tabs{display:none!important}
   #view-map.detail-open:not(.detail-wide) .side.show-detail.flt-open > .lg-body{display:block!important;grid-row:3/-1!important;min-height:0;max-height:none;overflow-y:auto;border:0}
@@ -868,6 +867,10 @@ h1,h2,h3{letter-spacing:-.02em}
 .lg-body .bt-i:hover{color:var(--accent)!important}
 .lg-body select{min-height:42px;padding:4px 12px!important;border:1.5px solid var(--line)!important;border-radius:12px!important;background:var(--surface)!important;font-weight:600}
 @media (max-width:760px){ .lg-body label:has(> input[type=checkbox]){min-height:44px} }
+.lg-body label:has(> input[type=checkbox]) > small.k{display:none}   /* 알약 안 긴 덧말은 숨김(줄이 깨짐) — 뜻은 ⓘ 에 */
+.lg-body .burd-q button span{white-space:nowrap;font-size:15px!important}
+.lg-body .burd-q button b{font-size:13.5px!important}
+.lg-body .burd-q button{padding:9px 10px!important}
 /* (E) 넓게 보기: 상세가 지도 자리까지 덮으니 지도·지도 위 칩·확대 단추는 숨김(전엔 왼쪽 칸으로 밀려 상세 위에 겹쳤음) */
 @media (min-width:761px){ #view-map.detail-wide .mapbox{visibility:hidden} }
 /* (C) ⓘ 카드: 문장마다 한 줄 · PC 크게 */
@@ -3598,7 +3601,7 @@ function nmInit(){
     if (lgPref !== 'open') sideEl.classList.add('lg-closed');   // 2026-11-03: 빠른 필터가 늘 보이므로 상세 필터는 기본 접힘
     var W3 = window.matchMedia('(min-width:1600px)'), fltShown = function(){ if (!sideEl.classList.contains('show-detail')) return true; var vm = document.getElementById('view-map'); return W3.matches && vm.classList.contains('detail-open') && !vm.classList.contains('detail-wide'); };
     var lgSync = function(){ var open = MQ.matches ? sideEl.classList.contains('lg-open') : !sideEl.classList.contains('lg-closed'), wide = !MQ.matches && open, vmEl = document.getElementById('view-map'), was = sideEl.classList.contains('flt-open');
-      var s0 = (was !== wide && window.nmMap) ? mapSnap() : null; sideEl.classList.toggle('flt-open', wide); if (vmEl) vmEl.classList.toggle('flt-open', wide); if (was !== wide) setTimeout(function(){ try { if (window.nmMap) { nmMap.autoResize(); mapKeep(s0); } } catch(e3) {} }, 60); var vis = open && (MQ.matches || fltShown()); lgBtn.textContent = vis ? '상세 필터 접기 ▴' : '상세 필터 ▾'; lgBtn.setAttribute('aria-expanded', vis ? 'true' : 'false'); };
+      var s0 = (was !== wide && window.nmMap) ? mapSnap() : null; sideEl.classList.toggle('flt-open', wide); if (vmEl) vmEl.classList.toggle('flt-open', wide); if (was !== wide) { try { if (window.nmMap) { nmMap.autoResize(); mapKeep(s0); } } catch(e3) {} } var vis = open && (MQ.matches || fltShown()); lgBtn.textContent = vis ? '상세 필터 접기 ▴' : '상세 필터 ▾'; lgBtn.setAttribute('aria-expanded', vis ? 'true' : 'false'); };
     window.__lgSync = function(){ lgSync(); };
     lgBtn.addEventListener('click', function(e){ e.stopPropagation();
       if (!MQ.matches && sideEl.classList.contains('show-detail') && !fltShown()) { hideDetail(); if (sideEl.classList.contains('lg-closed')) { sideEl.classList.remove('lg-closed'); try { localStorage.setItem('kkk-lg-pc2', 'open'); } catch(e2) {} } lgSync(); return; }   // 상세가 필터 자리를 가리고 있으면: 상세 닫고 필터
