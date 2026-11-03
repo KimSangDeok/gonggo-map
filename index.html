@@ -828,7 +828,16 @@ h1,h2,h3{letter-spacing:-.02em}
   .side.flt-open .lg-apply{display:block;position:sticky;bottom:0;z-index:3;margin:0 -2px;padding:14px 18px 16px;background:linear-gradient(color-mix(in srgb,var(--surface) 0%,transparent),var(--surface) 34%)}
   .side.flt-open .lg-apply button{width:100%;height:52px;border:0;border-radius:14px;background:#1E5CA6;color:#fff;font:700 16px/1 var(--font-body);cursor:pointer}
   .side.flt-open .lg-apply button:hover{background:#174C8C}
+  /* 필터 폭(2026-11-03): 목록 칸(400)에 묶지 않고 지도 위로 넓게 펼침 — 지도 칸은 그대로라 열고 닫아도 지도·핀이 안 움직임.
+     폭 = 필터 내용 높이가 더 줄지 않는 지점(노트북 글자 720 · 큰 화면 글자 800, 실측) · 단 지도는 폰 화면 폭(360)만큼은 남김 */
+  #view-map{--flt-k:720px;--flt-w:max(400px,min(var(--flt-k),calc(100vw - var(--rail-w) - 360px)))}
+  .mapbox{isolation:isolate}
+  #view-map.flt-open:not(.detail-open) .side.flt-open:not(.show-detail):not(.tab-notice){width:max(100%,var(--flt-w));box-shadow:8px 0 28px rgba(21,24,29,.16)}
+  #view-map.flt-open:not(.detail-open) .mapchips{left:calc(12px + var(--flt-w) - 400px)}
 }
+@media (min-width:1600px){ #view-map{--flt-k:800px} }
+/* 필터가 지도 위에 펼쳐져 오른쪽 지도 폭이 700 미만일 때: 위 빠른 필터 칩은 한 줄(옆으로 끌어서 넘김) — 여러 줄로 쌓여 지도를 가리지 않게 */
+@media (min-width:761px) and (max-width:1491px){ #view-map.flt-open:not(.detail-open) .mapchips .qf-row{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:none} #view-map.flt-open:not(.detail-open) .mapchips .qf-row::-webkit-scrollbar{display:none} }
 @media (min-width:1600px){
   #view-map.active.detail-open.flt-open:not(.detail-wide){grid-template-columns:calc(400px + var(--det-w)) minmax(0,1fr)!important}   /* 필터 400 + 상세 */
   #view-map.detail-open:not(.detail-wide) .side.show-detail.flt-open{display:grid!important;grid-template-columns:400px var(--det-w)!important;grid-template-rows:auto auto auto auto minmax(0,1fr)!important}
@@ -3111,7 +3120,7 @@ window.renderNoticePanel = function(){
     box.querySelectorAll('.nc').forEach(function(el){ var go = function(e){ if (e.target.closest('a,label,input')) return; var k = el.dataset.key, id = el.dataset.id; if (!id) return; if (k && window.ALERTS) window.ALERTS.mark(k, true);
         if (/^EXP:/.test(id)) { var prog = id.slice(4), goEx = function(){ if (window.setSideTab) setSideTab('list'); if (!LIVE) { var lv = document.getElementById('nm-live'); if (lv) lv.click(); } if (!EXP_ON) { EXP_ON = true; PREF.set('exp', true); }
             if (window.__applyFilter) window.__applyFilter(); if (window.pkRefreshIcons) pkRefreshIcons(); var ms = nmMarkers.filter(function(m){ return m.__vis && expMk(m.__p) && expProg(m.__p) === prog; });
-            if (ms.length) { try { var bd = new naver.maps.LatLngBounds(ms[0].getPosition(), ms[0].getPosition()); ms.forEach(function(m){ bd.extend(m.getPosition()); }); nmMap.fitBounds(bd, { top: 60, right: 60, bottom: 60, left: 60 }); } catch (er) {} } };
+            if (ms.length) { try { var bd = new naver.maps.LatLngBounds(ms[0].getPosition(), ms[0].getPosition()); ms.forEach(function(m){ bd.extend(m.getPosition()); }); nmMap.fitBounds(bd, { top: 60, right: 60, bottom: 60, left: 60 + mapPadL() }); } catch (er) {} } };
           if (cal) { location.hash = 'map'; setTimeout(goEx, 200); } else goEx(); return; }
         if (/^PL:/.test(id)) { var goPl = function(){ var mk = planMarker(id); if (!mk) return; if (window.setSideTab) setSideTab('list'); nmFocusMarker(mk); }; if (cal) { location.hash = 'map'; setTimeout(goPl, 200); } else goPl(); return; }
         if (/^AL:/.test(id) || !window.mapNotice) { var a = el.querySelector('.nc-link'); if (a) window.open(a.href, '_blank', 'noopener'); return; }
@@ -3302,8 +3311,9 @@ function mapSnap(){ try { var r = document.getElementById('nmap').getBoundingCli
 function mapKeep(s0){ if (!s0) return; try { var r = document.getElementById('nmap').getBoundingClientRect(), z = nmMap.getZoom(); if (z !== s0.z || !r.width || !s0.r.width) return;
   var tx = s0.w[0] + (r.left + r.width / 2) - (s0.r.left + s0.r.width / 2), ty = s0.w[1] + (r.top + r.height / 2) - (s0.r.top + s0.r.height / 2), c = nmMap.getCenter(), w = wPx(c.lat(), c.lng(), z);
   if (Math.abs(tx - w[0]) < 0.5 && Math.abs(ty - w[1]) < 0.5) return; nmMap.setCenter(wLL(tx, ty, z)); } catch(e) {} }
+function mapPadL(){ try { var sd = document.getElementById('side'), m = document.getElementById('nmap'); if (!sd || !m || !sd.classList.contains('flt-open') || sd.classList.contains('show-detail')) return 0; var d = sd.getBoundingClientRect().right - m.getBoundingClientRect().left; return d > 0 ? Math.round(d) : 0; } catch(e) { return 0; } }   // 필터가 지도 위를 덮은 폭
 function mapSees(pos){ try { var el = document.getElementById('nmap'), W = el.clientWidth, H = el.clientHeight, z = nmMap.getZoom(), c = nmMap.getCenter(), a = wPx(c.lat(), c.lng(), z), m = wPx(pos.lat(), pos.lng(), z);
-  var x = W / 2 + m[0] - a[0], y = H / 2 + m[1] - a[1]; return x >= 60 && x <= W - 60 && y >= 130 && y <= H - 50; } catch(e) { return false; } }   // 위 130px = 지도 위 칩 줄
+  var x = W / 2 + m[0] - a[0], y = H / 2 + m[1] - a[1]; return x >= 60 + mapPadL() && x <= W - 60 && y >= 130 && y <= H - 50; } catch(e) { return false; } }   // 위 130px = 지도 위 칩 줄
 // 화면 픽셀 → 위도 변환(웹 메르카토르, 타일 256px). dyPx>0 이면 남쪽(화면 아래). 지도 중심을 마커보다 아래에 두어 팝업이 위로 다 보이게 하는 데 씀
 function latPlusPx(lat, dyPx, zoom){
   var scale = 256 * Math.pow(2, zoom), rad = lat * Math.PI / 180;
@@ -3659,7 +3669,7 @@ function nmInit(){
     var gNvScale = function(el, inn){ var W = el.clientWidth || 340, H = el.clientHeight || 286, k = Math.max(1, Math.min(1.3, W / 310, H / 256)), w = W / k, h = H / k;
       inn.style.width = w + 'px'; inn.style.height = h + 'px'; inn.style.transform = 'scale(' + k + ')'; return [w, h, k]; };
     var gNvFit = function(){ if (!gNv) return; try { var sz = gNvScale(gNv.el, gNv.inn); if (gNv.map.setSize) gNv.map.setSize(new naver.maps.Size(sz[0], sz[1])); gNv.map.fitBounds(gNv.bd, { top: 1, right: 1, bottom: 1, left: 1 }); } catch (e) {} };
-    var gClose = function(){ if (!gOpen) return; gOpen = false; gpop.hidden = true; if (GU_ON.join() !== gStart && GU_ON.length && GU_ON[0] !== '-') { var ms = nmMarkers.filter(function(m){ return m.__vis; }); if (ms.length) { try { var bd = new naver.maps.LatLngBounds(ms[0].getPosition(), ms[0].getPosition()); ms.forEach(function(m){ bd.extend(m.getPosition()); }); nmMap.fitBounds(bd, { top: 60, right: 60, bottom: 60, left: 60 }); } catch(e) {} } } };
+    var gClose = function(){ if (!gOpen) return; gOpen = false; gpop.hidden = true; if (GU_ON.join() !== gStart && GU_ON.length && GU_ON[0] !== '-') { var ms = nmMarkers.filter(function(m){ return m.__vis; }); if (ms.length) { try { var bd = new naver.maps.LatLngBounds(ms[0].getPosition(), ms[0].getPosition()); ms.forEach(function(m){ bd.extend(m.getPosition()); }); nmMap.fitBounds(bd, { top: 60, right: 60, bottom: 60, left: 60 + mapPadL() }); } catch(e) {} } } };
     window.guPopRefresh = function(){ if (!gOpen) return; var by = qfCount({ gu: [], byGu: true }), tot = qfCount({});
       gpop.querySelectorAll('[data-g]').forEach(function(el){ var g = el.dataset.g, n = by[g] || 0, on = guIsOn(g); el.classList.toggle('on', on); el.classList.toggle('off', !on);
         if (el.classList.contains('gu-n')) el.textContent = n;
@@ -3787,7 +3797,7 @@ function nmInit(){
     setSideTab('list'); applyFilter();
     var ms = nrMarkers(id).filter(function(mk){ return mk.__vis; });
     if (ms.length === 1) nmFocusMarker(ms[0]);
-    else if (ms.length > 1) { try { var b = new naver.maps.LatLngBounds(ms[0].getPosition(), ms[0].getPosition()); ms.forEach(function(mk){ b.extend(mk.getPosition()); }); nmMap.fitBounds(b, { top: 60, right: 60, bottom: 60, left: 60 }); } catch(e) {} if (sheet.mobile() && sheet.state() < 2) sheet.go(2); }
+    else if (ms.length > 1) { try { var b = new naver.maps.LatLngBounds(ms[0].getPosition(), ms[0].getPosition()); ms.forEach(function(mk){ b.extend(mk.getPosition()); }); nmMap.fitBounds(b, { top: 60, right: 60, bottom: 60, left: 60 + mapPadL() }); } catch(e) {} if (sheet.mobile() && sheet.state() < 2) sheet.go(2); }
     else if (sheet.mobile() && sheet.state() < 2) sheet.go(2);
     return ms.length;
   };
