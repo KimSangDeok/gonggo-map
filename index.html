@@ -764,7 +764,7 @@ h1,h2,h3{letter-spacing:-.02em}
 .lst .it > .dot.plan{--c:#C2410C;font-size:12px}
 .lst .it b{font-size:16px;font-weight:600;line-height:1.4}
 .lst .it b .pill{font-size:12px!important;font-weight:600;padding:1px 7px!important;border-radius:6px;vertical-align:2px}
-.lst .it small{display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden;margin-top:2px;font-size:14px;line-height:1.45;color:var(--muted)}
+.lst .it small{display:block;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;margin-top:2px;font-size:14px;line-height:1.45;color:var(--muted)}
 .lst .it .num{font:700 16px/1.35 var(--font-body);color:var(--fg);text-align:right;white-space:nowrap;align-self:center}
 .lst .it .num b.n1{font-size:16px;font-weight:700}
 .lst .it .num small.n2{display:block;-webkit-line-clamp:unset;margin-top:2px;font-size:13px;font-weight:500}
@@ -804,8 +804,8 @@ h1,h2,h3{letter-spacing:-.02em}
 .nm-mkw.pr-on.pr-pri .nm-mk,.nm-mkw.pr-on.pr-live .nm-mk{background:#fff!important;box-shadow:none!important}
 .nm-flag{background:#12805A;color:#fff;border-color:#fff}.nm-flag::after{border-top-color:#12805A}
 .nm-flag.soon{background:#E5F5EE;color:#0D6B4A}.nm-flag.soon::after{border-top-color:#E5F5EE}
-.pr-legend{display:inline-block;margin-top:6px;padding:5px 11px;border-radius:999px;background:rgba(255,255,255,.94);color:var(--muted);font:500 12.5px/1.35 var(--font-body);box-shadow:0 1px 4px rgba(21,24,29,.16);pointer-events:none;max-width:calc(100% - 24px)}
-.pr-legend b{color:var(--fg);font-weight:700}
+.pr-legend{display:inline-block;margin-top:6px;padding:5px 11px;border-radius:999px;background:rgba(255,255,255,.94);color:#4B5462;font:500 12.5px/1.35 var(--font-body);box-shadow:0 1px 4px rgba(21,24,29,.16);pointer-events:none;max-width:calc(100% - 24px)}
+.pr-legend b{color:#15181D;font-weight:700}   /* 지도는 늘 밝은 색이라 어두운 모드에서도 같은 색 */
 @media (max-width:760px){.pr-legend{margin-left:12px;font-size:12px}}
 /* 월부담 팝업 · 구간 단추 */
 .burd-pop{width:min(380px,calc(100vw - 12px))}
@@ -866,6 +866,13 @@ h1,h2,h3{letter-spacing:-.02em}
 .nm-mkw:not(.pr-on) .nm-mk.plan{transform:none}
 /* 폰 시트 머리: 손잡이만(누르면 펼치기·접기) · 분절 단추 낮게 */
 @media (max-width:760px){
+  .side:not(.full) .lst,.side:not(.full) .detail,.side:not(.full) .nlist,.side:not(.full) .lg-body{touch-action:none}   /* 반 높이: 내용 위를 끌어도 시트가 움직임(안쪽 스크롤이 먼저 가로채던 것) */
+  .side .lst,.side .detail,.side .nlist,.side .lg-body{overscroll-behavior:contain}   /* 안쪽 스크롤 끝에서 문서로 안 넘어감 */
+  html:has(#view-map.active),html:has(#view-map.active) body{overflow:hidden;overscroll-behavior:none}   /* 지도 화면: 문서 자체는 안 움직임 */
+  .side:not(.tab-notice) .side-tabs{display:none}   /* 아래 탭 '공고'와 같은 목록 — 공고 탭으로 넘어갔을 때만 보임 */
+  #lg-sum-txt{flex:1 1 auto;min-width:0;flex-wrap:nowrap!important;overflow-x:auto;white-space:nowrap;scrollbar-width:none;touch-action:pan-x}
+  #lg-sum-txt::-webkit-scrollbar{display:none}
+  .lg-sum > .bt-i,.lg-sum #lg-toggle{display:none!important}   /* 필터는 지도 위 '필터' 칩 */
   .lst .grp{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:8px 20px 6px}
   .lg-sum{padding:4px 12px 4px 20px!important}
   .mapchips #qf-more{order:-1}
@@ -2291,12 +2298,27 @@ var sheet = (function(){
       else if (moved > 30 || st.v > 0.35) { for (var q = 0; q < idx.length; q++) { if (sn[idx[q]] > h + 8) { pick = idx[q]; break; } } if (pick === null) pick = 3; }
       else { pick = 0; sn.forEach(function(v, i){ if (Math.abs(v - h) < Math.abs(sn[pick] - h)) pick = i; }); }
       go(pick);
+      setTimeout(function(){ st.moved = false; }, 350);   // 끈 뒤 바로 오는 click 하나만 막고 풀기(폰은 끌기 뒤 click 이 안 와서, 안 풀면 다음 탭이 먹혔음)
     }
     side.addEventListener('pointerdown', dragStart); side.addEventListener('pointermove', dragMove);
     side.addEventListener('pointerup', dragEnd); side.addEventListener('pointercancel', dragEnd);
     side.addEventListener('click', function(e){ if (st.moved) { e.stopPropagation(); e.preventDefault(); st.moved = false; } }, true);
+    // 4) 전체 높이: 목록·상세가 맨 위일 때 아래로 끌면 시트를 내림 — 위로 밀거나 중간이면 안 내용 스크롤(손가락이 처음 움직일 때 정함)
+    var tp = null;
+    side.addEventListener('touchstart', function(e){ tp = null; if (!mobile() || state !== 3 || e.touches.length !== 1) return;
+      if (e.target.closest('select,input,textarea,.handle,.detail-bar,.lg-sum,.qf-row,.det-nav,.iw-strip')) return;
+      var sc = e.target.closest('.lst,.detail,.nlist,.lg-body'); if (!sc) return;
+      var y = e.touches[0].clientY; tp = { sc: sc, y0: y, y: y, top: sc.scrollTop <= 0, on: false, h: curH, ly: y, lt: e.timeStamp, v: 0 }; }, { passive: true });
+    side.addEventListener('touchmove', function(e){ if (!tp || e.touches.length !== 1) return; var y = e.touches[0].clientY;
+      if (!tp.on) { if (!tp.top || tp.sc.scrollTop > 0 || y - tp.y0 <= 0) { tp = null; return; } tp.on = true; tp.y = y; side.classList.add('dragging'); }
+      e.preventDefault(); setH(tp.h - (y - tp.y));
+      var dt = e.timeStamp - tp.lt; if (dt > 0) { tp.v = 0.7 * ((tp.ly - y) / dt) + 0.3 * tp.v; tp.ly = y; tp.lt = e.timeStamp; } }, { passive: false });
+    var tEnd = function(){ if (!tp) return; var o = tp; tp = null; if (!o.on) return; side.classList.remove('dragging'); var mv = curH - o.h;
+      if (Math.abs(mv) > 6) { st.moved = true; setTimeout(function(){ st.moved = false; }, 350); }
+      go(mv < -60 || o.v < -0.35 ? 2 : 3); };
+    side.addEventListener('touchend', tEnd, { passive: true }); side.addEventListener('touchcancel', tEnd, { passive: true });
     window.addEventListener('resize', function(){ if (mobile()) go(state); else { side.style.removeProperty('transform'); side.classList.add('full'); } });
-    setTimeout(function(){ if (mobile()) go(2); else side.classList.add('full'); }, 0);
+    setTimeout(function(){ if (mobile()) { go(2); if (side.classList.contains('tab-notice') && window.setSideTab) setSideTab('list'); } else side.classList.add('full'); }, 0);
   }
   return { go: go, mobile: mobile, visH: visH, state: function(){ return state; }, refit: function(){ if (mobile()) go(state); } };
 })();
