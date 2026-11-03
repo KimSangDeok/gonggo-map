@@ -969,14 +969,17 @@ details.cal-more[open]{padding-bottom:14px}
 #pano-ov{position:fixed;inset:0;z-index:5000;display:none;align-items:center;justify-content:center;background:rgba(8,10,14,.62)}
 #pano-ov.on{display:flex}
 html.pano-open,html.pano-open body{overflow:hidden}
-#pano-ov .pano-box{position:relative;display:flex;flex-direction:column;width:min(1280px,94vw);height:min(820px,88vh);background:var(--surface);color:var(--fg);border-radius:16px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.45)}
+#pano-ov .pano-box{position:relative;display:flex;flex-direction:column;width:calc(100vw - 48px);height:calc(100dvh - 48px);background:var(--surface);color:var(--fg);border-radius:16px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.45)}
 #pano-ov .pano-h{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:8px 8px 8px 16px;border-bottom:1px solid var(--line)}
 #pano-ov .pano-t{font-size:16px}
 #pano-ov .pano-k{margin-left:auto;font-size:14px;font-weight:600}
+#pano-ov .pano-fs{min-height:36px;padding:0 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--fg);font:inherit;font-size:14px;font-weight:600;cursor:pointer}
+#pano-ov .pano-fs:hover{background:var(--accent-soft)}
+#pano-ov .pano-box:fullscreen{border-radius:0}
 #pano-ov .pano-x{min-width:44px;min-height:44px;border:0;background:none;color:var(--muted);font-size:20px;cursor:pointer}
 #pano-ov .pano-v{position:relative;flex:1;min-height:0}
 #pano-ov .pano-msg{position:absolute;left:50%;top:55%;transform:translate(-50%,-50%);max-width:86%;padding:14px 18px;border-radius:12px;background:var(--surface);box-shadow:0 6px 20px rgba(0,0,0,.3);font-size:15px;text-align:center}
-@media (max-width:760px){ #pano-ov .pano-box{width:100vw;height:100dvh;border-radius:0} #pano-ov .pano-h small{display:none} }
+@media (max-width:760px){ #pano-ov .pano-box{width:100vw;height:100dvh;border-radius:0} #pano-ov .pano-h small{display:none} #pano-ov .pano-fs{display:none} }
 /* (J) 마우스로 끄는 가로 줄 */
 @media (hover:hover) and (pointer:fine){ .det-nav,.qf-row{cursor:grab} .det-nav.dragging,.qf-row.dragging,#lg-sum-txt.dragging{cursor:grabbing;user-select:none} .det-nav.dragging *,.qf-row.dragging *{cursor:grabbing} }
 /* 월부담 팝업 · 구간 단추 */
@@ -2084,11 +2087,16 @@ function hhShort(p){ var h = hhInfo(p); return h ? h.n.toLocaleString() + '세�
 function panoOpen(lat, lng, name){
   var ov = document.getElementById('pano-ov'), kk = 'https://map.kakao.com/link/roadview/' + lat + ',' + lng;
   if (!ov) { ov = document.createElement('div'); ov.id = 'pano-ov';
-    ov.innerHTML = '<div class="pano-box" role="dialog" aria-modal="true" aria-label="거리뷰"><div class="pano-h"><b class="pano-t"></b><small class="k">네이버 거리뷰 · 단지 좌표에서 가장 가까운 촬영 지점</small><a class="pano-k" target="_blank" rel="noopener">카카오 로드뷰 ↗</a><button type="button" class="pano-x" aria-label="닫기">✕</button></div><div class="pano-v"></div><div class="pano-msg" hidden></div></div>';
+    ov.innerHTML = '<div class="pano-box" role="dialog" aria-modal="true" aria-label="거리뷰"><div class="pano-h"><b class="pano-t"></b><small class="k">네이버 거리뷰 · 단지 좌표에서 가장 가까운 촬영 지점</small><a class="pano-k" target="_blank" rel="noopener">카카오 로드뷰 ↗</a><button type="button" class="pano-fs">⛶ 전체 화면</button><button type="button" class="pano-x" aria-label="닫기">✕</button></div><div class="pano-v"></div><div class="pano-msg" hidden></div></div>';
     document.body.appendChild(ov);
     var downBack = false; ov.addEventListener('pointerdown', function(e){ downBack = e.target === ov; });
-    ov.addEventListener('click', function(e){ if (e.target.closest && e.target.closest('.pano-x')) { panoClose(); return; } if (e.target === ov && downBack) panoClose(); downBack = false; });
-    document.addEventListener('keydown', function(e){ if (e.key === 'Escape' && ov.classList.contains('on')) panoClose(); }); }
+    ov.addEventListener('click', function(e){ if (e.target.closest && e.target.closest('.pano-x')) { panoClose(); return; }
+      if (e.target.closest && e.target.closest('.pano-fs')) { var bx = ov.querySelector('.pano-box'); if (document.fullscreenElement) document.exitFullscreen().catch(function(){}); else if (bx.requestFullscreen) bx.requestFullscreen().catch(function(){}); return; }
+      if (e.target === ov && downBack) panoClose(); downBack = false; });
+    document.addEventListener('keydown', function(e){ if (e.key === 'Escape' && ov.classList.contains('on') && !document.fullscreenElement) panoClose(); });
+    var fsb = ov.querySelector('.pano-fs'); if (!document.fullscreenEnabled) fsb.hidden = true;
+    document.addEventListener('fullscreenchange', function(){ fsb.textContent = document.fullscreenElement ? '전체 화면 끝' : '⛶ 전체 화면'; setTimeout(panoFit, 60); });
+    window.addEventListener('resize', function(){ if (ov.classList.contains('on')) panoFit(); }); }
   ov.querySelector('.pano-t').textContent = (name || '') + ' 거리뷰'; ov.querySelector('.pano-k').href = kk;
   var msg = ov.querySelector('.pano-msg'), v = ov.querySelector('.pano-v'); msg.hidden = true; v.innerHTML = ''; ov.classList.add('on'); document.documentElement.classList.add('pano-open');
   var fail = function(t){ msg.hidden = false; msg.innerHTML = t + ' — <a href="' + kk + '" target="_blank" rel="noopener">카카오 로드뷰로 보기</a>'; };
@@ -2102,7 +2110,9 @@ function panoOpen(lat, lng, name){
       pano.setPov({ pan: (Math.atan2(y, x) * 180 / Math.PI + 360) % 360, tilt: 5, fov: 100 }); } catch(e) {} });
   } catch(e) { fail('거리뷰를 못 띄움'); }
 }
-function panoClose(){ var ov = document.getElementById('pano-ov'); if (!ov) return; ov.classList.remove('on'); document.documentElement.classList.remove('pano-open'); var v = ov.querySelector('.pano-v'); if (v) v.innerHTML = ''; window.__pano = null; }
+// 거리뷰는 처음 띄울 때 칸 크기로 정해짐(네이버 Panorama: size 옵션 없으면 넣은 요소 크기) → 창·전체 화면이 바뀌면 setSize 로 다시 맞춤
+function panoFit(){ try { var p = window.__pano, v = document.querySelector('#pano-ov .pano-v'); if (p && p.setSize && v && v.clientWidth) p.setSize(new naver.maps.Size(v.clientWidth, v.clientHeight)); } catch(e) {} }
+function panoClose(){ var ov = document.getElementById('pano-ov'); if (!ov) return; if (document.fullscreenElement) document.exitFullscreen().catch(function(){}); ov.classList.remove('on'); document.documentElement.classList.remove('pano-open'); var v = ov.querySelector('.pano-v'); if (v) v.innerHTML = ''; window.__pano = null; }
 document.addEventListener('click', function(e){ var b = e.target.closest && e.target.closest('[data-pano]'); if (!b) return; e.preventDefault(); e.stopPropagation(); var ll = b.dataset.pano.split(','); panoOpen(+ll[0], +ll[1], b.dataset.pname || ''); }, true);
 function naviHtml(name, addr, lat, lng, approx){
   var q = (addr || name || '').replace(/\([^)]*\)/g, '').trim(), web = 'https://map.naver.com/p/search/' + encodeURIComponent(q), an = encodeURIComponent(location.origin + location.pathname);
