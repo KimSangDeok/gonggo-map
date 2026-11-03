@@ -13,8 +13,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="공고 지도">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=Noto+Serif+KR:wght@600;700&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="stylesheet" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <style>
 /* Layout: one reading column (max 980px). Document-style sections, numbers in mono, pass/warn pills by state. */
 :root{
@@ -682,21 +682,168 @@ td .bt-i,.iw-t .bt-i{width:20px;height:20px;line-height:18px;font-size:11.5px;ma
 .al-body{flex:1 1 auto;min-width:0;overflow-wrap:anywhere}
 #al-all{font:inherit;font-size:13px;padding:6px 12px;border-radius:8px;border:1px solid var(--line);background:var(--accent-soft);color:var(--accent-ink);cursor:pointer}
 #push-reg textarea{width:100%;box-sizing:border-box;font:12px/1.4 var(--font-mono);border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--fg);padding:6px}
+
+/* ===== 시안 B+ (2026-11-03) — 폰: 아래 탭 4개 · 지도 위 칩 · 시트 / 노트북: 왼쪽 레일 + 목록 400px + 지도 / PC(1600px~): 목록 + 상세 + 지도 ===== */
+:root{--bg:#F3F4F6;--surface:#FFFFFF;--fg:#15181D;--muted:#4B5462;--line:#E3E6EA;--accent:#1E5CA6;--accent-soft:#EBF2FB;--accent-ink:#174C8C;--ok:#12805A;--ok-soft:#E5F5EE;
+  --font-body:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,system-ui,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;--font-display:var(--font-body);--font-mono:var(--font-body);
+  --bn-h:64px;--rail-w:72px;--chip-on:#15181D;--chip-on-fg:#FFFFFF}
+:root:not([data-theme="light"]){--chip-on:var(--fg);--chip-on-fg:var(--surface)}
+body{font-feature-settings:"tnum";letter-spacing:-.01em}
+h1,h2,h3{letter-spacing:-.02em}
+.appbar{display:none}
+/* 메뉴: 폰 = 아래 탭, 노트북·PC = 왼쪽 레일 */
+.bnav{position:fixed;z-index:1200;background:var(--surface);display:flex}
+.bnav a{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:var(--muted);text-decoration:none;font-size:12px;font-weight:500;line-height:1.2;-webkit-tap-highlight-color:transparent}
+.bnav a .ic{display:flex;align-items:center;justify-content:center}
+.bnav a svg{width:24px;height:24px;flex:none}
+.bnav a.on{color:var(--accent);font-weight:700}
+.bnav .bn-logo{display:none}
+.bnav .tab-badge{position:absolute;top:6px;left:50%;margin:0 0 0 6px;min-width:18px;height:18px;line-height:18px;padding:0 5px;border-radius:999px;background:var(--ok);color:#fff;font-size:12px;font-weight:700;box-shadow:0 0 0 2px var(--surface)}
+.subnav{display:flex;gap:4px;padding:4px;margin:0 0 18px;border-radius:14px;background:color-mix(in srgb,var(--fg) 6%,var(--surface));max-width:520px}
+.subnav a{flex:1;display:flex;align-items:center;justify-content:center;min-height:44px;border-radius:10px;color:var(--muted);font-size:15px;font-weight:600;text-decoration:none;text-align:center}
+.subnav a.on{background:var(--surface);color:var(--fg);font-weight:700;box-shadow:0 1px 3px rgba(21,24,29,.14)}
+@media (max-width:760px){
+  .bnav{left:0;right:0;bottom:0;height:calc(var(--bn-h) + env(safe-area-inset-bottom,0px));padding-bottom:env(safe-area-inset-bottom,0px);box-sizing:border-box;box-shadow:0 -1px 0 var(--line);display:grid;grid-template-columns:repeat(4,minmax(0,1fr))}
+  main{padding-bottom:calc(var(--bn-h) + env(safe-area-inset-bottom,0px))}
+  #view-map.active{height:calc(100dvh - var(--bn-h) - env(safe-area-inset-bottom,0px))}
+  .view .wrap{padding-top:calc(16px + env(safe-area-inset-top,0px))}
+}
+@media (min-width:761px){
+  .bnav{left:0;top:0;bottom:0;width:var(--rail-w);flex-direction:column;align-items:stretch;gap:4px;padding:12px 0;box-sizing:border-box;box-shadow:1px 0 0 var(--line)}
+  .bnav a{height:64px}
+  .bnav a .ic{width:52px;height:32px;border-radius:16px}
+  .bnav a.on{color:var(--accent-ink)}
+  .bnav a.on .ic{background:var(--accent-soft)}
+  .bnav .bn-logo{display:flex;height:56px;margin-bottom:4px}
+  .bnav .tab-badge{top:2px}
+  main{margin-left:var(--rail-w)}
+  #view-map.active{height:100dvh}
+}
+/* 지도 위 칩(검색 자리) — 칩 높이 44px(손가락 영역), 보이는 알약은 36px */
+@media (min-width:761px){.mapbox{position:relative}}   /* 폰은 원래대로 absolute(지도 전체) — relative 로 두면 높이 0 */
+.mapchips{position:absolute;z-index:20;top:calc(10px + env(safe-area-inset-top,0px));left:12px;right:12px;pointer-events:none}
+.mapchips .qf-row{pointer-events:auto;padding:0;gap:6px;background:none;border:0;align-items:center}
+.mapchips .qf-c{min-height:44px;height:44px;padding:0 14px;border:4px solid transparent;border-radius:999px;background:var(--surface);background-clip:padding-box;color:var(--fg);font-size:14px;font-weight:600;gap:6px;filter:drop-shadow(0 1px 1px rgba(21,24,29,.10)) drop-shadow(0 2px 6px rgba(21,24,29,.13))}
+.mapchips .qf-c[aria-pressed="true"]{background-color:var(--chip-on);color:var(--chip-on-fg);border-color:transparent}
+.mapchips .qf-c[aria-pressed="true"] .qf-n{color:inherit;opacity:.8}
+.mapchips .qf-c .qf-n{font-size:13px;font-weight:600;color:var(--muted)}
+.mapchips .qf-seg{border:4px solid transparent;border-radius:999px;background:var(--surface);background-clip:padding-box;filter:drop-shadow(0 1px 1px rgba(21,24,29,.10)) drop-shadow(0 2px 6px rgba(21,24,29,.13));height:44px;box-sizing:border-box;align-items:stretch}
+.mapchips .qf-seg button{min-height:36px;height:36px;padding:0 11px;font-size:14px;background:transparent;border-radius:999px}
+.mapchips .qf-seg button+button{border-left:0}
+.mapchips .qf-seg button[aria-pressed="true"]{background:var(--chip-on);color:var(--chip-on-fg)}
+.qf-more svg{width:16px;height:16px}
+.qf-sw.live{box-shadow:0 0 0 2.5px #12805A}
+@media (max-width:760px){.mapchips{left:0;right:0}.mapchips .qf-row{padding:0 12px}}
+/* 노트북·PC: 목록 패널을 왼쪽 400px로 · 지도는 오른쪽 넓게 · 상세는 그 자리(한 단) · 1600px 이상은 목록 옆에 상세 */
+@media (min-width:761px){
+  #view-map.active{grid-template-columns:minmax(340px,400px) minmax(0,1fr)}
+  #view-map .side{order:-1;border-left:0;box-shadow:1px 0 0 var(--line);z-index:2}
+  #view-map.active.detail-open{grid-template-columns:minmax(340px,400px) minmax(0,1fr)}
+  #view-map.active.flt-open:not(.detail-open){grid-template-columns:min(1150px,64vw,calc(100vw - 360px)) minmax(360px,1fr)}
+}
+@media (min-width:1600px){
+  #view-map.active.detail-open:not(.detail-wide){grid-template-columns:840px minmax(0,1fr)}
+  #view-map.detail-open:not(.detail-wide) .side.show-detail{display:grid;grid-template-columns:400px 440px;grid-template-rows:auto auto auto auto minmax(0,1fr)}
+  #view-map.detail-open:not(.detail-wide) .side.show-detail > *{grid-column:1}
+  #view-map.detail-open:not(.detail-wide) .side.show-detail > .side-tabs{display:flex!important;grid-row:1}
+  #view-map.detail-open:not(.detail-wide) .side.show-detail > .lg-sum{display:flex!important;grid-row:2}
+  #view-map.detail-open:not(.detail-wide) .side.show-detail > #nm-selnote{grid-row:3}
+  #view-map.detail-open:not(.detail-wide) .side.show-detail > #nm-list,#view-map.detail-open:not(.detail-wide) .side.show-detail > #nm-list[hidden]{display:block!important;grid-row:5;min-height:0;overflow:auto}
+  #view-map.detail-open:not(.detail-wide) .side.show-detail > #nm-detail{grid-column:2;grid-row:1/-1;min-height:0;box-shadow:inset 1px 0 0 var(--line)}
+}
+/* 목록 줄: 왼쪽 44px 칸(종류 색) · 이름 16px · 둘째 줄 14px(두 줄까지) · 오른쪽 월세 굵게 */
+.lst .grp{position:sticky;top:0;z-index:1;background:var(--bg);color:var(--muted);font-size:13px;font-weight:700;letter-spacing:0;padding:10px 20px 8px;line-height:1.4}
+.lst .it,.lst .it[data-cat="plan"]{grid-template-columns:44px minmax(0,1fr) auto;gap:12px;align-items:center;padding:12px 16px 12px 20px;min-height:72px;box-sizing:border-box;border-bottom:0;font-size:14px;line-height:1.45}
+.lst .it:hover,.lst .it.on{background:color-mix(in srgb,var(--accent) 7%,var(--surface))}
+.lst .it > .dot,.lst .it > .dot.plan{width:44px;height:44px;min-width:0;margin:0!important;padding:0;border:0;border-radius:12px;transform:none;box-shadow:none;background:color-mix(in srgb,var(--c,#E65100) 13%,var(--surface));display:flex;align-items:center;justify-content:center;color:color-mix(in srgb,var(--c,#E65100) 78%,#000);font:700 13px/1 var(--font-body);letter-spacing:0;white-space:nowrap}
+.lst .it > .dot::after{content:"";width:12px;height:12px;border-radius:50%;background:var(--c)}
+.lst .it > .dot.hl::after{background:transparent;box-shadow:inset 0 0 0 3px var(--c)}
+.lst .it > .dot.sq::after{border-radius:3px}
+.lst .it > .dot.ya::after{width:11px;height:11px;border-radius:2px;transform:rotate(45deg)}
+.lst .it > .dot.lh::after,.lst .it > .dot.plan::after{display:none}
+.lst .it > .dot.plan{--c:#C2410C;font-size:12px}
+.lst .it b{font-size:16px;font-weight:600;line-height:1.4}
+.lst .it b .pill{font-size:12px!important;font-weight:600;padding:1px 7px!important;border-radius:6px;vertical-align:2px}
+.lst .it small{display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden;margin-top:2px;font-size:14px;line-height:1.45;color:var(--muted)}
+.lst .it .num{font:700 16px/1.35 var(--font-body);color:var(--fg);text-align:right;white-space:nowrap;align-self:center}
+.lst .it .num b.n1{font-size:16px;font-weight:700}
+.lst .it .num small.n2{display:block;-webkit-line-clamp:unset;margin-top:2px;font-size:13px;font-weight:500}
+.lst .it.out:not([data-cat="na"]) > div:not(.num) > b::after{font-size:12px}
+/* 목록 머리: 단지 목록 | 공고(분절 단추) · 곳 수 크게 */
+.side-tabs{gap:4px;padding:4px;margin:8px 16px 4px;border:0;border-radius:12px;background:color-mix(in srgb,var(--fg) 6%,var(--surface))}
+.side-tabs button{min-height:40px;padding:0 6px;border:0;border-radius:9px;color:var(--muted);font-size:14px;font-weight:600}
+.side-tabs button.on{background:var(--surface);color:var(--fg);font-weight:700;border-bottom-color:transparent;box-shadow:0 1px 3px rgba(21,24,29,.14)}
+.lg-sum{border-bottom:0!important;padding:8px 12px 8px 20px!important}
+.lg-sum #lg-sum-txt > b{font-size:20px;font-weight:700;letter-spacing:-.02em;margin-right:8px}
+.lg-sum #lg-toggle{min-height:36px!important;border:0!important;background:color-mix(in srgb,var(--fg) 7%,var(--surface))!important;font-size:13px!important}
+.nc{padding:12px 20px;font-size:14px}
+/* 상세 머리 */
+.detail-bar{min-height:56px;box-sizing:border-box;padding:8px 12px 8px 12px;gap:8px;border-bottom:1px solid var(--line)}
+.detail-bar b{font-size:17px;font-weight:700}
+#detail-back,#detail-wide{min-height:40px;padding:0 14px;border:0;border-radius:999px;background:color-mix(in srgb,var(--fg) 7%,var(--surface));font-size:14px;font-weight:600}
+.det-nav button{min-height:36px;padding:0 12px;font-size:13px}
+/* 폰 시트: 둥근 위 24px · 손잡이 · 지도 위 칩과 겹치지 않게 위 62px 남김 */
+@media (max-width:760px){
+  .side{height:calc(100% - 62px);border-top:0;border-radius:24px 24px 0 0;box-shadow:0 -1px 0 rgba(21,24,29,.05),0 -8px 28px rgba(21,24,29,.14)}
+  .handle{padding:8px 0 0}
+  .handle i{width:36px;height:5px;background:color-mix(in srgb,var(--fg) 20%,var(--surface))}
+  .handle .hb{margin-top:2px;gap:2px}
+  #sheet-btn,#sheet-hide{min-height:36px;padding:0 12px;border:0;background:none;color:var(--muted);font-size:13px;font-weight:600}
+}
+/* 지도 핀: 월세 알약(겹치면 점으로) · 1순위 파랑 · 접수 중 초록 */
+.nm-pr{display:none}
+.nm-mkw.pr-on{display:inline-flex;align-items:center;gap:5px;height:26px;padding:0 9px 0 6px;border-radius:999px;background:#fff;color:#15181D;font:700 13px/1 var(--font-body);letter-spacing:-.01em;white-space:nowrap;box-shadow:0 0 0 1px rgba(21,24,29,.12),0 2px 6px rgba(21,24,29,.22);transform:translate(-1px,-3px)}
+.nm-mkw.pr-on .nm-pr{display:inline}
+.nm-mkw.pr-on .nm-mk{width:10px!important;height:10px!important;min-width:0!important;padding:0!important;border:0!important;outline:0!important;box-shadow:none!important;transform:none!important;font-size:0!important;line-height:0!important;flex:none;background:var(--c)!important}
+.nm-mkw.pr-on .nm-mk.ya{width:9px!important;height:9px!important;border-radius:2px!important;transform:rotate(45deg)!important}
+.nm-mkw.pr-on .nm-mk.hl{background:#fff!important;box-shadow:inset 0 0 0 2.5px var(--c)!important}
+.nm-mkw.pr-on .nm-mk.lh{border-radius:2px!important}
+.nm-mkw.pr-on .pk-b{display:none}
+.nm-mkw.pr-on.pr-pri{background:#1E5CA6;color:#fff;box-shadow:0 0 0 1px rgba(21,24,29,.10),0 2px 6px rgba(21,24,29,.28)}
+.nm-mkw.pr-on.pr-live{background:#12805A;color:#fff;box-shadow:0 0 0 1px rgba(21,24,29,.10),0 2px 6px rgba(21,24,29,.28)}
+.nm-mkw.pr-on.pr-pri .nm-mk,.nm-mkw.pr-on.pr-live .nm-mk{background:#fff!important;box-shadow:none!important}
+.nm-flag{background:#12805A;color:#fff;border-color:#fff}.nm-flag::after{border-top-color:#12805A}
+.nm-flag.soon{background:#E5F5EE;color:#0D6B4A}.nm-flag.soon::after{border-top-color:#E5F5EE}
+/* 알약이 아닌 핀 = 작은 점(조용하게) — 'LH'·'매' 글자는 알약일 때만, 공고 예상 점선은 목록·상세에서 */
+.nm-mkw:not(.pr-on) .nm-mk{transform:scale(.72);box-shadow:0 0 0 2px #fff,0 1px 4px rgba(0,0,0,.35)}
+.nm-mkw:not(.pr-on) .nm-mk.hl{box-shadow:inset 0 0 0 4.5px var(--c),0 0 0 2px #fff,0 1px 4px rgba(0,0,0,.35)}
+.nm-mkw:not(.pr-on) .nm-mk.ya{transform:rotate(45deg) scale(.72);box-shadow:inset 0 0 0 3.5px var(--c),0 0 0 2px #fff,0 1px 4px rgba(0,0,0,.35)}
+.nm-mkw:not(.pr-on) .nm-mk.lh{font-size:0;transform:scale(.6)}
+.nm-mkw:not(.pr-on) .nm-mk.lh.live{transform:scale(.75)}
+.nm-mkw:not(.pr-on)::before{content:'';position:absolute;inset:-9px}   /* 점은 작게, 누르는 자리는 넓게(약 32px) */
+.nm-mkw:not(.pr-on) .nm-mk.exp{outline:0}
+.nm-mkw:not(.pr-on) .nm-mk.live{transform:scale(.9);box-shadow:0 0 0 2.5px #fff,0 0 0 5px #12805A,0 2px 6px rgba(0,0,0,.4)}
+.nm-mkw:not(.pr-on) .nm-mk.ya.live{transform:rotate(45deg) scale(.9);box-shadow:inset 0 0 0 3.5px var(--c),0 0 0 2.5px #fff,0 0 0 5px #12805A,0 2px 6px rgba(0,0,0,.4)}
+.nm-mkw:not(.pr-on) .nm-mk.plan{transform:scale(.92)}
+.nm-mkw:not(.pr-on) .pk-b{transform:scale(.8)}
+/* 폰 시트 머리: 손잡이만(누르면 펼치기·접기) · 분절 단추 낮게 */
+@media (max-width:760px){
+  .lst .grp{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:8px 20px 6px}
+  .lg-sum{padding:4px 12px 4px 20px!important}
+  .mapchips #qf-more{order:-1}
+  .handle{padding:8px 0 10px}
+  .handle .hb{display:none}
+  .side-tabs{margin:0 16px 2px}
+  .side-tabs button{min-height:36px}
+}
+/* 고른 단지: 검은 점 + 이름 알약(꼬리) */
+.nm-sel{width:22px;height:22px;box-sizing:border-box;border-radius:50%!important;background:#15181D!important;border:4px solid #fff;box-shadow:0 0 0 6px rgba(21,24,29,.16),0 2px 8px rgba(0,0,0,.35)!important}
+.nm-sel::after{display:none}
+.nm-sel b{left:50%;top:auto;bottom:calc(100% + 12px);transform:translateX(-50%);background:#15181D;color:#fff;border:0;border-radius:999px;padding:8px 13px;font-size:14px;font-weight:700;line-height:1.1;box-shadow:0 4px 14px rgba(21,24,29,.32)}
+.nm-sel b::after{content:"";position:absolute;left:50%;top:100%;margin-left:-6px;border:6px solid transparent;border-top-color:#15181D}
 </style>
 </head>
 <body>
 <header class="appbar">
   <div class="brand">공고 지도</div>
   <nav class="tabs" aria-label="메뉴">
-    <a href="#map" data-view="map">지도</a><a href="#list" data-view="list">단지</a><a href="#calendar" data-view="calendar">공고 일정<span id="cal-badge" class="tab-badge" hidden></span></a><a href="#rules" data-view="rules">자격·순위</a><a href="#money" data-view="money">보증금·대출</a><a href="#me" data-view="me">내 조건 🔒</a><a href="#sources" data-view="sources">근거</a>
+    <a href="#map" data-view="map">지도</a><a href="#list" data-view="list">단지</a><a href="#calendar" data-view="calendar">공고 일정</a><a href="#rules" data-view="rules">자격·순위</a><a href="#money" data-view="money">보증금·대출</a><a href="#me" data-view="me">내 조건 🔒</a><a href="#sources" data-view="sources">근거</a>
   </nav>
 </header>
+<nav class="bnav" aria-label="메뉴"><a href="#map" class="bn-logo" aria-label="공고 지도 처음으로"><svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true"><rect width="40" height="40" rx="11" fill="#1E5CA6"/><path d="M20 10.5 9.5 19.6h3v9.9h5.2v-6.3h4.6v6.3h5.2v-9.9h3z" fill="#fff"/></svg></a><a href="#map" data-g="map"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4.5 3.5 6.6v13l5.5-2.1 6 2.1 5.5-2.1v-13L15 6.6 9 4.5z"/><path d="M9 4.5v13"/><path d="M15 6.6v13"/></svg></span>지도</a><a href="#calendar" data-g="notice"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 10h17"/><path d="M8 3v4"/><path d="M16 3v4"/></svg></span>공고<span id="cal-badge" class="tab-badge" hidden></span></a><a href="#rules" data-g="rules"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="18" height="13.5" rx="3"/><path d="M3 10.5h18"/><path d="M15.5 15h2.5"/></svg></span>자격·돈</a><a href="#me" data-g="me"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8.5" r="3.8"/><path d="M4.5 20c.8-3.6 3.8-5.6 7.5-5.6s6.7 2 7.5 5.6"/></svg></span>내 조건</a></nav>
 <main>
   <section class="view" id="view-map">
-    <div class="mapbox"><div id="nmap"></div></div>
-    <aside class="side" id="side">
-      <div class="handle" id="sheet-handle"><i></i><div class="hb"><button type="button" id="sheet-btn" aria-label="시트 펼치기/접기">목록 펼치기 ▲</button><button type="button" id="sheet-hide" aria-label="시트 숨기기(지도만 보기)">숨기기 ▼</button></div></div>
-      <div class="side-tabs" id="side-tabs" role="tablist"><button type="button" data-tab="list" class="on" role="tab" aria-selected="true">단지 목록</button><button type="button" data-tab="notice" role="tab" aria-selected="false">공고 <span id="st-live" class="pill ok" hidden></span></button></div>
+    <div class="mapbox"><div id="nmap"></div><div class="mapchips" id="mapchips">
       <div class="qf-row" id="qf-row" role="group" aria-label="빠른 필터">
         <button type="button" class="qf-c" id="qf-live" aria-pressed="false" title="지금 접수 중·접수 예정인 공고의 단지만"><i class="qf-sw live"></i>접수 끝난 곳 빼기 <span class="qf-n"></span></button>
         <button type="button" class="qf-c" id="qf-plan" aria-pressed="true" hidden title="SH·LH가 공급계획으로 미리 발표했고 아직 공고 전인 곳도 남김(지도: 주황 '예정' 마커)"><i class="qf-sw plan"></i>공고 예정(기관 발표) <span class="qf-n"></span></button>
@@ -705,7 +852,12 @@ td .bt-i,.iw-t .bt-i{width:20px;height:20px;line-height:18px;font-size:11.5px;ma
         <button type="button" class="qf-c" id="qf-gu" aria-pressed="false" aria-haspopup="dialog" title="서울 구를 골라 그 구의 단지만"><span class="qf-l">구 전체</span> <span class="qf-n"></span> ▾</button>
         <button type="button" class="qf-c" id="qf-pk" aria-pressed="false" title="세대당 주차면 1대 이상">주차 넉넉만 <span class="qf-n"></span></button>
         <button type="button" class="qf-c" id="qf-ao" aria-pressed="false" title="건축물대장 주용도가 아파트·오피스텔인 곳만">아파트·오피스텔만 <span class="qf-n"></span></button>
+        <button type="button" class="qf-c qf-more" id="qf-more" title="상세 필터 열기"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h10"/><path d="M18 7h2"/><circle cx="16" cy="7" r="2"/><path d="M4 17h2"/><path d="M10 17h10"/><circle cx="8" cy="17" r="2"/></svg>필터</button>
       </div>
+    </div></div>
+    <aside class="side" id="side">
+      <div class="handle" id="sheet-handle"><i></i><div class="hb"><button type="button" id="sheet-btn" aria-label="시트 펼치기/접기">목록 펼치기 ▲</button><button type="button" id="sheet-hide" aria-label="시트 숨기기(지도만 보기)">숨기기 ▼</button></div></div>
+      <div class="side-tabs" id="side-tabs" role="tablist"><button type="button" data-tab="list" class="on" role="tab" aria-selected="true">단지 목록</button><button type="button" data-tab="notice" role="tab" aria-selected="false">공고 <span id="st-live" class="pill ok" hidden></span></button></div>
       <div class="lg-sum" id="lg-sum"><span id="lg-sum-txt"></span><button type="button" class="bt-i" data-bt="sec-quick" aria-label="필터 설명">ⓘ</button><button type="button" id="lg-toggle" aria-expanded="false">상세 필터 ▾</button></div>
       <div class="lg-body" id="lg-body">
       <div class="nmbar">
@@ -745,6 +897,7 @@ td .bt-i,.iw-t .bt-i{width:20px;height:20px;line-height:18px;font-size:11.5px;ma
   </section>
 
   <section class="view" id="view-list"><div class="wrap">
+    <div class="subnav" aria-label="공고"><a href="#calendar" data-sv="calendar">공고 일정</a><a href="#list" data-sv="list">공고별 단지</a></div>
     <h2>단지 — 2026년 SH 공고에 실제로 나온 집</h2>
     <div class="note"><p><b>단지는 공고에 묶여 있습니다.</b> 아래 호수(공가·예비)·보증금·월세는 모두 해당 <b>입주자모집공고</b> 시점의 숫자이고, 접수·당첨·입주 일정도 공고별입니다. 예비자로 뽑혀도 같은 유형의 다른 공고에 또 뽑히면 앞 공고의 예비 지위는 자동 탈락하고, 공가가 나면 공고일이 빠른 공고의 예비자부터 배정됩니다(SH 2026 1차 공고문 8쪽). 그래서 "어느 공고의 단지인가"를 같이 봐야 합니다.</p></div>
     <div class="tbl" style="margin-bottom:18px"><table class="stack" id="notice-table"><thead><tr><th>공고</th><th>공고일</th><th>접수</th><th>당첨자 발표</th><th>입주</th><th>지금 상태</th></tr></thead><tbody></tbody></table></div>
@@ -872,6 +1025,7 @@ td .bt-i,.iw-t .bt-i{width:20px;height:20px;line-height:18px;font-size:11.5px;ma
   </div></section>
 
   <section class="view" id="view-calendar"><div class="wrap">
+    <div class="subnav" aria-label="공고"><a href="#calendar" data-sv="calendar">공고 일정</a><a href="#list" data-sv="list">공고별 단지</a></div>
     <h2>공고 일정 — 2025·2026 실제, 2027 추정</h2>
     <p class="src" id="live-stamp">자동 갱신 상태 확인 중…</p>
     <div class="note" id="alerts-box" style="margin:6px 0 12px"><p><b>공고 목록</b> <small class="k">(지도 '공고' 탭과 같은 목록)</small> <span id="alerts-sum" class="src"></span></p><p class="src" style="margin:0 0 4px"><span class="sync-st" data-sync-st></span> <button type="button" class="sync-open">기기 동기화</button></p><div id="alerts-list" class="nlist cal"><p class="src">불러오는 중…</p></div></div>
@@ -937,6 +1091,7 @@ td .bt-i,.iw-t .bt-i{width:20px;height:20px;line-height:18px;font-size:11.5px;ma
   </div></section>
 
   <section class="view" id="view-rules"><div class="wrap">
+    <div class="subnav" aria-label="자격·돈"><a href="#rules" data-sv="rules">자격·순위</a><a href="#money" data-sv="money">보증금·대출</a></div>
     <h2>어디에 넣나 — 유형별 우선순위와 금액</h2>
 
   <p>서울 공고 기준입니다. <b>내 조건: 전용 8평(26.45㎡) 이상만.</b> 그 아래 원룸(16~25㎡(4.8평~7.6평))은 어느 트랙이든 선택지에서 빼고 데이터로만 둡니다. 가구원 수별 면적 기준은 2024.12.5 시행규칙 개정으로 폐지돼 1인 가구도 36㎡(10.9평) 이상을 신청할 수 있습니다. 1~5번은 처음 추린 트랙, 6~8번은 2026-10-27에 추가한 청년안심주택 공공·민간, 청년 매입임대 — 이 셋은 물량 대부분이 원룸이라 <b>8평 이상 형이 있는 단지·집만</b> 셉니다(청년안심주택은 서울시 단지정보 99곳 중 청년 자격 형이 8평 이상인 단지 <b class="live-ya-ok">45</b>곳만 — 나머지는 원룸(8평 미만)뿐이거나 형별 표가 없어 지도에서 '해당 없음'. 숫자는 지도 분류로 매일 갱신, 기본값은 2026-10-28). LH 통합공공임대는 서울 공고가 드물어(2026년엔 9월 강서염창 59.95㎡(18.1평) 1건) 경기까지 보는 선택지. 금액은 각 공고에 적힌 실제 숫자이며, 추정치는 따로 표시했습니다. 뺀 것: 장기전세(보증금 수억), 서울시 청년월세지원(차량시가표준액 2,500만원 이상 차가 있으면 제외) — 사유는 표 아래.</p>
@@ -1065,6 +1220,7 @@ td .bt-i,.iw-t .bt-i{width:20px;height:20px;line-height:18px;font-size:11.5px;ma
   </div></section>
 
   <section class="view" id="view-money"><div class="wrap">
+    <div class="subnav" aria-label="자격·돈"><a href="#rules" data-sv="rules">자격·순위</a><a href="#money" data-sv="money">보증금·대출</a></div>
     <h2>보증금과 대출</h2>
 <div class="note"><p><b>현실적으로 가능한 대출 (2026-11 기준)</b></p><ul><li><b>LH·SH 공공임대</b>(행복주택·국민임대·매입임대·청년안심 공공임대)는 서울시 청년 임차보증금 이자지원 대상이 아님 — "공공임대주택은 지원 불가"(<a href="https://www.seoulhousing.kr/html/0504003.do" target="_blank" rel="noopener">서울주거포털</a>) → <b>청년 버팀목 전세자금</b>이 사실상 하나뿐.</li><li>청년 버팀목: 보증금의 <b>80%</b>, 최대 <b>1.5억</b> · 기본금리 연소득 2천만 이하 2.2% · 2천만 초과~4천만 이하 <b>2.5%</b> · 4천만 초과 2.9%(변동, <a href="https://kbthink.com/loan-guide/beotimok-youth.html" target="_blank" rel="noopener">KB 2026.8.31</a>) · 계약금(보증금 5% 이상) 먼저 · 한도는 소득·신용도에 따라 줄 수 있음 → 기금 취급은행 사전 상담.</li><li>예: 보증금 7,272만 → 대출 5,817만 · 내 돈 1,455만 · 연 2.5%면 이자 월 12.1만.</li><li>행복주택은 월세→보증금 전환이율(연 6.0%)이 대출 금리보다 높아 <b>보증금을 최대로 올리고 대출</b>을 쓰는 쪽이 매달 덜 냄.</li><li><b>청년안심주택 민간임대</b>만 서울시 이자지원 가능: 보증금의 90%·최대 2억, 서울시가 연 2.0%p 지원(본인 부담 최저 1%), 하나은행, 생애 1회, 연소득 5천만 이하(2026.6.5부터)·보증금 3억·월세 90만 이하(<a href="https://mediahub.seoul.go.kr/archives/2018213" target="_blank" rel="noopener">서울시 2026.5.19</a>).</li><li>단지마다 대출액·내 돈·월 이자·월 부담(월세+이자)은 지도에서 단지를 누르면 <b>"대출 쓰면"</b>에.</li></ul></div>
   <div class="grid2">
@@ -1090,6 +1246,7 @@ td .bt-i,.iw-t .bt-i{width:20px;height:20px;line-height:18px;font-size:11.5px;ma
   </div></section>
 
   <section class="view" id="view-me"><div class="wrap">
+    <div class="subnav" aria-label="내 조건"><a href="#me" data-sv="me">내 조건</a><a href="#sources" data-sv="sources">근거</a></div>
     <div class="lock" id="me-lock" hidden>
       <h2 style="font-size:17px">내 조건 · 확인 목록 · 총자산</h2>
       <p class="src" style="margin-bottom:12px">소득·차량·청약·거주 이력·신용 조회 결과가 들어 있어 암호로 잠겨 있습니다. 암호는 이 브라우저 안에서만 쓰이고 서버로 가지 않습니다.</p>
@@ -1105,6 +1262,7 @@ td .bt-i,.iw-t .bt-i{width:20px;height:20px;line-height:18px;font-size:11.5px;ma
   </div></section>
 
   <section class="view" id="view-sources"><div class="wrap">
+    <div class="subnav" aria-label="내 조건"><a href="#me" data-sv="me">내 조건</a><a href="#sources" data-sv="sources">근거</a></div>
     <h2>근거</h2>
 
   <h3>법령·제도</h3>
@@ -1502,9 +1660,41 @@ function nmFlag(p){   // 접수 중·예정 공고가 있는 단지: 마커 위 
   var md = function(d){ return d ? (d.getMonth() + 1) + '/' + d.getDate() : ''; }, open = rs.filter(function(r){ return nrState(r) === 'open'; });
   if (open.length) { var r = open.reduce(function(a, x){ return (x.a1 && (!a.a1 || x.a1 < a.a1)) ? x : a; }, open[0]); return '<span class="nm-flag">접수 중' + (r.a1 ? ' ~' + md(r.a1) : '') + '</span>'; }
   var r2 = rs.reduce(function(a, x){ return (x.a0 && (!a.a0 || x.a0 < a.a0)) ? x : a; }, rs[0]); return '<span class="nm-flag soon">접수 ' + (r2.a0 ? md(r2.a0) + '~' : '예정') + '</span>'; }
-function mkWrap(inner, p){ var f = nmFlag(p), e = expMk(p) ? expOf(p) : null; return '<div class="nm-mkw"' + (e ? ' title="공고 예상(추정): ' + e.name + ' — ' + e.when + '"' : '') + '>' + inner + pkMk(p) + (f || planFlag(p)) + '</div>'; }
+var MKID = 0;
+function mkWrap(inner, p){ var f = nmFlag(p), e = expMk(p) ? expOf(p) : null, lv = nrLive(p); if (!p.__mkid) p.__mkid = 'm' + (++MKID);
+  return '<div class="nm-mkw' + (p.cat === 'pri' ? ' pr-pri' : '') + (lv ? ' pr-live' : '') + '" data-mk="' + p.__mkid + '"' + (e ? ' title="공고 예상(추정): ' + e.name + ' — ' + e.when + '"' : '') + '>' + inner + (p.__pr ? '<span class="nm-pr">' + p.__pr + '</span>' : '') + pkMk(p) + (f || planFlag(p)) + '</div>'; }
+// B+ 지도 핀: 목록 줄 오른쪽 월세('월 26.6만', '월 51~61만')를 핀 글자로 → 화면에서 서로 겹치지 않는 핀만 알약(우선: 접수 중 > 1순위 > 월세 낮은 곳), 나머지는 점
+function prParse(it){ var n = it.querySelector('.num'); if (!n) return ''; var m = n.textContent.replace(/\s+/g, ' ').match(/월\s*([\d.]+)(?:\s*~\s*([\d.]+))?\s*만/); if (!m) return ''; return m[2] ? (Math.round(+m[1]) + '만~') : (m[1] + '만'); }
+function prW(t){ var w = 0; for (var i = 0; i < t.length; i++) { var c = t.charCodeAt(i); w += (c >= 48 && c <= 57) ? 7.6 : (c === 46 ? 3.6 : (c === 126 ? 8 : (c === 32 ? 3.5 : 13))); } return w + 31; }
+function prLayout(){
+  if (!window.nmMap || !nmMap.getCenter || !nmMap.getZoom) return;
+  var el = document.getElementById('nmap'); if (!el) return; var W = el.clientWidth, H = el.clientHeight; if (!W || !H) return;
+  var c = nmMap.getCenter(), z = nmMap.getZoom(), sc = 256 * Math.pow(2, z);
+  var px = function(lat, lng){ var s = Math.sin(lat * Math.PI / 180); return [(lng + 180) / 360 * sc, (0.5 - Math.log((1 + s) / (1 - s)) / (4 * Math.PI)) * sc]; }, c0 = px(c.lat(), c.lng());
+  var cand = [];
+  (window.nmMarkers || []).forEach(function(mk){ var p = mk.__p; if (!mk.__vis || !p.__pr || p.__out || p.cat === 'na' || mk === window.nmSelected) return;
+    var pos = mk.getPosition(); if (!pos) return; var q = px(pos.lat(), pos.lng()), x = q[0] - c0[0] + W / 2, y = q[1] - c0[1] + H / 2;
+    if (x < -60 || y < -30 || x > W + 60 || y > H + 30) return; var lv = nrLive(p);
+    cand.push({ id: p.__mkid, x: x, y: y, w: prW(p.__pr), f: lv && nmFlag(p) ? 1 : 0, k: lv ? 0 : (p.cat === 'pri' ? 1 : 2), r: parseFloat(p.__pr) || 999 }); });
+  cand.sort(function(a, b){ return a.k - b.k || a.r - b.r; });
+  var placed = [], on = {};
+  cand.forEach(function(o){ var r = { l: o.x - 12, t: o.y - 16, r: o.x - 12 + o.w, b: o.y + 12 };
+    if (o.f) { var cx = o.x - 12 + o.w / 2; r.t = o.y - 46; r.l = Math.min(r.l, cx - 48); r.r = Math.max(r.r, cx + 48); }   // 위 깃발('접수 중 ~11/6')까지 한 덩어리
+    for (var i = 0; i < placed.length; i++) { var q = placed[i]; if (!(r.l > q.r + 4 || r.r < q.l - 4 || r.t > q.b + 2 || r.b < q.t - 2)) return; }
+    placed.push(r); on[o.id] = o.k === 0 ? 70 : 60; });
+  document.querySelectorAll('#nmap .nm-mkw[data-mk]').forEach(function(w){ w.classList.toggle('pr-on', !!on[w.dataset.mk]); });
+  (window.nmMarkers || []).forEach(function(mk){ var p = mk.__p; if (!p || mk === window.nmSelected || !mk.setZIndex || !mk.getZIndex) return; var z = mk.getZIndex();
+    var zt = on[p.__mkid]; if (zt) { if (z !== zt) { if (z !== 60 && z !== 70) mk.__z0 = z; try { mk.setZIndex(zt); } catch(e) {} } } else if (z === 60 || z === 70) { try { mk.setZIndex(mk.__z0 != null ? mk.__z0 : 10); } catch(e) {} } });
+  window.__prOn = Object.keys(on).length;
+}
+window.prLayout = prLayout;
+window.prRefresh = function(){
+  document.querySelectorAll('#nm-list .it').forEach(function(it){ var mk = it.__mk; if (!mk || !mk.__p) return; var p = mk.__p, v = p.cat === 'na' ? '' : prParse(it);
+    if ((p.__pr || '') !== v) { p.__pr = v; if (mk !== window.nmSelected && mk.__icon && mk.setIcon) { try { mk.setIcon(mk.__icon()); } catch(e) {} } } });
+  prLayout();
+};
 function pkSel(p){ if (!PK_BADGE) return ''; var lv = pkLevel(p); return lv === 'unk' ? '' : '<i class="pk-s ' + lv + '">P ' + PK_SHORT[lv] + ' ' + pkNum(pkOf(p).per) + '</i>'; }
-function pkRefreshIcons(){ (window.nmMarkers || []).forEach(function(mk){ if (mk === nmSelected || !mk.__icon || !mk.setIcon) return; try { mk.setIcon(mk.__icon()); } catch(e) {} }); }
+function pkRefreshIcons(){ (window.nmMarkers || []).forEach(function(mk){ if (mk === nmSelected || !mk.__icon || !mk.setIcon) return; try { mk.setIcon(mk.__icon()); } catch(e) {} }); if (window.prLayout) setTimeout(prLayout, 0); }
 function pkBadge(p, sh){ var lv = pkLevel(p); return '<span class="pk-tag ' + lv + '"><i>P</i>' + (sh ? PK_SHORT[lv] : (lv === 'unk' ? '주차 모름' : '주차 ' + PK_NAME[lv])) + '</span> <button type="button" class="bt-i" data-bt="pk-' + lv + '" aria-label="주차 기준 설명">ⓘ</button>'; }
 function pkHtml(p){   // 상세 '주차' 줄: 등급 · 세대당 대수 = 주차면 ÷ 세대·호 · 근거
   var r = pkOf(p);
@@ -1794,6 +1984,9 @@ function currentView(){ var h = (location.hash || '').replace(/^#/, '').split(/[
 function showView(v){
   VIEWS.forEach(function(k){ var el = document.getElementById('view-' + k); if (el) el.classList.toggle('active', k === v); });
   document.querySelectorAll('.tabs a').forEach(function(a){ a.classList.toggle('active', a.getAttribute('data-view') === v); });
+  var VG = { map: 'map', calendar: 'notice', list: 'notice', rules: 'rules', money: 'rules', me: 'me', sources: 'me' };
+  document.querySelectorAll('.bnav a[data-g]').forEach(function(a){ var on = a.dataset.g === VG[v]; a.classList.toggle('on', on); if (on) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
+  document.querySelectorAll('.subnav a[data-sv]').forEach(function(a){ var on = a.dataset.sv === v; a.classList.toggle('on', on); if (on) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
   window.scrollTo(0, 0);
   if (v === 'map' && window.nmMap) { try { nmMap.autoResize(); } catch(e) {} }
   if (v === 'me') meOpen();
@@ -1950,7 +2143,7 @@ document.addEventListener('click', function(e){
 var sheet = (function(){
   var side = document.getElementById('side'), handle = document.getElementById('sheet-handle'), btn = document.getElementById('sheet-btn'), hideBtn = document.getElementById('sheet-hide');
   function mobile(){ return window.matchMedia('(max-width:760px)').matches; }
-  function maxH(){ return side.parentNode.clientHeight - 48; }
+  function maxH(){ return side.parentNode.clientHeight - 62; }
   function minH(){ return handle.offsetHeight + 4; }   // 손잡이만 남기고 숨김(범례·공고 선택까지 내려감)
   function peekH(){ var bars = side.querySelectorAll('.side-tabs,.qf-row,.nmbar,.lg-sum'); var h = handle.offsetHeight + 6; bars.forEach(function(b){ h += b.offsetHeight; }); if (side.classList.contains('show-detail')) { var db = side.querySelector('.detail-bar'); if (db) h += db.offsetHeight + 120; } return h; }
   function snaps(){ var half = Math.round(side.parentNode.clientHeight * 0.5), pk = Math.min(peekH(), half); return [minH(), pk, half, maxH()]; }   // 범례가 화면 절반보다 길면 '범례' 높이 = 절반(높이가 위·아래로 뒤집히지 않게)
@@ -1961,6 +2154,9 @@ var sheet = (function(){
   function label(){ if (!btn) return; btn.textContent = state === 3 ? '지도 보기 ▼' : (state === 0 ? '범례·목록 ▲' : (state === 1 ? '목록 펼치기 ▲' : '전체로 펼치기 ▲')); }
   function go(s){ state = Math.max(0, Math.min(3, s)); setH(snaps()[state]); side.classList.toggle('full', state === 3); side.classList.toggle('hidden-sheet', state === 0); label(); }
   if (handle) {
+    handle.setAttribute('role', 'button'); handle.setAttribute('tabindex', '0'); handle.setAttribute('aria-label', '목록 펼치기·접기');
+    handle.addEventListener('click', function(e){ if (!mobile() || e.target.closest('button')) return; e.stopPropagation(); go(state === 3 ? 2 : 3); });
+    handle.addEventListener('keydown', function(e){ if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(state === 3 ? 2 : 3); } });
     // 1) 버튼: 접혀 있으면 전체로, 전체면 범례만(지도 보기) (탭 한 번). 손잡이(막대)를 누르면 한 단계 아래로(숨김까지)
     btn.addEventListener('click', function(e){ e.stopPropagation(); go(state === 3 ? 1 : 3); });
     if (hideBtn) hideBtn.addEventListener('click', function(e){ e.stopPropagation(); go(0); });   // 숨기기: 손잡이만 남김(지도 전체)
@@ -2684,7 +2880,8 @@ var nmSelected = null;
 function nmSelect(mk){
   if (nmSelected && nmSelected !== mk) { try { nmSelected.setIcon(nmSelected.__icon ? nmSelected.__icon() : nmIcon(nmSelected.__p, nmSelected.__approx)); nmSelected.setZIndex(nrLive(nmSelected.__p) ? 30 : (nmSelected.__p.pick ? 20 : 10)); } catch(e) {} }
   nmSelected = mk;
-  try { mk.setIcon({ content: '<div class="nm-sel' + nmCls(mk.__p) + '" style="--c:' + nmColor(mk.__p) + '"><b>' + mk.__p.name + pkSel(mk.__p) + '</b></div>', anchor: new naver.maps.Point(13, 13) }); mk.setZIndex(100); } catch(e) {}
+  try { mk.setIcon({ content: '<div class="nm-sel' + nmCls(mk.__p) + '" style="--c:' + nmColor(mk.__p) + '"><b>' + mk.__p.name + pkSel(mk.__p) + '</b></div>', anchor: new naver.maps.Point(11, 11) }); mk.setZIndex(100); } catch(e) {}
+  if (window.prLayout) setTimeout(prLayout, 0);
 }
 function showDetail(p, approx){
   var d = document.getElementById('nm-detail'), l = document.getElementById('nm-list'); if (!d) return;
@@ -2761,7 +2958,8 @@ function nmFocus(name, m2){
 }
 function nmInit(){
   if (!window.naver || !naver.maps) return;
-  nmMap = new naver.maps.Map('nmap', { center: new naver.maps.LatLng(37.565, 126.93), zoom: 11, zoomControl: !sheet.mobile(), zoomControlOptions: { position: naver.maps.Position.TOP_LEFT } });  // 폰은 손가락 확대, 줌 막대 없음
+  nmMap = new naver.maps.Map('nmap', { center: new naver.maps.LatLng(37.565, 126.93), zoom: 11, zoomControl: !sheet.mobile(), zoomControlOptions: { position: naver.maps.Position.RIGHT_CENTER || naver.maps.Position.TOP_RIGHT || naver.maps.Position.TOP_LEFT } });  // 폰은 손가락 확대, 줌 막대 없음
+  try { naver.maps.Event.addListener(nmMap, 'idle', function(){ if (window.prLayout) prLayout(); }); } catch(e) {}
   nmInfo = new naver.maps.InfoWindow({ borderWidth: 0, backgroundColor: 'transparent', disableAnchor: true, disableAutoPan: true, pixelOffset: new naver.maps.Point(0, -6) });  // autoPan 끔: 이동은 nmFocusMarker 가 한 번만
   var status = document.getElementById('nm-status'), list = document.getElementById('nm-list');
   // 폰: 바닥 시트가 아래 절반을 덮으므로 보이는 위쪽 절반에 서울이 오도록 중심을 남쪽으로 내림
@@ -2927,7 +3125,7 @@ function nmInit(){
         naver.maps.Event.addListener(mk, 'click', function(){ nmFocusMarker(mk); });
         var it = document.createElement('div'); it.className = 'it'; it.setAttribute('data-key', k);
         it.setAttribute('data-nid', p.nid);
-        it.__render = function(){ it.dataset.cat = p.cat; it.innerHTML = '<span class="dot' + nmCls(p) + '" style="--c:' + nmColor(p) + ';margin-top:3px"></span><div><b>' + p.name + ' <span class="pill ' + (p.cat === 'na' ? 'warn' : 'info') + '" style="font-size:11px;padding:0 7px">' + (p.cat === 'na' ? (p.kind === '행복주택' ? naPill(p) : (p.na0 ? '지금 해당 없음' : '기준 미만')) : p.kind === '국민임대' ? '26년 국민임대 ' + (p.ok26 || []).map(function(a){ return a.replace(/^(\d+)㎡$/, function(_, n){ return n + '㎡(' + py(n) + ')'; }); }).join('·') : NOTICES[p.nid].short) + '</span></b><small>' + (p.kind === '행복주택' ? p.m2 + '㎡ ' + p.py + ' · ' + hhShort(p) + ' · 공가 ' + p.vac + (p.wait ? ' · 예비 ' + p.wait : '') + ' · ' + p.rank : hhShort(p) + ' · ' + p.rank) + btTag(p) + pkTag(p) + stTag(p) + '</small></div><div class="num">' + (p.kind === '행복주택' ? p.dep + '<br>월 ' + p.rent : '') + '</div>'; };
+        it.__render = function(){ it.dataset.cat = p.cat; it.innerHTML = '<span class="dot' + nmCls(p) + '" style="--c:' + nmColor(p) + ';margin-top:3px"></span><div><b>' + p.name + ' <span class="pill ' + (p.cat === 'na' ? 'warn' : 'info') + '" style="font-size:11px;padding:0 7px">' + (p.cat === 'na' ? (p.kind === '행복주택' ? naPill(p) : (p.na0 ? '지금 해당 없음' : '기준 미만')) : p.kind === '국민임대' ? '26년 국민임대 ' + (p.ok26 || []).map(function(a){ return a.replace(/^(\d+)㎡$/, function(_, n){ return n + '㎡(' + py(n) + ')'; }); }).join('·') : NOTICES[p.nid].short) + '</span></b><small>' + (p.kind === '행복주택' ? p.m2 + '㎡ ' + p.py + ' · ' + hhShort(p) + ' · 공가 ' + p.vac + (p.wait ? ' · 예비 ' + p.wait : '') + ' · ' + p.rank : hhShort(p) + ' · ' + p.rank) + btTag(p) + pkTag(p) + stTag(p) + '</small></div><div class="num">' + (p.kind === '행복주택' ? '<b class="n1">월 ' + p.rent + '</b><small class="n2">보증 ' + p.dep + '</small>' : '') + '</div>'; };
         it.__render();
         it.__mk = mk;
         it.addEventListener('click', function(){ nmFocusMarker(mk); });
@@ -3102,6 +3300,7 @@ function nmInit(){
       if (!MQ.matches) { var closed = !sideEl.classList.contains('lg-closed'); sideEl.classList.toggle('lg-closed', closed); try { localStorage.setItem('kkk-lg-pc2', closed ? 'closed' : 'open'); } catch(e2) {} lgSync(); return; }
       var open = !sideEl.classList.contains('lg-open'); sideEl.classList.toggle('lg-open', open); lgSync(); if (open) sheet.go(3); else sheet.refit(); });   // 필터를 펼치면 늘 시트 전체로(반 높이면 필터 아래쪽이 화면 밖이라 못 닿음)
     if (MQ.addEventListener) MQ.addEventListener('change', lgSync); lgSync();
+    var qfMore = document.getElementById('qf-more'); if (qfMore) qfMore.addEventListener('click', function(e){ e.stopPropagation(); lgBtn.click(); });
   }
   function applyFilter(){
     var on = {}; document.querySelectorAll('.nmbar input[data-cat]').forEach(function(c){ on[c.dataset.cat] = c.checked; });
@@ -3122,7 +3321,7 @@ function nmInit(){
     document.querySelectorAll('.lst .grp').forEach(function(el){ el.style.display = shown[el.dataset.cat] ? '' : 'none'; });   // 보이는 단지가 없는 묶음 제목은 숨김
     selNote(nid); if (window.renderNoticePanel) window.renderNoticePanel();   // 공고 카드의 '지금 필터로 보이는 곳' 숫자도 같이
     var em = document.getElementById('nm-empty'); if (em) { var nv = Object.keys(shown).reduce(function(a, k){ return a + shown[k]; }, 0); em.hidden = !!nv || !nmMarkers.length; em.innerHTML = LIVE ? '<b>지금 접수 중·접수 예정' + (EXP_ON ? '·공고 예정' : '') + '인 단지가 없음</b> — 위 \'접수 끝난 곳 빼기\'를 끄면 전부 보임' : '조건에 맞는 단지가 없음 — 필터를 바꿔 보세요'; }
-    lgSummary();
+    lgSummary(); if (window.prRefresh) prRefresh();
   }
   // 고른 공고 띠: 무슨 공고인지·접수 상태·지도에 몇 곳 · ✕로 해제
   function selNote(nid){ var el = document.getElementById('nm-selnote'); if (!el) return; if (!nid || !NREG[nid]) { el.hidden = true; el.innerHTML = ''; return; }
