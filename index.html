@@ -807,6 +807,21 @@ h1,h2,h3{letter-spacing:-.02em}
 .pr-legend{display:inline-block;margin-top:6px;padding:5px 11px;border-radius:999px;background:rgba(255,255,255,.94);color:var(--muted);font:500 12.5px/1.35 var(--font-body);box-shadow:0 1px 4px rgba(21,24,29,.16);pointer-events:none;max-width:calc(100% - 24px)}
 .pr-legend b{color:var(--fg);font-weight:700}
 @media (max-width:760px){.pr-legend{margin-left:12px;font-size:12px}}
+/* 상세 맨 위 요약 */
+.det-hero{margin:2px 0 14px;padding:14px 16px 12px;border-radius:16px;background:var(--accent-soft)}
+.det-hero .dh-m{display:flex;align-items:baseline;flex-wrap:wrap;gap:4px 6px;color:var(--muted);font-size:14px;font-weight:600}
+.det-hero .dh-m b{color:var(--fg);font-size:24px;font-weight:800;letter-spacing:-.02em;margin-right:2px}
+.det-hero .dh-m i{font-style:normal;color:var(--muted);font-size:20px;margin:0 4px 0 0}
+.det-hero .dh-s{margin-top:4px;color:var(--muted);font-size:13.5px;line-height:1.45}
+.det-hero .dh-t{margin-top:8px;font-size:14px;color:var(--fg)}
+/* 폰 필터: 시트 전체를 필터로, 아래에 'n곳 보기' */
+.lg-apply{display:none}
+@media (max-width:760px){
+  .side.lg-open #nm-list,.side.lg-open #nm-notices,.side.lg-open #nm-empty,.side.lg-open #nm-selnote{display:none!important}
+  .side.lg-open .lg-body{max-height:none!important;flex:1 1 auto;min-height:0;border-bottom:0!important}
+  .side.lg-open .lg-apply{display:block;position:sticky;bottom:0;z-index:3;padding:12px 16px calc(12px + env(safe-area-inset-bottom,0px));background:linear-gradient(rgba(255,255,255,0),var(--surface) 28%)}
+  .lg-apply button{width:100%;height:52px;border:0;border-radius:14px;background:#1E5CA6;color:#fff;font:700 16px/1 var(--font-body)}
+}
 /* 겹쳐서 묶인 핀: 숨기고, 묶음 대표에 숫자 배지 */
 .nm-mkw.pr-hid{visibility:hidden}
 .nm-mkw[data-n]::after{content:attr(data-n);position:absolute;top:-9px;right:-11px;min-width:19px;height:19px;padding:0 5px;box-sizing:border-box;border-radius:10px;background:#15181D;color:#fff;font:800 11.5px/19px var(--font-body);text-align:center;box-shadow:0 0 0 2px #fff;pointer-events:none;z-index:2}
@@ -2920,10 +2935,22 @@ function nmSelect(mk){
   try { mk.setIcon({ content: '<div class="nm-sel' + nmCls(mk.__p) + '" style="--c:' + nmColor(mk.__p) + '"><b>' + mk.__p.name + pkSel(mk.__p) + '</b></div>', anchor: new naver.maps.Point(11, 11) }); mk.setZIndex(100); } catch(e) {}
   if (window.prLayout) setTimeout(prLayout, 0);
 }
+// 상세 맨 위 요약: 목록 줄과 같은 보증금/월세(공고 기본 조합) · 전용 평형 · 내 순위 — 핀을 누르면 폰 반 시트에 이것부터 보임
+function detHero(p){
+  var it = null; document.querySelectorAll('#nm-list .it').forEach(function(x){ if (!it && x.__mk && x.__mk.__p === p) it = x; });
+  if (!it || !it.dataset.pr || isNaN(+it.dataset.pr)) return '';
+  var d = +it.dataset.pd || 0, r = Math.round(+it.dataset.pr * 10) / 10, m = it.dataset.pm;
+  var sub = [];
+  if (p.kind === '행복주택' && p.m2) sub.push('전용 ' + p.m2 + '㎡(' + String(p.py || '').replace(/^\s+|\s+$/g, '') + ')');
+  if (p.rank && typeof rankPill === 'function') sub.push(rankPill(p.rank));
+  return '<div class="det-hero"><div class="dh-m">' + (d ? '<span>보증금</span><b>' + fmtMan(d) + '</b><i>/</i>' : '') + '<span>월세</span><b>' + r + '만' + (m ? '~' : '') + '</b></div>' +
+    '<div class="dh-s">' + (m ? '월세 가장 싼 형 기준 · 형마다 다름(아래 표)' : '공고에 적힌 기본 조합 · 보증금을 올리거나 내리면 월세가 바뀜(아래 임대조건)') + '</div>' +
+    (sub.length ? '<div class="dh-t">' + sub.join(' ') + '</div>' : '') + '</div>';
+}
 function showDetail(p, approx){
   var d = document.getElementById('nm-detail'), l = document.getElementById('nm-list'); if (!d) return;
   document.getElementById('side').classList.add('show-detail');   // 폰: 상세를 열면 위쪽 범례·필터를 접어 설명이 시트 전체를 씀(← 목록으로 돌아오면 다시 보임)
-  document.getElementById('nm-detail-body').innerHTML = expNote(p) + nmHtml(p, approx); document.getElementById('detail-title').innerHTML = p.name + ' <span class="pill info" style="font-size:11px;padding:0 7px;vertical-align:middle">' + p.kind + '</span>';
+  document.getElementById('nm-detail-body').innerHTML = detHero(p) + expNote(p) + nmHtml(p, approx); document.getElementById('detail-title').innerHTML = p.name + ' <span class="pill info" style="font-size:11px;padding:0 7px;vertical-align:middle">' + p.kind + '</span>';
   l.hidden = true; d.hidden = false; d.scrollTop = 0;
   // 섹션 바로가기: 상세 안 섹션 제목(임대조건·전환·사진·거주 조건·경쟁률·단지 정보 …)을 눌러 바로 그 자리로
   var nav = document.getElementById('det-nav'), body = document.getElementById('nm-detail-body');
@@ -3343,6 +3370,8 @@ function nmInit(){
       var open = !sideEl.classList.contains('lg-open'); sideEl.classList.toggle('lg-open', open); lgSync(); if (open) sheet.go(3); else sheet.refit(); });   // 필터를 펼치면 늘 시트 전체로(반 높이면 필터 아래쪽이 화면 밖이라 못 닿음)
     if (MQ.addEventListener) MQ.addEventListener('change', lgSync); lgSync();
     var qfMore = document.getElementById('qf-more'); if (qfMore) qfMore.addEventListener('click', function(e){ e.stopPropagation(); lgBtn.click(); });
+    var lgBody = document.getElementById('lg-body'); if (lgBody && !document.getElementById('lg-apply')) { var la = document.createElement('div'); la.className = 'lg-apply'; la.innerHTML = '<button type="button" id="lg-apply">결과 보기</button>'; lgBody.appendChild(la);
+      la.querySelector('button').addEventListener('click', function(e){ e.stopPropagation(); if (sideEl.classList.contains('lg-open')) lgBtn.click(); sheet.go(2); }); }
     var mch = document.getElementById('mapchips'); if (mch && !document.getElementById('pr-legend')) { var pl = document.createElement('div'); pl.id = 'pr-legend'; pl.className = 'pr-legend'; pl.innerHTML = '핀 = <b>보증금/월세</b>(만 원, 공고 기본) · <b>검은 숫자</b> = 겹친 곳'; mch.appendChild(pl); }
   }
   function applyFilter(){
@@ -3365,6 +3394,7 @@ function nmInit(){
     selNote(nid); if (window.renderNoticePanel) window.renderNoticePanel();   // 공고 카드의 '지금 필터로 보이는 곳' 숫자도 같이
     var em = document.getElementById('nm-empty'); if (em) { var nv = Object.keys(shown).reduce(function(a, k){ return a + shown[k]; }, 0); em.hidden = !!nv || !nmMarkers.length; em.innerHTML = LIVE ? '<b>지금 접수 중·접수 예정' + (EXP_ON ? '·공고 예정' : '') + '인 단지가 없음</b> — 위 \'접수 끝난 곳 빼기\'를 끄면 전부 보임' : '조건에 맞는 단지가 없음 — 필터를 바꿔 보세요'; }
     lgSummary(); if (window.prRefresh) prRefresh();
+  var lab = document.getElementById('lg-apply'), lsb = document.querySelector('#lg-sum-txt > b'); if (lab && lsb) lab.textContent = lsb.textContent + ' 보기';
   }
   // 고른 공고 띠: 무슨 공고인지·접수 상태·지도에 몇 곳 · ✕로 해제
   function selNote(nid){ var el = document.getElementById('nm-selnote'); if (!el) return; if (!nid || !NREG[nid]) { el.hidden = true; el.innerHTML = ''; return; }
