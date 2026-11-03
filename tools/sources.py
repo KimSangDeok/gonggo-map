@@ -161,6 +161,75 @@ def lh_detail(url):
         if m: sched[key] = [g.replace('.', '-') for g in m.groups()]
     return {'complexes': comps, 'sched': sched}
 
+# ---------------- 기관 공급계획(공고 예고) — 아직 공고 전인 단지를 기관이 미리 밝힌 것 ----------------
+# SH: 인터넷청약 '청약 공급계획 보기'(행복주택·국민임대·청년안심주택 표) · LH: 청약플러스 부동산맵 > 공급계획 > 임대주택(지역 서울)
+SH_PLAN = {'happy': ('행복주택', 'https://www.i-sh.co.kr/main/lay2/S1T243C1045/contents.do'),
+           'kook': ('국민임대', 'https://www.i-sh.co.kr/main/lay2/S1T243C1044/contents.do'),
+           'yapub': ('청년안심주택(공공임대)', 'https://www.i-sh.co.kr/main/lay2/S1T243C2811/contents.do')}
+LH_PLAN = 'https://apply.lh.or.kr/lhapply/apply/noti/sp/list.do'
+def _plan_table(soup):
+    for t in soup.find_all('table'):
+        cap = t.find('caption')
+        if cap and '공급계획' in cap.get_text(): return t
+    return None
+def _grid(tbl):   # rowspan 을 풀어 tbody 를 칸 목록으로
+    rows, carry = [], {}
+    for tr in tbl.select('tbody tr'):
+        cells, ci, tds = [], 0, tr.find_all(['td', 'th'])
+        k = 0
+        while k < len(tds) or ci in carry:
+            if ci in carry:
+                txt, left = carry[ci]; cells.append(txt)
+                if left <= 1: del carry[ci]
+                else: carry[ci] = (txt, left - 1)
+                ci += 1; continue
+            td = tds[k]; k += 1
+            txt = ' '.join(td.get_text(' ', strip=True).split())
+            rs = int(td.get('rowspan') or 1)
+            if rs > 1: carry[ci] = (txt, rs - 1)
+            cells.append(txt); ci += int(td.get('colspan') or 1)
+        rows.append(cells)
+    return rows
+def sh_plans():
+    out = []
+    for prog, (label, url) in SH_PLAN.items():
+        try:
+            r = S.get(url, timeout=60); r.raise_for_status()
+            soup = BeautifulSoup(r.text, 'html.parser'); tbl = _plan_table(soup)
+            if not tbl: log('SH plan', label, 'no table'); continue
+            m = re.search(r'\d{4}\s*년\s*\d{1,2}\s*월\s*(?:현재|기준)|\d{4}\.\s*\d{1,2}\.\s*(?:현재|기준)', soup.get_text(' '))
+            basis = ' '.join(m.group(0).split()) if m else ''
+            head = []   # 첫 머리줄을 colspan 만큼 펼쳐 칸 번호를 맞춤(공급예정물량 칸이 면적별로 여러 칸)
+            for th in tbl.select('thead tr')[0].find_all('th'): head += [' '.join(th.get_text(' ', strip=True).split())] * int(th.get('colspan') or 1)
+            col = lambda *names: next((i for i, h in enumerate(head) if any(n in h for n in names)), None)
+            iw, iname, isum, igu, ity = col('공급월', '공급예정월'), col('단지명'), col('계', '합계'), col('소재지'), col('유형')
+            for c in _grid(tbl):
+                get = lambda i: (c[i] if i is not None and i < len(c) else '')
+                name = get(iname)
+                if not name or '합계' in name: continue
+                out.append({'src': 'SH', 'prog': prog, 'type': label, 'name': name, 'gu': get(igu), 'hh': get(isum), 'when': get(iw), 'kind': get(ity), 'basis': basis, 'url': url})
+            log('SH plan', label, sum(1 for x in out if x['prog'] == prog), 'rows', basis)
+        except Exception as e:
+            log('SH plan failed', label, repr(e))
+    return out
+def lh_plans(regions=(('11', '서울특별시'),)):
+    out = []
+    for code, rname in regions:
+        try:
+            data = {'mi': '1042', 'sUppAisTpCd': '06', 'sAisTpCd': '', 'srchCnpCd': code, 'srchY': 'Y', 'listCo': '100', 'prevListCo': '100', 'currPage': '1', 'hyCd': '99'}
+            r = S.post(LH_PLAN, data=data, timeout=60, headers={'Referer': LH_PLAN + '?sUppAisTpCd=06&mi=1042'}); r.raise_for_status()
+            soup = BeautifulSoup(r.text, 'html.parser')
+            year = (re.search(r'(20\d{2})\s*년\s*공급계획', soup.get_text(' ')) or [None, ''])[1]
+            for tr in soup.select('table tbody tr'):
+                c = [' '.join(td.get_text(' ', strip=True).split()) for td in tr.find_all('td')]
+                if len(c) < 7 or rname[:2] not in c[0]: continue
+                out.append({'src': 'LH', 'prog': 'lh', 'type': c[1], 'name': c[2], 'm2': c[3], 'hh': c[4], 'when': c[5], 'movein': c[6], 'org': c[7] if len(c) > 7 else '', 'note': c[8] if len(c) > 8 else '',
+                            'basis': (year + '년 공급계획') if year else '공급계획', 'url': LH_PLAN + '?sUppAisTpCd=06&mi=1042'})
+            log('LH plan', rname, sum(1 for x in out if x['src'] == 'LH'), 'rows')
+        except Exception as e:
+            log('LH plan failed', rname, repr(e))
+    return out
+
 def lh_notices(regions=(('11', '서울특별시'),), days=150):   # 서울만 (경기 제외 — 2026-10-27)
     today = datetime.date.today(); start = today - datetime.timedelta(days=days)
     out = []

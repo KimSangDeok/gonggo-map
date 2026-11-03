@@ -29,8 +29,18 @@ except Exception as e:
 if not ya['complexes'] and os.path.exists('data/ya.json'):   # 실패한 날은 기존 단지 데이터 유지
     try: ya['complexes'] = json.load(open('data/ya.json', encoding='utf-8')).get('complexes', [])
     except Exception: pass
+# 기관 공급계획(공고 예고): SH 청약 공급계획(행복주택·국민임대·청년안심주택) + LH 공급계획(임대, 서울) — 실패한 날은 기존 것 유지
+plans = {'updated': now, 'about': '기관이 미리 밝힌 공급계획(아직 공고 전) — SH 인터넷청약 청약 공급계획 · LH 청약플러스 공급계획(임대주택, 서울). 이미 공고가 났는지·계획 시기가 지났는지는 지도 화면에서 판정', 'items': []}
+try:
+    plans['items'] = src.sh_plans() + src.lh_plans()
+except Exception as e:
+    src.log('plans failed:', repr(e))
+if not plans['items'] and os.path.exists('data/plans.json'):
+    try: plans['items'] = json.load(open('data/plans.json', encoding='utf-8')).get('items', [])
+    except Exception: pass
+json.dump(plans, open('data/plans.json', 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
 out['log'] = src.LOG[-60:]
 json.dump(out, open('data/notices.json', 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
 json.dump(lh, open('data/lh.json', 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
 json.dump(ya, open('data/ya.json', 'w', encoding='utf-8'), ensure_ascii=False, separators=(',', ':'))
-print('notices', len(out['items']), 'lh', len(lh['items']), 'ya notices', len(ya['notices']), 'ya complexes', len(ya['complexes']))
+print('plans', len(plans['items']), 'notices', len(out['items']), 'lh', len(lh['items']), 'ya notices', len(ya['notices']), 'ya complexes', len(ya['complexes']))
