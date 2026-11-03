@@ -741,15 +741,6 @@ h1,h2,h3{letter-spacing:-.02em}
   #view-map.active.detail-open{grid-template-columns:minmax(340px,400px) minmax(0,1fr)}
   #view-map.active.flt-open:not(.detail-open){grid-template-columns:min(1150px,64vw,calc(100vw - 360px)) minmax(360px,1fr)}
 }
-@media (min-width:1600px){
-  #view-map.active.detail-open:not(.detail-wide){grid-template-columns:840px minmax(0,1fr)}
-  #view-map.detail-open:not(.detail-wide) .side.show-detail{display:grid;grid-template-columns:400px 440px;grid-template-rows:auto auto auto auto minmax(0,1fr)}
-  #view-map.detail-open:not(.detail-wide) .side.show-detail > *{grid-column:1}
-  #view-map.detail-open:not(.detail-wide) .side.show-detail > .side-tabs{display:flex!important;grid-row:1}
-  #view-map.detail-open:not(.detail-wide) .side.show-detail > .lg-sum{display:flex!important;grid-row:2}
-  #view-map.detail-open:not(.detail-wide) .side.show-detail > #nm-selnote{grid-row:3}
-  #view-map.detail-open:not(.detail-wide) .side.show-detail > #nm-list,#view-map.detail-open:not(.detail-wide) .side.show-detail > #nm-list[hidden]{display:block!important;grid-row:5;min-height:0;overflow:auto}
-  #view-map.detail-open:not(.detail-wide) .side.show-detail > #nm-detail{grid-column:2;grid-row:1/-1;min-height:0;box-shadow:inset 1px 0 0 var(--line)}
 }
 /* 목록 줄: 왼쪽 44px 칸(종류 색) · 이름 16px · 둘째 줄 14px(두 줄까지) · 오른쪽 월세 굵게 */
 .lst .grp{position:sticky;top:0;z-index:1;background:var(--bg);color:var(--muted);font-size:13px;font-weight:700;letter-spacing:0;padding:10px 20px 8px;line-height:1.4}
@@ -839,12 +830,13 @@ h1,h2,h3{letter-spacing:-.02em}
   .side.flt-open .lg-apply button:hover{background:#174C8C}
 }
 @media (min-width:1600px){
-  #view-map.active.detail-open.flt-open:not(.detail-wide){grid-template-columns:840px minmax(0,1fr)!important}   /* 목록+상세와 같은 폭 */
-  #view-map.detail-open:not(.detail-wide) .side.show-detail.flt-open{grid-template-columns:400px 440px!important}
+  #view-map.active.detail-open.flt-open:not(.detail-wide){grid-template-columns:calc(400px + var(--det-w)) minmax(0,1fr)!important}   /* 필터 400 + 상세 */
+  #view-map.detail-open:not(.detail-wide) .side.show-detail.flt-open{display:grid!important;grid-template-columns:400px var(--det-w)!important;grid-template-rows:auto auto auto auto minmax(0,1fr)!important}
   #view-map.detail-open:not(.detail-wide) .side.show-detail.flt-open > *{grid-column:1!important}
+  #view-map.detail-open:not(.detail-wide) .side.show-detail.flt-open > .lg-sum{display:flex!important;grid-row:2!important}
   #view-map.detail-open:not(.detail-wide) .side.show-detail.flt-open > #nm-list,#view-map.detail-open:not(.detail-wide) .side.show-detail.flt-open > .side-tabs{display:none!important}
   #view-map.detail-open:not(.detail-wide) .side.show-detail.flt-open > .lg-body{display:block!important;grid-row:3/-1!important;min-height:0;max-height:none;overflow-y:auto;border:0}
-  #view-map.detail-open:not(.detail-wide) .side.show-detail.flt-open > #nm-detail{grid-column:2!important;grid-row:1/-1!important}
+  #view-map.detail-open:not(.detail-wide) .side.show-detail.flt-open > #nm-detail{grid-column:2!important;grid-row:1/-1!important;min-height:0;box-shadow:inset 1px 0 0 var(--line)}
 }
 /* ===== 필터 고르기: 체크 항목 = 큰 알약 단추(켜면 파란 테두리·✓) · 제목은 한 줄 위로 · ⓘ 는 옅게 ===== */
 .lg-body .nmbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px 8px}
@@ -871,6 +863,36 @@ h1,h2,h3{letter-spacing:-.02em}
 .lg-body .burd-q button span{white-space:nowrap;font-size:15px!important}
 .lg-body .burd-q button b{font-size:13.5px!important}
 .lg-body .burd-q button{padding:9px 10px!important}
+/* ===== PC 단지 상세: 목록은 접고 상세를 넓게 — '☰ 목록 보기'를 누르면 목록(400px)이 상세 옆에 펼쳐짐 ===== */
+#detail-list{display:none}
+@media (min-width:761px){
+  #view-map{--det-w:520px}
+  #detail-list{flex:none;display:inline-flex;align-items:center;gap:4px;min-height:36px;border:1px solid var(--line);background:var(--bg);color:var(--fg);border-radius:10px;padding:0 12px;font:inherit;font-size:13.5px;font-weight:600;cursor:pointer;white-space:nowrap}
+  #detail-list[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent);color:var(--accent-ink)}
+  #view-map.detail-wide #detail-list{display:none}
+  #view-map.active.detail-open:not(.detail-wide):not(.list-open):not(.flt-open){grid-template-columns:var(--det-w) minmax(0,1fr)!important}   /* 상세만(목록 접힘) */
+  #view-map.active.detail-open.list-open:not(.detail-wide):not(.flt-open){grid-template-columns:calc(400px + var(--det-w)) minmax(0,1fr)!important}   /* 목록 + 상세 */
+  #view-map.detail-open.list-open:not(.detail-wide):not(.flt-open) .side.show-detail{display:grid!important;grid-template-columns:400px var(--det-w)!important;grid-template-rows:auto auto auto auto minmax(0,1fr)!important}
+  #view-map.detail-open.list-open:not(.detail-wide):not(.flt-open) .side.show-detail > *{grid-column:1}
+  #view-map.detail-open.list-open:not(.detail-wide):not(.flt-open) .side.show-detail > .side-tabs{display:flex!important;grid-row:1}
+  #view-map.detail-open.list-open:not(.detail-wide):not(.flt-open) .side.show-detail > .lg-sum{display:flex!important;grid-row:2}
+  #view-map.detail-open.list-open:not(.detail-wide):not(.flt-open) .side.show-detail > #nm-selnote{grid-row:3}
+  #view-map.detail-open.list-open:not(.detail-wide):not(.flt-open) .side.show-detail > #nm-list,#view-map.detail-open.list-open:not(.detail-wide):not(.flt-open) .side.show-detail > #nm-list[hidden]{display:block!important;grid-row:5;min-height:0;overflow:auto}
+  #view-map.detail-open.list-open:not(.detail-wide):not(.flt-open) .side.show-detail > #nm-detail{grid-column:2;grid-row:1/-1;min-height:0;box-shadow:inset 1px 0 0 var(--line)}
+}
+@media (min-width:1600px){ #view-map{--det-w:600px} }
+@media (min-width:2200px){ #view-map{--det-w:680px} }
+/* 근거 접기 */
+td.k-fold:not(.k-on) small.k,.dh-b.k-fold:not(.k-on) small.k,.exp-note.k-fold:not(.k-on) small.k{display:none!important}
+td.k-fold:not(.k-on) br:has(+ small.k),.exp-note.k-fold:not(.k-on) br:has(+ small.k){display:none}
+.iw-sec.k-sec:not(.k-on) .k-hide{display:none!important}
+.iw-sec.k-sec.k-on .k-hide.iw-fn,.iw-sec.k-sec.k-on > small.k-hide{display:block}
+.k-tg{display:inline-flex;align-items:center;margin:0 0 0 6px;padding:1px 8px;min-height:22px;border:1px solid var(--line);border-radius:999px;background:transparent;color:var(--muted);font:600 12px/1.4 var(--font-body);cursor:pointer;vertical-align:1px;white-space:nowrap}
+.k-tg:hover,.k-tgl:hover{color:var(--accent);border-color:var(--accent)}
+.k-tg[aria-expanded="true"],.k-tgl[aria-expanded="true"]{background:var(--accent-soft);color:var(--accent-ink);border-color:transparent}
+td.k-fold.k-on > .k-tg{margin-bottom:2px}
+.k-tgl{display:inline-flex;align-items:center;margin:8px 0 4px;padding:4px 12px;min-height:30px;border:1px solid var(--line);border-radius:999px;background:transparent;color:var(--muted);font:600 12.5px/1.3 var(--font-body);cursor:pointer}
+@media (max-width:760px){ .k-tg{min-height:28px;padding:2px 10px} .k-tgl{min-height:36px} }
 /* (E) 넓게 보기: 상세가 지도 자리까지 덮으니 지도·지도 위 칩·확대 단추는 숨김(전엔 왼쪽 칸으로 밀려 상세 위에 겹쳤음) */
 @media (min-width:761px){ #view-map.detail-wide .mapbox{visibility:hidden} }
 /* (C) ⓘ 카드: 문장마다 한 줄 · PC 크게 */
@@ -1044,7 +1066,7 @@ html.pano-open,html.pano-open body{overflow:hidden}
       <div id="nm-empty" class="note" hidden style="margin:10px 12px"></div>
       <div class="lst" id="nm-list"></div>
       <div class="nlist" id="nm-notices" hidden></div>
-      <div class="detail" id="nm-detail" hidden><div class="detail-bar"><button type="button" id="detail-back">← 목록</button><b id="detail-title"></b><button type="button" id="detail-wide" title="패널을 화면 전체로(3단) — 다시 누르면 지도 보기">넓게 보기 ⤢</button></div><div class="det-nav" id="det-nav"></div><div id="nm-detail-body"></div></div>
+      <div class="detail" id="nm-detail" hidden><div class="detail-bar"><button type="button" id="detail-back">← 목록</button><b id="detail-title"></b><button type="button" id="detail-list" aria-pressed="false" title="단지 목록을 상세 옆에 펼치기·접기">☰ 목록 보기</button><button type="button" id="detail-wide" title="패널을 화면 전체로(3단) — 다시 누르면 지도 보기">넓게 보기 ⤢</button></div><div class="det-nav" id="det-nav"></div><div id="nm-detail-body"></div></div>
     </aside>
   </section>
 
@@ -2001,7 +2023,8 @@ function panoOpen(lat, lng, name){
   if (!ov) { ov = document.createElement('div'); ov.id = 'pano-ov';
     ov.innerHTML = '<div class="pano-box" role="dialog" aria-modal="true" aria-label="거리뷰"><div class="pano-h"><b class="pano-t"></b><small class="k">네이버 거리뷰 · 단지 좌표에서 가장 가까운 촬영 지점</small><a class="pano-k" target="_blank" rel="noopener">카카오 로드뷰 ↗</a><button type="button" class="pano-x" aria-label="닫기">✕</button></div><div class="pano-v"></div><div class="pano-msg" hidden></div></div>';
     document.body.appendChild(ov);
-    ov.addEventListener('click', function(e){ if (e.target === ov || (e.target.closest && e.target.closest('.pano-x'))) panoClose(); });
+    var downBack = false; ov.addEventListener('pointerdown', function(e){ downBack = e.target === ov; });
+    ov.addEventListener('click', function(e){ if (e.target.closest && e.target.closest('.pano-x')) { panoClose(); return; } if (e.target === ov && downBack) panoClose(); downBack = false; });
     document.addEventListener('keydown', function(e){ if (e.key === 'Escape' && ov.classList.contains('on')) panoClose(); }); }
   ov.querySelector('.pano-t').textContent = (name || '') + ' 거리뷰'; ov.querySelector('.pano-k').href = kk;
   var msg = ov.querySelector('.pano-msg'), v = ov.querySelector('.pano-v'); msg.hidden = true; v.innerHTML = ''; ov.classList.add('on'); document.documentElement.classList.add('pano-open');
@@ -3150,11 +3173,35 @@ function detHero(p){
     '<div class="dh-s">' + (m ? '월세 가장 싼 형 기준 · 형마다 다름(아래 표)' : '공고에 적힌 기본 조합 · 보증금을 올리거나 내리면 월세가 바뀜(아래 임대조건)') + '</div>' +
     (sub.length ? '<div class="dh-t">' + sub.join(' ') + '</div>' : '') + '</div>';
 }
+// 근거·덧말(작은 회색 글씨)은 접어 두고 단추로 펼침 — 칸(표 칸·요약·다음 공고 상자)마다 '근거', 섹션 아래 설명 줄은 '설명 보기'
+function kFold(root){
+  if (!root) return;
+  root.querySelectorAll('td, .dh-b, .exp-note').forEach(function(cell){
+    if (cell.classList.contains('k-fold')) return;
+    var ks = Array.prototype.filter.call(cell.querySelectorAll('small.k'), function(k){ return !k.closest('th') && !k.closest('.k-tg'); }); if (!ks.length) return;
+    cell.classList.add('k-fold'); var only = !Array.prototype.some.call(cell.childNodes, function(n){ return (n.nodeType === 3 && n.textContent.trim()) || (n.nodeType === 1 && !(n.matches && n.matches('small.k,br'))); });
+    var b = document.createElement('button'); b.type = 'button'; b.className = 'k-tg'; b.setAttribute('aria-expanded', 'false'); b.textContent = only ? '설명 ▾' : '근거 ▾';
+    if (only) cell.insertBefore(b, cell.firstChild); else cell.insertBefore(b, ks[0]); });
+  root.querySelectorAll('.iw-sec').forEach(function(sec){
+    if (sec.classList.contains('k-sec')) return;
+    var ks = Array.prototype.filter.call(sec.children, function(c){ return (c.matches && (c.matches('small.k') || c.matches('ul.iw-fn') || c.matches('p.k'))); });
+    var hs = Array.prototype.slice.call(sec.querySelectorAll(':scope > .iw-sh small.k'));   // 섹션 제목 옆 출처 글씨도 같이 접음
+    if (!ks.length && !hs.length) return;
+    sec.classList.add('k-sec'); ks.concat(hs).forEach(function(c){ c.classList.add('k-hide'); }); if (!ks.length) { var sh = sec.querySelector(':scope > .iw-sh'); ks = [sh ? sh.nextSibling : sec.firstChild]; }
+    var b = document.createElement('button'); b.type = 'button'; b.className = 'k-tgl'; b.setAttribute('aria-expanded', 'false'); b.textContent = '근거·설명 보기 ▾'; sec.insertBefore(b, ks[0]); });
+}
+document.addEventListener('click', function(e){
+  var b = e.target.closest && e.target.closest('.k-tg, .k-tgl'); if (!b) return; e.preventDefault(); e.stopPropagation();
+  var on = b.getAttribute('aria-expanded') !== 'true'; b.setAttribute('aria-expanded', on ? 'true' : 'false');
+  if (b.classList.contains('k-tg')) { b.parentNode.classList.toggle('k-on', on); b.textContent = (b.textContent.indexOf('설명') === 0 ? '설명 ' : '근거 ') + (on ? '▴' : '▾'); }
+  else { b.parentNode.classList.toggle('k-on', on); b.textContent = on ? '근거·설명 접기 ▴' : '근거·설명 보기 ▾'; }
+}, true);
 function showDetail(p, approx){
   setTimeout(function(){ if (window.__lgSync) window.__lgSync(); }, 0);
   var d = document.getElementById('nm-detail'), l = document.getElementById('nm-list'); if (!d) return;
   document.getElementById('side').classList.add('show-detail');   // 폰: 상세를 열면 위쪽 범례·필터를 접어 설명이 시트 전체를 씀(← 목록으로 돌아오면 다시 보임)
   document.getElementById('nm-detail-body').innerHTML = detHero(p) + expNote(p) + nmHtml(p, approx); document.getElementById('detail-title').innerHTML = p.name + ' <span class="pill info" style="font-size:11px;padding:0 7px;vertical-align:middle">' + p.kind + '</span>';
+  kFold(document.getElementById('nm-detail-body'));
   l.hidden = true; d.hidden = false; d.scrollTop = 0;
   // 섹션 바로가기: 상세 안 섹션 제목(임대조건·전환·사진·거주 조건·경쟁률·단지 정보 …)을 눌러 바로 그 자리로
   var nav = document.getElementById('det-nav'), body = document.getElementById('nm-detail-body');
@@ -3173,6 +3220,10 @@ function hideDetail(){ nmDeselect(); setTimeout(function(){ if (window.__lgSync)
 var DET_WIDE = false; try { DET_WIDE = localStorage.getItem('kkk-detwide') === '1'; } catch(e) {}
 document.getElementById('detail-wide').addEventListener('click', function(){ var vm = document.getElementById('view-map'); DET_WIDE = !vm.classList.contains('detail-wide'); vm.classList.toggle('detail-wide', DET_WIDE); this.textContent = DET_WIDE ? '지도 보기 ⤡' : '넓게 보기 ⤢'; try { localStorage.setItem('kkk-detwide', DET_WIDE ? '1' : '0'); } catch(e) {} });
 document.getElementById('detail-back').addEventListener('click', hideDetail);
+document.getElementById('detail-list').addEventListener('click', function(){ var vm = document.getElementById('view-map'), s0 = window.nmMap ? mapSnap() : null, on = !vm.classList.contains('list-open');
+  vm.classList.toggle('list-open', on); this.setAttribute('aria-pressed', on ? 'true' : 'false'); this.textContent = on ? '☰ 목록 접기' : '☰ 목록 보기';
+  try { nmMap.autoResize(); } catch(e) {} mapKeep(s0);   // 칸 폭이 바뀌어도 지도 그림은 제자리
+  if (on) { var it = document.querySelector('#nm-list .it.on'); if (it && it.scrollIntoView) it.scrollIntoView({ block: 'nearest' }); } });
 // 지도 칸 크기가 바뀔 때(상세·필터 칸이 열리고 닫힘) 화면 속 지도 그림이 옆으로 밀리지 않게: 바뀌기 전 칸·중심을 기억 → 바뀐 뒤 그만큼 중심을 옮김
 function wPx(lat, lng, z){ var sc = 256 * Math.pow(2, z), s = Math.sin(lat * Math.PI / 180); return [(lng + 180) / 360 * sc, (0.5 - Math.log((1 + s) / (1 - s)) / (4 * Math.PI)) * sc]; }
 function wLL(x, y, z){ var sc = 256 * Math.pow(2, z), n = Math.PI - 2 * Math.PI * y / sc; return new naver.maps.LatLng(180 / Math.PI * Math.atan(0.5 * (Math.exp(n) - Math.exp(-n))), x / sc * 360 - 180); }
