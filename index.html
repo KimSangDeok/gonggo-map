@@ -977,6 +977,8 @@ td.k-fold.k-on > .k-tg{margin-bottom:2px}
 .nlist .n2-grp span{color:var(--muted);font-weight:700;margin-left:2px}
 .nlist .n2-grp:first-child{margin-top:4px}
 .n2-empty{margin:0 0 8px;color:var(--muted);font-size:14px}
+.nc.n2.v2.f-out{border-style:dashed}
+.n2-fo{margin:0;font-size:13.5px;font-weight:700;line-height:1.45;color:var(--warn);word-break:keep-all}
 .nlist .nc.n2{display:grid;grid-template-columns:100px minmax(0,1fr) auto;word-break:keep-all;overflow-wrap:anywhere;gap:10px 16px;align-items:center;margin:0 0 10px;padding:14px 16px;border:1px solid var(--line);border-radius:16px;background:var(--surface);cursor:pointer;transition:border-color .12s,box-shadow .12s}
 .nlist .nc.n2:hover{border-color:color-mix(in srgb,var(--accent) 55%,var(--line));box-shadow:0 2px 12px rgba(21,24,29,.08)}
 .nlist .nc.n2:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
@@ -3335,9 +3337,9 @@ function noticeListHtml(){
   // 카드 한 장: [언제] 제목 → 판단 한 줄 → 근거 3줄(내 순위 · 지난 결과 · 내 필터) → 먼저 볼 곳 → [지도에서 n곳] · 근거(출처)
   var full = function(o){ var w = o.w, n = o.ms.length;
     var rows = [['내 순위', w.rank], ['지난 결과', w.past], [w.fitLab, w.fit]].filter(function(x){ return x[1]; });
-    return '<div class="nc n2 v2 ' + o.st + (w.tone ? ' t-' + w.tone : '') + (o.nw ? ' unseen' : '') + '" data-id="' + hesc(o.id) + '"' + (o.key ? ' data-key="' + hesc(o.key) + '"' : '') + ' role="button" tabindex="0">' +
+    return '<div class="nc n2 v2 ' + o.st + (w.tone ? ' t-' + w.tone : '') + (o.nw ? ' unseen' : '') + (o.fout ? ' f-out' : '') + '" data-id="' + hesc(o.id) + '"' + (o.key ? ' data-key="' + hesc(o.key) + '"' : '') + ' role="button" tabindex="0">' +
       '<div class="n2-hd"><span class="n2-w">' + hesc(o.when) + '</span>' + (o.nw ? '<span class="n2c new">새 알림</span>' : '') + (o.url ? '<a class="nc-link n2-doc" href="' + o.url + '" target="_blank" rel="noopener">' + (o.urlTxt || '공고문') + ' ↗</a>' : '') + '</div>' +
-      '<b class="n2-t">' + hesc(o.title) + '</b>' +
+      '<b class="n2-t">' + hesc(o.title) + '</b>' + (o.fout ? '<p class="n2-fo">지도 필터 밖 — ' + hesc(o.fout) + '</p>' : '') +
       (w.why ? '<p class="n2-v">' + (w.lab ? '<span class="n2-vl">' + w.lab + '</span>' : '') + hesc(w.why) + '</p>' : '') +
       (rows.length ? '<dl class="n2-why">' + rows.map(function(x){ return '<div><dt>' + x[0] + '</dt><dd>' + hesc(x[1]) + '</dd></div>'; }).join('') + '</dl>' : '') +
       (w.picks.length ? '<div class="n2-pk"><span>먼저 볼 곳 · ' + (w.pickBy || '월부담 낮은 순') + '</span>' + w.picks.map(function(p){ return '<button type="button" class="n2-p" data-pk="' + p.i + '"><b>' + hesc(p.nm) + '</b><small>' + hesc(p.t) + '</small></button>'; }).join('') + '</div>' : '') +
@@ -3350,7 +3352,20 @@ function noticeListHtml(){
     return { st: st, id: r.id, key: al ? al.key : '', nw: !!(al && !seen[al.key]), when: whenOf(r, st), title: r.name, url: r.url, prog: nwProgOf(r), r: r, all: ms, ms: okMs(ms) }; };
   var withW = function(o){ o.w = nwWhy(o.prog, o.ms, o.r); return o; };
   var oIn = by.open.filter(fOk).map(nOf).map(withW), sIn = by.soon.filter(fOk).map(nOf).map(withW);
-  var oOut = by.open.filter(function(r){ return !fOk(r); }).map(nOf), sOut = by.soon.filter(function(r){ return !fOk(r); }).map(nOf);
+  // 접수 중·곧 접수인데 지도 필터 밖인 공고도 위 칸에 — 판단은 내 조건 단지 전부로, 왜 필터 밖인지 한 줄(가장 적게 걸린 단지 기준)
+  var whyOut = function(ms){ var best = null, allNa = ms.length > 0;
+    ms.forEach(function(m){ var p = m.__p; if (p.cat === 'na') return; allNa = false; var rs = [];
+      if (on0[p.cat] === false) rs.push('단지 종류를 숨김');
+      if (!guOk(p)) rs.push((guOf(p) || '그 구') + '가 구 필터에 없음');
+      if (!burdOk(p)) { var bv = burdOf(p); rs.push(bv === null ? '월부담 모름' : '월부담 ' + Math.round(bv) + '만(필터 ' + burdTxt(BURD.min, BURD.max) + ')'); }
+      if (!builtOk(p)) { var ag = builtAge(p); rs.push(ag === null ? '준공 모름' : '준공 ' + ag + '년차'); }
+      if (!btOk(p)) { var ks = btKeys(p); rs.push(ks.length === 1 && ks[0] === 'unk' ? '건물 종류 모름(새 건물 등)' : '건물 ' + ks.map(function(k){ var x = BT_KINDS.filter(function(b){ return b.k === k; })[0]; return x ? x.name : k; }).join('·')); }
+      if (!pkOk(p)) rs.push('주차 ' + (PK_SHORT[pkLevel(p)] || '모름'));
+      if (!best || rs.length < best.length) best = rs; });
+    return allNa ? '모든 형이 ' + PY_MIN + '평 미만' : (best && best.length ? best.join(' · ') : '지도 필터 밖'); };
+  var on0 = {}; document.querySelectorAll('.nmbar input[data-cat]').forEach(function(c){ on0[c.dataset.cat] = c.checked; });
+  var withOut = function(o){ o.fout = whyOut(o.all); o.ms = o.all.filter(function(m){ return m.__p.cat !== 'na'; }); return withW(o); };
+  var oOut = by.open.filter(function(r){ return !fOk(r); }).map(nOf).map(withOut), sOut = by.soon.filter(function(r){ return !fOk(r); }).map(nOf).map(withOut);
   // 다음 공고(예상): 지난해 같은 공고 날짜로 짐작 — 기관 발표 아님
   var now = new Date(), act = expActive(), later = EXPECT.filter(function(e){ var f = nrDate(e.from); return f && f - now > 90 * 864e5; });
   var expMs = function(e){ return (window.nmMarkers || []).filter(function(m){ var p = m.__p; return p.cat !== 'na' && !nrLive(p) && expProg(p) === e.prog && (!ready || m.__ok); }); };
@@ -3368,19 +3383,18 @@ function noticeListHtml(){
   var pIn = ps.filter(planOk).map(pOf), pOut = ps.filter(function(x){ return !planOk(x); }).map(pOf);
   // 맨 위 '지금 할 일': 지금 신청할 것 → 다음 볼 것(볼 만함 먼저) — 판단 한 줄 그대로
   var vtxt = function(o){ return (o.w.lab ? '<span class="n2-vl sm t-' + o.w.tone + '">' + o.w.lab + '</span>' : '') + hesc(o.w.why || ''); };
-  var nextPool = sIn.concat(eIn), next = nextPool.filter(function(o){ return o.w.tone !== 'low'; })[0] || nextPool[0] || null;
-  var todo = oIn.length ? '지금 신청할 것 <b>' + oIn.length + '건</b>' : '지금 신청할 것 없음';
-  var line = function(t, o){ return '<p class="n2-nx"><span class="n2-nk">' + t + '</span><b>' + hesc(o.title) + '</b> · ' + hesc(o.when) + (o.w.why ? '<br>' + vtxt(o) : '') + '</p>'; };
+  var nextPool = sIn.concat(sOut, eIn), next = nextPool.filter(function(o){ return o.w.tone !== 'low'; })[0] || nextPool[0] || null;
+  var todo = oIn.length ? '지금 신청할 것 <b>' + oIn.length + '건</b>' + (oOut.length ? ' <small>+ 지도 필터 밖 ' + oOut.length + '건</small>' : '') : (oOut.length ? '지금 접수 중 <b>' + oOut.length + '건</b> <small>— 지도 필터 밖</small>' : '지금 신청할 것 없음');
+  var line = function(t, o){ return '<p class="n2-nx"><span class="n2-nk">' + t + '</span><b>' + hesc(o.title) + '</b> · ' + hesc(o.when) + (o.w.why ? '<br>' + vtxt(o) : '') + (o.fout ? '<br><span class="n2-fo">지도 필터 밖 — ' + hesc(o.fout) + '</span>' : '') + '</p>'; };
   var fl = [];
   if (ready) { var CN = { pri: '행복 ' + priLabel(), gen: '행복 그 외', kook: '국민임대', ya: '청년안심', lh: 'LH', mi: '매입임대' }, ks = Object.keys(CN), onK = ks.filter(function(k){ return on[k] !== false; }), offK = ks.filter(function(k){ return on[k] === false; });
     fl.push(PY_MIN + '평 이상'); if (offK.length) fl.push(onK.length ? (onK.length <= offK.length ? onK.map(function(k){ return CN[k]; }).join(', ') + '만' : offK.map(function(k){ return CN[k]; }).join(', ') + ' 숨김') : '종류 전부 숨김');   // 이름 안에 '·'가 있어 쉼표로
     Array.prototype.forEach.call(document.querySelectorAll('#lg-sum-txt .af-c'), function(c){ var t = c.firstChild ? c.firstChild.textContent.trim() : ''; if (t && !/숨김$/.test(t)) fl.push(t); }); }
-  var sum = '<div class="n2-sum"><p class="n2-todo">' + todo + '</p>' + (oIn.length ? line('마감 먼저', oIn[0]) : '') + (next ? line(oIn.length ? '다음' : '다음 볼 것', next) : (oIn.length ? '' : '<p class="n2-nx">필터에 맞는 다음 공고도 없음</p>')) +
+  var oAll = oIn.concat(oOut);
+  var sum = '<div class="n2-sum"><p class="n2-todo">' + todo + '</p>' + (oAll.length ? line('마감 먼저', oAll.slice().sort(function(a, b){ return (a.r.a1 || 0) - (b.r.a1 || 0); })[0]) : '') + (next ? line(oAll.length ? '다음' : '다음 볼 것', next) : (oAll.length ? '' : '<p class="n2-nx">필터에 맞는 다음 공고도 없음</p>')) +
     '<p class="n2-fl">' + (ready ? '지도 필터 그대로: ' + fl.map(hesc).join(' · ') : '지도 자료 불러오는 중 — 다 올라오면 지도 필터로 거름') + ' <button type="button" class="n2-flt">필터 바꾸기</button></p></div>';
   var head = function(t, n){ return '<div class="n2-grp">' + t + ' <span>' + n + '</span></div>'; };
-  var outMini = function(o){ var mine = o.all ? o.all.filter(function(m){ return m.__p.cat !== 'na'; }).length : 0; o.sub = '지금 필터 밖' + (mine ? ' · 내 조건 단지 ' + mine + '곳' : ''); return mini(o); };
   var restParts = [   // [소제목, 접힌 줄 요약 이름, 카드들]
-    ['접수 중·예정 — 지금 필터 밖', '필터 밖 접수', oOut.concat(sOut).map(outMini)],
     ['다음 공고 — 지금 필터 밖', '필터 밖 다음 공고', eOut.map(function(o){ var n0 = expAll(o.e); o.sub = '지금 필터 밖' + (n0 ? ' · 내 조건 단지 ' + n0 + '곳' : ''); return mini(o); }).concat(pOut.map(mini))],
     ['그다음 예상', '그다음 예상', later.map(function(e){ return mini({ st: 'exp', when: e.when + ' 예상', title: e.name, url: e.url, urlTxt: '예상 근거', sub: hesc('예상 근거: ' + e.basis) }); })],
     ['끝난 공고', '끝난 공고', by.ended.map(function(r){ var o = nOf(r); o.sub = hesc(r.src || ''); return mini(o); })],
@@ -3388,13 +3402,13 @@ function noticeListHtml(){
   ].filter(function(x){ return x[2].length; });
   var restN = restParts.reduce(function(a, x){ return a + x[2].length; }, 0);
   return sum +
-    head('지금 신청 가능', oIn.length) + (oIn.length ? oIn.map(full).join('') : '<p class="n2-empty">' + (oOut.length ? '접수 중 ' + oOut.length + '건은 지금 필터 밖(맨 아래 \'그 밖\')' : '지금 접수 중인 공고 없음') + '</p>') +
-    (sIn.length ? head('곧 접수 시작', sIn.length) + sIn.map(full).join('') : '') +
+    head('지금 신청 가능', oIn.length + oOut.length) + (oIn.length + oOut.length ? oIn.map(full).join('') + oOut.map(full).join('') : '<p class="n2-empty">지금 접수 중인 공고 없음</p>') +
+    (sIn.length + sOut.length ? head('곧 접수 시작', sIn.length + sOut.length) + sIn.map(full).join('') + sOut.map(full).join('') : '') +
     ((eIn.length || pIn.length) ? head('다음 공고', eIn.length + pIn.length) + eIn.map(full).join('') + pIn.map(mini).join('') : '') +
     (restN ? '<details class="n2-more"><summary>그 밖 ' + restN + '건 <small>' + restParts.map(function(x){ return x[1] + ' ' + x[2].length; }).join(' · ') + '</small></summary>' + restParts.map(function(x){ return '<div class="n2-sub">' + x[0] + ' <span>' + x[2].length + '</span></div>' + x[2].join(''); }).join('') + '</details>' : '') +
     (unseen ? '<p class="nl-foot"><button type="button" class="al-all">🔔 새 알림 공고 모두 확인</button></p>' : '') +
     '<details class="n2-help"><summary>ⓘ 판단은 어떻게?</summary><p class="src">카드 굵은 한 줄 = 지난 회차의 실제 숫자(SH 경쟁률 PDF). 행복주택·국민임대는 필터에 맞는 단지 중 <b>지난 경쟁률이 가장 낮은 곳</b>과 내가 1순위인 곳 수, \'먼저 볼 곳\' = 지난 경쟁률 낮은 순. <b>기대 낮음</b> = 지난 회차를 순위 순으로 나눠 보면 내 순위(3순위)까지 내려온 집이 0호(청년안심 공공·청년 매입임대), 또는 전부 예비자 모집. 지난 결과가 없는 새 공고·민간임대·LH는 \'자료 없음\'. 내 순위는 본인 소득·자산만 봄(부모를 보는 순위는 뺌). 카드의 \'근거\'를 누르면 공고문 쪽수·PDF 출처.</p>' +
-    '<p class="src">목록은 SH(행복·국민·매입임대)·서울시 청년안심·LH 공고를 접수 상태로 묶고, <b>지도 필터</b>에 맞는 단지가 있는 공고만 위에 둠(나머지는 \'그 밖\'). \'다음 공고\'의 예상 = 지난해 같은 공고 날짜로 짐작(기관 발표 아님), 공고 전 = SH·LH가 미리 발표한 공급계획. 🔔 새 알림 = 알림을 켠 뒤 새로 올라와 알림을 보낸 공고(카드를 누르면 확인). 카드를 누르면 지도에서 그 공고 단지만(목록 위 ✕로 해제), \'먼저 볼 곳\'을 누르면 그 단지 상세.</p>' +
+    '<p class="src">목록은 SH(행복·국민·매입임대)·서울시 청년안심·LH 공고를 접수 상태로 묶고, 접수 중·곧 접수 공고는 <b>지도 필터 밖이어도 위에</b> 두고 \'지도 필터 밖 — 까닭\'(예: 월부담 88만 — 필터 80만 이하)을 붙임. 다음 공고(예상·공급계획)는 지도 필터에 맞는 단지가 있는 것만 위에(나머지는 \'그 밖\'). \'다음 공고\'의 예상 = 지난해 같은 공고 날짜로 짐작(기관 발표 아님), 공고 전 = SH·LH가 미리 발표한 공급계획. 🔔 새 알림 = 알림을 켠 뒤 새로 올라와 알림을 보낸 공고(카드를 누르면 확인). 카드를 누르면 지도에서 그 공고 단지만(목록 위 ✕로 해제), \'먼저 볼 곳\'을 누르면 그 단지 상세.</p>' +
     (outN ? '<p class="src">내 조건 밖 공고 ' + outN + '건은 뺌 — 지도에 올라간 단지가 전부 \'해당 없음\'(청년 자격 형이 ' + belowTxt() + '뿐 등)인 공고</p>' : '') + '</details>';
 }
 window.renderNoticePanel = function(){
@@ -4505,7 +4519,7 @@ window.addEventListener('beforeinstallprompt', function(e){ e.preventDefault(); 
 // ===== 새로고침 (2026-11-04) — 아이폰 홈 화면 앱엔 새로고침 버튼이 없어 껐다 켜야 했음 =====
 // ① 지도 말고 다른 화면 맨 위에서 아래로 당겼다 놓으면 새로고침(홈 화면 앱에서만 — 브라우저 탭은 자체 기능이 있음)
 // ② 앱으로 돌아올 때·30분마다 새 버전(version.json)·새 공고 자료(data/notices.json)를 확인 → 바뀌었으면 맨 위 띠 '눌러서 새로고침'
-var SITE_BUILD = 'd079ec0c197f';
+var SITE_BUILD = '1f4a9650daf0';
 function nwSig(j){ var s = JSON.stringify([(j && j.items) || [], (j && j.list_ids) || {}]), h = 0; for (var i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0; return h + ':' + s.length; }
 (function(){
   var sa = navigator.standalone === true || (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches);
