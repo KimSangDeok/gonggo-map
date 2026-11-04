@@ -745,6 +745,21 @@ h1,h2,h3{letter-spacing:-.02em}
 .mapchips .qf-seg button+button{border-left:0}
 .mapchips .qf-seg button[aria-pressed="true"]{background:var(--chip-on);color:var(--chip-on-fg)}
 .qf-more svg{width:16px;height:16px}
+#qf-pysel{display:none}
+@media (max-width:760px){
+  /* 지도 위 칩: 한 줄 9개(화면 밖 7개) → 2줄 5개. 근거: Baymard — 폰 한 줄엔 2~3개, 가로 필터 줄은 6~8개를 넘으면 문제 (2026-11-04) */
+  .mapchips .qf-row{flex-wrap:wrap;overflow:visible;touch-action:manipulation;row-gap:6px}
+  .mapchips #qf-py,.mapchips #qf-plan,.mapchips #qf-exp,.mapchips #qf-pk,.mapchips #qf-ao{display:none!important}
+  .mapchips #qf-pysel{display:inline-flex;padding:0 24px 0 11px!important}
+  .mapchips #qf-pysel::after{right:10px}
+  .mapchips #qf-gu .qf-n{display:none}
+  .mapchips .qf-c{padding:0 11px}
+  .mapchips #qf-more[data-n]:not([data-n="0"])::after{content:attr(data-n);display:inline-grid;place-items:center;min-width:20px;height:20px;padding:0 6px;box-sizing:border-box;border-radius:10px;background:var(--accent);color:#fff;font-size:12px;font-weight:800}
+}
+@media (max-width:360px){
+  .mapchips .qf-c{padding:0 9px;font-size:13px}
+  .mapchips #qf-pysel{padding:0 22px 0 9px!important}
+}
 .qf-sw.live{box-shadow:0 0 0 2.5px #12805A}
 @media (max-width:760px){.mapchips{left:0;right:0}.mapchips .qf-row{padding:0 12px}}
 /* 노트북·PC: 목록 패널을 왼쪽 400px로 · 지도는 오른쪽 넓게 · 상세는 그 자리(한 단) · 1600px 이상은 목록 옆에 상세 */
@@ -1184,6 +1199,7 @@ html.pano-open,html.pano-open body{overflow:hidden}
         <button type="button" class="qf-c" id="qf-plan" aria-pressed="true" hidden title="SH·LH가 공급계획으로 미리 발표했고 아직 공고 전인 곳도 남김(지도: 주황 '예정' 마커)"><i class="qf-sw plan"></i>공고 예정(기관 발표) <span class="qf-n"></span></button>
         <button type="button" class="qf-c" id="qf-exp" aria-pressed="true" hidden title="기관 발표는 없지만 지난 공고 날짜로 90일 안에 공고가 뜰 것으로 짐작한 곳도 남김(지도: 노란 점선 테두리)"><i class="qf-sw exp"></i><span class="qf-l">공고 예상(추정)</span> <span class="qf-n"></span></button>
         <span class="qf-seg" id="qf-py" role="group" aria-label="최소 평형(전용)"><button type="button" data-py="8" aria-pressed="true" title="전용 26.45㎡ 이상">8평↑</button><button type="button" data-py="9" aria-pressed="false" title="전용 29.75㎡ 이상">9평↑</button><button type="button" data-py="10" aria-pressed="false" title="전용 33.06㎡ 이상">10평↑</button></span>
+        <label class="qf-c qf-sel" id="qf-pysel" title="최소 평형(전용)"><select aria-label="최소 평형(전용)"><option value="8">8평↑</option><option value="9">9평↑</option><option value="10">10평↑</option></select></label>
         <button type="button" class="qf-c" id="qf-burd" aria-pressed="false" aria-haspopup="dialog" title="월부담 = 월세 + 보증금 대출 이자(청년 버팀목 보증금 80%·연 2.5%) · 보증금 최대 기준 · 관리비 빼고 — 이상·이하·구간"><span class="qf-l">월부담</span> ▾</button>
         <button type="button" class="qf-c" id="qf-gu" aria-pressed="false" aria-haspopup="dialog" title="서울 구를 골라 그 구의 단지만"><span class="qf-l">구 전체</span> <span class="qf-n"></span> ▾</button>
         <button type="button" class="qf-c" id="qf-pk" aria-pressed="false" title="세대당 주차면 1대 이상">주차 넉넉만 <span class="qf-n"></span></button>
@@ -1221,6 +1237,10 @@ html.pano-open,html.pano-open body{overflow:hidden}
         <div class="bt-row" id="nm-bt"><span class="bt-it"><label><input type="checkbox" data-bt="apt" checked> <svg class="bt-ico" viewBox="0 0 20 20" aria-hidden="true"><g class="geo"><path class="cl" d="M10 13.8L13.5 15.5L13.5 5.5L10 3.8Z"/><path class="cr" d="M13.5 15.5L18 13.2L18 3.2L13.5 5.5Z"/><path class="ct" d="M13.5 5.5L18 3.2L14.5 1.5L10 3.8Z"/><path class="w1" d="M15.1 14.1l1.4 -0.7v-1.2l-1.4 0.7zM12.4 14.4l-1.4 -0.7v-1.2l1.4 0.7zM15.1 11.7l1.4 -0.7v-1.2l-1.4 0.7zM12.4 12l-1.4 -0.7v-1.2l1.4 0.7zM15.1 9.3l1.4 -0.7v-1.2l-1.4 0.7zM12.4 7.2l-1.4 -0.7v-1.2l1.4 0.7z"/><path class="w1" d="M12.4 9.6l-1.4 -0.7v-1.2l1.4 0.7zM15.1 6.9l1.4 -0.7v-1.2l-1.4 0.7z"/><path class="cl" d="M5 17.2L8.5 19L8.5 5L5 3.2Z"/><path class="cr" d="M8.5 19L13 16.8L13 2.8L8.5 5Z"/><path class="ct" d="M8.5 5L13 2.8L9.5 1L5 3.2Z"/><path class="w1" d="M10.1 17.6l1.4 -0.7v-1.3l-1.4 0.7zM7.5 17.8l-1.4 -0.7v-1.3l1.4 0.7zM10.1 15l1.4 -0.7v-1.3l-1.4 0.7zM7.5 15.2l-1.4 -0.7v-1.3l1.4 0.7zM10.1 12.4l1.4 -0.7v-1.3l-1.4 0.7zM7.5 10l-1.4 -0.7v-1.3l1.4 0.7zM10.1 7.2l1.4 -0.7v-1.3l-1.4 0.7zM7.5 7.4l-1.4 -0.7v-1.3l1.4 0.7z"/><path class="w1" d="M7.5 12.6l-1.4 -0.7v-1.3l1.4 0.7zM10.1 9.8l1.4 -0.7v-1.3l-1.4 0.7z"/></g></svg> 아파트 <span class="bt-n" data-n="apt"></span></label><button type="button" class="bt-i" data-bt="apt" aria-label="아파트 뜻">ⓘ</button></span><span class="bt-it"><label><input type="checkbox" data-bt="opst" checked> <svg class="bt-ico" viewBox="0 0 20 20" aria-hidden="true"><g class="geo"><path class="cl" d="M4.5 16.5L9.5 19L9.5 16.4L4.5 13.9Z"/><path class="cr" d="M9.5 19L15.5 16L15.5 13.4L9.5 16.4Z"/><path class="ct" d="M9.5 16.4L15.5 13.4L10.5 10.9L4.5 13.9Z"/><path class="sl" d="M4.5 13.9L9.5 16.4L9.5 4L4.5 1.5Z"/><path class="sr" d="M9.5 16.4L15.5 13.4L15.5 1L9.5 4Z"/><path class="st" d="M9.5 4L15.5 1L10.5 -1.5L4.5 1.5Z"/></g></svg> 오피스텔 <span class="bt-n" data-n="opst"></span></label><button type="button" class="bt-i" data-bt="opst" aria-label="오피스텔 뜻">ⓘ</button></span><span class="bt-it"><label><input type="checkbox" data-bt="dosi" checked> <svg class="bt-ico" viewBox="0 0 20 20" aria-hidden="true"><g class="geo"><path class="pl" d="M5 16.8L9.5 19L9.5 16L5 13.8Z"/><path class="pr" d="M9.5 19L15 16.2L15 13.2L9.5 16Z"/><path class="cl" d="M5 13.8L9.5 16L9.5 5L5 2.8Z"/><path class="cr" d="M9.5 16L15 13.2L15 2.2L9.5 5Z"/><path class="ct" d="M9.5 5L15 2.2L10.5 0L5 2.8Z"/><path class="w1" d="M10.6 14.7l1.1 -0.6v-1.2l-1.1 0.6zM12.8 13.6l1.1 -0.6v-1.2l-1.1 0.6zM7.8 14.4l-1.1 -0.6v-1.2l1.1 0.6zM10.6 12l1.1 -0.6v-1.2l-1.1 0.6zM12.8 10.9l1.1 -0.6v-1.2l-1.1 0.6zM7.8 11.7l-1.1 -0.6v-1.2l1.1 0.6zM10.6 9.3l1.1 -0.6v-1.2l-1.1 0.6zM12.8 8.2l1.1 -0.6v-1.2l-1.1 0.6zM12.8 5.5l1.1 -0.6v-1.2l-1.1 0.6zM7.8 6.3l-1.1 -0.6v-1.2l1.1 0.6z"/><path class="w1" d="M7.8 9l-1.1 -0.6v-1.2l1.1 0.6zM10.6 6.6l1.1 -0.6v-1.2l-1.1 0.6z"/></g></svg> 도시형생활주택 <span class="bt-n" data-n="dosi"></span></label><button type="button" class="bt-i" data-bt="dosi" aria-label="도시형생활주택 뜻">ⓘ</button></span><span class="bt-it"><label><input type="checkbox" data-bt="dase" checked> <svg class="bt-ico" viewBox="0 0 20 20" aria-hidden="true"><g class="geo"><path class="pl" d="M4 16L9 18.5L9 15.9L4 13.4Z"/><path class="pr" d="M9 18.5L16 15L16 12.4L9 15.9Z"/><path class="rl" d="M4 13.4L9 15.9L9 7.9L4 5.4Z"/><path class="rr" d="M9 15.9L16 12.4L16 4.4L9 7.9Z"/><path class="rt" d="M9 7.9L16 4.4L11 1.9L4 5.4Z"/><path class="wl" d="M10.4 14l1.4 -0.7v-1.6l-1.4 0.7zM13.2 12.6l1.4 -0.7v-1.6l-1.4 0.7zM7.2 13.8l-1.4 -0.7v-1.6l1.4 0.7zM10.4 10l1.4 -0.7v-1.6l-1.4 0.7zM13.2 8.6l1.4 -0.7v-1.6l-1.4 0.7zM7.2 9.8l-1.4 -0.7v-1.6l1.4 0.7z"/></g></svg> 다세대주택 <span class="bt-n" data-n="dase"></span></label><button type="button" class="bt-i" data-bt="dase" aria-label="다세대주택 뜻">ⓘ</button></span><span class="bt-it"><label><input type="checkbox" data-bt="yeon" checked> <svg class="bt-ico" viewBox="0 0 20 20" aria-hidden="true"><g class="geo"><path class="rl" d="M1.5 15.5L5.5 17.5L5.5 10.5L1.5 8.5Z"/><path class="rr" d="M5.5 17.5L18.5 11L18.5 4L5.5 10.5Z"/><path class="rt" d="M5.5 10.5L18.5 4L14.5 2L1.5 8.5Z"/><path class="wl" d="M7 15.8l1.4 -0.7v-1.5l-1.4 0.7zM9.9 14.3l1.4 -0.7v-1.5l-1.4 0.7zM15.6 11.4l1.4 -0.7v-1.5l-1.4 0.7zM4.2 15.9l-1.4 -0.7v-1.5l1.4 0.7zM7 12.3l1.4 -0.7v-1.5l-1.4 0.7zM9.9 10.8l1.4 -0.7v-1.5l-1.4 0.7zM12.7 9.4l1.4 -0.7v-1.5l-1.4 0.7zM4.2 12.4l-1.4 -0.7v-1.5l1.4 0.7z"/><path class="wl" d="M12.7 12.9l1.4 -0.7v-1.5l-1.4 0.7zM15.6 7.9l1.4 -0.7v-1.5l-1.4 0.7z"/></g></svg> 연립주택 <span class="bt-n" data-n="yeon"></span></label><button type="button" class="bt-i" data-bt="yeon" aria-label="연립주택 뜻">ⓘ</button></span><span class="bt-it"><label><input type="checkbox" data-bt="dagu" checked> <svg class="bt-ico" viewBox="0 0 20 20" aria-hidden="true"><g class="geo"><path class="rl" d="M3 15.5L9 18.5L9 11.5L3 8.5Z"/><path class="rr" d="M9 18.5L16 15L16 8L9 11.5Z"/><path class="rl" d="M9 11.5L3 8.5L6 6.5Z"/><path class="fr" d="M9 12.3L17 8.3L13.5 2.8L5.5 6.8Z"/></g></svg> 다가구주택 <span class="bt-n" data-n="dagu"></span></label><button type="button" class="bt-i" data-bt="dagu" aria-label="다가구주택 뜻">ⓘ</button></span><span class="bt-it"><label><input type="checkbox" data-bt="gisuk" checked> <svg class="bt-ico" viewBox="0 0 20 20" aria-hidden="true"><g class="geo"><path class="kl" d="M3.5 16L8.5 18.5L8.5 8.5L3.5 6Z"/><path class="kr" d="M8.5 18.5L17.5 14L17.5 4L8.5 8.5Z"/><path class="kt" d="M8.5 8.5L17.5 4L12.5 1.5L3.5 6Z"/><path class="w1" d="M10.5 16.6l1.5 -0.8v-1.4l-1.5 0.8zM14 14.8l1.5 -0.8v-1.4l-1.5 0.8zM6.8 16.7l-1.5 -0.8v-1.4l1.5 0.8zM10.5 13.4l1.5 -0.8v-1.4l-1.5 0.8zM14 11.6l1.5 -0.8v-1.4l-1.5 0.8zM6.8 13.5l-1.5 -0.8v-1.4l1.5 0.8zM10.5 10.2l1.5 -0.8v-1.4l-1.5 0.8zM14 8.4l1.5 -0.8v-1.4l-1.5 0.8z"/><path class="w1" d="M6.8 10.3l-1.5 -0.8v-1.4l1.5 0.8z"/></g><rect class="ic" x="11.2" y="13.6" width="7" height="4.4" rx="1.4"/><path class="icl" d="M12.6 12.6h4.2"/></svg> 기숙사 <span class="bt-n" data-n="gisuk"></span></label><button type="button" class="bt-i" data-bt="gisuk" aria-label="기숙사 뜻">ⓘ</button></span><span class="bt-it"><label><input type="checkbox" data-bt="unk" checked> <svg class="bt-ico" viewBox="0 0 20 20" aria-hidden="true"><g class="geo"><path class="xl" d="M4 16L9 18.5L9 7.5L4 5Z"/><path class="xr" d="M9 18.5L15 15.5L15 4.5L9 7.5Z"/><path class="xt" d="M9 7.5L15 4.5L10 2L4 5Z"/></g><text class="qi" x="11.6" y="14.4" text-anchor="middle">?</text></svg> 종류 모름 <span class="bt-n" data-n="unk"></span></label><button type="button" class="bt-i" data-bt="unk" aria-label="종류 모름 뜻">ⓘ</button></span></div>
         <span class="lg-h">주차 <small class="k">세대당 주차면</small> <button type="button" class="bt-i" data-bt="sec-pk" aria-label="주차 설명">ⓘ</button><span class="lg-all"><button type="button" data-all="pk:1">전체 선택</button><button type="button" data-all="pk:0">전체 해제</button></span></span>
         <div class="bt-row" id="nm-pk"><span class="bt-it"><label><input type="checkbox" data-pk="ok" checked> <span class="pk-dot ok"></span> 넉넉 <small class="k">1대 이상</small> <span class="bt-n" data-pn="ok"></span></label><button type="button" class="bt-i" data-bt="pk-ok" aria-label="넉넉 기준">ⓘ</button></span><span class="bt-it"><label><input type="checkbox" data-pk="mid" checked> <span class="pk-dot mid"></span> 보통 <small class="k">0.7~1대</small> <span class="bt-n" data-pn="mid"></span></label><button type="button" class="bt-i" data-bt="pk-mid" aria-label="보통 기준">ⓘ</button></span><span class="bt-it"><label><input type="checkbox" data-pk="low" checked> <span class="pk-dot low"></span> 부족 <small class="k">0.7대 미만</small> <span class="bt-n" data-pn="low"></span></label><button type="button" class="bt-i" data-bt="pk-low" aria-label="부족 기준">ⓘ</button></span><span class="bt-it"><label><input type="checkbox" data-pk="unk" checked> <span class="pk-dot unk"></span> 주차 모름 <span class="bt-n" data-pn="unk"></span></label><button type="button" class="bt-i" data-bt="pk-unk" aria-label="주차 모름 기준">ⓘ</button></span></div>
+        <span class="lg-h inl">공고 상태</span>
+        <label><input type="checkbox" id="nm-live2"> 접수 끝난 곳 빼기</label>
+        <label><input type="checkbox" id="nm-plan"> 공고 예정(기관 발표)도 남김</label>
+        <label><input type="checkbox" id="nm-exp"> 공고 예상(추정)도 남김</label>
         <span class="lg-h inl">그 밖</span>
         <label><input type="checkbox" id="nm-nodup" checked> 복층·2층형 빼기</label><button type="button" class="bt-i" data-bt="sec-dup" aria-label="복층·2층형 설명">ⓘ</button>
         <label><input type="checkbox" data-cat="na"> <span class="dot sq hl" style="--c:#9aa4b2"></span> 해당 없음도 회색으로 보기</label><button type="button" class="bt-i" data-bt="sec-na" aria-label="해당 없음 설명">ⓘ</button>
@@ -3822,6 +3842,10 @@ function nmInit(){
     var ex = document.getElementById('qf-exp'); if (ex) { ex.hidden = !LIVE; if (LIVE) { set('qf-exp', EXP_ON, '+' + (qfCount({ exp: true }) - qfCount({ exp: false })) + '곳'); var wh = expWhens(); ex.querySelector('.qf-l').textContent = '공고 예상' + (wh ? ' ' + wh : '') + '(추정)'; } }
     var pl = document.getElementById('qf-plan'); if (pl) { pl.hidden = !LIVE; if (LIVE) set('qf-plan', PLAN_ON, '+' + (qfCount({ plan: true }) - qfCount({ plan: false })) + '곳'); }
     document.querySelectorAll('#qf-py button').forEach(function(b){ b.setAttribute('aria-pressed', +b.dataset.py === PY_MIN ? 'true' : 'false'); });
+    var ps = document.querySelector('#qf-pysel select'); if (ps) { ps.value = String(PY_MIN); document.getElementById('qf-pysel').classList.toggle('on', PY_MIN !== 8); }
+    var c2 = document.getElementById('nm-live2'); if (c2) c2.checked = LIVE;
+    var cp = document.getElementById('nm-plan'); if (cp) { cp.checked = PLAN_ON; cp.disabled = !LIVE; }
+    var ce = document.getElementById('nm-exp'); if (ce) { ce.checked = EXP_ON; ce.disabled = !LIVE; }
     var gb = document.getElementById('qf-gu'); if (gb) { gb.setAttribute('aria-pressed', GU_ON.length ? 'true' : 'false'); gb.querySelector('.qf-l').textContent = guDesc(2); gb.querySelector('.qf-n').textContent = GU_ON.length ? cur + '곳' : ''; }
     if (window.guPopRefresh) window.guPopRefresh();
     var pko = pkOnlyOk(); set('qf-pk', pko, (pko ? cur : qfCount({ pk: { ok: true, mid: false, low: false, unk: false } })) + '곳');
@@ -3847,6 +3871,8 @@ function nmInit(){
     var dirty = chips.length || LIVE || !EXP_ON || !PLAN_ON || PY_MIN !== 8 || !allBt || !allPk || GU_ON.length;
     el.innerHTML = '<b>' + vis + '곳</b> ' + chips.join('') + (dirty ? '<button type="button" class="af-reset" data-af="reset">초기화</button>' : '');
     var tg = document.getElementById('lg-toggle'); if (tg) tg.dataset.n = chips.length;
+    var nHid = (offC.length === Object.keys(CAT_NAMES).length ? 1 : offC.length) + (on.na ? 1 : 0) + (BUILT.max ? 1 : 0) + (allBt ? 0 : 1) + (allPk ? 0 : 1) + (NO_DUP ? 0 : 1) + (LIVE && !PLAN_ON ? 1 : 0) + (LIVE && !EXP_ON ? 1 : 0);
+    var qm = document.getElementById('qf-more'); if (qm) qm.dataset.n = nHid;
     qfSync(vis);
   }
   function qfReset(){
@@ -3884,6 +3910,9 @@ function nmInit(){
     q('qf-live', function(){ var lv = document.getElementById('nm-live'); if (lv) lv.click(); });
     q('qf-exp', function(){ EXP_ON = !EXP_ON; PREF.set('exp', EXP_ON); applyFilter(); pkRefreshIcons(); });
     q('qf-plan', function(){ PLAN_ON = !PLAN_ON; PREF.set('plan', PLAN_ON); applyFilter(); pkRefreshIcons(); });
+    // 폰: 지도 위 칩을 2줄로 줄이면서 뺀 칩(공고 예정·예상·주차·아파트·오피스텔)은 상세 필터에서 — 같은 동작을 부름 (2026-11-04)
+    [['nm-live2', 'qf-live'], ['nm-plan', 'qf-plan'], ['nm-exp', 'qf-exp']].forEach(function(p){ var c = document.getElementById(p[0]); if (c) c.addEventListener('change', function(){ var b = document.getElementById(p[1]); if (b) b.click(); }); });
+    var pys = document.querySelector('#qf-pysel select'); if (pys) { pys.addEventListener('click', function(e){ e.stopPropagation(); }); pys.addEventListener('change', function(){ var b = document.querySelector('#qf-py button[data-py="' + pys.value + '"]'); if (b) b.click(); }); }
     // 구 고르기: 칠한 구 = 지도에 나오는 구(기본 25개 구 전부). 다른 필터와 상관없이 어느 구든 눌러서 넣고 빼기 · 누를 때마다 바로 적용(지도·목록·숫자 같이 바뀜)
     // 창 안 지도 = 실제 네이버 지도 위 구 경계(한 번 만든 지도를 다시 씀). 네이버 지도를 못 쓰면(인증 실패·오프라인) 작은 SVG 모형. 닫을 때 고른 구가 바뀌었으면 큰 지도를 그 단지들에 맞춤
     var gpop = null, gOpen = false, gStart = '', gNv = null, GU_C = '#1E5CA6', GU_OFF = '#5f6670';
@@ -4069,7 +4098,7 @@ function nmInit(){
   window.__burdUI = function(){
     burdOpts(document.getElementById('nm-burd-lo'), BURD.min); burdOpts(document.getElementById('nm-burd'), BURD.max); burdOpts(document.getElementById('bp-lo'), BURD.min); burdOpts(document.getElementById('bp-hi'), BURD.max);
     ['nm-burd-unk', 'bp-unk'].forEach(function(id){ var c = document.getElementById(id); if (c) c.checked = BURD.unk; });
-    var on = !!(BURD.min || BURD.max), qb = document.getElementById('qf-burd'); if (qb) { qb.setAttribute('aria-pressed', on ? 'true' : 'false'); qb.querySelector('.qf-l').textContent = on ? '월부담 ' + burdTxt(BURD.min, BURD.max) : '월부담'; }
+    var on = !!(BURD.min || BURD.max), qb = document.getElementById('qf-burd'); if (qb) { qb.setAttribute('aria-pressed', on ? 'true' : 'false'); qb.querySelector('.qf-l').textContent = on ? '월부담 ' + (BURD.min && BURD.max ? BURD.min + '~' + BURD.max + '만' : BURD.max ? '~' + BURD.max + '만' : BURD.min + '만~') : '월부담'; }   // 칩은 짧게(~80만) — 폰 2줄에 들어가게. 상세 필터·켠 필터 줄은 '80만 이하'
     if (window.__burdQ) window.__burdQ(); };
   window.__burdSet = function(lo, hi, unk){ lo = +lo || 0; hi = +hi || 0; if (lo && hi && lo > hi) { var t = lo; lo = hi; hi = t; }   // 이상 > 이하로 고르면 둘을 바꿈
     BURD = { min: lo, max: hi, unk: !!unk }; PREF.set('burden', BURD); window.__burdUI(); applyFilter(); };
@@ -4448,7 +4477,7 @@ window.addEventListener('beforeinstallprompt', function(e){ e.preventDefault(); 
 // ===== 새로고침 (2026-11-04) — 아이폰 홈 화면 앱엔 새로고침 버튼이 없어 껐다 켜야 했음 =====
 // ① 지도 말고 다른 화면 맨 위에서 아래로 당겼다 놓으면 새로고침(홈 화면 앱에서만 — 브라우저 탭은 자체 기능이 있음)
 // ② 앱으로 돌아올 때·30분마다 새 버전(version.json)·새 공고 자료(data/notices.json)를 확인 → 바뀌었으면 맨 위 띠 '눌러서 새로고침'
-var SITE_BUILD = '3cfa74a9b61c';
+var SITE_BUILD = 'bb55ac665b5e';
 function nwSig(j){ var s = JSON.stringify([(j && j.items) || [], (j && j.list_ids) || {}]), h = 0; for (var i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0; return h + ':' + s.length; }
 (function(){
   var sa = navigator.standalone === true || (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches);
