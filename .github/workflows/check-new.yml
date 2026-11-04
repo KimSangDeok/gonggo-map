@@ -5,6 +5,11 @@ on:
   schedule:
     - cron: '2-59/5 * * * *'     # 매시 2·7·12…57분(정각은 GitHub 혼잡이 심해 피함). 실제 시작은 GitHub 사정으로 늦어질 수 있음
   workflow_dispatch:
+    inputs:
+      force:
+        description: '시험용: 새 글이 없어도 전체 수집 실행 요청'
+        type: boolean
+        default: false
 permissions:
   contents: read
   actions: write
@@ -28,7 +33,7 @@ jobs:
       - id: c
         run: python tools/check_new.py
       - name: 새 글이 있으면 전체 수집 바로 실행
-        if: steps.c.outputs.new == '1'
+        if: steps.c.outputs.new == '1' || inputs.force
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
