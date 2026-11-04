@@ -3420,7 +3420,7 @@ function noticeListHtml(){
   var line = function(t, o){ return '<p class="n2-nx"><span class="n2-nk">' + t + '</span><b>' + hesc(o.title) + '</b> · ' + hesc(o.when) + (o.w.why ? '<br>' + vtxt(o) : '') + '</p>'; };
   var fl = [];
   if (ready) { var CN = { pri: '행복 ' + priLabel(), gen: '행복 그 외', kook: '국민임대', ya: '청년안심', lh: 'LH', mi: '매입임대' }, ks = Object.keys(CN), onK = ks.filter(function(k){ return on[k] !== false; }), offK = ks.filter(function(k){ return on[k] === false; });
-    fl.push(PY_MIN + '평 이상'); if (offK.length) fl.push(onK.length ? (onK.length <= offK.length ? onK.map(function(k){ return CN[k]; }).join('·') + '만' : offK.map(function(k){ return CN[k]; }).join('·') + ' 숨김') : '종류 전부 숨김');
+    fl.push(PY_MIN + '평 이상'); if (offK.length) fl.push(onK.length ? (onK.length <= offK.length ? onK.map(function(k){ return CN[k]; }).join(', ') + '만' : offK.map(function(k){ return CN[k]; }).join(', ') + ' 숨김') : '종류 전부 숨김');   // 이름 안에 '·'가 있어 쉼표로
     Array.prototype.forEach.call(document.querySelectorAll('#lg-sum-txt .af-c'), function(c){ var t = c.firstChild ? c.firstChild.textContent.trim() : ''; if (t && !/숨김$/.test(t)) fl.push(t); }); }
   var sum = '<div class="n2-sum"><p class="n2-todo">' + todo + '</p>' + (oIn.length ? line('마감 먼저', oIn[0]) : '') + (next ? line(oIn.length ? '다음' : '다음 볼 것', next) : (oIn.length ? '' : '<p class="n2-nx">필터에 맞는 다음 공고도 없음</p>')) +
     '<p class="n2-fl">' + (ready ? '지도 필터 그대로: ' + fl.map(hesc).join(' · ') : '지도 자료 불러오는 중 — 다 올라오면 지도 필터로 거름') + ' <button type="button" class="n2-flt">필터 바꾸기</button></p></div>';
