@@ -211,7 +211,7 @@ def main():
         if not (TOPIC or VAPID_PRIVATE): print('NTFY_TOPIC·PUSH_SEED 둘 다 없음'); return
         cur = open(PUB_FILE, encoding='utf-8').read().strip() if os.path.exists(PUB_FILE) else ''
         if VAPID_PUBLIC and cur != VAPID_PUBLIC: print('주의: data/push/vapid_public.txt 가 지금 비밀값의 공개키와 다름 → update-notices 한 번 돌려 갱신하고 다시 구독해야 함')
-        done, errs = notify('공공임대 공고 알림 테스트', '이 알림이 보이면 연결 끝. 새 모집공고가 잡히면(매일 09:23·15:23 수집) 이렇게 옵니다.', SITE + '#calendar', 3)
+        done, errs = notify('공공임대 공고 알림 테스트', '이 알림이 보이면 연결 끝. 새 모집공고가 잡히면(5분마다 게시판 확인) 이렇게 옵니다.', SITE + '#calendar', 3)
         print('test', done, errs, 'subs', len(push_subs()), 'dead', [os.path.basename(f) for f in DEAD]); return
     if not DRY and write_public(): print('vapid public key written')
     st = load(STATE, None)

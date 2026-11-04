@@ -9,6 +9,10 @@ UA = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/1
       'Accept-Language': 'ko-KR,ko;q=0.9,en;q=0.5'}
 S = requests.Session(); S.headers.update(UA)
 LOG = []
+SEEN = {'sh': [], 'lh': [], 'ya': []}   # 목록에서 본 글 번호(거르기 전) — update_notices.py 가 data/notices.json 'list_ids'로 남기고, check_new.py(5분마다)가 새 글인지 비교
+def _seen(k, v):
+    v = str(v or '')
+    if v and v not in SEEN[k]: SEEN[k].append(v)
 def log(*a):
     msg = ' '.join(str(x) for x in a); LOG.append(msg); print(msg, flush=True)
 
@@ -39,7 +43,7 @@ def sh_list(pages=3):
             date = next((x for x in tds if re.fullmatch(r'\d{4}[-.]\d{2}[-.]\d{2}', x)), None)
             title = ' '.join(a.get_text(' ', strip=True).split())
             title = re.sub(r'^\[?\s*NEW\s*\]?\s*', '', title, flags=re.I)
-            rows.append({'seq': m.group(1), 'title': title, 'date': (date or '').replace('.', '-')}); got += 1
+            rows.append({'seq': m.group(1), 'title': title, 'date': (date or '').replace('.', '-')}); got += 1; _seen('sh', m.group(1))
         log(f'SH list page {page}: {got} rows')
         if got == 0:
             first = soup.find('table'); log('SH list sample:', (first.prettify()[:1500] if first else r.text[:800]))
@@ -230,7 +234,7 @@ def lh_plans(regions=(('11', '서울특별시'),)):
             log('LH plan failed', rname, repr(e))
     return out
 
-def lh_notices(regions=(('11', '서울특별시'),), days=150):   # 서울만 (경기 제외 — 2026-10-27)
+def lh_rows(regions=(('11', '서울특별시'),), days=150):   # LH 공고 목록만(요청 1번, 상세는 안 읽음) — 서울만 (경기 제외 — 2026-10-27)
     today = datetime.date.today(); start = today - datetime.timedelta(days=days)
     out = []
     for code, rname in regions:
@@ -254,10 +258,14 @@ def lh_notices(regions=(('11', '서울특별시'),), days=150):   # 서울만 (�
             region = cells[3] if len(cells) > 3 else rname
             ids = {k: a.get('data-id' + str(i)) for i, k in ((1, 'panId'), (2, 'ccrCnntSysDsCd'), (3, 'uppAisTpCd'), (4, 'aisTpCd'))}
             url = LH_INFO + '?mi=1026&' + '&'.join(f'{k}={v or ""}' for k, v in ids.items())
-            out.append({'src': 'LH', 'type': ty, 'title': title, 'region': region, 'posted': dates[0].replace('.', '-') if dates else '', 'deadline': dates[1].replace('.', '-') if len(dates) > 1 else '', 'status': status, 'url': url, 'panId': ids['panId']}); n += 1
+            out.append({'src': 'LH', 'type': ty, 'title': title, 'region': region, 'posted': dates[0].replace('.', '-') if dates else '', 'deadline': dates[1].replace('.', '-') if len(dates) > 1 else '', 'status': status, 'url': url, 'panId': ids['panId']}); n += 1; _seen('lh', ids['panId'])
         log(f'LH {rname}: {n} rows (all types)')
         if n == 0: log('LH sample:', r.text[:600])
         time.sleep(1)
+    return out
+
+def lh_notices(regions=(('11', '서울특별시'),), days=150):   # 목록 + 공고마다 상세(단지 좌표·주택형 표·일정)
+    out = lh_rows(regions, days)
     seen = set(); res = []
     for x in out:
         k = x['panId'] + x['title']
@@ -359,6 +367,7 @@ def ya_notices(pages=3):
         j = ya_post('/bbsListJson.json', {'bbsId': 'BMSR00015', 'pageIndex': p, 'searchAdresGu': '', 'searchCondition': '', 'searchKeyword': '', 'optn2': '', 'optn5': ''})
         rows = j.get('resultList') or []
         for r in rows:
+            _seen('ya', r.get('boardId'))
             out.append({'id': str(r.get('boardId')), 'title': ' '.join((r.get('nttSj') or '').split()), 'kind': '공공임대' if str(r.get('optn2')) == '1' else '민간임대',
                         'stage': '최초' if str(r.get('optn5')) == '1' else '추가', 'posted': r.get('optn1') or '', 'apply': r.get('optn4') or '', 'org': r.get('optn3') or '',
                         'url': f"{YA}/bbs/BMSR00015/view.do?boardId={r.get('boardId')}&menuNo=400008", 'text': _txt(r.get('content'))[:500]})

@@ -5,23 +5,28 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import sources as src
 KNOWN = {'304864': 'H26-1', '309337': 'H26-2', '308340': 'K26', '292541': 'K25'}   # 지도에 단지표가 반영된 공고
 os.makedirs('data', exist_ok=True)
+def _load(f):
+    try: return json.load(open(f, encoding='utf-8'))
+    except Exception: return {}
+PREV_N, PREV_L, PREV_Y = _load('data/notices.json'), _load('data/lh.json'), _load('data/ya.json')   # 한 곳이 실패하면 그곳은 지난 자료 유지(빈 목록으로 덮지 않음)
+OK = {}
 now = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9))).strftime('%Y-%m-%d %H:%M KST')
 out = {'updated': now, 'source': src.SH_LIST, 'known': KNOWN, 'items': []}
 try:
-    out['items'] = src.sh_notices(set(KNOWN))
+    out['items'] = src.sh_notices(set(KNOWN)); OK['sh'] = True
 except Exception as e:
-    src.log('SH failed:', repr(e))
+    src.log('SH failed:', repr(e)); out['items'] = PREV_N.get('items', [])
 lh = {'updated': now, 'source': src.LH_LIST, 'items': []}
 try:
-    lh['items'] = src.lh_notices()
+    lh['items'] = src.lh_notices(); OK['lh'] = True
 except Exception as e:
-    src.log('LH failed:', repr(e))
+    src.log('LH failed:', repr(e)); lh['items'] = PREV_L.get('items', [])
 # 서울시 청년안심주택: 공고(공공·민간) + 단지(좌표·규모·입주현황). 단지 상세는 99곳×1회라 매일 돌려도 가벼움
 ya = {'updated': now, 'source': src.YA + '/bbs/BMSR00015/list.do?menuNo=400008', 'list_url': src.YA + '/pgm/home/yohome/list.do?menuNo=400002', 'notices': [], 'complexes': []}
 try:
-    ya['notices'] = src.ya_notices()
+    ya['notices'] = src.ya_notices(); OK['ya'] = True
 except Exception as e:
-    src.log('YA notices failed:', repr(e))
+    src.log('YA notices failed:', repr(e)); ya['notices'] = PREV_Y.get('notices', [])
 try:
     ya['complexes'] = src.ya_complexes()
 except Exception as e:
@@ -39,6 +44,9 @@ if not plans['items'] and os.path.exists('data/plans.json'):
     try: plans['items'] = json.load(open('data/plans.json', encoding='utf-8')).get('items', [])
     except Exception: pass
 json.dump(plans, open('data/plans.json', 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
+# 목록에서 본 글 번호 — check_new.py 가 5분마다 이것과 비교해 새 글이면 이 수집을 바로 돌림. 실패했거나 0건인 곳은 지난 값 유지
+PL = PREV_N.get('list_ids') or {}
+out['list_ids'] = {k: (src.SEEN[k] if OK.get(k) and src.SEEN[k] else (PL.get(k) or [])) for k in ('sh', 'lh', 'ya')}
 out['log'] = src.LOG[-60:]
 json.dump(out, open('data/notices.json', 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
 json.dump(lh, open('data/lh.json', 'w', encoding='utf-8'), ensure_ascii=False, indent=1)

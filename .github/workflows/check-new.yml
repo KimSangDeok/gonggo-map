@@ -1,0 +1,41 @@
+name: check-new
+# 새 공고 빨리 잡기: 5분마다(GitHub 예약 실행의 최소 간격) 기관 게시판 목록 3곳만 읽고(tools/check_new.py),
+# 지난 수집에 없던 글이 있으면 전체 수집(update-notices — 상세·경쟁률·새 공고 알림)을 바로 돌림. 전체 수집 정기 실행(하루 2번)은 그대로
+on:
+  schedule:
+    - cron: '2-59/5 * * * *'     # 매시 2·7·12…57분(정각은 GitHub 혼잡이 심해 피함). 실제 시작은 GitHub 사정으로 늦어질 수 있음
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: write
+concurrency:
+  group: check-new
+  cancel-in-progress: true
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            /tools/
+            /data/notices.json
+          sparse-checkout-cone-mode: false
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.12' }
+      - run: pip install -q requests beautifulsoup4
+      - id: c
+        run: python tools/check_new.py
+      - name: 새 글이 있으면 전체 수집 바로 실행
+        if: steps.c.outputs.new == '1'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          R="$GITHUB_REPOSITORY"
+          busy=$(gh run list -R "$R" --workflow update-notices.yml --limit 10 --json status -q '[.[] | select(.status != "completed")] | length')
+          if [ "${busy:-0}" != "0" ]; then echo "::notice title=check-new::전체 수집이 이미 도는 중 — 건너뜀"; exit 0; fi
+          last=$(gh run list -R "$R" --workflow update-notices.yml --limit 1 --json createdAt -q '.[0].createdAt // ""')
+          if [ -n "$last" ] && [ $(( $(date +%s) - $(date -d "$last" +%s) )) -lt 600 ]; then echo "::notice title=check-new::10분 안에 전체 수집이 돌았음 — 건너뜀(다음 확인 때 다시)"; exit 0; fi
+          gh workflow run update-notices.yml -R "$R" --ref gh-pages
+          echo "::notice title=check-new::전체 수집 실행 요청"
