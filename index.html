@@ -947,6 +947,10 @@ td.k-fold.k-on > .k-tg{margin-bottom:2px}
 /* ===== 공고 화면(카드) ===== */
 .side:not(.tab-notice) > .side-tabs{display:none!important}
 .n2-box{margin:4px 0 18px}
+.n2-sum{margin:2px 0 8px;padding:14px 16px;border-radius:14px;background:var(--accent-soft)}
+.n2-todo{margin:0 0 6px;font-size:17px;font-weight:700;line-height:1.45;color:var(--fg);word-break:keep-all}
+.n2-fl{margin:0;font-size:13px;line-height:1.55;color:var(--muted);word-break:keep-all}
+.n2-flt{margin-left:4px;min-height:30px;padding:0 12px;border:1px solid color-mix(in srgb,var(--accent) 45%,var(--line));border-radius:999px;background:var(--surface);color:var(--accent);font:inherit;font-size:13px;font-weight:700;cursor:pointer}
 .n2-sumline{margin:0 0 6px}
 .nlist .n2-grp{margin:20px 0 10px;font-size:16px;font-weight:800;color:var(--fg);letter-spacing:-.01em;background:none!important;padding:0!important;position:static!important}
 .nlist .n2-grp span{color:var(--muted);font-weight:700;margin-left:2px}
@@ -3214,33 +3218,55 @@ function noticeListHtml(){
     if (st === 'ended') return { big: '끝남', sub: r.result ? '발표 ' + String(r.result).replace(/^\d{4}-/, '').replace('-', '.') : (r.a1 ? md(r.a1) + ' 마감' : '') };
     return { big: '일정 모름', sub: '' }; };
   // 공고 카드: 왼쪽 남은 날 크게 · 가운데 제목·기관·내 조건 n곳 · 오른쪽 [지도에서 보기] [공고문 ↗] — 카드 아무 데나 눌러도 지도에서 이 공고 단지만(알림 공고는 누르면 '확인')
-  var card = function(r){ var al = r.alert || aBy[r.id], ms = r.alert ? [] : nrMarkers(r.id), mine = ms.filter(function(m){ return m.__p.cat !== 'na'; }).length, st = nrState(r), w = whenOf(r, st), nw = al && !seen[al.key];
-    var chips = (mine ? '<span class="n2c mine">내 조건 ' + mine + '곳</span>' : (r.alert ? '<span class="n2c">지도 자료 아직 없음</span>' : (ms.length ? '<span class="n2c">내 조건 0곳</span>' : ''))) + (nw ? '<span class="n2c new">새 알림</span>' : '');
+  // 지도 필터(종류·구·평형·월부담·준공·건물·주차·접수 끝난 곳 빼기)를 통과한 단지 수 — 단지 자료가 다 올라오기 전엔 거르지 않음
+  var ready = !!window.__placesDone && (window.nmMarkers || []).length > 0;
+  var fitN = function(ms){ return ms.filter(function(m){ return m.__ok && m.__p.cat !== 'na'; }).length; };
+  var fOk = function(r){ if (!ready || r.alert) return true; var ms = nrMarkers(r.id); return !ms.length || fitN(ms) > 0; };
+  // 공고 카드: 왼쪽 남은 날 크게 · 가운데 제목·기관·필터 맞는 단지 n곳 · 오른쪽 [지도에서 보기] [공고문 ↗]
+  var card = function(r){ var al = r.alert || aBy[r.id], ms = r.alert ? [] : nrMarkers(r.id), mine = ms.filter(function(m){ return m.__p.cat !== 'na'; }).length, fit = ready ? fitN(ms) : mine, st = nrState(r), w = whenOf(r, st), nw = al && !seen[al.key];
+    var chips = (fit ? '<span class="n2c mine">필터 맞는 단지 ' + fit + '곳</span>' : (r.alert ? '<span class="n2c">지도 자료 아직 없음</span>' : (ms.length ? '<span class="n2c">필터 밖' + (mine ? ' · 내 조건 ' + mine + '곳' : '') + '</span>' : ''))) + (nw ? '<span class="n2c new">새 알림</span>' : '');
     return '<div class="nc n2 ' + st + (nw ? ' unseen' : '') + '" data-id="' + hesc(r.id) + '"' + (al ? ' data-key="' + hesc(al.key) + '"' : '') + ' role="button" tabindex="0">' +
       '<div class="n2-when"><b>' + w.big + '</b><small>' + w.sub + '</small></div>' +
       '<div class="n2-main"><b class="n2-t">' + hesc(r.name) + '</b><span class="n2-s">' + hesc(r.src || '') + '</span>' + (chips ? '<div class="n2-chips">' + chips + '</div>' : '') + '</div>' +
       '<div class="n2-act">' + (mine || r.alert ? '<span class="n2-go">' + (r.alert ? '공고문 보기' : '지도에서 보기') + ' →</span>' : '') + '<a class="nc-link n2-doc" href="' + r.url + '" target="_blank" rel="noopener">공고문 ↗</a></div></div>'; };
   var ps = window.PLAN_ITEMS || [];
-  var planCard = function(x){ var st = x.st || {}, mk = planMarker(x.id);
-    return '<div class="nc n2 plan" data-id="' + hesc(x.id) + '" role="button" tabindex="0"><div class="n2-when"><b>' + (st.od ? '지연' : '예정') + '</b><small>' + hesc(((st.pd && st.pd.txt) || '') + (st.od ? ' 계획' : '')) + '</small></div>' +
-      '<div class="n2-main"><b class="n2-t">' + hesc(planTitle(x)) + '</b><span class="n2-s">' + hesc(x.src) + ' 공급계획' + (st.od ? ' · 공고 아직 없음' : '') + '</span>' + (x.hh ? '<div class="n2-chips"><span class="n2c">' + x.hh + '호</span></div>' : '') + '</div>' +
+  var catOn = function(k){ var c = document.querySelector('.nmbar input[data-cat="' + k + '"]'); return !c || c.checked; };
+  var planOk = function(x){ if (!ready) return true; var mk = planMarker(x.id); if (mk) return !!mk.__ok; return x.prog === 'lh' ? catOn('lh') : (x.prog === 'yapub' ? catOn('ya') : (catOn('pri') || catOn('gen'))); };
+  // 공급계획 카드: '공고 전' + 기관 계획 시기(늦어졌으면 '늦어짐')
+  var planCard = function(x){ var st = x.st || {}, mk = planMarker(x.id), pd = (st.pd && st.pd.txt) || '';
+    return '<div class="nc n2 plan" data-id="' + hesc(x.id) + '" role="button" tabindex="0"><div class="n2-when"><b>공고 전</b><small>' + hesc('계획 ' + pd + (st.od ? ' · 늦어짐' : '')) + '</small></div>' +
+      '<div class="n2-main"><b class="n2-t">' + hesc(planTitle(x)) + '</b><span class="n2-s">' + hesc(x.src) + '가 미리 발표한 공급계획 · 아직 모집공고 전</span>' + (x.hh ? '<div class="n2-chips"><span class="n2c">' + x.hh + '호</span></div>' : '') + '</div>' +
       '<div class="n2-act">' + (mk ? '<span class="n2-go">지도에서 위치 →</span>' : '') + '<a class="nc-link n2-doc" href="' + x.url + '" target="_blank" rel="noopener">공급계획 ↗</a></div></div>'; };
   var now = new Date(), act = expActive(), later = EXPECT.filter(function(e){ var f = nrDate(e.from); return f && f - now > 90 * 864e5; });
-  var cnt = function(e){ return (window.nmMarkers || []).filter(function(m){ var p = m.__p; return p.cat !== 'na' && !nrLive(p) && expProg(p) === e.prog; }).length; };
-  var expCard = function(e, on){ var n = on ? cnt(e) : 0;
+  var cnt = function(e, f){ return (window.nmMarkers || []).filter(function(m){ var p = m.__p; return p.cat !== 'na' && !nrLive(p) && expProg(p) === e.prog && (!f || !ready || m.__ok); }).length; };
+  var expCard = function(e, on){ var n = on ? cnt(e, true) : 0, n0 = on ? cnt(e) : 0;
     return '<div class="nc n2 exp"' + (on ? ' data-id="EXP:' + hesc(e.prog) + '" role="button" tabindex="0"' : '') + '><div class="n2-when"><b>예상</b><small>' + hesc(e.when) + '</small></div>' +
-      '<div class="n2-main"><b class="n2-t">' + hesc(e.name) + '</b><span class="n2-s">추정 · 지난 공고 날짜로 짐작</span>' + (n ? '<div class="n2-chips"><span class="n2c mine">내 조건 ' + n + '곳</span></div>' : '') + '</div>' +
-      '<div class="n2-act">' + (n ? '<span class="n2-go">지도에서 보기 →</span>' : '') + (e.url ? '<a class="nc-link n2-doc" href="' + e.url + '" target="_blank" rel="noopener">근거 ↗</a>' : '') + '</div></div>'; };
+      '<div class="n2-main"><b class="n2-t">' + hesc(e.name) + '</b><span class="n2-s">기관 발표 아님 · 지난해 같은 공고 날짜로 짐작</span>' + (on ? '<div class="n2-chips"><span class="n2c' + (n ? ' mine' : '') + '">' + (n ? '필터 맞는 단지 ' + n + '곳' : '필터 밖' + (n0 ? ' · 내 조건 ' + n0 + '곳' : '')) + '</span></div>' : '') + '</div>' +
+      '<div class="n2-act">' + (n0 ? '<span class="n2-go">지도에서 보기 →</span>' : '') + (e.url ? '<a class="nc-link n2-doc" href="' + e.url + '" target="_blank" rel="noopener">근거 ↗</a>' : '') + '</div></div>'; };
   var head = function(t, n){ return '<div class="n2-grp">' + t + ' <span>' + n + '</span></div>'; };
   var more = function(t, n, body){ return n ? '<details class="n2-more"><summary>' + t + ' ' + n + '건</summary>' + body + '</details>' : ''; };
-  return (by.open.length ? head('지금 신청 가능', by.open.length) + by.open.map(card).join('') : '<div class="n2-grp">지금 신청 가능 <span>0</span></div><p class="n2-empty">지금 접수 중인 공고 없음</p>') +
-    (by.soon.length ? head('곧 접수 시작', by.soon.length) + by.soon.map(card).join('') : '') +
-    ((ps.length || act.length) ? head('곧 나올 공고', ps.length + act.length) + ps.map(planCard).join('') + act.map(function(e){ return expCard(e, true); }).join('') : '') +
+  var oIn = by.open.filter(fOk), oOut = by.open.filter(function(r){ return !fOk(r); }), sIn = by.soon.filter(fOk), sOut = by.soon.filter(function(r){ return !fOk(r); });
+  var pIn = ps.filter(planOk), pOut = ps.filter(function(x){ return !planOk(x); }), eIn = act.filter(function(e){ return !ready || cnt(e, true) > 0; }), eOut = act.filter(function(e){ return ready && !cnt(e, true); });
+  eIn.sort(function(a, b){ return (nrDate(a.from) || 0) - (nrDate(b.from) || 0); });
+  // 맨 위 한 줄: 지금 할 일
+  var todo = oIn.length ? '지금 신청할 것 <b>' + oIn.length + '건</b> — 가장 빠른 마감 ' + md(oIn[0].a1)
+    : sIn.length ? '지금 신청할 것 없음 · 곧 접수 시작 <b>' + sIn.length + '건</b> — ' + md(sIn[0].a0) + '부터'
+    : eIn.length ? '지금 신청할 것 없음 · 다음은 <b>' + hesc(eIn[0].name) + '</b>(' + hesc(eIn[0].when) + ' 예상)'
+    : pIn.length ? '지금 신청할 것 없음 · 기관 공급계획 ' + pIn.length + '건(아직 모집공고 전)'
+    : '지금 필터에 맞는 공고 없음';
+  var fl = ready ? Array.prototype.map.call(document.querySelectorAll('#lg-sum-txt .af-c'), function(c){ return c.firstChild ? c.firstChild.textContent.trim() : ''; }).filter(Boolean) : [];
+  fl.unshift(PY_MIN + '평 이상');
+  var outAll = oOut.length + sOut.length + pOut.length + eOut.length;
+  return '<div class="n2-sum"><p class="n2-todo">' + todo + '</p><p class="n2-fl">' + (ready ? '지도 필터 그대로: ' + fl.map(hesc).join(' · ') : '지도 자료 불러오는 중 — 다 올라오면 지도 필터로 거름') + ' <button type="button" class="n2-flt">필터 바꾸기</button></p></div>' +
+    (oIn.length ? head('지금 신청 가능', oIn.length) + oIn.map(card).join('') : '<div class="n2-grp">지금 신청 가능 <span>0</span></div><p class="n2-empty">' + (oOut.length ? '접수 중인 공고는 있지만 지금 필터 밖(아래 \'필터 밖\')' : '지금 접수 중인 공고 없음') + '</p>') +
+    (sIn.length ? head('곧 접수 시작', sIn.length) + sIn.map(card).join('') : '') +
+    ((eIn.length || pIn.length) ? head('다음에 나올 공고', eIn.length + pIn.length) + eIn.map(function(e){ return expCard(e, true); }).join('') + pIn.map(planCard).join('') : '') +
+    more('지금 필터 밖', outAll, oOut.map(card).join('') + sOut.map(card).join('') + eOut.map(function(e){ return expCard(e, true); }).join('') + pOut.map(planCard).join('')) +
     more('그다음 예상', later.length, later.map(function(e){ return expCard(e, false); }).join('')) +
     more('끝난 공고', by.ended.length, by.ended.map(card).join('')) +
     more('접수 일정 모름', by.none.length, by.none.map(card).join('')) +
     (unseen ? '<p class="nl-foot"><button type="button" class="al-all">🔔 새 알림 공고 모두 확인</button></p>' : '') +
-    '<details class="n2-help"><summary>ⓘ 이 목록은?</summary><p class="src">SH(행복·국민·매입임대)·서울시 청년안심·LH 공고 중 내 조건 공고를 접수 상태로 묶음. 🔔 새 알림 = 2026-10-28 알림을 켠 뒤 새로 올라와 알림을 보낸 공고(카드를 누르면 확인). 접수 기간은 공고문 일정·서울시 게시판 본문 청약신청 시각·LH 공고 일정. 카드를 누르면 지도에서 그 공고 단지만(목록 위 ✕로 해제). \'곧 나올 공고\'의 예정 = SH·LH가 미리 발표한 공급계획, 예상 = 지난 공고 날짜로 짐작.</p>' +
+    '<details class="n2-help"><summary>ⓘ 이 목록은?</summary><p class="src">SH(행복·국민·매입임대)·서울시 청년안심·LH 공고를 접수 상태로 묶고, <b>지도 필터</b>(단지 종류·구·평형·월부담·준공·건물 종류·주차·접수 끝난 곳 빼기)에 맞는 단지가 있는 공고만 위에 둠 — 나머지는 \'지금 필터 밖\'. 🔔 새 알림 = 알림을 켠 뒤 새로 올라와 알림을 보낸 공고(카드를 누르면 확인). 접수 기간은 공고문 일정·서울시 게시판 본문 청약신청 시각·LH 공고 일정. 카드를 누르면 지도에서 그 공고 단지만(목록 위 ✕로 해제). \'다음에 나올 공고\'의 예상 = 지난해 같은 공고 날짜로 짐작(기관 발표 아님), 공고 전 = SH·LH가 미리 발표한 공급계획.</p>' +
     (outN ? '<p class="src">내 조건 밖 공고 ' + outN + '건은 뺌 — 지도에 올라간 단지가 전부 \'해당 없음\'(청년 자격 형이 ' + belowTxt() + '뿐 등)인 공고</p>' : '') + '</details>';
 }
 window.renderNoticePanel = function(){
@@ -3258,6 +3284,7 @@ window.renderNoticePanel = function(){
     box.querySelectorAll('input[data-key]').forEach(function(c){ c.addEventListener('click', function(e){ e.stopPropagation(); }); c.addEventListener('change', function(){ if (window.ALERTS) window.ALERTS.mark(c.dataset.key, c.checked); }); });
     box.querySelectorAll('a.nc-link').forEach(function(a){ a.addEventListener('click', function(e){ e.stopPropagation(); var el = a.closest('.nc'); if (el && el.dataset.key && window.ALERTS) window.ALERTS.mark(el.dataset.key, true); }); });
     var all = box.querySelector('.al-all'); if (all) all.onclick = function(e){ e.stopPropagation(); if (window.ALERTS) window.ALERTS.markAll(); };
+    var fb = box.querySelector('.n2-flt'); if (fb) fb.onclick = function(e){ e.stopPropagation(); var openF = function(){ if (window.setSideTab) setSideTab('list'); var q = document.getElementById('qf-more'); if (q) q.click(); }; if (cal) { location.hash = 'map'; setTimeout(openF, 250); } else openF(); };
   });
 };
 function nmHtml(p, approx){
@@ -3660,7 +3687,7 @@ function nmInit(){
 
   var i = 0, done = 0, approxN = 0;
   function next(){
-    if (i >= PLACES.length) { status.textContent = PLACES.length + '곳' + (approxN ? ' (' + approxN + '곳 근사)' : ''); sortGen(); buildNoticeSelect(); applyFilter(); minPyNote(); tryPending(); return; }
+    if (i >= PLACES.length) { window.__placesDone = true; status.textContent = PLACES.length + '곳' + (approxN ? ' (' + approxN + '곳 근사)' : ''); sortGen(); buildNoticeSelect(); applyFilter(); minPyNote(); tryPending(); return; }
     var p = PLACES[i++];
     (p.ll ? function(cb){ cb(p.ll); } : (nmSvcOk() || nmCache[p.addr]) ? function(cb){ nmGeocode(p.addr, cb); } : function(cb){ cb(null); })(function(pt){   // Geocoding 모듈이 아직 없으면 기다리지 않고 근사 위치(뒤 단지가 멈추지 않게)
       var approx = !pt || !!p.dong, pos = pt || p.approx;
@@ -3887,7 +3914,7 @@ function nmInit(){
     function vis0(p){ if (p.planOnly && (!p.plan.st || p.plan.st.done)) return false; return on[p.cat] && guOk(p) && builtOk(p) && burdOk(p) && liveOk(p); }
     function inN(p){ return !nid || (p.nids || [p.nid]).indexOf(nid) >= 0; }   // 공고를 골랐으면(공고 탭·공고 일정·알림에서 '지도에서') 그 공고 단지는 필터와 상관없이 다 보임 — 지금 필터 밖은 p.__out(흐리게)
     var btN = {}, pkN = {}; BT_KINDS.forEach(function(x){ btN[x.k] = 0; }); PK_KINDS.forEach(function(x){ pkN[x.k] = 0; });
-    nmMarkers.forEach(function(mk){ var p = mk.__p, n0 = inN(p), v0 = n0 && !!vis0(p), bo = v0 && btOk(p), po = v0 && pkOk(p); if (po) btCountKeys(p).forEach(function(k){ btN[k]++; }); if (bo) pkN[pkLevel(p)]++;
+    nmMarkers.forEach(function(mk){ var p = mk.__p; mk.__ok = !!vis0(p) && btOk(p) && pkOk(p); var n0 = inN(p), v0 = n0 && !!vis0(p), bo = v0 && btOk(p), po = v0 && pkOk(p); if (po) btCountKeys(p).forEach(function(k){ btN[k]++; }); if (bo) pkN[pkLevel(p)]++;
       var ok = bo && po, v = nid ? n0 : ok, out = !!nid && n0 && !ok;
       if (!!p.__out !== out) { p.__out = out; if (mk !== nmSelected && mk.__icon && mk.setIcon) { try { mk.setIcon(mk.__icon()); } catch(e) {} } }
       mk.__vis = v; mk.setMap(v ? nmMap : null); });
@@ -3898,12 +3925,13 @@ function nmInit(){
     var shown = {};
     document.querySelectorAll('.lst .it').forEach(function(el){ var v = el.__mk ? el.__mk.__vis : !!on[el.dataset.cat]; el.style.display = v ? '' : 'none'; el.classList.toggle('out', !!(el.__mk && el.__mk.__p.__out)); if (v) shown[el.dataset.cat] = (shown[el.dataset.cat] || 0) + 1; });
     document.querySelectorAll('.lst .grp').forEach(function(el){ el.style.display = shown[el.dataset.cat] ? '' : 'none'; });   // 보이는 단지가 없는 묶음 제목은 숨김
-    selNote(nid); if (window.renderNoticePanel) window.renderNoticePanel();   // 공고 카드의 '지금 필터로 보이는 곳' 숫자도 같이
+    selNote(nid);
     var em = document.getElementById('nm-empty'); if (em) { var nv = Object.keys(shown).reduce(function(a, k){ return a + shown[k]; }, 0); em.hidden = !!nv || !nmMarkers.length; em.innerHTML = LIVE ? '<b>지금 접수 중·접수 예정' + (EXP_ON ? '·공고 예정' : '') + '인 단지가 없음</b> — 위 \'접수 끝난 곳 빼기\'를 끄면 전부 보임' : '조건에 맞는 단지가 없음 — 필터를 바꿔 보세요'; }
     var bbSeen = {}, bb = []; nmMarkers.forEach(function(mk){ var p = mk.__p; if (!p || p.cat === 'na' || bbSeen[p.__mkid] || !inN(p)) return; if (p.planOnly && (!p.plan.st || p.plan.st.done)) return;
       if (!(on[p.cat] && guOk(p) && builtOk(p) && liveOk(p) && btOk(p) && pkOk(p))) return; bbSeen[p.__mkid] = 1; var bv = burdOf(p); if (bv != null) bb.push(bv); });
     window.__burdBase = bb.sort(function(x, y){ return x - y; }); if (window.__burdQ) window.__burdQ();
-    lgSummary(); if (window.prRefresh) prRefresh(); if (window.__burdDone) window.__burdDone();
+    lgSummary(); if (window.renderNoticePanel) window.renderNoticePanel();   // 공고 화면도 같은 필터로(필터 이름표는 lgSummary 뒤라 최신)
+    if (window.prRefresh) prRefresh(); if (window.__burdDone) window.__burdDone();
   var lab = document.getElementById('lg-apply'), lsb = document.querySelector('#lg-sum-txt > b'); if (lab && lsb) lab.textContent = lsb.textContent + ' 보기';
     if (window.lsApply) window.lsApply();
   }
