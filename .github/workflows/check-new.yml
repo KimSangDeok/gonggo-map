@@ -1,6 +1,9 @@
 name: check-new
-# 새 공고 빨리 잡기: 5분마다(GitHub 예약 실행의 최소 간격) 기관 게시판 목록 3곳만 읽고(tools/check_new.py),
-# 지난 수집에 없던 글이 있으면 전체 수집(update-notices — 상세·경쟁률·새 공고 알림)을 바로 돌림. 전체 수집 정기 실행(하루 2번)은 그대로
+# 새 공고 빨리 잡기: 기관 게시판 목록 3곳만 읽고(tools/check_new.py), 지난 수집에 없던 글이 있으면
+# 전체 수집(update-notices — 상세·경쟁률·새 공고 알림)을 바로 돌림. 전체 수집 정기 실행(하루 2번)은 그대로.
+# 5분 간격 유지: GitHub 예약 실행이 몇 시간씩 늦어서(2026-11-04 실측: 5분 예약 70분 동안 0번), 실행마다 끝에서
+# 저장소 환경 'check-wait'의 대기 타이머(5분, 기다리는 동안 러너 안 씀)를 거친 뒤 스스로 다음 실행을 부름.
+# 대기 타이머가 없으면(기다린 시간 4분 미만) 다음 실행을 부르지 않음 → 끝없이 바로바로 도는 일 없음. 예약(cron)은 사슬이 끊겼을 때 잇는 예비용.
 on:
   schedule:
     - cron: '2-59/5 * * * *'     # 매시 2·7·12…57분(정각은 GitHub 혼잡이 심해 피함). 실제 시작은 GitHub 사정으로 늦어질 수 있음
@@ -15,11 +18,13 @@ permissions:
   actions: write
 concurrency:
   group: check-new
-  cancel-in-progress: true
+  cancel-in-progress: false
 jobs:
   check:
     runs-on: ubuntu-latest
     timeout-minutes: 5
+    outputs:
+      done: ${{ steps.t.outputs.done }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -44,3 +49,22 @@ jobs:
           if [ -n "$last" ] && [ $(( $(date +%s) - $(date -d "$last" +%s) )) -lt 600 ]; then echo "::notice title=check-new::10분 안에 전체 수집이 돌았음 — 건너뜀(다음 확인 때 다시)"; exit 0; fi
           gh workflow run update-notices.yml -R "$R" --ref gh-pages
           echo "::notice title=check-new::전체 수집 실행 요청"
+      - id: t
+        if: always()
+        run: echo "done=$(date +%s)" >> "$GITHUB_OUTPUT"
+  next:
+    needs: check
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    environment: check-wait
+    steps:
+      - name: 5분 기다린 뒤 다음 확인 부르기
+        env:
+          GH_TOKEN: ${{ github.token }}
+          DONE: ${{ needs.check.outputs.done }}
+        run: |
+          waited=$(( $(date +%s) - ${DONE:-0} ))
+          if [ -z "$DONE" ] || [ "$waited" -lt 240 ]; then echo "::warning title=check-new::대기 타이머가 없어(기다린 시간 ${waited}초) 다음 실행을 안 부름 — 저장소 Settings › Environments › check-wait › Wait timer 5분"; exit 0; fi
+          gh workflow run check-new.yml -R "$GITHUB_REPOSITORY" --ref gh-pages
+          echo "::notice title=check-new::${waited}초 기다린 뒤 다음 확인을 부름"
