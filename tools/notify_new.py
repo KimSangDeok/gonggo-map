@@ -104,6 +104,54 @@ def ya_fit(n, comps):
     if cs: return '판정 불가', '서울시 단지정보에 형별 표가 없음 → 공고문 확인'
     return '판정 불가', '제목으로 단지 매칭 안 됨 → 공고문 확인'
 
+# ---------- 판단 한 줄 — 공고 화면 카드의 '판단'과 같은 근거를 알림마다 바로(토큰 없이) ----------
+# 내 순위 = 본인 소득·자산만 봄(부모를 보는 순위는 뺌) → 청년안심 공공·청년 매입임대는 3순위. 지난 결과 = SH 최종 경쟁률 PDF를 순위 순으로 나눠 봄
+def _split(rows):   # 1순위 신청자 ≥ 호수면 그 형은 1순위에서 끝, 모자라면 2순위 → 3순위로 내려감
+    n = f1 = f2 = f3 = 0
+    for r in rows:
+        x = r.get('rate') or {}; k = r.get('n') or 0; a = x.get('r1') or 0; b = x.get('r2') or 0; n += k
+        if x.get('r1_fills') or a >= k: f1 += k
+        elif a + b >= k: f1 += a; f2 += k - a
+        else: f1 += a; f2 += b; f3 += k - a - b
+    return n, f1, f2, f3
+def past_yapub():   # SH 청년안심 공공: 공고문 단지표 + 최종 경쟁률이 있는 가장 최근 회차(data/ya_notice.json)
+    for rd in reversed((load(D('ya_notice.json'), {}) or {}).get('rounds') or []):
+        rt = [r for r in (rd.get('ok') or []) if r.get('rate') and in_sel(float(r.get('m2') or 0))]
+        if rt: return (rd.get('label') or '',) + _split(rt)
+    return None
+def past_mi():      # SH 청년 매입임대 2026 1차: 주택형 안 호실이 전부 8평 이상인 형만(지도와 같은 규칙, data/mi_notice.json)
+    j = load(D('mi_notice.json'), {}) or {}
+    rt = [g for g in (j.get('groups') or []) if g.get('rate') and all(in_sel(float(m)) for m in (g.get('m2s') or [g.get('m2_min') or 0])) and not DUP.search(g.get('struct') or '')]
+    return ('2026 1차',) + _split(rt) if rt else None
+def past_txt(p, what):
+    lab, n, f1, f2, f3 = p
+    if not f2 and not f3: return f'지난번({lab}) 8평↑ {what}{n}호 전부 1순위 마감 → 3순위 0호'
+    return f'지난번({lab}) 8평↑ {what}{n}호: 1순위 {f1} · 2순위 {f2} · 3순위 {f3}호'
+def judge3(p, what, one):   # 3순위로 넣는 공고
+    if not p: return f'내 순위 3순위(1순위 = {one}) · 지난 결과 자료 없음'
+    return ('기대 낮음 — ' if not p[4] else '') + past_txt(p, what) + f' · 내 순위 3순위(1순위 = {one})'
+PRI_UNTIL = '2027-01-31'   # 행복주택 우선공급 1순위 지역: 집 강서 + 직장(소득근거지) 동대문은 이날 공고분까지
+def judge_sh(cat, title, posted):
+    if cat == '청년안심': return judge3(past_yapub(), '청년형 ', '수급자·한부모·차상위')
+    if cat == '매입임대':
+        if '특화형' in title: return '순위 없음 — 운영기관이 자체 심사로 뽑음 · 은행 전세대출 되는지는 공고문 확인'
+        if '청년' in title: return judge3(past_mi(), '', '수급자·차상위·한부모')
+        return '대상 계층·순위는 공고문 확인'
+    if cat == '행복주택':
+        pri = '강서·동대문' if (posted or '9999') <= PRI_UNTIL else '강서'
+        return f'우선 1순위 = {pri} 단지(공고일 기준) · 그 외 서울 단지 = 일반공급 추첨(배점 없음) — 어느 단지인지는 공고문 단지표'
+    if cat == '국민임대': return '39·49형 = 해당구·연접구 거주 1순위(소득 50%, 1인 70% 안에서) · 59형 = 청약 24회↑ 1순위지만 배점에 밀림'
+    return '이 유형은 지도 자료 없음 — 대상·순위는 공고문 확인'
+def judge_lh(it):
+    rows = [r for c in (it.get('complexes') or []) for r in (c.get('rows') or [])]
+    def m2(r):
+        try: return float(re.sub(r'[^\d.]', '', str(r.get('m2') or '')) or 0)
+        except ValueError: return 0
+    ok = sorted({m2(r) for r in rows if m2(r) >= FLOOR})
+    size = (f'8평↑ 형 {len(ok)}개(전용 {ok[0]:g}' + (f'~{ok[-1]:g}' if len(ok) > 1 else '') + f'㎡ = {ok[0] / 3.3058:.1f}' + (f'~{ok[-1] / 3.3058:.1f}' if len(ok) > 1 else '') + '평)') if ok else ('8평↑ 형 없음 → 내 조건 밖' if rows else '형별 표 없음')
+    return size + ' · 순위는 LH 공고문 확인(LH 페이지에 순위 자료 없음)'
+YA_PRIV = '민간 특별공급 자격 됨(소득 120%·자산 2억 5,100만·차 4,542만 이하 — 본인 세대 기준) · 지난 경쟁률 자료 없음'
+
 # ---------- 대상 고르기 ----------
 SH_CATS = {'행복주택', '국민임대', '통합공공임대', '청년안심', '매입임대', '전세임대'}
 NOT_YOUTH = re.compile(r'신혼|신생아|다자녀|고령자|어르신|주거취약|노숙|쪽방|장애인|대학생|기숙사|희망하우징|영구임대')
@@ -120,14 +168,15 @@ def collect():
         title = it.get('title') or ''
         if not title or not youth_ok(title): continue
         ap = step(it, '접수')
+        posted = it.get('date') or step(it, '공고')
         out.append({'key': 'sh:' + str(it['seq']), 'src': 'SH ' + it.get('cat', ''), 'title': title, 'url': it.get('url'),
-                    'posted': it.get('date') or step(it, '공고'), 'apply': ap, 'fit': '', 'why': '', 'send': not re.search(r'정정', title), 'prio': 4})
+                    'posted': posted, 'apply': ap, 'fit': '', 'why': '', 'send': not re.search(r'정정', title), 'prio': 4, 'judge': judge_sh(it.get('cat'), title, posted)})
     for it in (load(D('lh.json'), {}).get('items') or []):
         title = it.get('title') or ''
         if not it.get('panId'): continue
         send = not re.search(r'정정', title) and youth_ok(title) and (it.get('type') or '') != '영구임대'
         out.append({'key': 'lh:' + str(it['panId']), 'src': 'LH 서울 ' + (it.get('type') or ''), 'title': title, 'url': it.get('url') or 'https://apply.lh.or.kr/lhapply/apply/wt/wrtanc/selectWrtancList.do?mi=1026',
-                    'posted': it.get('posted') or '', 'apply': ('~' + it['deadline']) if it.get('deadline') else '', 'fit': '', 'why': '', 'send': send, 'prio': 4})
+                    'posted': it.get('posted') or '', 'apply': ('~' + it['deadline']) if it.get('deadline') else '', 'fit': '', 'why': '', 'send': send, 'prio': 4, 'judge': judge_lh(it)})
     ya = apply_ya_fix(load(D('ya.json'), {}))   # 형 이름 ≠ 전용면적인 단지는 평면도의 전용면적으로
     comps = ya.get('complexes') or []
     for n in ya.get('notices') or []:
@@ -137,7 +186,7 @@ def collect():
         else:
             fit, why = ya_fit(n, comps); send = fit != '원룸뿐'
         out.append({'key': 'ya:' + str(n['id']), 'src': '청년안심 ' + (n.get('kind') or ''), 'title': n.get('title') or '', 'url': n.get('url'),
-                    'posted': n.get('posted') or '', 'apply': n.get('apply') or '', 'fit': fit, 'why': why, 'send': send, 'prio': 3})
+                    'posted': n.get('posted') or '', 'apply': n.get('apply') or '', 'fit': fit, 'why': why, 'send': send, 'prio': 3, 'judge': YA_PRIV if n.get('kind') != '공공임대' else ''})
     return out
 
 def ntfy(title, msg, url, prio=3, tags=('house',)):
@@ -207,6 +256,11 @@ def notify(title, msg, url, prio=3, key=''):
     return done, errs
 
 def main():
+    if '--preview' in sys.argv:   # 지금 목록 전부의 알림 문구 미리보기(보내지도 기록하지도 않음)
+        for it in collect():
+            if not it['send']: continue
+            print('-', it['src'], '|', it['title'][:50]); print('   판단:', it.get('judge') or '(없음)')
+        return
     if '--test' in sys.argv:
         if not (TOPIC or VAPID_PRIVATE): print('NTFY_TOPIC·PUSH_SEED 둘 다 없음'); return
         cur = open(PUB_FILE, encoding='utf-8').read().strip() if os.path.exists(PUB_FILE) else ''
@@ -230,11 +284,12 @@ def main():
         if it['send'] and (TOPIC or VAPID_PRIVATE) and not DRY and sent < 8:
             msg = it['src'] + ' · 게시 ' + (it['posted'] or '?') + (' · 접수 ' + it['apply'] if it['apply'] else '')
             if it['fit']: msg += '\n' + ('내 조건(청년·8평↑): ' + it['fit']) + (' — ' + it['why'] if it['why'] else '')
+            if it.get('judge'): msg += '\n판단: ' + it['judge']
             done, errs = notify(it['title'] or it['src'], msg, it['url'], it['prio'], it['key'])
             it['pushed'] = ', '.join(done) if done else False
             if errs: it['err'] = ' / '.join(errs)[:240]
             if done: sent += 1
-        st['log'].append({k: it.get(k) for k in ('at', 'key', 'src', 'title', 'url', 'posted', 'apply', 'fit', 'why', 'send', 'pushed', 'err') if it.get(k) not in (None, '')})
+        st['log'].append({k: it.get(k) for k in ('at', 'key', 'src', 'title', 'url', 'posted', 'apply', 'fit', 'why', 'judge', 'send', 'pushed', 'err') if it.get(k) not in (None, '')})
     if len([it for it in new if it['send']]) > 8 and (TOPIC or VAPID_PRIVATE) and not DRY:
         try: notify('새 공고가 더 있음', '한 번에 ' + str(len(new)) + '건이 새로 잡혀 8건만 따로 보냈습니다. 나머지는 사이트 공고 일정 탭에서 확인.', SITE + '#calendar', 3)
         except Exception: pass
