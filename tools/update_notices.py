@@ -47,6 +47,17 @@ json.dump(plans, open('data/plans.json', 'w', encoding='utf-8'), ensure_ascii=Fa
 # 목록에서 본 글 번호 — check_new.py 가 5분마다 이것과 비교해 새 글이면 이 수집을 바로 돌림. 실패했거나 0건인 곳은 지난 값 유지
 PL = PREV_N.get('list_ids') or {}
 out['list_ids'] = {k: (src.SEEN[k] if OK.get(k) and src.SEEN[k] else (PL.get(k) or [])) for k in ('sh', 'lh', 'ya')}
+# 처음 본 시각(KST) — 5분마다 확인 + 새 글이면 바로 이 수집이라 '게시 후 몇 분 안'의 시각. 공고가 보통 몇 시에 올라오는지 재는 근거(SH·LH 페이지엔 날짜만 있음)
+# 이 기록을 시작한 때 이미 있던 글은 시각을 모르므로 null
+FS = PREV_N.get('first_seen')
+stamp = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9))).strftime('%Y-%m-%d %H:%M')
+if FS is None: FS = {k + ':' + x: None for k in ('sh', 'lh', 'ya') for x in out['list_ids'][k]}
+else:
+    for k in ('sh', 'lh', 'ya'):
+        for x in out['list_ids'][k]:
+            FS.setdefault(k + ':' + x, stamp)
+keep = {k + ':' + x for k in ('sh', 'lh', 'ya') for x in out['list_ids'][k]}
+out['first_seen'] = {k: v for k, v in FS.items() if k in keep or v}   # 목록에서 빠져도 시각이 있는 건 남김(통계용)
 out['log'] = src.LOG[-60:]
 json.dump(out, open('data/notices.json', 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
 json.dump(lh, open('data/lh.json', 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
