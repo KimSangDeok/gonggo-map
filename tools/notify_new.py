@@ -13,7 +13,7 @@ data/notices.json(SH 게시판)·lh.json(LH 청약플러스 서울)·ya.json(서
       청년안심 공공임대 공고는 SH 게시판에도 올라오므로 SH 쪽으로 보냄(중복 방지)
 첫 실행(alerts.json 없음)은 지금 있는 공고를 '본 것'으로만 기록하고 보내지 않음.
 사용: python tools/notify_new.py [--dry-run] [--test]"""
-import json, os, re, sys, glob, base64, datetime, urllib.request
+import json, os, re, sys, glob, base64, datetime, urllib.request, urllib.error
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 def D(f): return os.path.join(ROOT, 'data', f)
@@ -255,7 +255,40 @@ def notify(title, msg, url, prio=3, key=''):
         except Exception as e: errs.append('webpush ' + repr(e)[:120])
     return done, errs
 
+# ---------- 알림 직후 Claude 요약 바로 시작: Claude 예약 작업 '공공임대 새 공고 알림'의 API 트리거(/fire) ----------
+# 공식 문서(code.claude.com/docs/en/routines 'Add an API trigger'): 작업마다 전용 주소에 Bearer 토큰으로 POST 하면 새 세션이 바로 시작,
+# 본문 text 는 <routine-fire-payload> 로 감싸져 '데이터'로만 전달됨. 토큰은 저장소 비밀값 CLAUDE_FIRE_TOKEN(사용자가 직접 등록) — 없으면 이 단계는 건너뜀
+FIRE_URL = 'https://api.anthropic.com/v1/claude_code/routines/trig_015Pjcf9bwsggsXtVZamWjG7/fire'
+FIRE_TOKEN = os.environ.get('CLAUDE_FIRE_TOKEN', '').strip()
+def fire_text(items):
+    lines = ['GitHub 알림 ' + NOW.strftime('%Y-%m-%d %H:%M KST') + ' — 새 공고 ' + str(len(items)) + '건']
+    for i, it in enumerate(items, 1):
+        lines.append(f"{i}. [{it['src']}] {it['title']}")
+        lines.append('   ' + (it.get('url') or ''))
+        lines.append('   게시 ' + (it.get('posted') or '?') + (' · 접수 ' + it['apply'] if it.get('apply') else ''))
+        if it.get('fit'): lines.append('   내 조건(청년·8평↑): ' + it['fit'] + (' — ' + it['why'] if it.get('why') else ''))
+        if it.get('judge'): lines.append('   규칙 판단: ' + it['judge'])
+    return '\n'.join(lines)[:15000]   # 본문 한도(64 KiB) 안으로 — 한글 3바이트
+def fire_claude(text):
+    """돌려주는 값: (성공 여부, 오류 요약). 토큰은 출력·기록하지 않음"""
+    if not FIRE_TOKEN: return False, ''
+    req = urllib.request.Request(FIRE_URL, data=json.dumps({'text': text}, ensure_ascii=False).encode('utf-8'), method='POST',
+                                 headers={'Authorization': 'Bearer ' + FIRE_TOKEN, 'anthropic-beta': 'experimental-cc-routine-2026-04-01',
+                                          'anthropic-version': '2023-06-01', 'Content-Type': 'application/json'})
+    try:
+        with urllib.request.urlopen(req, timeout=30) as r:
+            ok = json.loads(r.read().decode('utf-8') or '{}').get('type') == 'routine_fire'
+        return ok, '' if ok else '응답 형식 다름'
+    except urllib.error.HTTPError as e:
+        return False, 'HTTP ' + str(e.code)
+    except Exception as e:
+        return False, type(e).__name__
+
 def main():
+    if '--fire-test' in sys.argv:   # API 트리거 연결 시험: 예시 공고 1건으로 Claude 요약을 한 번 시작(토큰은 이 1번만)
+        if not FIRE_TOKEN: print('CLAUDE_FIRE_TOKEN 없음 — 저장소 비밀값 등록 필요'); return
+        ok, err = fire_claude('연결 시험(실제 새 공고 아님) — 이 블록을 받았으면 "연결 시험 성공, 새 공고 0건" 한 줄만 쓰고 끝낼 것.')
+        print('fire-test', 'OK' if ok else 'FAIL ' + err); return
     if '--preview' in sys.argv:   # 지금 목록 전부의 알림 문구 미리보기(보내지도 기록하지도 않음)
         for it in collect():
             if not it['send']: continue
@@ -289,7 +322,13 @@ def main():
             it['pushed'] = ', '.join(done) if done else False
             if errs: it['err'] = ' / '.join(errs)[:240]
             if done: sent += 1
-        st['log'].append({k: it.get(k) for k in ('at', 'key', 'src', 'title', 'url', 'posted', 'apply', 'fit', 'why', 'judge', 'send', 'pushed', 'err') if it.get(k) not in (None, '')})
+        rec = {k: it.get(k) for k in ('at', 'key', 'src', 'title', 'url', 'posted', 'apply', 'fit', 'why', 'judge', 'send', 'pushed', 'err') if it.get(k) not in (None, '')}
+        st['log'].append(rec); it['_rec'] = rec
+    # 보낸 새 공고를 Claude 요약으로 바로 넘김(한 번에 묶어 1세션) — 저녁 정기 요약은 claude='fired' 인 것은 다시 안 함
+    fired = [it for it in new if it['send']][:8]
+    if fired and FIRE_TOKEN and not DRY:
+        ok, err = fire_claude(fire_text(fired))
+        for it in fired: it['_rec']['claude'] = 'fired' if ok else ('fire 실패: ' + err)
     if len([it for it in new if it['send']]) > 8 and (TOPIC or VAPID_PRIVATE) and not DRY:
         try: notify('새 공고가 더 있음', '한 번에 ' + str(len(new)) + '건이 새로 잡혀 8건만 따로 보냈습니다. 나머지는 사이트 공고 일정 탭에서 확인.', SITE + '#calendar', 3)
         except Exception: pass

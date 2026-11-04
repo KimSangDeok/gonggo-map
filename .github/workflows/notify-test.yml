@@ -1,6 +1,11 @@
 name: notify-test
 on:
   workflow_dispatch:
+    inputs:
+      fire:
+        description: 'Claude 요약 바로 시작(API 트리거) 연결 시험'
+        type: boolean
+        default: false
 permissions:
   contents: read
 jobs:
@@ -13,6 +18,11 @@ jobs:
         with: { python-version: '3.12' }
       - run: pip install -q pywebpush
       - run: python tools/notify_new.py --test
+        if: ${{ !inputs.fire }}
         env:
           PUSH_SEED: ${{ secrets.PUSH_SEED }}
           NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+      - run: python tools/notify_new.py --fire-test
+        if: ${{ inputs.fire }}
+        env:
+          CLAUDE_FIRE_TOKEN: ${{ secrets.CLAUDE_FIRE_TOKEN }}

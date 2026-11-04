@@ -29,6 +29,7 @@ jobs:
         env:
           PUSH_SEED: ${{ secrets.PUSH_SEED }}
           NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+          CLAUDE_FIRE_TOKEN: ${{ secrets.CLAUDE_FIRE_TOKEN }}   # 있으면 새 공고 알림 직후 Claude 요약을 바로 시작(없으면 건너뜀)
         continue-on-error: true
       - name: commit
         run: |
