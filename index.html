@@ -354,6 +354,8 @@ table.stack tr.dim td{color:#8a94a3}
 .iw-sec{margin-top:12px;padding-top:10px;border-top:2px solid color-mix(in srgb,var(--fg) 30%,transparent)}
 .iw-t tr+tr>th,.iw-t tr+tr>td{border-top:1px solid color-mix(in srgb,var(--fg) 14%,transparent)}
 .iw-m tr+tr:not(.sub2)>th,.iw-m tr+tr:not(.sub2)>td{border-top:1px solid color-mix(in srgb,var(--fg) 12%,transparent)}
+.iw-ln{margin:2px 0 10px;padding:8px 10px;border-radius:10px;background:var(--accent-soft);font-size:13px;line-height:1.55;word-break:keep-all}
+.iw-ln.alt{background:transparent;border:1px dashed var(--line)}
 .iw-sh{font-weight:700;font-size:13px;margin-bottom:6px}.iw-sh small{font-weight:500;font-size:11px;margin-left:4px}
 .iw-ph{display:flex;gap:6px;margin:6px 0 8px}
 .iw-ph a{flex:1;min-width:0;height:74px;border-radius:8px;overflow:hidden;background:#eef1f5;position:relative;display:block}
@@ -1934,7 +1936,7 @@ function bMan(w){ var m = w / 10000; return m >= 10000 ? fmtMan(Math.round(m)) :
 function burdParts(b){ var T = Math.round(b.tot / 1000), R = Math.round(b.rent / 1000); return { tot: T / 10 + '만', rent: R / 10 + '만', it: (T - R) / 10 + '만' }; }   // 이자 = 합 − 월세(0.1만 반올림 때문에 덧셈이 안 맞아 보이지 않게)
 function burdCalc(p, short){ var b = burdInfo(p); if (!b) return ''; var s = burdParts(b);
   if (b.nl) return '월세 ' + s.rent + ' + 이자 0(대출 안 됨) = ' + s.tot + (short ? '' : ' · 보증금 ' + bMan(b.dep) + ' 전부 내 돈(공고문: 시중은행 전세자금대출 대상 아님)');
-  var h = '월세 ' + s.rent + ' + 대출 이자 ' + s.it + ' = ' + s.tot; if (short) return h;
+  var h = '월세 ' + s.rent + ' + 버팀목 대출 이자 ' + s.it + ' = ' + s.tot; if (short) return h;
   return h + ' · 대출 ' + bMan(b.L) + ' = 보증금 ' + bMan(b.dep) + (b.mx ? '(최대로 올린 금액)' : '(공고 금액)') + (b.L >= LOAN.cap ? '의 80%가 한도를 넘어 1.5억' : '의 80%') + ' · 연 ' + LOAN.rate + '% · 내 돈 ' + bMan(b.dep - b.L); }
 function burdBasis(ps){ var B = ps.map(function(p){ return burdInfo(p); }).filter(Boolean); if (!B.length) return '';
   var nl = B.filter(function(b){ return b.nl; }).length, ln = B.length - nl, mx = B.filter(function(b){ return b.mx; }).length;
@@ -2112,16 +2114,18 @@ function pkHtml(p){   // 상세 '주차' 줄: 등급 · 세대당 대수 = 주�
 // LH·SH 공공임대는 서울시 청년 임차보증금 이자지원 대상이 아님(서울주거포털 "공공임대주택은 지원 불가") → 버팀목 기준. 청년안심 민간임대만 서울시 이자지원(90%·최대 2억·시 2.0%p 지원·본인 최저 1%)도 가능
 var LOAN = { rate: 2.5, ltv: 0.8, cap: 150000000 };
 function loanCalc(dep, rent){ var L = Math.floor(Math.min(dep * LOAN.ltv, LOAN.cap) / 10000) * 10000, it = L * LOAN.rate / 100 / 12; return { L: L, own: dep - L, it: it, tot: (rent || 0) + it }; }
-function loanSec(opts, note, sub){
+// 무슨 대출로 셌는지 — '근거·설명 보기'로 접히지 않게 small.k 가 아닌 줄로 (2026-11-05 사용자: "무슨 대출받아야 되는건지 표기하라니까")
+var LOAN_WHO = '<div class="iw-ln"><b>무슨 대출?</b> <b>청년 버팀목 전세자금대출</b>(주택도시기금)로 셈 — 보증금의 80%(최대 1.5억)를 연 2.5%로 빌림 · 대상: 만 19~34세 무주택 세대주, 연소득 5천만 이하 · 신청: 기금 수탁은행(예: KB국민은행) 영업점·인터넷</div>';
+function loanSec(opts, note, sub, alt){
   opts = (opts || []).filter(function(o){ return o && o.dep > 0 && o.rent != null; }); if (!opts.length) return '';
   var rs = opts.map(function(o){ var r = { label: o.label, dep: o.dep, rent: o.rent, c: loanCalc(o.dep, o.rent) }; if (o.base && o.base < o.dep) { var L0 = loanCalc(o.base, 0).L, it0 = L0 * LOAN.rate / 100 / 12; r.alt = { L: L0, own: o.dep - L0, it: it0, tot: o.rent + it0 }; } return r; });
   var best = rs.reduce(function(a, x){ return x.c.tot < a.c.tot ? x : a; }, rs[0]);
   var m = function(w){ return man1(w / 10000) + '만'; };
-  return '<div class="iw-sec"><div class="iw-sh">대출 쓰면 <small class="k">' + (sub || '청년 버팀목 전세자금대출로 셈 — 보증금의 80%(최대 1.5억)를 연 2.5%로 · 월 부담 = 월세 + 대출 이자') + '</small></div>' +
-    '<table class="iw-m iw-loan"><tr class="hd"><th>대출</th><th>내 돈</th><th>월세</th><th>월 이자</th><th>월 부담<br><small class="k">월세+이자</small></th></tr>' +
-    rs.map(function(x){ var bc = x === best && rs.length > 1 ? ' best' : ''; return '<tr class="lb' + bc + '"><th colspan="5">' + x.label + (bc ? ' <span class="tag">제일 쌈</span>' : '') + '</th></tr><tr class="v' + bc + '"><td>' + fmtMan(x.c.L / 10000) + '</td><td>' + fmtMan(x.c.own / 10000) + '</td><td>' + m(x.rent) + '</td><td>' + m(x.c.it) + '</td><td><b>' + m(x.c.tot) + '</b></td></tr>' +
+  return '<div class="iw-sec"><div class="iw-sh">대출 쓰면 <small class="k">' + (sub || '월 부담 = 월세 + 대출 이자 · 금리는 연소득 2천만 초과~4천만 이하 구간(KB 2026.8.31)') + '</small></div>' + LOAN_WHO + (alt || '') +
+    '<table class="iw-m iw-loan"><tr class="hd"><th>버팀목<br>대출</th><th>내 돈</th><th>월세</th><th>월 이자</th><th>월 부담<br><small class="k">월세+이자</small></th></tr>' +
+    rs.map(function(x){ var bc = x === best && rs.length > 1 ? ' best' : ''; return '<tr class="lb' + bc + '"><th colspan="5">' + x.label + ' <small class="k">· 보증금 ' + fmtMan(x.dep / 10000) + '</small>' + (bc ? ' <span class="tag">제일 쌈</span>' : '') + '</th></tr><tr class="v' + bc + '"><td>' + fmtMan(x.c.L / 10000) + '</td><td>' + fmtMan(x.c.own / 10000) + '</td><td>' + m(x.rent) + '</td><td>' + m(x.c.it) + '</td><td><b>' + m(x.c.tot) + '</b></td></tr>' +
       (x.alt ? (function(){ var ex = x.alt.own - x.c.own, ei = ex * LOAN.rate / 100 / 12; return '<tr class="sub2"><td colspan="5"><small class="k">↳ <b>은행이 늘린 보증금만큼 대출을 안 늘려 주면</b>(보증금 전환은 계약 뒤라 첫 대출은 공고 기준 보증금의 80%까지): 대출 ' + fmtMan(x.alt.L / 10000) + ' · 내 돈 <b>' + fmtMan(x.alt.own / 10000) + '</b>(위보다 ' + fmtMan(ex / 10000) + ' 더) · 월세 ' + m(x.rent) + ' + 이자 ' + m(x.alt.it) + ' = 월 ' + m(x.alt.tot) + '.<br>매달 나가는 돈이 줄어 보이는 건 내 돈 ' + fmtMan(ex / 10000) + '을 더 넣어 대출 이자가 준 것 — 그 돈을 예금에 뒀으면 받을 이자(연 ' + LOAN.rate + '%로 치면 월 ' + m(ei) + ')까지 치면 월 ' + m(x.alt.tot + ei) + '로 위 줄과 같음.</small></td></tr>'; })() : ''); }).join('') + '</table>' +
-    notes('월 부담 = 월세 + 대출 이자(관리비 빼고). 월세는 그 줄의 보증금 기준(보증금을 늘리면 전환율만큼 월세가 줄어듦). 내 돈 = 보증금 − 대출 — 내 돈을 예금에 뒀으면 받았을 이자(기회비용)는 안 넣음. 신청 자격은 연소득 5천만 이하(청년 혼자 기준) · 순자산 3억 4,500만 이하. 금리는 연소득 2천만 이하 2.2% · 2천만 초과~4천만 이하 <b>2.5%</b> · 4천만 초과~5천만 이하 2.9%(<a href="https://kbthink.com/loan-guide/beotimok-youth.html" target="_blank" rel="noopener">KB 2026.8.31</a>, 변동). 계약금(보증금 5% 이상)은 먼저 내야 하고, 한도는 소득·신용도에 따라 줄 수 있어 기금 취급은행 사전 상담. 2년마다 연장 때 10% 안 갚으면 연 0.2%p 가산. ' + (note || '')) + '</div>';
+    notes('월 부담 = 월세 + 대출 이자(관리비 빼고). 월세는 그 줄의 보증금 기준(보증금을 늘리면 전환율만큼 월세가 줄어듦). 내 돈 = 보증금 − 대출 — 내 돈을 예금에 뒀으면 받았을 이자(기회비용)는 안 넣음. 신청 자격은 연소득 5천만 이하(청년 혼자 기준) · 순자산 3억 4,500만 이하. 금리는 연소득 2천만 이하 2.2% · 2천만 초과~4천만 이하 <b>2.5%</b> · 4천만 초과~5천만 이하 2.9%(<a href="https://kbthink.com/loan-guide/beotimok-youth.html" target="_blank" rel="noopener">KB 2026.8.31</a>, 변동 · 대상 주택 전용 85㎡ 이하·보증금 3억 이하, 취급은 기금 수탁은행 — <a href="https://housing.gg.go.kr/html/24204.do" target="_blank" rel="noopener">경기주거복지포털 청년전용 버팀목</a>). 계약금(보증금 5% 이상)은 먼저 내야 하고, 한도는 소득·신용도에 따라 줄 수 있어 기금 취급은행 사전 상담. 2년마다 연장 때 10% 안 갚으면 연 0.2%p 가산. ' + (note || '')) + '</div>';
 }
 var LOAN_PUB = 'LH·SH 공공임대는 서울시 청년 임차보증금 이자지원 대상이 아님(<a href="https://www.seoulhousing.kr/html/0504003.do" target="_blank" rel="noopener">서울주거포털</a> "공공임대주택은 지원 불가").';
 function happyLoan(p){
@@ -2141,7 +2145,7 @@ function yaLoan(p){
   var c = p.comp; if (!c) return ''; var all = yaSplit(c).ok.filter(function(x){ return x.dep != null && x.rent != null; }); if (!all.length) return '';
   var lo = all.reduce(function(a, x){ return x.dep < a.dep ? x : a; }, all[0]), hi = all.reduce(function(a, x){ return x.dep > a.dep ? x : a; }, all[0]);
   var two = hi !== lo && hi.dep !== lo.dep, o = [{ label: two ? '보증금 가장 낮은 형' : '내 조건 형', dep: lo.dep, rent: lo.rent }]; if (two) o.push({ label: '보증금 가장 높은 형', dep: hi.dep, rent: hi.rent });
-  return loanSec(o, '민간임대는 <b>서울시 청년 임차보증금 이자지원</b>도 가능 — 보증금의 90%·최대 2억, 서울시가 연 2.0%p 지원(본인 부담 최저 1%), 하나은행, 생애 1회, 연소득 5천만 이하·보증금 3억·월세 90만 이하(<a href="https://mediahub.seoul.go.kr/archives/2018213" target="_blank" rel="noopener">서울시 2026.5.19</a>, <a href="https://www.seoulhousing.kr/html/0504003.do" target="_blank" rel="noopener">서울주거포털</a>) — 은행 금리에서 2%p를 빼므로 버팀목보다 낮을 수 있음.');
+  return loanSec(o, '민간임대는 <b>서울시 청년 임차보증금 이자지원</b>도 가능 — 보증금의 90%·최대 2억, 서울시가 연 2.0%p 지원(본인 부담 최저 1%), 하나은행, 생애 1회, 연소득 5천만 이하·보증금 3억·월세 90만 이하(<a href="https://mediahub.seoul.go.kr/archives/2018213" target="_blank" rel="noopener">서울시 2026.5.19</a>, <a href="https://www.seoulhousing.kr/html/0504003.do" target="_blank" rel="noopener">서울주거포털</a>) — 은행 금리에서 2%p를 빼므로 버팀목보다 낮을 수 있음.', null, '<div class="iw-ln alt"><b>또는</b> <b>서울시 청년 임차보증금 이자지원</b>(하나은행, 청년안심 민간임대만) — 보증금의 90%·최대 2억, 서울시가 연 2.0%p 대신 냄(본인 부담 최저 1%) · 은행 금리에 따라 버팀목보다 쌀 수 있음</div>');
 }
 function miLoan(ok){
   var gs = (ok || []).filter(function(g){ return g.p23 && g.p23.dep; }).slice(0, 4); if (!gs.length) return '';
@@ -4685,7 +4689,7 @@ window.addEventListener('beforeinstallprompt', function(e){ e.preventDefault(); 
 // ===== 새로고침 (2026-11-04) — 아이폰 홈 화면 앱엔 새로고침 버튼이 없어 껐다 켜야 했음 =====
 // ① 지도 말고 다른 화면 맨 위에서 아래로 당겼다 놓으면 새로고침(홈 화면 앱에서만 — 브라우저 탭은 자체 기능이 있음)
 // ② 앱으로 돌아올 때·30분마다 새 버전(version.json)·새 공고 자료(data/notices.json)를 확인 → 바뀌었으면 맨 위 띠 '눌러서 새로고침'
-var SITE_BUILD = '9ed0a2ff4c73';
+var SITE_BUILD = 'da52ee453f01';
 function nwSig(j){ var s = JSON.stringify([(j && j.items) || [], (j && j.list_ids) || {}]), h = 0; for (var i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0; return h + ':' + s.length; }
 (function(){
   var sa = navigator.standalone === true || (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches);
