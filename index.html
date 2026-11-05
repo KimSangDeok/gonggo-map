@@ -748,6 +748,40 @@ h1,h2,h3{letter-spacing:-.02em}
 #qf-pysel{display:none}
 .nm-py{display:contents}
 .lg-body .nm-py label > input[type=radio]{margin:0;accent-color:var(--accent)}
+.nf{margin-top:10px;padding-top:10px;border-top:1px solid color-mix(in srgb,var(--line) 70%,transparent)}
+.nf-row{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+.nf-k{font-size:13px;font-weight:800;color:var(--muted);margin-right:2px}
+.nf-none{font-size:13px;color:var(--muted);word-break:keep-all}
+.nf-c{display:inline-flex;align-items:center;gap:2px;padding:2px 2px 2px 10px;border:1.5px solid var(--accent);border-radius:999px;background:var(--accent-soft);color:var(--accent-ink);font-size:13px;font-weight:700}
+.nf-c button{border:0;background:none;color:inherit;font-size:16px;line-height:1;padding:4px 8px;cursor:pointer}
+.nf-tg{margin-left:auto;min-height:36px;border:1.5px solid var(--line);border-radius:999px;background:var(--surface);color:var(--fg);font:inherit;font-size:13px;font-weight:700;padding:0 14px;cursor:pointer}
+.nf-hid{margin:8px 0 0;font-size:13px;line-height:1.5;color:var(--warn);word-break:keep-all}
+.nf-pan{margin-top:10px;display:grid;gap:14px}
+.nf-pan[hidden]{display:none}
+.nf-note{margin:0;font-size:12.5px;color:var(--muted);line-height:1.5;word-break:keep-all}
+.nf-s > b{font-size:14px}
+.nf-s > small{font-size:12px}
+.nf-opts{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.nf-opts label,.nf-pyb{display:inline-flex;align-items:center;gap:6px;min-height:40px;box-sizing:border-box;padding:0 12px;border:1.5px solid var(--line);border-radius:999px;background:var(--surface);color:var(--fg);font:inherit;font-size:13.5px;font-weight:600;cursor:pointer}
+.nf-opts label:has(input:checked),.nf-pyb[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft);color:var(--accent-ink)}
+.nf-opts input{margin:0;width:17px;height:17px;accent-color:var(--accent)}
+.nf-opts label small{font-weight:500}
+.nf-gu label{min-height:36px;padding:0 10px;font-size:13px}
+.nf-opts select{min-height:40px;font:inherit;font-size:13.5px;padding:0 10px;border:1.5px solid var(--line);border-radius:10px;background:var(--surface);color:var(--fg)}
+.nf-ft{display:flex;flex-wrap:wrap;gap:8px}
+.nf-ft2{margin-top:6px}
+.nf-ft button{min-height:36px;border:1.5px solid var(--line);border-radius:999px;background:var(--surface);color:var(--fg);font:inherit;font-size:13px;font-weight:700;padding:0 14px;cursor:pointer}
+/* 지도 '공고 보기' 띠 — 지도 칩 대신 */
+.nm-focus{pointer-events:auto;display:flex;align-items:center;gap:10px;max-width:560px;padding:9px 9px 9px 14px;border-radius:16px;background:#15181D;color:#fff;box-shadow:0 2px 12px rgba(21,24,29,.3)}
+.nm-focus[hidden]{display:none}
+.nm-focus > div{flex:1;min-width:0}
+.nm-focus b{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:14.5px;line-height:1.35;word-break:keep-all}
+.nm-focus small{display:block;margin-top:2px;font-size:12.5px;line-height:1.4;color:rgba(255,255,255,.8);word-break:keep-all}
+.nm-focus button{flex:none;min-height:40px;padding:0 14px;border:0;border-radius:999px;background:#fff;color:#15181D;font:800 14px/1 var(--font-body);cursor:pointer}
+@media (max-width:760px){ .nm-focus{margin:0 12px} }
+#view-map.focusing .mapchips .qf-row,#view-map.focusing #pr-legend{display:none!important}
+#view-map.focusing #lg-sum-txt .af-c,#view-map.focusing #lg-sum-txt .af-reset{display:none!important}   /* 공고 보기 중엔 지도 필터 칩 숨김(안 먹으니까) */
+#view-map.focusing #lg-sum-txt > b::after{content:' · 공고 보기';font-weight:600;color:var(--muted);font-size:.8em}
 .nm-gu-open{border:1.5px solid var(--line);border-radius:999px;background:var(--bg);color:var(--fg);font:inherit;font-weight:600;padding:7px 14px;cursor:pointer}
 @media (max-width:760px){
   /* 지도 위 칩: 한 줄 9개(화면 밖 7개) → 2줄 5개. 근거: Baymard — 폰 한 줄엔 2~3개, 가로 필터 줄은 6~8개를 넘으면 문제 (2026-11-04) */
@@ -2434,6 +2468,7 @@ function btPara(h){ var ss = btSents(h); return ss.length > 1 ? '<ul class="bt-u
 var VIEWS = ['map','calendar','rules','money','me','sources'];
 function currentView(){ var h = (location.hash || '').replace(/^#/, '').split(/[&?]/)[0]; if (h === 'list') return 'calendar'; return VIEWS.indexOf(h) >= 0 ? h : 'map'; }   // 옛 '단지'(#list) 화면은 없앰 → 공고 화면   // '#calendar&seen=…'(알림 눌러 들어옴)도 공고 일정으로
 function showView(v){
+  if (v !== 'map' && window.__FOC && window.nmFocusEnd) { try { window.nmFocusEnd(true); } catch(e) {} }   // 지도를 떠나면 '공고 보기' 끝(다음에 지도 탭은 보통 지도)
   VIEWS.forEach(function(k){ var el = document.getElementById('view-' + k); if (el) el.classList.toggle('active', k === v); });
   document.querySelectorAll('.tabs a').forEach(function(a){ a.classList.toggle('active', a.getAttribute('data-view') === v); });
   var VG = { map: 'map', calendar: 'notice', list: 'notice', rules: 'rules', money: 'rules', me: 'me', sources: 'me' };
@@ -3312,7 +3347,56 @@ function nwWhy(prog, ms, r){
 // 공고 목록(공고 화면 · 지도 사이드바 '공고' 탭 같은 내용): 맨 위 '지금 할 일' → 지금 신청 가능 → 곧 접수 → 다음 공고 → 나머지는 한 곳에 접음
 // 공고는 '내 조건'(청년·8평↑·복층 빼기 — 알림 tools/notify_new.py 와 같은 기준)으로 판정 — 지도 필터(평형 9·10평·월부담·구·건물 종류·주차·준공·종류)와 따로 (2026-11-05)
 function nwReclass(){ try { classifyPlaces(); } catch(e) {} (window.nmMarkers || []).forEach(function(mk){ var p = mk.__p; if (p && p.__classify) { try { p.__classify(); } catch(e) {} } }); }
-function withMyCond(fn){ var m = PY_MIN, nd = NO_DUP; if (m === 8 && nd) return fn(); setMin(8); NO_DUP = true; nwReclass(); try { return fn(); } finally { setMin(m); NO_DUP = nd; nwReclass(); } }
+function withMyCond(fn, py){ py = py || 8; var m = PY_MIN, nd = NO_DUP; if (m === py && nd) return fn(); setMin(py); NO_DUP = true; nwReclass(); try { return fn(); } finally { setMin(m); NO_DUP = nd; nwReclass(); } }
+// ===== 공고 필터 (2026-11-05) — 지도 필터와 따로 · PREF 'nf'(기기 동기화) · 기본 = 내 조건(청년·8평↑) 공고 전부 =====
+var NF_CATS = [['happy', '행복주택'], ['kook', '국민임대'], ['yapub', '청년안심 공공'], ['yapriv', '청년안심 민간'], ['mi', '매입임대'], ['lh', 'LH']];
+var NF_BURD = [0, 50, 60, 70, 80, 90, 100, 120];
+function nfDef(){ return { py: 8, burd: 0, unk: true, gu: [], cats: { happy: true, kook: true, yapub: true, yapriv: true, mi: true, lh: true }, low: false }; }
+function nfGet(){ var d = nfDef(), v = PREF.get('nf', null);
+  if (v && typeof v === 'object') { if ([8, 9, 10].indexOf(+v.py) >= 0) d.py = +v.py; if (+v.burd > 0) d.burd = +v.burd; if (v.unk === false) d.unk = false;
+    if (Array.isArray(v.gu)) d.gu = v.gu[0] === '-' ? ['-'] : v.gu.filter(function(g){ return GU25.indexOf(g) >= 0; });
+    if (v.cats) Object.keys(d.cats).forEach(function(k){ if (v.cats[k] === false) d.cats[k] = false; }); if (v.low === true) d.low = true; }
+  return d; }
+function nfSet(o){ PREF.set('nf', o); if (window.renderNoticePanel) window.renderNoticePanel(); }
+function nfCatOf(prog){ return prog === 'misp' ? 'mi' : (NF_CATS.some(function(x){ return x[0] === prog; }) ? prog : ''); }
+function nfCatName(c){ var x = NF_CATS.filter(function(y){ return y[0] === c; })[0]; return x ? x[1] : c; }
+function nfChips(nf){ var c = [];
+  if (nf.py !== 8) c.push(['py', nf.py + '평 이상']);
+  var off = NF_CATS.filter(function(x){ return nf.cats[x[0]] === false; }); if (off.length) c.push(['cats', off.length === NF_CATS.length ? '종류 전부 숨김' : off.map(function(x){ return x[1]; }).join('·') + ' 숨김']);
+  if (nf.burd) c.push(['burd', '월부담 ' + nf.burd + '만 이하' + (nf.unk ? '' : '(모름 뺌)')]);
+  if (nf.gu.length) c.push(['gu', nf.gu[0] === '-' ? '구 하나도 안 고름' : (nf.gu.length <= 3 ? '구 ' + nf.gu.map(guShort).join('·') : '구 ' + nf.gu.length + '개')]);
+  if (nf.low) c.push(['low', '기대 낮음 뺌']);
+  return c; }
+function nfMsOk(m, NF){ var p = m.__p; if (!p || p.cat === 'na' || m.__nfPy === false) return false;
+  if (NF.gu.length && NF.gu.indexOf(guOf(p)) < 0) return false;
+  if (NF.burd) { var b = burdOf(p); if (b === null ? !NF.unk : b > NF.burd) return false; }
+  return true; }
+function nfMsWhy(mine, NF){   // 내 조건 단지가 공고 필터에 다 걸렸을 때 까닭(가장 적게 걸린 단지 기준)
+  var best = null; mine.forEach(function(m){ var p = m.__p, r = [];
+    if (m.__nfPy === false) r.push(NF.py + '평 미만');
+    if (NF.gu.length && NF.gu.indexOf(guOf(p)) < 0) r.push((guOf(p) || '구 모름') + ' — 고른 구 아님');
+    if (NF.burd) { var b = burdOf(p); if (b === null ? !NF.unk : b > NF.burd) r.push(b === null ? '월부담 모름' : '월부담 ' + Math.round(b) + '만'); }
+    if (!best || r.length < best.length) best = r; });
+  return best && best.length ? best.join(' · ') : ''; }
+PREF.onApply('nf', function(){ if (window.renderNoticePanel) window.renderNoticePanel(); });
+// 공고 → 지도: 그 공고 단지를 지도 필터와 상관없이 보여 주는 '공고 보기'(위 띠 · × 로 끝 · 끝나면 지도 필터·보던 자리로) — 2026-11-05
+function nwGoMap(id, pick, cal, title){
+  var run = function(){ if (window.setSideTab) setSideTab('list');
+    var S = (window.__nwSets || {})[id], ids = S && S.ids && Object.keys(S.ids).length ? S.ids : null;
+    if (/^PL:/.test(id)) { var pm = planMarker(id); if (pm) { ids = {}; ids[pm.__p.__mkid] = 1; pick = pick || pm; } }
+    if (ids && window.nmFocusEnter) { window.nmFocusEnter({ title: title || (S && S.title) || '', ids: ids, nid: NREG[id] ? id : '' }); if (!pick) window.nmFocusFit(); }
+    else if (NREG[id] && window.mapNotice) window.mapNotice(id);
+    else if (pick && window.nmFocusEnter) { var o = {}; o[pick.__p.__mkid] = 1; window.nmFocusEnter({ title: pick.__p.name, ids: o }); }
+    if (pick) nmFocusMarker(pick); };
+  if (cal) { location.hash = 'map'; setTimeout(run, 200); } else run(); }
+function focBanner(){ var el = document.getElementById('nm-focus'), vm = document.getElementById('view-map'), F = window.__FOC, sel = document.getElementById('nm-notice');
+  if (F && F.sel && (!sel || sel.value !== F.nid)) { window.__FOC = F = null; }   // 공고 선택이 다른 데서 풀렸으면 끝
+  if (!el || !vm) return;
+  if (!F) { if (!el.hidden) el.hidden = true; vm.classList.remove('focusing'); return; }
+  var ms = (window.nmMarkers || []).filter(function(mk){ return mk.__vis; }), out = ms.filter(function(mk){ return mk.__p.__out && mk.__p.cat !== 'na'; }).length, na = ms.filter(function(mk){ return mk.__p.cat === 'na'; }).length;
+  el.innerHTML = '<div><b>' + hesc(F.title || '공고') + '</b><small>' + ms.length + '곳 · 지도 필터와 상관없이 보는 중' + (out ? ' · 흐린 ' + out + '곳 = 지도 필터 밖' : '') + (na ? ' · 회색 ' + na + '곳 = 지도 평형 기준 밖' : '') + '</small></div><button type="button" class="nm-focus-x" aria-label="공고 보기 끝내기">× 끝</button>';
+  el.hidden = false; vm.classList.add('focusing');
+  el.querySelector('.nm-focus-x').onclick = function(e){ e.stopPropagation(); if (window.nmFocusEnd) window.nmFocusEnd(true); }; }
 function noticeListHtml(){
   nrFromNotices();
   window.__nwPicks = [];
@@ -3334,6 +3418,13 @@ function noticeListHtml(){
   // 내 조건 단지(청년·8평↑ — 해당 없음 아닌 곳)만 셈. 지도 필터는 안 씀(지도 화면에만)
   var ready = !!window.__placesDone && (window.nmMarkers || []).length > 0;
   var okMs = function(ms){ return ms.filter(function(m){ return m.__p.cat !== 'na'; }); };
+  var NF = nfGet(), nfMs = function(ms){ return ms.filter(function(m){ return nfMsOk(m, NF); }); };
+  // 공고 필터로 숨길지: 종류 · (내 조건 단지가 있으면) 단지 전부가 평형·구·월부담에 걸림 · 기대 낮음 — 단지 자료가 없는 공고는 종류만 봄
+  var nfWhy = function(o){ var rs = [], c = nfCatOf(o.prog); if (c && NF.cats[c] === false) rs.push(nfCatName(c) + ' 숨김');
+    var mine = o.mine || []; if (mine.length && !(o.ms || []).length) { var w0 = nfMsWhy(mine, NF); if (w0) rs.push(w0); }
+    if (NF.low && o.w && o.w.tone === 'low') rs.push('기대 낮음');
+    return rs.join(' · '); };
+  var nfSplit = function(arr){ var a = [], h = []; arr.forEach(function(o){ o.nfx = nfWhy(o); (o.nfx ? h : a).push(o); }); return [a, h]; };
   var go = function(n, t){ return n ? '<span class="n2-go">' + (t || '지도에서 ' + n + '곳 보기') + ' →</span>' : ''; };
   var srcHtml = function(src){ src = src.filter(function(s){ return s && s[0]; }); return src.length ? '<details class="n2-src"><summary>근거</summary><ul>' + src.map(function(s){ return '<li>' + hesc(s[0]) + (s[1] ? ' <a href="' + s[1] + '" target="_blank" rel="noopener">↗</a>' : '') + '</li>'; }).join('') + '</ul></details>' : ''; };
   // 카드 한 장: [언제] 제목 → 판단 한 줄 → 근거 3줄(내 순위 · 지난 결과 · 내 필터) → 먼저 볼 곳 → [지도에서 n곳] · 근거(출처)
@@ -3351,15 +3442,15 @@ function noticeListHtml(){
       '<div class="n2-hd"><span class="n2-w">' + hesc(o.when) + '</span>' + (o.nw ? '<span class="n2c new">새 알림</span>' : '') + (o.url ? '<a class="nc-link n2-doc" href="' + o.url + '" target="_blank" rel="noopener">' + (o.urlTxt || '공고문') + ' ↗</a>' : '') + '</div>' +
       '<b class="n2-t">' + hesc(o.title) + '</b>' + (o.sub ? '<p class="n2-s">' + o.sub + '</p>' : '') + '</div>'; };
   var nOf = function(r){ var al = r.alert || aBy[r.id], ms = r.alert ? [] : nrMarkers(r.id), st = nrState(r);
-    return { st: st, id: r.id, key: al ? al.key : '', nw: !!(al && !seen[al.key]), when: whenOf(r, st), title: r.name, url: r.url, prog: nwProgOf(r), r: r, all: ms, ms: okMs(ms) }; };
+    return { st: st, id: r.id, key: al ? al.key : '', nw: !!(al && !seen[al.key]), when: whenOf(r, st), title: r.name, url: r.url, prog: nwProgOf(r), r: r, all: ms, mine: okMs(ms), ms: nfMs(ms) }; };
   var withW = function(o){ o.w = nwWhy(o.prog, o.ms, o.r); return o; };
-  var oIn = by.open.map(nOf).map(withW), sIn = by.soon.map(nOf).map(withW);
+  var t1 = nfSplit(by.open.map(nOf).map(withW)), t2 = nfSplit(by.soon.map(nOf).map(withW)), oIn = t1[0], oHid = t1[1], sIn = t2[0], sHid = t2[1];
   // 다음 공고(예상): 지난해 같은 공고 날짜로 짐작 — 기관 발표 아님
   var now = new Date(), act = expActive(), later = EXPECT.filter(function(e){ var f = nrDate(e.from); return f && f - now > 90 * 864e5; });
   var expMs = function(e){ return (window.nmMarkers || []).filter(function(m){ var p = m.__p; return p.cat !== 'na' && !nrLive(p) && expProg(p) === e.prog; }); };
   var expAll = function(e){ return (window.nmMarkers || []).filter(function(m){ var p = m.__p; return p.cat !== 'na' && !nrLive(p) && expProg(p) === e.prog; }).length; };
-  var eOf = function(e){ return { st: 'exp', id: 'EXP:' + e.prog, when: e.when + ' 예상', title: e.name, url: e.url, urlTxt: '예상 근거', prog: e.prog, r: null, ms: expMs(e), e: e, src0: [['예상 시기: ' + e.basis + ' → 지난 같은 공고 날짜로 짐작(기관 발표 아님) · 어느 단지가 들어갈지는 공고가 떠야 확정', e.url]] }; };
-  var eAll = act.map(eOf), eIn = eAll.filter(function(o){ return !ready || o.ms.length; }).map(withW), eOut = eAll.filter(function(o){ return ready && !o.ms.length; });
+  var eOf = function(e){ return { st: 'exp', id: 'EXP:' + e.prog, when: e.when + ' 예상', title: e.name, url: e.url, urlTxt: '예상 근거', prog: e.prog, r: null, mine: expMs(e), ms: nfMs(expMs(e)), e: e, src0: [['예상 시기: ' + e.basis + ' → 지난 같은 공고 날짜로 짐작(기관 발표 아님) · 어느 단지가 들어갈지는 공고가 떠야 확정', e.url]] }; };
+  var eAll = act.map(eOf), eT = nfSplit(eAll.filter(function(o){ return !ready || o.mine.length; }).map(withW)), eIn = eT[0], eHid = eT[1], eOut = eAll.filter(function(o){ return ready && !o.mine.length; });
   eIn.sort(function(a, b){ return (nrDate(a.e.from) || 0) - (nrDate(b.e.from) || 0); });
   // 공급계획(SH·LH가 미리 발표 · 아직 모집공고 전)
   var ps = window.PLAN_ITEMS || [], on = {}; document.querySelectorAll('.nmbar input[data-cat]').forEach(function(c){ on[c.dataset.cat] = c.checked; });
@@ -3368,7 +3459,26 @@ function noticeListHtml(){
   var pOf = function(x){ var st = x.st || {}, pd = (st.pd && st.pd.txt) || '', mk = planMarker(x.id), sub = hesc(x.src + ' 공급계획' + (x.hh ? ' · ' + x.hh + '호' : ''));
     if (x.prog === 'yapub') { var w = nwWhy('yapub', [], null); if (w.tone) sub += ' · <span class="n2-vl sm t-' + w.tone + '">' + w.lab + '</span>' + hesc(w.why); }
     return { st: 'plan', id: mk ? x.id : '', when: '공고 전 · 계획 ' + pd.replace(/^\d{4}년 /, '') + (st.od ? '(늦어짐)' : ''), title: planTitle(x), url: x.url, urlTxt: '공급계획', sub: sub }; };
-  var pIn = ps.filter(planOk).map(pOf), pOut = ps.filter(function(x){ return !planOk(x); }).map(pOf);
+  var pNf = function(x){ var c = nfCatOf(x.prog), mk = planMarker(x.id); if (c && NF.cats[c] === false) return nfCatName(c) + ' 숨김'; if (ready && mk && mk.__p.cat !== 'na' && !nfMsOk(mk, NF)) return nfMsWhy([mk], NF) || '공고 필터 밖'; return ''; };
+  var pIn = [], pHid = []; ps.filter(planOk).forEach(function(x){ var o = pOf(x), why = pNf(x); if (why) { o.nfx = why; pHid.push(o); } else pIn.push(o); }); var pOut = ps.filter(function(x){ return !planOk(x); }).map(pOf);
+  // 카드 → 지도 '공고 보기'에 쓸 단지 묶음(카드의 '지도에서 n곳'과 같은 단지 · 공고 필터에 다 걸린 공고는 내 조건 단지 전부)
+  var SETS = {}, rec = function(o){ if (!o || !o.id) return; var src = (o.ms && o.ms.length) ? o.ms : (o.mine || []), ids = {}; src.forEach(function(m){ if (m.__p && m.__p.__mkid) ids[m.__p.__mkid] = 1; }); SETS[o.id] = { title: o.title, ids: ids }; };
+  oIn.concat(oHid, sIn, sHid, eIn, eHid).forEach(rec); window.__nwSets = SETS;
+  var hid = oHid.concat(sHid, eHid, pHid), hidAct = oHid.length + sHid.length, hidNew = hid.filter(function(o){ return o.nw; }).length;
+  var nfOpen = !!window.__nfOpen, chips = nfChips(NF), ck = function(b){ return b ? ' checked' : ''; };
+  var nfHtml = '<div class="nf"><div class="nf-row"><span class="nf-k">공고 필터</span>' +
+      (chips.length ? chips.map(function(c){ return '<span class="nf-c">' + hesc(c[1]) + '<button type="button" class="nf-x" data-nfx="' + c[0] + '" aria-label="' + hesc(c[1]) + ' 끄기">×</button></span>'; }).join('') : '<span class="nf-none">없음 · 내 조건 공고 전부</span>') +
+      '<button type="button" class="nf-tg" aria-expanded="' + (nfOpen ? 'true' : 'false') + '">' + (nfOpen ? '접기 ▴' : '바꾸기 ▾') + '</button></div>' +
+    (hid.length ? '<p class="nf-hid">공고 필터로 숨긴 공고 ' + hid.length + '건' + (hidAct ? ' — <b>접수 중·곧 접수 ' + hidAct + '건 포함</b>' : '') + (hidNew ? ' · 새 알림 ' + hidNew + '건' : '') + ' (맨 아래 \'그 밖\')</p>' : '') +
+    '<div class="nf-pan"' + (nfOpen ? '' : ' hidden') + '>' +
+      '<p class="nf-note">지도 필터와 따로 · 기본은 내 조건(청년·8평↑·복층 빼기, 알림과 같은 기준) 공고 전부 · 바꾸면 바로 적용</p>' +
+      '<div class="nf-s"><b>평형</b><div class="nf-opts">' + [8, 9, 10].map(function(v){ return '<button type="button" class="nf-pyb" data-v="' + v + '" aria-pressed="' + (NF.py === v ? 'true' : 'false') + '">' + v + '평 이상</button>'; }).join('') + '</div></div>' +
+      '<div class="nf-s"><b>종류</b><div class="nf-opts">' + NF_CATS.map(function(x){ return '<label><input type="checkbox" data-nfcat="' + x[0] + '"' + ck(NF.cats[x[0]] !== false) + '> ' + x[1] + '</label>'; }).join('') + '</div></div>' +
+      '<div class="nf-s"><b>월부담</b> <small class="k">월세 + 보증금 대출 이자 · 단지 하나라도 맞으면 남김</small><div class="nf-opts"><select data-nf="burd" aria-label="월부담">' + NF_BURD.map(function(v){ return '<option value="' + v + '"' + (NF.burd === v ? ' selected' : '') + '>' + (v ? v + '만 이하' : '전체') + '</option>'; }).join('') + '</select><label><input type="checkbox" data-nf="unk"' + ck(NF.unk) + '> 월부담 모름도 남김</label></div></div>' +
+      '<div class="nf-s"><b>구</b> <small class="k">단지 하나라도 고른 구에 있으면 남김</small><div class="nf-opts nf-gu">' + GU25.map(function(g){ return '<label><input type="checkbox" data-nfgu="' + g + '"' + ck(!NF.gu.length || NF.gu.indexOf(g) >= 0) + '> ' + guShort(g) + '</label>'; }).join('') + '</div><div class="nf-ft nf-ft2"><button type="button" class="nf-gu-all">구 전체</button><button type="button" class="nf-gu-none">구 전체 해제</button></div></div>' +
+      '<div class="nf-s"><b>그 밖</b><div class="nf-opts"><label><input type="checkbox" data-nf="low"' + ck(NF.low) + '> 기대 낮음 빼기 <small class="k">(청년안심 공공·청년 매입)</small></label></div></div>' +
+      '<div class="nf-ft"><button type="button" class="nf-map">지도 필터 그대로 가져오기</button><button type="button" class="nf-reset">초기화</button></div>' +
+    '</div></div>';
   // 맨 위 '지금 할 일': 지금 신청할 것 → 다음 볼 것(볼 만함 먼저) — 판단 한 줄 그대로
   var vtxt = function(o){ return (o.w.lab ? '<span class="n2-vl sm t-' + o.w.tone + '">' + o.w.lab + '</span>' : '') + hesc(o.w.why || ''); };
   var nextPool = sIn.concat(eIn), next = nextPool.filter(function(o){ return o.w.tone !== 'low'; })[0] || nextPool[0] || null;
@@ -3376,9 +3486,10 @@ function noticeListHtml(){
   var line = function(t, o){ return '<p class="n2-nx"><span class="n2-nk">' + t + '</span><b>' + hesc(o.title) + '</b> · ' + hesc(o.when) + (o.w.why ? '<br>' + vtxt(o) : '') + (o.fout ? '<br><span class="n2-fo">지도 필터 밖 — ' + hesc(o.fout) + '</span>' : '') + '</p>'; };
   var oAll = oIn;
   var sum = '<div class="n2-sum"><p class="n2-todo">' + todo + '</p>' + (oAll.length ? line('마감 먼저', oAll.slice().sort(function(a, b){ return (a.r.a1 || 0) - (b.r.a1 || 0); })[0]) : '') + (next ? line(oAll.length ? '다음' : '다음 볼 것', next) : (oAll.length ? '' : '<p class="n2-nx">필터에 맞는 다음 공고도 없음</p>')) +
-    '<p class="n2-fl">내 조건 기준: 청년 · 8평 이상 · 복층 빼기 — 알림과 같음 · 지도 필터와 따로</p></div>';
+    nfHtml + '</div>';
   var head = function(t, n){ return '<div class="n2-grp">' + t + ' <span>' + n + '</span></div>'; };
   var restParts = [   // [소제목, 접힌 줄 요약 이름, 카드들]
+    ['공고 필터로 숨김', '공고 필터로 숨김', hid.map(function(o){ o.sub = '공고 필터에 걸림 — ' + hesc(o.nfx); return mini(o); })],
     ['다음 공고 — 내 조건 단지 없음', '내 조건 단지 없는 다음 공고', eOut.map(function(o){ o.sub = '청년·8평↑ 단지가 지도에 없음'; return mini(o); }).concat(pOut.map(mini))],
     ['그다음 예상', '그다음 예상', later.map(function(e){ return mini({ st: 'exp', when: e.when + ' 예상', title: e.name, url: e.url, urlTxt: '예상 근거', sub: hesc('예상 근거: ' + e.basis) }); })],
     ['끝난 공고', '끝난 공고', by.ended.map(function(r){ var o = nOf(r); o.sub = hesc(r.src || ''); return mini(o); })],
@@ -3392,23 +3503,38 @@ function noticeListHtml(){
     (restN ? '<details class="n2-more"><summary>그 밖 ' + restN + '건 <small>' + restParts.map(function(x){ return x[1] + ' ' + x[2].length; }).join(' · ') + '</small></summary>' + restParts.map(function(x){ return '<div class="n2-sub">' + x[0] + ' <span>' + x[2].length + '</span></div>' + x[2].join(''); }).join('') + '</details>' : '') +
     (unseen ? '<p class="nl-foot"><button type="button" class="al-all">🔔 새 알림 공고 모두 확인</button></p>' : '') +
     '<details class="n2-help"><summary>ⓘ 판단은 어떻게?</summary><p class="src">카드 굵은 한 줄 = 지난 회차의 실제 숫자(SH 경쟁률 PDF). 행복주택·국민임대는 내 조건 단지 중 <b>지난 경쟁률이 가장 낮은 곳</b>과 내가 1순위인 곳 수, \'먼저 볼 곳\' = 지난 경쟁률 낮은 순. <b>기대 낮음</b> = 지난 회차를 순위 순으로 나눠 보면 내 순위(3순위)까지 내려온 집이 0호(청년안심 공공·청년 매입임대), 또는 전부 예비자 모집. 지난 결과가 없는 새 공고·민간임대·LH는 \'자료 없음\'. 내 순위는 본인 소득·자산만 봄(부모를 보는 순위는 뺌). 카드의 \'근거\'를 누르면 공고문 쪽수·PDF 출처.</p>' +
-    '<p class="src">목록은 SH(행복·국민·매입임대)·서울시 청년안심·LH 공고를 접수 상태로 묶고, <b>지도 필터와 따로</b> — 내 조건(청년·8평↑·복층 빼기, 알림과 같은 기준)에 맞는 공고를 전부 보이고, 단지 수·월부담·먼저 볼 곳도 내 조건 단지로 셈. 지도 필터(평형 9·10평·월부담·구·건물 종류·주차·준공)는 지도 화면에만. 다음 공고(예상·공급계획) 중 내 조건 단지가 지도에 없는 것은 \'그 밖\'. \'다음 공고\'의 예상 = 지난해 같은 공고 날짜로 짐작(기관 발표 아님), 공고 전 = SH·LH가 미리 발표한 공급계획. 🔔 새 알림 = 알림을 켠 뒤 새로 올라와 알림을 보낸 공고(카드를 누르면 확인). 카드를 누르면 지도에서 그 공고 단지만(목록 위 ✕로 해제), \'먼저 볼 곳\'을 누르면 그 단지 상세.</p>' +
+    '<p class="src">목록은 SH(행복·국민·매입임대)·서울시 청년안심·LH 공고를 접수 상태로 묶고, <b>지도 필터와 따로</b> — 내 조건(청년·8평↑·복층 빼기, 알림과 같은 기준)에 맞는 공고를 전부 보이고, 단지 수·월부담·먼저 볼 곳도 내 조건 단지로 셈. 지도 필터(평형 9·10평·월부담·구·건물 종류·주차·준공)는 지도 화면에만. 대신 <b>공고 필터</b>(평형·종류·월부담·구·기대 낮음)가 따로 있고, 숨긴 공고는 맨 위에 몇 건인지(접수 중·곧 접수·새 알림이 섞였는지) 보이며 \'그 밖\'에 까닭과 같이 있음. 공고·먼저 볼 곳을 누르면 지도가 <b>\'공고 보기\'</b>로 바뀌어 그 단지를 지도 필터와 상관없이 보여 줌(지도 위 띠의 \'× 끝\'로 끝내면 지도 필터·보던 자리로). 다음 공고(예상·공급계획) 중 내 조건 단지가 지도에 없는 것은 \'그 밖\'. \'다음 공고\'의 예상 = 지난해 같은 공고 날짜로 짐작(기관 발표 아님), 공고 전 = SH·LH가 미리 발표한 공급계획. 🔔 새 알림 = 알림을 켠 뒤 새로 올라와 알림을 보낸 공고(카드를 누르면 확인). 카드를 누르면 지도에서 그 공고 단지만(목록 위 ✕로 해제), \'먼저 볼 곳\'을 누르면 그 단지 상세.</p>' +
     (outN ? '<p class="src">내 조건 밖 공고 ' + outN + '건은 뺌 — 지도에 올라간 단지가 전부 \'해당 없음\'(청년 자격 형이 ' + belowTxt() + '뿐 등)인 공고</p>' : '') + '</details>';
 }
 window.renderNoticePanel = function(){
   var html = null;   // 한 번만 계산해 두 상자(지도 사이드바 '공고' 탭 · 공고 화면)에 — '먼저 볼 곳' 번호(__nwPicks)도 둘이 같게
   ['nm-notices', 'alerts-list'].forEach(function(bid){ var box = document.getElementById(bid); if (!box) return; var cal = bid === 'alerts-list';
-    if (html === null) html = withMyCond(noticeListHtml);
+    if (html === null) { var nf0 = nfGet(); (window.nmMarkers || []).forEach(function(mk){ mk.__nfPy = true; }); if (nf0.py > 8) withMyCond(function(){ (window.nmMarkers || []).forEach(function(mk){ mk.__nfPy = mk.__p.cat !== 'na'; }); }, nf0.py); html = withMyCond(noticeListHtml); }
     box.innerHTML = html;
-    box.querySelectorAll('.n2-p').forEach(function(b){ b.addEventListener('click', function(e){ e.stopPropagation(); var mk = (window.__nwPicks || [])[+b.dataset.pk]; if (!mk) return; var f = function(){ if (window.setSideTab) setSideTab('list'); nmFocusMarker(mk); }; if (cal) { location.hash = 'map'; setTimeout(f, 200); } else f(); }); });
+    var nfB = box.querySelector('.nf'); if (nfB) {
+      var stop = function(e){ e.stopPropagation(); };
+      var tg = nfB.querySelector('.nf-tg'); if (tg) tg.onclick = function(e){ stop(e); window.__nfOpen = !window.__nfOpen; window.renderNoticePanel(); };
+      nfB.querySelectorAll('.nf-x').forEach(function(b){ b.onclick = function(e){ stop(e); var o = nfGet(), d = nfDef(), k = b.dataset.nfx; o[k] = d[k]; if (k === 'burd') o.unk = true; nfSet(o); }; });
+      nfB.querySelectorAll('.nf-pyb').forEach(function(b){ b.onclick = function(e){ stop(e); var o = nfGet(); o.py = +b.dataset.v; nfSet(o); }; });
+      var nfRd = function(){ var o = nfGet();
+        nfB.querySelectorAll('input[data-nfcat]').forEach(function(c){ o.cats[c.dataset.nfcat] = c.checked; });
+        var gs = Array.prototype.filter.call(nfB.querySelectorAll('input[data-nfgu]'), function(c){ return c.checked; }).map(function(c){ return c.dataset.nfgu; });
+        o.gu = gs.length === GU25.length ? [] : (gs.length ? gs : ['-']);
+        var bs = nfB.querySelector('select[data-nf="burd"]'); if (bs) o.burd = +bs.value || 0;
+        var un = nfB.querySelector('input[data-nf="unk"]'); if (un) o.unk = un.checked;
+        var lw = nfB.querySelector('input[data-nf="low"]'); if (lw) o.low = lw.checked;
+        return o; };
+      nfB.querySelectorAll('.nf-pan input, .nf-pan select').forEach(function(c){ c.addEventListener('click', stop); c.addEventListener('change', function(e){ stop(e); nfSet(nfRd()); }); });
+      var ga = nfB.querySelector('.nf-gu-all'); if (ga) ga.onclick = function(e){ stop(e); var o = nfGet(); o.gu = []; nfSet(o); };
+      var gn = nfB.querySelector('.nf-gu-none'); if (gn) gn.onclick = function(e){ stop(e); var o = nfGet(); o.gu = ['-']; nfSet(o); };
+      var gm = nfB.querySelector('.nf-map'); if (gm) gm.onclick = function(e){ stop(e); var o = nfGet(); o.py = PY_MIN; o.burd = BURD.max || 0; o.unk = !!BURD.unk; o.gu = !GU_ON.length ? [] : (GU_ON[0] === '-' ? ['-'] : GU_ON.filter(function(g){ return GU25.indexOf(g) >= 0; })); nfSet(o); };
+      var rs = nfB.querySelector('.nf-reset'); if (rs) rs.onclick = function(e){ stop(e); nfSet(nfDef()); };
+      nfB.addEventListener('click', stop);
+    }
+    box.querySelectorAll('.n2-p').forEach(function(b){ b.addEventListener('click', function(e){ e.stopPropagation(); var mk = (window.__nwPicks || [])[+b.dataset.pk]; if (!mk) return; var c = b.closest('.nc'), t = c && c.querySelector('.n2-t'); nwGoMap(c ? c.dataset.id : '', mk, cal, t ? t.textContent : ''); }); });
     box.querySelectorAll('.nc').forEach(function(el){ var go = function(e){ if (e.target.closest('a,label,input,details,.n2-p')) return; var k = el.dataset.key, id = el.dataset.id; if (!id) return; if (k && window.ALERTS) window.ALERTS.mark(k, true);
-        if (/^EXP:/.test(id)) { var prog = id.slice(4), goEx = function(){ if (window.setSideTab) setSideTab('list'); if (!LIVE) { var lv = document.getElementById('nm-live'); if (lv) lv.click(); } if (!EXP_ON) { EXP_ON = true; PREF.set('exp', true); }
-            if (window.__applyFilter) window.__applyFilter(); if (window.pkRefreshIcons) pkRefreshIcons(); var ms = nmMarkers.filter(function(m){ return m.__vis && expMk(m.__p) && expProg(m.__p) === prog; });
-            if (ms.length) { try { var bd = new naver.maps.LatLngBounds(ms[0].getPosition(), ms[0].getPosition()); ms.forEach(function(m){ bd.extend(m.getPosition()); }); nmMap.fitBounds(bd, { top: 60, right: 60, bottom: 60, left: 60 + mapPadL() }); } catch (er) {} } };
-          if (cal) { location.hash = 'map'; setTimeout(goEx, 200); } else goEx(); return; }
-        if (/^PL:/.test(id)) { var goPl = function(){ var mk = planMarker(id); if (!mk) return; if (window.setSideTab) setSideTab('list'); nmFocusMarker(mk); }; if (cal) { location.hash = 'map'; setTimeout(goPl, 200); } else goPl(); return; }
-        if (/^AL:/.test(id) || !window.mapNotice) { var a = el.querySelector('.nc-link'); if (a) window.open(a.href, '_blank', 'noopener'); return; }
-        if (cal) { location.hash = 'map'; setTimeout(function(){ window.mapNotice(id); }, 150); } else window.mapNotice(id); };
+        if (/^AL:/.test(id)) { var a = el.querySelector('.nc-link'); if (a) window.open(a.href, '_blank', 'noopener'); return; }
+        var tt = el.querySelector('.n2-t'); nwGoMap(id, null, cal, tt ? tt.textContent : ''); };
       el.addEventListener('click', go); el.addEventListener('keydown', function(e){ if (e.key === 'Enter') go(e); }); });
     box.querySelectorAll('input[data-key]').forEach(function(c){ c.addEventListener('click', function(e){ e.stopPropagation(); }); c.addEventListener('change', function(){ if (window.ALERTS) window.ALERTS.mark(c.dataset.key, c.checked); }); });
     box.querySelectorAll('a.nc-link').forEach(function(a){ a.addEventListener('click', function(e){ e.stopPropagation(); var el = a.closest('.nc'); if (el && el.dataset.key && window.ALERTS) window.ALERTS.mark(el.dataset.key, true); }); });
@@ -4047,16 +4173,17 @@ function nmInit(){
     var lgBody = document.getElementById('lg-body'); if (lgBody && !document.getElementById('lg-apply')) { var la = document.createElement('div'); la.className = 'lg-apply'; la.innerHTML = '<button type="button" id="lg-apply">결과 보기</button>'; lgBody.appendChild(la);
       la.querySelector('button').addEventListener('click', function(e){ e.stopPropagation(); if (sheet.mobile()) { if (sideEl.classList.contains('lg-open')) lgBtn.click(); sheet.go(2); } else if (!sideEl.classList.contains('lg-closed')) lgBtn.click(); }); }
     var mch = document.getElementById('mapchips'); if (mch && !document.getElementById('pr-legend')) { var pl = document.createElement('div'); pl.id = 'pr-legend'; pl.className = 'pr-legend'; pl.innerHTML = '핀 = <b>보증금/월세</b>(만 원) · <b>+2</b> = 밑에 2곳 더'; mch.appendChild(pl);
+      var fb0 = document.createElement('div'); fb0.id = 'nm-focus'; fb0.className = 'nm-focus'; fb0.hidden = true; mch.insertBefore(fb0, mch.firstChild); focBanner();
       var ob = document.createElement('button'); ob.type = 'button'; ob.id = 'nm-offs'; ob.className = 'pr-off'; ob.hidden = true; mch.appendChild(ob); ob.addEventListener('click', function(e){ e.stopPropagation(); nmFitAll(); }); }
   }
   function applyFilter(){
     var on = {}; document.querySelectorAll('.nmbar input[data-cat]').forEach(function(c){ on[c.dataset.cat] = c.checked; });
-    var nid = document.getElementById('nm-notice').value;
+    var nid = document.getElementById('nm-notice').value, FX = (window.__FOC && window.__FOC.ids && !nid) ? window.__FOC.ids : null;   // '공고 보기' 단지 묶음
     function vis0(p){ if (p.planOnly && (!p.plan.st || p.plan.st.done)) return false; return on[p.cat] && guOk(p) && builtOk(p) && burdOk(p) && liveOk(p); }
-    function inN(p){ return !nid || (p.nids || [p.nid]).indexOf(nid) >= 0; }   // 공고를 골랐으면(공고 탭·공고 일정·알림에서 '지도에서') 그 공고 단지는 필터와 상관없이 다 보임 — 지금 필터 밖은 p.__out(흐리게)
+    function inN(p){ if (FX) return !!FX[p.__mkid]; return !nid || (p.nids || [p.nid]).indexOf(nid) >= 0; }   // 공고를 골랐으면(공고 탭·공고 일정·알림에서 '지도에서') 그 공고 단지는 필터와 상관없이 다 보임 — 지금 필터 밖은 p.__out(흐리게)
     var btN = {}, pkN = {}; BT_KINDS.forEach(function(x){ btN[x.k] = 0; }); PK_KINDS.forEach(function(x){ pkN[x.k] = 0; });
     nmMarkers.forEach(function(mk){ var p = mk.__p; mk.__ok = !!vis0(p) && btOk(p) && pkOk(p); var n0 = inN(p), v0 = n0 && !!vis0(p), bo = v0 && btOk(p), po = v0 && pkOk(p); if (po) btCountKeys(p).forEach(function(k){ btN[k]++; }); if (bo) pkN[pkLevel(p)]++;
-      var ok = bo && po, v = nid ? n0 : ok, out = !!nid && n0 && !ok;
+      var ok = bo && po, v = (nid || FX) ? n0 : ok, out = !!(nid || FX) && n0 && !ok;
       if (!!p.__out !== out) { p.__out = out; if (mk !== nmSelected && mk.__icon && mk.setIcon) { try { mk.setIcon(mk.__icon()); } catch(e) {} } }
       mk.__vis = v; mk.setMap(v ? nmMap : null); });
     document.querySelectorAll('#nm-pk .bt-n').forEach(function(el){ var n = pkN[el.dataset.pn] || 0; el.textContent = n; (el.closest('.bt-it') || el.parentNode).classList.toggle('zero', !n); });
@@ -4066,7 +4193,7 @@ function nmInit(){
     var shown = {};
     document.querySelectorAll('.lst .it').forEach(function(el){ var v = el.__mk ? el.__mk.__vis : !!on[el.dataset.cat]; el.style.display = v ? '' : 'none'; el.classList.toggle('out', !!(el.__mk && el.__mk.__p.__out)); if (v) shown[el.dataset.cat] = (shown[el.dataset.cat] || 0) + 1; });
     document.querySelectorAll('.lst .grp').forEach(function(el){ el.style.display = shown[el.dataset.cat] ? '' : 'none'; });   // 보이는 단지가 없는 묶음 제목은 숨김
-    selNote(nid);
+    selNote(nid); focBanner();
     var em = document.getElementById('nm-empty'); if (em) { var nv = Object.keys(shown).reduce(function(a, k){ return a + shown[k]; }, 0); em.hidden = !!nv || !nmMarkers.length; em.innerHTML = LIVE ? '<b>지금 접수 중·접수 예정' + (EXP_ON ? '·공고 예정' : '') + '인 단지가 없음</b> — 위 \'접수 끝난 곳 빼기\'를 끄면 전부 보임' : '조건에 맞는 단지가 없음 — 필터를 바꿔 보세요'; }
     var bbSeen = {}, bb = []; nmMarkers.forEach(function(mk){ var p = mk.__p; if (!p || p.cat === 'na' || bbSeen[p.__mkid] || !inN(p)) return; if (p.planOnly && (!p.plan.st || p.plan.st.done)) return;
       if (!(on[p.cat] && guOk(p) && builtOk(p) && liveOk(p) && btOk(p) && pkOk(p))) return; bbSeen[p.__mkid] = 1; var bv = burdOf(p); if (bv != null) bb.push(bv); });
@@ -4080,7 +4207,7 @@ function nmInit(){
   function selNote(nid){ var el = document.getElementById('nm-selnote'); if (!el) return; if (!nid || !NREG[nid]) { el.hidden = true; el.innerHTML = ''; return; }
     var r = NREG[nid], ms = nrMarkers(nid), vn = ms.filter(function(m){ return m.__vis; }).length, oF = ms.filter(function(m){ return m.__p.__out && m.__p.cat !== 'na'; }).length, oN = ms.filter(function(m){ return m.__p.cat === 'na'; }).length;
     el.hidden = false; el.innerHTML = '<div>' + nrPill(r) + ' <b>' + hesc(r.name) + '</b><br><small class="k">' + nrApplyTxt(r) + (r.result ? ' · 발표 ' + r.result : '') + ' · 지도 ' + vn + '곳' + (oF || oN ? ' — ' + [oF ? '지금 필터 밖 ' + oF + '곳(흐리게)' : '', oN ? '내 조건 밖 ' + oN + '곳(회색)' : ''].filter(Boolean).join(' · ') + ' · 이 공고를 보는 동안은 필터와 상관없이 다 보여 줌' : '') + (ms.length ? '' : ' — 이 공고는 지도에 올릴 단지 자료가 없음') + ' · <a href="' + r.url + '" target="_blank" rel="noopener">공고문 ↗</a></small></div><button type="button" id="nm-selnote-x" aria-label="공고 고르기 해제">✕ 전체</button>';
-    document.getElementById('nm-selnote-x').onclick = function(){ document.getElementById('nm-notice').value = ''; applyFilter(); }; }
+    document.getElementById('nm-selnote-x').onclick = function(){ if (window.__FOC && window.nmFocusEnd) window.nmFocusEnd(true); else { document.getElementById('nm-notice').value = ''; applyFilter(); } }; }
   var liveBox = document.getElementById('nm-live'); if (liveBox) { liveBox.checked = LIVE; liveBox.addEventListener('change', function(){ LIVE = liveBox.checked; PREF.set('live', LIVE); try { localStorage.setItem('kkk-live', LIVE ? '1' : '0'); } catch(e) {} applyFilter(); pkRefreshIcons(); }); }
   // 사이드바 탭: 단지 목록 | 공고 — 공고를 누르면 지도·목록이 그 공고 단지만
   var tabs = document.getElementById('side-tabs');
@@ -4088,11 +4215,22 @@ function nmInit(){
     if (tabs) tabs.querySelectorAll('button[data-tab]').forEach(function(b){ var o = b.dataset.tab === t; b.classList.toggle('on', o); b.setAttribute('aria-selected', o ? 'true' : 'false'); });
     if (t === 'notice') window.renderNoticePanel(); try { if (sheet.mobile()) sheet.refit(); } catch(e) {} };
   if (tabs) tabs.addEventListener('click', function(e){ var b = e.target.closest('button[data-tab]'); if (!b) return; e.stopPropagation(); if (document.getElementById('side').classList.contains('show-detail')) hideDetail(); setSideTab(b.dataset.tab); if (sheet.mobile() && sheet.state() < 2) sheet.go(2); });
+  var nmViewNow = function(){ try { return { c: nmMap.getCenter(), z: nmMap.getZoom() }; } catch(e) { return null; } };
+  window.nmFocusEnter = function(F){ var cur = window.__FOC; F.prev = cur ? cur.prev : nmViewNow(); window.__FOC = F;
+    var sel = document.getElementById('nm-notice'); if (sel) sel.value = '';
+    if (document.getElementById('side').classList.contains('show-detail')) hideDetail();
+    applyFilter(); };
+  window.nmFocusFit = function(){ var ms = nmMarkers.filter(function(m){ return m.__vis; }); if (!ms.length) return; if (ms.length === 1) return nmFocusMarker(ms[0]);
+    try { var b = new naver.maps.LatLngBounds(ms[0].getPosition(), ms[0].getPosition()); ms.forEach(function(m){ b.extend(m.getPosition()); });
+      var nm = document.getElementById('nmap').getBoundingClientRect(), mc = document.getElementById('mapchips').getBoundingClientRect();
+      nmMap.fitBounds(b, { top: Math.max(60, Math.round(mc.bottom - nm.top) + 20), right: 40, bottom: sheet.mobile() ? Math.round(sheet.visH()) + 40 : 60, left: 40 + mapPadL() }); } catch(e) {} };
+  window.nmFocusEnd = function(restore){ var F = window.__FOC; if (!F) return; window.__FOC = null; var sel = document.getElementById('nm-notice'); if (sel && sel.value) sel.value = ''; applyFilter();
+    if (restore && F.prev) { try { nmMap.setZoom(F.prev.z); nmMap.setCenter(F.prev.c); } catch(e) {} } };
   window.mapNotice = function(id){
     if (!id || !NREG[id]) return 0;
     var sel = document.getElementById('nm-notice'), has = function(){ return [].some.call(sel.options, function(o){ return o.value === id; }); }; if (!has()) buildNoticeSelect();
     if (!has()) { var o = document.createElement('option'); o.value = id; o.textContent = NREG[id].name + ' — ' + nrStateTxt(NREG[id]) + ' (내 조건 밖)'; sel.appendChild(o); }   // 내 조건 밖 공고(목록에선 뺌)도 눌러서 왔으면 그 공고로 — 예전엔 선택이 안 먹어 전체가 보였음
-    sel.value = id;
+    sel.value = id; var cur0 = window.__FOC; window.__FOC = { title: NREG[id].name, nid: id, sel: true, prev: cur0 ? cur0.prev : nmViewNow() };   // 알림·공고 선택으로 온 것도 '공고 보기'(위 띠)
     if (document.getElementById('side').classList.contains('show-detail')) hideDetail();
     setSideTab('list'); applyFilter();
     var ms = nrMarkers(id).filter(function(mk){ return mk.__vis; });
@@ -4505,7 +4643,7 @@ window.addEventListener('beforeinstallprompt', function(e){ e.preventDefault(); 
 // ===== 새로고침 (2026-11-04) — 아이폰 홈 화면 앱엔 새로고침 버튼이 없어 껐다 켜야 했음 =====
 // ① 지도 말고 다른 화면 맨 위에서 아래로 당겼다 놓으면 새로고침(홈 화면 앱에서만 — 브라우저 탭은 자체 기능이 있음)
 // ② 앱으로 돌아올 때·30분마다 새 버전(version.json)·새 공고 자료(data/notices.json)를 확인 → 바뀌었으면 맨 위 띠 '눌러서 새로고침'
-var SITE_BUILD = 'ee413542dfcc';
+var SITE_BUILD = '9142e17b8f11';
 function nwSig(j){ var s = JSON.stringify([(j && j.items) || [], (j && j.list_ids) || {}]), h = 0; for (var i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0; return h + ':' + s.length; }
 (function(){
   var sa = navigator.standalone === true || (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches);
