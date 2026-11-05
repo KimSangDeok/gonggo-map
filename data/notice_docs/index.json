@@ -1,5 +1,66 @@
 {
  "about": "알림 대상 공고의 공고문 사본(tools/notice_docs.py, GitHub 러너가 받음) — 매일 Claude 요약이 웹사이트를 열지 않고 이걸로 확인. [p.N] = 첨부 공고문 N쪽",
- "updated": "",
- "items": {}
+ "updated": "2026-11-05 17:44 KST",
+ "items": {
+  "sh:312053": {
+   "file": "data/notice_docs/sh-312053.txt",
+   "title": "[청년형] 특화형 매입임대주택(구로구) 입주자 모집 공고(운영기관 : 마을과집 협동조합)",
+   "url": "https://www.i-sh.co.kr/app/lay2/program/S1T294C295/www/brd/m_241/view.do?multi_itm_seqs=1%2C2%2C4%2C8%2C16%2C32%2C64%2C128%2C256&seq=312053",
+   "fetched": "2026-11-05 17:44 KST",
+   "pdfs": [
+    {
+     "name": "[마을과집]SH특화형 매입임대주택(청년) 입주자 모집 공고문_20261102.pdf",
+     "pages": 18
+    }
+   ],
+   "chars": 24870,
+   "tries": 1,
+   "err": ""
+  },
+  "ya:6718": {
+   "file": "data/notice_docs/ya-6718.txt",
+   "title": "[민간임대] 효창공원앞역 해링턴 플레이스 용산 리버뷰 최초모집공고",
+   "url": "https://soco.seoul.go.kr/youth/bbs/BMSR00015/view.do?boardId=6718&menuNo=400008",
+   "fetched": "2026-11-05 17:44 KST",
+   "pdfs": [
+    {
+     "name": "민간_261103_효창공원앞역_해링턴플레이스 용산 리버뷰_청년안심주택 최초모집공고문.pdf",
+     "pages": 34
+    }
+   ],
+   "chars": 46261,
+   "tries": 1,
+   "err": ""
+  },
+  "ya:6720": {
+   "file": "data/notice_docs/ya-6720.txt",
+   "title": "[민간임대] 건대입구역 더포디엄830 추가모집공고",
+   "url": "https://soco.seoul.go.kr/youth/bbs/BMSR00015/view.do?boardId=6720&menuNo=400008",
+   "fetched": "2026-11-05 17:44 KST",
+   "pdfs": [
+    {
+     "name": "민간_261105_건대입구역_더포디엄830_청년안심주택 추가모집공고문.pdf",
+     "pages": 7
+    }
+   ],
+   "chars": 10497,
+   "tries": 1,
+   "err": ""
+  },
+  "ya:6721": {
+   "file": "data/notice_docs/ya-6721.txt",
+   "title": "[민간임대] 숭곡초교역(예정) 성북펠릭스 추가모집공고",
+   "url": "https://soco.seoul.go.kr/youth/bbs/BMSR00015/view.do?boardId=6721&menuNo=400008",
+   "fetched": "2026-11-05 17:44 KST",
+   "pdfs": [
+    {
+     "name": "민간_261105_숭곡초교역_성북펠릭스_청년안심주택 추가모집공고문.pdf",
+     "pages": 3
+    }
+   ],
+   "chars": 9219,
+   "tries": 1,
+   "err": ""
+  }
+ }
 }
