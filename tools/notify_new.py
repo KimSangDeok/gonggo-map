@@ -260,6 +260,10 @@ def notify(title, msg, url, prio=3, key=''):
 # 본문 text 는 <routine-fire-payload> 로 감싸져 '데이터'로만 전달됨. 토큰은 저장소 비밀값 CLAUDE_FIRE_TOKEN(사용자가 직접 등록) — 없으면 이 단계는 건너뜀
 FIRE_URL = 'https://api.anthropic.com/v1/claude_code/routines/trig_015Pjcf9bwsggsXtVZamWjG7/fire'
 FIRE_TOKEN = os.environ.get('CLAUDE_FIRE_TOKEN', '').strip()
+# 2026-11-05 사용자: "니가 정리 안 한 거는 어디에도 안 뜨게 해. 나한테 알림도 안 보내도 돼" → 새 공고를 잡자마자 보내던 알림(웹 푸시·ntfy)은 끔.
+# 기록(data/alerts.json log)은 그대로 남겨 매일 17:30 Claude 요약이 이걸 보고 공고문을 확인·정리 → 그 요약(Claude 앱 알림)과 사이트 'Claude 확인'만 보임.
+# 다시 켜려면 저장소 변수/환경변수 PUSH_RAW=1
+PUSH_RAW = os.environ.get('PUSH_RAW', '') == '1'
 def fire_text(items):
     lines = ['GitHub 알림 ' + NOW.strftime('%Y-%m-%d %H:%M KST') + ' — 새 공고 ' + str(len(items)) + '건']
     for i, it in enumerate(items, 1):
@@ -314,7 +318,7 @@ def main():
     sent = 0
     for it in new:
         it['at'] = NOW.strftime('%Y-%m-%d %H:%M KST')
-        if it['send'] and (TOPIC or VAPID_PRIVATE) and not DRY and sent < 8:
+        if it['send'] and PUSH_RAW and (TOPIC or VAPID_PRIVATE) and not DRY and sent < 8:
             msg = it['src'] + ' · 게시 ' + (it['posted'] or '?') + (' · 접수 ' + it['apply'] if it['apply'] else '')
             if it['fit']: msg += '\n' + ('내 조건(청년·8평↑): ' + it['fit']) + (' — ' + it['why'] if it['why'] else '')
             if it.get('judge'): msg += '\n판단: ' + it['judge']
@@ -329,7 +333,7 @@ def main():
     if fired and FIRE_TOKEN and not DRY:
         ok, err = fire_claude(fire_text(fired))
         for it in fired: it['_rec']['claude'] = 'fired' if ok else ('fire 실패: ' + err)
-    if len([it for it in new if it['send']]) > 8 and (TOPIC or VAPID_PRIVATE) and not DRY:
+    if PUSH_RAW and len([it for it in new if it['send']]) > 8 and (TOPIC or VAPID_PRIVATE) and not DRY:
         try: notify('새 공고가 더 있음', '한 번에 ' + str(len(new)) + '건이 새로 잡혀 8건만 따로 보냈습니다. 나머지는 사이트 공고 일정 탭에서 확인.', SITE + '#calendar', 3)
         except Exception: pass
     if DEAD and not DRY:
@@ -342,7 +346,7 @@ def main():
     st['seen'] = {k: v for k, v in st['seen'].items() if k in keys or v >= cut}
     st['log'] = st['log'][-300:]
     st['updated'] = NOW.strftime('%Y-%m-%d %H:%M KST')
-    st['about'] = '새 모집공고 알림 기록(tools/notify_new.py). send=알림 대상 여부, pushed=보낸 경로(ntfy·webpush×기기 수). 청년안심은 fit(8평 이상·경계·원룸뿐·판정 불가)으로 거름'
+    st['about'] = '새 모집공고 알림 기록(tools/notify_new.py). send=알림 대상 여부(2026-11-05부터 바로 알림은 끔 — Claude 17:30 정리 대상), pushed=보낸 경로(ntfy·webpush×기기 수). 청년안심은 fit(8평 이상·경계·원룸뿐·판정 불가)으로 거름'
     if not DRY: json.dump(st, open(STATE, 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
     print('items', len(items), 'new', len(new), 'to-send', sum(1 for it in new if it['send']), 'pushed', sent, 'subs', len(push_subs()), '(dry-run)' if DRY else '')
     for it in new: print(' ', 'SEND' if it['send'] else 'skip', it['key'], it['src'], '|', it['title'][:60], '|', it['fit'], it['why'][:60])

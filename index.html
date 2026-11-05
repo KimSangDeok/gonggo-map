@@ -746,6 +746,7 @@ h1,h2,h3{letter-spacing:-.02em}
 .mapchips .qf-seg button[aria-pressed="true"]{background:var(--chip-on);color:var(--chip-on-fg)}
 .qf-more svg{width:16px;height:16px}
 #qf-pysel{display:none}
+#qf-plan,label:has(> #nm-plan){display:none!important}   /* 공급계획은 Claude가 정리하지 않아 끔 */
 .nm-py{display:contents}
 .lg-body .nm-py label > input[type=radio]{margin:0;accent-color:var(--accent)}
 .nf{margin-top:10px;padding-top:10px;border-top:1px solid color-mix(in srgb,var(--line) 70%,transparent)}
@@ -1358,7 +1359,7 @@ html.pano-open,html.pano-open body{overflow:hidden}
     <details class="cal-more"><summary><h3 id="rates-head">SH 공고별 청약 경쟁률 <small>(결과 게시 PDF 자동 수집 · 2021년~)</small></h3></summary>
     <p>공고가 끝나면 SH가 게시판에 "최종 청약 경쟁률"(행복주택) · "선순위 청약접수결과"(국민임대) 게시물을 올리고 단지·형·계층별 표를 PDF로 붙입니다. 그 PDF를 매일 읽어 와서 지도의 단지 상세에 <b>그 단지·그 형의 지난 경쟁률</b>을 붙이고, 여기엔 공고별 총괄을 둡니다.</p>
     <div id="rates-all"><p class="src">불러오는 중…</p></div></details>
-    <details class="cal-more"><summary><h3 id="ya-head">서울시 청년안심주택 공고 <small>(자동 수집)</small></h3></summary>
+    <details class="cal-more"><summary><h3 id="ya-head">서울시 청년안심주택 공고 <small>(Claude가 정리한 것만)</small></h3></summary>
     <p>서울시 청년안심주택 모집공고 게시판(공공임대·민간임대)을 매일 읽어 옵니다. 단지 99곳은 지도에 청년안심 마커(초록 마름모, 공고 있는 곳은 채움)로 찍히고, 단지를 누르면 서울시 단지정보의 입주현황 표(형·세대·보증금·월세)가 나옵니다.</p>
     <div id="ya-live"><p class="src">불러오는 중…</p></div></details>
     <details class="cal-more"><summary><h3 id="yan-head">SH 청년안심주택 공공임대 2026 1·2차 — 내 조건(청년 · 전용 8평 이상) 물량과 결과</h3></summary>
@@ -1367,7 +1368,7 @@ html.pano-open,html.pano-open body{overflow:hidden}
     <details class="cal-more"><summary><h3 id="mi-head">SH 청년 매입임대 2026 1차 — 내 조건(전용 8평 이상) 집과 결과</h3></summary>
     <p>공고(306214) 첨부 '주택목록(홈페이지 공개용)' 849호의 <b>호별 전용면적·보증금·월세</b>와 최종 청약 경쟁률 PDF(307073)의 주택군별 순위별 신청자 수를 읽어 묶었습니다. 주택형 코드(25B·31C…)는 전용면적이 아니라서(31C가 27.32㎡ = 8.3평) 전용면적 열로 판정. 1순위 = 수급자·차상위·한부모, 2순위 = 본인+부모 소득 100%·자산 3억 4,500만, 3순위 = 본인 소득 100%·자산 2억 5,100만(공고문 2쪽). 서류심사대상자는 주택별 신청순위 상위자부터 뽑으므로 <b>1순위 신청자 ≥ 공급호수면 2·3순위엔 안 내려옴</b>(경쟁률 게시물 본문).</p>
     <div id="mi-live"><p class="src">불러오는 중…</p></div></details>
-    <details class="cal-more"><summary><h3 id="lh-head">서울 LH 공고 <small>(자동 수집)</small></h3></summary>
+    <details class="cal-more"><summary><h3 id="lh-head">서울 LH 공고 <small>(Claude가 정리한 것만)</small></h3></summary>
     <p>LH 청약플러스 공고 목록(서울특별시, 행복주택·국민임대·통합공공임대)을 5분마다 확인하고, 하루 2번 + 새 공고가 잡힐 때 상세까지 읽어 옵니다. 공고 상세 페이지에 있는 단지 좌표·주택형 표·일정도 같이 읽어 지도에 LH 마커로 찍습니다.</p>
     <div id="lh-live"><p class="src">불러오는 중…</p></div></details>
   </div></section>
@@ -2345,7 +2346,7 @@ function priOf(p){ return priGus().indexOf(guOf(p)) >= 0; }
 function priCat(p){ try { return priOf(p) ? 'pri' : 'gen'; } catch (e) { return p.cat0; } }   // 맨 처음 분류 때는 구 이름표가 아직 없어 원자료 분류
 classifyPlaces();   // 구 이름표·1순위 지역이 생긴 뒤 날짜 기준으로 다시 분류
 PREF.onApply('gu', function(){ GU_ON = guClean(PREF.get('gu')); if (window.__applyFilter) window.__applyFilter(); });
-var PLAN_ON = PREF.get('plan', true) !== false;   // '공고 예정(기관 발표)도 보기'(기본 켬)
+var PLAN_ON = false;   // '공고 예정(기관 발표)' — 자동 수집 공급계획이라 Claude가 정리하지 않음 → 끔(2026-11-05 "니가 정리 안 한 거는 어디에도 안 뜨게")
 function planBasis(x){ var b = String(x.basis || ''); return b ? (/공급계획/.test(b) ? b : b + ' 공급계획') : '공급계획'; }
 var PLAN_ADDR = { '서울대방': '서울특별시 동작구 대방동', '서울공릉': '서울특별시 노원구 공릉동' };   // LH 는 지구 이름만 밝힘 → 동 단위(대략)
 function planPeriod(x){ var w = String(x.when || ''), by = +((String(x.basis || '').match(/(20\d{2})/) || [])[1] || new Date().getFullYear()), m;
@@ -2383,7 +2384,15 @@ function planHtml(p, approx){ var x = p.plan, st = x.st || {};
 function nrDate(s, endOfDay){ var m = String(s || '').match(/(\d{4})-(\d{2})-(\d{2})(?:[T ](\d{1,2}):(\d{2}))?/); if (!m) return null; return new Date(+m[1], +m[2] - 1, +m[3], m[4] != null ? +m[4] : (endOfDay ? 23 : 0), m[5] != null ? +m[5] : (endOfDay ? 59 : 0)); }
 function nrPut(o){ var r = NREG[o.id] || (NREG[o.id] = {}); for (var k in o) r[k] = o[k]; return r; }
 function nrState(r){ var now = new Date(); if (r && r.a1) { if (r.a0 && now < r.a0) return 'soon'; return now <= r.a1 ? 'open' : 'ended'; } return (r && r.st) || 'none'; }
-function nrLiveId(id){ var s = NREG[id] ? nrState(NREG[id]) : 'none'; return s === 'open' || s === 'soon'; }
+// ===== Claude가 정리한 공고만 보임 (2026-11-05 사용자: "니가 정리 안 한 거는 어디에도 안 뜨게 해") =====
+// 자동 수집 공고(SH·LH·서울시 청년안심 게시판 · 특화형 매입임대)는 매일 17:30 Claude가 공고문을 확인해 data/claude_notes.json 에 적은 것만 공고 화면·지도 '접수 중' 표시·새 알림 숫자에 나옴.
+// 직접 정리해 넣은 공고(사이트 공고 일정표 NOTICES · 청년 매입 2026 1차)는 그대로
+function nrAutoR(r){ if (!r) return false; if (r.id === 'MI26-1') return false; var n = NOTICES[r.id]; return !(n && !n.auto); }
+var CN_IDX = { o: null, n: -1, ids: {} };
+function cnIds(){ var o = window.CNOTES && window.CNOTES.items, kn = Object.keys(NREG_KNOWN).length; if (CN_IDX.o !== o || CN_IDX.n !== kn) { var ids = {}; Object.keys(o || {}).forEach(function(k){ var id = nrAlertId(k); if (id) ids[id] = k; }); CN_IDX = { o: o, n: kn, ids: ids }; } return CN_IDX.ids; }
+function nrOk(id){ var r = NREG[id]; if (!r) return /^(YA|LH|AL):/.test(String(id)) ? !!cnIds()[id] : true; if (!nrAutoR(r)) return true; return !!cnIds()[id]; }
+function revOk(p){ if (p.planOnly) return false; return !(p.lh || p.sp) || (p.nids || [p.nid]).some(function(id){ return id && nrOk(id); }); }   // LH·특화형 단지는 공고에서만 나온 것 → 그 공고를 정리해야 지도에
+function nrLiveId(id){ var s = NREG[id] ? nrState(NREG[id]) : 'none'; return (s === 'open' || s === 'soon') && nrOk(id); }
 function nrLive(p){ return (p.nids || []).some(nrLiveId); }
 function nrMarkers(id){ return (window.nmMarkers || []).filter(function(mk){ return (mk.__p.nids || []).indexOf(id) >= 0; }); }
 function nrMine(id){ var ms = nrMarkers(id); return { all: ms.length, mine: ms.filter(function(m){ return m.__p.cat !== 'na'; }).length }; }
@@ -2426,7 +2435,7 @@ PREF.onApply('burden', function(){ var v = PREF.get('burden') || {}; BURD = { mi
 PREF.onApply('built', function(){ var v = PREF.get('built') || {}; BUILT = { max: +v.max || 0, unk: v.unk !== false }; var s = document.getElementById('nm-built'), u = document.getElementById('nm-built-unk'); if (s) s.value = String(BUILT.max); if (u) u.checked = BUILT.unk; if (window.__applyFilter) window.__applyFilter(); });
 PREF.onApply('live', function(){ LIVE = PREF.get('live', false) === true; var b = document.getElementById('nm-live'); if (b) b.checked = LIVE; if (window.__applyFilter) window.__applyFilter(); pkRefreshIcons(); });
 PREF.onApply('exp', function(){ EXP_ON = PREF.get('exp', true) !== false; if (window.__applyFilter) window.__applyFilter(); pkRefreshIcons(); });
-PREF.onApply('plan', function(){ PLAN_ON = PREF.get('plan', true) !== false; if (window.__applyFilter) window.__applyFilter(); pkRefreshIcons(); });
+PREF.onApply('plan', function(){ PLAN_ON = false; });
 PREF.onApply('cats', function(){ catsFromPref(); if (window.__applyFilter) window.__applyFilter(); });
 PREF.onApply('btype', function(){ BT_ON = Object.assign({}, BT_ALL, PREF.get('btype') || {}); btSyncBoxes(); if (window.__applyFilter) window.__applyFilter(); });
 PREF.onApply('park', function(){ PK_ON = Object.assign({}, PK_ALL, PREF.get('park') || {}); pkSyncBoxes(); if (window.__applyFilter) window.__applyFilter(); });
@@ -3404,7 +3413,7 @@ function noticeListHtml(){
   var A = window.ALERTS || { items: [], seen: {} }, aBy = {}, extra = [];
   (A.items || []).forEach(function(e){ var id = nrAlertId(e.key); if (id && NREG[id]) { if (!aBy[id]) aBy[id] = e; } else extra.push(e); });
   var by = { open: [], soon: [], ended: [], none: [] }, outN = 0;
-  Object.keys(NREG).forEach(function(id){ var r = NREG[id]; if (!nrRelevant(id) && !aBy[id]) { outN++; return; } by[nrState(r)].push(r); });
+  Object.keys(NREG).forEach(function(id){ var r = NREG[id]; if (!nrOk(id)) return; if (!nrRelevant(id) && !aBy[id]) { outN++; return; } by[nrState(r)].push(r); });
   extra.forEach(function(e){ var r = { id: 'AL:' + e.key, src: e.src, name: e.title, url: e.url, posted: e.posted || '', a0: nrDate(e.apply), a1: nrDate(e.apply, true), alert: e }; by[nrState(r)].push(r); });   // 알림은 갔는데 지도 공고 목록엔 아직 없는 새 공고
   by.open.sort(function(a, b){ return a.a1 - b.a1; }); by.soon.sort(function(a, b){ return a.a0 - b.a0; }); by.ended.sort(function(a, b){ return (b.a1 || 0) - (a.a1 || 0); });
   var seen = A.seen || {}, unseen = (A.items || []).filter(function(e){ return !seen[e.key]; }).length;
@@ -3456,7 +3465,7 @@ function noticeListHtml(){
   var eAll = act.map(eOf), eT = nfSplit(eAll.filter(function(o){ return !ready || o.mine.length; }).map(withW)), eIn = eT[0], eHid = eT[1], eOut = eAll.filter(function(o){ return ready && !o.mine.length; });
   eIn.sort(function(a, b){ return (nrDate(a.e.from) || 0) - (nrDate(b.e.from) || 0); });
   // 공급계획(SH·LH가 미리 발표 · 아직 모집공고 전)
-  var ps = window.PLAN_ITEMS || [], on = {}; document.querySelectorAll('.nmbar input[data-cat]').forEach(function(c){ on[c.dataset.cat] = c.checked; });
+  var ps = (window.PLAN_ITEMS || []).filter(function(x){ return !!cnIds()['PL:' + x.id]; }), on = {}; document.querySelectorAll('.nmbar input[data-cat]').forEach(function(c){ on[c.dataset.cat] = c.checked; });
   var catOn = function(k){ return on[k] !== false; };
   var planOk = function(x){ if (!ready) return true; var mk = planMarker(x.id); return mk ? mk.__p.cat !== 'na' : true; };
   var pOf = function(x){ var st = x.st || {}, pd = (st.pd && st.pd.txt) || '', mk = planMarker(x.id), sub = hesc(x.src + ' 공급계획' + (x.hh ? ' · ' + x.hh + '호' : ''));
@@ -3508,7 +3517,7 @@ function noticeListHtml(){
     (restN ? '<details class="n2-more"><summary>그 밖 ' + restN + '건 <small>' + restParts.map(function(x){ return x[1] + ' ' + x[2].length; }).join(' · ') + '</small></summary>' + restParts.map(function(x){ return '<div class="n2-sub">' + x[0] + ' <span>' + x[2].length + '</span></div>' + x[2].join(''); }).join('') + '</details>' : '') +
     (unseen ? '<p class="nl-foot"><button type="button" class="al-all">🔔 새 알림 공고 모두 확인</button></p>' : '') +
     '<details class="n2-help"><summary>ⓘ 판단은 어떻게?</summary><p class="src">카드 굵은 한 줄 = 지난 회차의 실제 숫자(SH 경쟁률 PDF). 행복주택·국민임대는 내 조건 단지 중 <b>지난 경쟁률이 가장 낮은 곳</b>과 내가 1순위인 곳 수, \'먼저 볼 곳\' = 지난 경쟁률 낮은 순. <b>기대 낮음</b> = 지난 회차를 순위 순으로 나눠 보면 내 순위(3순위)까지 내려온 집이 0호(청년안심 공공·청년 매입임대), 또는 전부 예비자 모집. 지난 결과가 없는 새 공고·민간임대·LH는 \'자료 없음\'. 내 순위는 본인 소득·자산만 봄(부모를 보는 순위는 뺌). 카드의 \'근거\'를 누르면 공고문 쪽수·PDF 출처.</p>' +
-    '<p class="src">목록은 SH(행복·국민·매입임대)·서울시 청년안심·LH 공고를 접수 상태로 묶고, <b>지도 필터와 따로</b> — 내 조건(청년·8평↑·복층 빼기, 알림과 같은 기준)에 맞는 공고를 전부 보이고, 단지 수·월부담·먼저 볼 곳도 내 조건 단지로 셈. 지도 필터(평형 9·10평·월부담·구·건물 종류·주차·준공)는 지도 화면에만. 대신 <b>공고 필터</b>(평형·종류·월부담·구·기대 낮음)가 따로 있고, 숨긴 공고는 맨 위에 몇 건인지(접수 중·곧 접수·새 알림이 섞였는지) 보이며 \'그 밖\'에 까닭과 같이 있음. <b>Claude 확인</b> 줄 = 매일 17:30 Claude가 그날 알림 간 공고의 공고문을 열어 본 것(접수 기간·대상·면적·금액 → 한 줄 판단, 개인 정보는 안 올림). 공고·먼저 볼 곳을 누르면 지도가 <b>\'공고 보기\'</b>로 바뀌어 그 단지를 지도 필터와 상관없이 보여 줌(지도 위 띠의 \'× 끝\'로 끝내면 지도 필터·보던 자리로). 다음 공고(예상·공급계획) 중 내 조건 단지가 지도에 없는 것은 \'그 밖\'. \'다음 공고\'의 예상 = 지난해 같은 공고 날짜로 짐작(기관 발표 아님), 공고 전 = SH·LH가 미리 발표한 공급계획. 🔔 새 알림 = 알림을 켠 뒤 새로 올라와 알림을 보낸 공고(카드를 누르면 확인). 카드를 누르면 지도에서 그 공고 단지만(목록 위 ✕로 해제), \'먼저 볼 곳\'을 누르면 그 단지 상세.</p>' +
+    '<p class="src">목록은 SH(행복·국민·매입임대)·서울시 청년안심·LH 공고를 접수 상태로 묶고, <b>지도 필터와 따로</b> — 내 조건(청년·8평↑·복층 빼기, 알림과 같은 기준)에 맞는 공고를 전부 보이고, 단지 수·월부담·먼저 볼 곳도 내 조건 단지로 셈. 지도 필터(평형 9·10평·월부담·구·건물 종류·주차·준공)는 지도 화면에만. 대신 <b>공고 필터</b>(평형·종류·월부담·구·기대 낮음)가 따로 있고, 숨긴 공고는 맨 위에 몇 건인지(접수 중·곧 접수·새 알림이 섞였는지) 보이며 \'그 밖\'에 까닭과 같이 있음. <b>Claude가 정리한 공고만 보임</b> — 게시판에서 자동으로 잡힌 공고는 매일 17:30 Claude가 공고문을 확인한 뒤에야 여기·지도에 나옴(알림도 그 정리 요약 하나만). <b>Claude 확인</b> 줄 = 매일 17:30 Claude가 그날 알림 간 공고의 공고문을 열어 본 것(접수 기간·대상·면적·금액 → 한 줄 판단, 개인 정보는 안 올림). 공고·먼저 볼 곳을 누르면 지도가 <b>\'공고 보기\'</b>로 바뀌어 그 단지를 지도 필터와 상관없이 보여 줌(지도 위 띠의 \'× 끝\'로 끝내면 지도 필터·보던 자리로). 다음 공고(예상·공급계획) 중 내 조건 단지가 지도에 없는 것은 \'그 밖\'. \'다음 공고\'의 예상 = 지난해 같은 공고 날짜로 짐작(기관 발표 아님), 공고 전 = SH·LH가 미리 발표한 공급계획. 🔔 새 알림 = 알림을 켠 뒤 새로 올라와 알림을 보낸 공고(카드를 누르면 확인). 카드를 누르면 지도에서 그 공고 단지만(목록 위 ✕로 해제), \'먼저 볼 곳\'을 누르면 그 단지 상세.</p>' +
     (outN ? '<p class="src">내 조건 밖 공고 ' + outN + '건은 뺌 — 지도에 올라간 단지가 전부 \'해당 없음\'(청년 자격 형이 ' + belowTxt() + '뿐 등)인 공고</p>' : '') + '</details>';
 }
 window.renderNoticePanel = function(){
@@ -3983,7 +3992,7 @@ function nmInit(){
   // '이 칩을 켜면 몇 곳' — 지금 다른 필터는 그대로 두고 그 칩만 바꿔 셈(마커 기준)
   function qfCount(o){ var on = catsOn(), nid = document.getElementById('nm-notice').value, sv = { live: LIVE, exp: EXP_ON, plan: PLAN_ON, bt: BT_ON, pk: PK_ON, gu: GU_ON };
     if ('live' in o) LIVE = o.live; if ('exp' in o) EXP_ON = o.exp; if ('plan' in o) PLAN_ON = o.plan; if (o.bt) BT_ON = o.bt; if (o.pk) PK_ON = o.pk; if (o.gu) GU_ON = o.gu;
-    try { var ms = (window.nmMarkers || []).filter(function(mk){ var p = mk.__p; return !(p.planOnly && (!p.plan.st || p.plan.st.done)) && on[p.cat] && guOk(p) && (!nid || (p.nids || [p.nid]).indexOf(nid) >= 0) && builtOk(p) && burdOk(p) && liveOk(p) && btOk(p) && pkOk(p); });
+    try { var ms = (window.nmMarkers || []).filter(function(mk){ var p = mk.__p; return revOk(p) && !(p.planOnly && (!p.plan.st || p.plan.st.done)) && on[p.cat] && guOk(p) && (!nid || (p.nids || [p.nid]).indexOf(nid) >= 0) && builtOk(p) && burdOk(p) && liveOk(p) && btOk(p) && pkOk(p); });
       if (o.byGu) { var by = {}; ms.forEach(function(mk){ var g = guOf(mk.__p); by[g] = (by[g] || 0) + 1; }); return by; } return ms.length; }
     finally { LIVE = sv.live; EXP_ON = sv.exp; PLAN_ON = sv.plan; BT_ON = sv.bt; PK_ON = sv.pk; GU_ON = sv.gu; } }
   window.qfCount = qfCount;
@@ -4035,7 +4044,7 @@ function nmInit(){
     var o = {}; document.querySelectorAll('.nmbar input[data-cat]').forEach(function(c){ o[c.dataset.cat] = c.checked; }); PREF.set('cats', o);
     BT_KINDS.forEach(function(k){ BT_ON[k.k] = true; }); PREF.set('btype', Object.assign({}, BT_ON)); btSyncBoxes();
     PK_KINDS.forEach(function(k){ PK_ON[k.k] = true; }); PREF.set('park', Object.assign({}, PK_ON)); pkSyncBoxes();
-    EXP_ON = true; PREF.set('exp', true); PLAN_ON = true; PREF.set('plan', true); GU_ON = []; PREF.set('gu', []);
+    EXP_ON = true; PREF.set('exp', true); PLAN_ON = false; GU_ON = []; PREF.set('gu', []);
     var lv = document.getElementById('nm-live'); if (LIVE && lv) lv.click();
     var bs = document.getElementById('nm-built'), bu = document.getElementById('nm-built-unk'); if (bs && bu && (BUILT.max || !BUILT.unk)) { bs.value = '0'; bu.checked = true; bs.dispatchEvent(new Event('change')); }
     if (BURD.min || BURD.max || BURD.unk) window.__burdSet(0, 0, false);
@@ -4064,7 +4073,7 @@ function nmInit(){
       applyFilter(); });
     q('qf-live', function(){ var lv = document.getElementById('nm-live'); if (lv) lv.click(); });
     q('qf-exp', function(){ EXP_ON = !EXP_ON; PREF.set('exp', EXP_ON); applyFilter(); pkRefreshIcons(); });
-    q('qf-plan', function(){ PLAN_ON = !PLAN_ON; PREF.set('plan', PLAN_ON); applyFilter(); pkRefreshIcons(); });
+    q('qf-plan', function(){ PLAN_ON = false; applyFilter(); });
     // 폰: 지도 위 칩을 2줄로 줄이면서 뺀 칩(공고 예정·예상·주차·아파트·오피스텔)은 상세 필터에서 — 같은 동작을 부름 (2026-11-04)
     q('nm-gu-open', function(){ var g = document.getElementById('qf-gu'); if (g) g.click(); });   // 상세 필터에도 구(지도 위 구 칩과 같은 창)
     [['nm-live2', 'qf-live'], ['nm-plan', 'qf-plan'], ['nm-exp', 'qf-exp']].forEach(function(p){ var c = document.getElementById(p[0]); if (c) c.addEventListener('change', function(){ var b = document.getElementById(p[1]); if (b) b.click(); }); });
@@ -4184,7 +4193,7 @@ function nmInit(){
   function applyFilter(){
     var on = {}; document.querySelectorAll('.nmbar input[data-cat]').forEach(function(c){ on[c.dataset.cat] = c.checked; });
     var nid = document.getElementById('nm-notice').value, FX = (window.__FOC && window.__FOC.ids && !nid) ? window.__FOC.ids : null;   // '공고 보기' 단지 묶음
-    function vis0(p){ if (p.planOnly && (!p.plan.st || p.plan.st.done)) return false; return on[p.cat] && guOk(p) && builtOk(p) && burdOk(p) && liveOk(p); }
+    function vis0(p){ if (p.planOnly && (!p.plan.st || p.plan.st.done)) return false; if (!revOk(p)) return false; return on[p.cat] && guOk(p) && builtOk(p) && burdOk(p) && liveOk(p); }
     function inN(p){ if (FX) return !!FX[p.__mkid]; return !nid || (p.nids || [p.nid]).indexOf(nid) >= 0; }   // 공고를 골랐으면(공고 탭·공고 일정·알림에서 '지도에서') 그 공고 단지는 필터와 상관없이 다 보임 — 지금 필터 밖은 p.__out(흐리게)
     var btN = {}, pkN = {}; BT_KINDS.forEach(function(x){ btN[x.k] = 0; }); PK_KINDS.forEach(function(x){ pkN[x.k] = 0; });
     nmMarkers.forEach(function(mk){ var p = mk.__p; mk.__ok = !!vis0(p) && btOk(p) && pkOk(p); var n0 = inN(p), v0 = n0 && !!vis0(p), bo = v0 && btOk(p), po = v0 && pkOk(p); if (po) btCountKeys(p).forEach(function(k){ btN[k]++; }); if (bo) pkN[pkLevel(p)]++;
@@ -4380,7 +4389,7 @@ function noticeIds(){ return Object.keys(NOTICES).sort(function(a, b){ return (N
 function buildNoticeSelect(){
   var sel = document.getElementById('nm-notice'); if (!sel) return; var cur = sel.value;
   nrFromNotices();
-  var all = Object.keys(NREG).map(function(id){ return NREG[id]; }), rs = all.filter(function(r){ return nrRelevant(r.id) || r.id === cur; }), outN = all.length - rs.length, live = rs.filter(function(r){ return nrLiveId(r.id); }), rest = rs.filter(function(r){ return !nrLiveId(r.id); });
+  var all = Object.keys(NREG).map(function(id){ return NREG[id]; }), rs = all.filter(function(r){ return (nrRelevant(r.id) && nrOk(r.id)) || r.id === cur; }), outN = all.length - rs.length, live = rs.filter(function(r){ return nrLiveId(r.id); }), rest = rs.filter(function(r){ return !nrLiveId(r.id); });
   live.sort(function(a, b){ return (a.a1 || 0) - (b.a1 || 0); }); rest.sort(function(a, b){ return String(b.posted || '').localeCompare(String(a.posted || '')); });
   var opt = function(r){ var n = nrMarkers(r.id).length; return '<option value="' + hesc(r.id) + '">' + hesc(r.name) + ' — ' + nrStateTxt(r) + (r.a1 ? ' · ' + nrApplyTxt(r).replace(/^접수 /, '') : '') + (n ? '' : ' · 지도에 단지 없음') + '</option>'; };
   sel.innerHTML = '<option value="">전체 공고 (내 조건 ' + rs.length + '건 · 접수 중·예정 ' + live.length + '건' + (outN ? ' · 내 조건 밖 ' + outN + '건 뺌' : '') + ')</option>' + (live.length ? '<optgroup label="접수 중·예정">' + live.map(opt).join('') + '</optgroup>' : '') + (rest.length ? '<optgroup label="접수 끝난 공고 (최근 게시 순)">' + rest.map(opt).join('') + '</optgroup>' : '');
@@ -4390,7 +4399,7 @@ function buildNoticeSelect(){
 }
 function buildNoticeTable(){
   var tb = document.querySelector('#notice-table tbody'); if (!tb) return; tb.innerHTML = '';
-  noticeIds().forEach(function(id){
+  noticeIds().forEach(function(id){ if (NOTICES[id].auto && !cnIds()[id]) return;
     var n = NOTICES[id], s = noticeStatus(n), g = function(k){ var x = n.steps.find(function(st){ return st[0] === k; }); return x ? fmtD(x[1]) + (x[2] ? '~' + fmtD(x[2]) : '') : '<small class="k">공고에 없음</small>'; };
     var tr = document.createElement('tr');
     var note8 = n.auto ? (/청년안심주택|매입임대/.test(n.name) ? '<br><small class="k">내 조건(청년 · ' + selLabel() + ') 판정 불가 — 단지·호수별 전용면적은 공고문 첨부에만 있음. 대부분 원룸이라 ' + selLabel() + '만 골라야 함</small>' : '<br><small class="k">새 공고 — 단지표 미반영(8평 이상 형만 넣을 것)</small>') : '';
@@ -4423,10 +4432,10 @@ function applyLive(){
         if (!NOTICES[nid]) { NOTICES[nid] = { name: it.title, short: it.title.slice(0, 12), url: it.url, steps: it.steps, auto: true, live: j.updated }; added++; }
       }
     });
-    if (st) { st.innerHTML = String(j.updated || '').replace(/^\d{4}-(\d\d)-(\d\d)\s+(\d\d:\d\d).*$/, '$1.$2 $3') + ' 업데이트' + (added ? ' · <b>새 공고 ' + added + '건 감지(단지 자료는 아직)</b>' : ''); st.title = '자동 갱신: 공고 ' + j.updated + ' · SH 게시판 재확인 ' + touched + '건'; }
+    if (st) { st.innerHTML = String(j.updated || '').replace(/^\d{4}-(\d\d)-(\d\d)\s+(\d\d:\d\d).*$/, '$1.$2 $3') + ' 업데이트'; st.title = '자동 갱신: 공고 ' + j.updated + ' · SH 게시판 재확인 ' + touched + '건'; }
     buildNoticeSelect(); buildNoticeTable();
   });
-  fetch('data/claude_notes.json?t=' + Date.now(), { cache: 'no-store' }).then(function(r){ return r.ok ? r.json() : null; }).catch(function(){ return null; }).then(function(j){ window.CNOTES_U = (j && j.updated) || ''; if (j && j.items) { window.CNOTES = j; if (window.renderNoticePanel) window.renderNoticePanel(); } });
+  fetch('data/claude_notes.json?t=' + Date.now(), { cache: 'no-store' }).then(function(r){ return r.ok ? r.json() : null; }).catch(function(){ return null; }).then(function(j){ window.CNOTES_U = (j && j.updated) || ''; if (j && j.items) { window.CNOTES = j; if (window.ALERTS && window.ALERTS.refilter) window.ALERTS.refilter(); if (window.__applyFilter && window.nmMarkers && window.nmMarkers.length) window.__applyFilter(); else if (window.renderNoticePanel) window.renderNoticePanel(); if (window.YA && window.renderYaLive) window.renderYaLive(window.YA); if (window.LH_DATA && window.renderLhLive) window.renderLhLive(window.LH_DATA); } });
   liveFetch('data/fact.json').then(function(j){ if (j && j.fact) { Object.keys(j.fact).forEach(function(k){ FACT[k] = j.fact[k]; }); window.FACT_UPDATED = j.updated; } });
   liveFetch('data/pamphlets.json').then(function(j){ if (j && j.items) window.PAM = j; });
   liveFetch('data/thumbs.json').then(function(j){ if (j && j.items) window.THUMBS = j.items; });   // 사진 띠용 작은 그림(원본은 수 MB)
@@ -4446,7 +4455,7 @@ function applyLive(){
   });
   window.renderYaLive = function(j){
     var box = document.getElementById('ya-live'); if (!box) return;
-    var ns = (j.notices || []).slice(), comps = j.complexes || [];
+    var ns = (j.notices || []).filter(function(n){ return nrOk('YA:' + n.id); }), comps = j.complexes || [];
     // 공고 ↔ 단지 매칭(단지 카드와 같은 규칙) → 공고마다 내 조건(청년 자격 · 전용 8평 이상) 판정
     ns.forEach(function(n){
       var cs = comps.filter(function(c){ return yaNoticesFor(c).indexOf(n) >= 0; });
@@ -4459,7 +4468,7 @@ function applyLive(){
       else { n.fit = 2; n.fitHtml = '<span class="pill info">공고문 확인</span><br><small class="k">' + (n.kind === '공공임대' ? 'SH 공공임대 공고는 여러 단지 묶음 — ' + selLabel() + ' 청년형은 공고문 단지표에서 골라야 함(서울시 표엔 공공임대 형이 안 실림)' : '제목으로 단지 매칭 안 됨 → 공고문에서 전용면적 확인') + '</small>'; }
     });
     var main = ns.filter(function(n){ return n.fit !== 0; }), out = ns.filter(function(n){ return n.fit === 0; });
-    var head = document.getElementById('ya-head'); if (head) head.innerHTML = '서울시 청년안심주택 공고 <small>(자동 수집 · 최근 ' + ns.length + '건 중 내 조건 가능성 ' + main.length + '건, ' + (PY_MIN === 8 ? '원룸뿐이라' : belowTxt() + '뿐이라') + ' 제외 ' + out.length + '건 · 단지 ' + comps.length + '곳 지도 표시)</small>';
+    var head = document.getElementById('ya-head'); if (head) head.innerHTML = '서울시 청년안심주택 공고 <small>(Claude가 정리한 것만 · ' + ns.length + '건 중 내 조건 가능성 ' + main.length + '건, ' + (PY_MIN === 8 ? '원룸뿐이라' : belowTxt() + '뿐이라') + ' 제외 ' + out.length + '건 · 단지 ' + comps.length + '곳 지도 표시)</small>';
     var row = function(n){ return '<tr><td><span class="pill ' + (n.kind === '공공임대' ? 'ok' : 'info') + '">' + n.kind + (n.stage === '추가' ? ' 추가' : '') + '</span></td><td><a href="' + n.url + '" target="_blank" rel="noopener">' + n.title + '</a></td><td>' + n.fitHtml + '</td><td class="num">' + n.posted + '</td><td class="num">' + (n.apply || '<small class="k">미기재</small>') + '</td><td>' + (n.org || '<small class="k">미기재</small>') + '</td></tr>'; };
     var thead = '<thead><tr><th>구분</th><th>공고명</th><th>내 조건 (청년 · ' + selLabel() + ')</th><th>게시일</th><th>청약신청일</th><th>담당·사업자</th></tr></thead>';
     box.innerHTML = '<div class="tbl"><table class="stack">' + thead + '<tbody>' + main.map(row).join('') + '</tbody></table></div>' +
@@ -4535,9 +4544,9 @@ function applyLive(){
   window.renderLhLive = function(j){
     var box = document.getElementById('lh-live'); if (!box) return;
     var outLh = function(x){ var cs = x.complexes || []; if (!cs.length) return false; var ok = 0, sm = 0; cs.forEach(function(c){ var f = lhFit(c); ok += f.ok.length; sm += f.small.length; }); return !ok && sm > 0; };   // 형이 전부 기준 미만 = 내 것 아님
-    var items = j.items.filter(function(x){ return !outLh(x); }), lhOut = j.items.length - items.length;
+    var items0 = j.items.filter(function(x){ return nrOk('LH:' + x.panId); }), items = items0.filter(function(x){ return !outLh(x); }), lhOut = items0.length - items.length;
     var openN = items.filter(function(x){ return x.status === '접수중' || x.status === '공고중'; }).length;
-    var head = document.getElementById('lh-head'); if (head) head.innerHTML = '서울 LH 공고 <small>(자동 수집 · 최근 150일 ' + j.items.length + '건 중 내 조건 밖 ' + lhOut + '건 뺌, 지금 접수 중 ' + openN + '건)</small>';
+    var head = document.getElementById('lh-head'); if (head) head.innerHTML = '서울 LH 공고 <small>(Claude가 정리한 것만 · ' + items0.length + '건 중 내 조건 밖 ' + lhOut + '건 뺌, 지금 접수 중 ' + openN + '건)</small>';
     var brief = document.getElementById('lh-brief'); if (brief) brief.innerHTML = '· LH 서울 접수 중 <b>' + openN + '건</b> <a href="#calendar">(공고 화면)</a>';
     var lhFitHtml = function(x){ var cs = x.complexes || []; if (!cs.length) return '<span class="pill info">단지표 없음</span><br><small class="k">LH 페이지에 주택형 표 없음 → 공고문</small>';
       var ok = [], small = []; cs.forEach(function(c){ var f = lhFit(c); f.ok.forEach(function(r){ ok.push(r); }); f.small.forEach(function(r){ small.push(r); }); });
@@ -4619,9 +4628,11 @@ window.addEventListener('beforeinstallprompt', function(e){ e.preventDefault(); 
   function setMany(pairs){ PREF.mset('seen', pairs); seen = PREF.mget('seen'); A.seen = seen; render(); }
   function mark(k, on){ if (!k) return; var o = {}; o[k] = on === false ? 0 : (seen[k] || today()); setMany(o); }
   var sum = document.getElementById('alerts-sum'), badge = document.getElementById('cal-badge');
-  var items = [];
+  var items = [], all = [];
+  function rv(e){ var c = window.CNOTES && window.CNOTES.items; return !!(c && c[e.key]); }   // Claude가 정리한 알림 공고만(2026-11-05)
   var A = window.ALERTS = { items: items, seen: seen, mark: mark, markAll: function(){ var o = {}; items.forEach(function(e){ o[e.key] = seen[e.key] || today(); }); setMany(o); } };
   PREF.onApply('seen', function(){ seen = PREF.mget('seen'); A.seen = seen; render(); });
+  A.refilter = function(){ items = all.filter(rv); A.items = items; render(); };
   // 알림을 눌러 들어온 경우(#calendar&seen=KEY&go=URL): 확인 처리 후 공고 페이지로. 넘어가는 곳은 공고 출처(SH·LH·서울시·마이홈)만 — 남이 만든 링크로 엉뚱한 사이트에 보내지 못하게
   var GO_OK = /^https?:\/\/([a-z0-9-]+\.)*(i-sh\.co\.kr|lh\.or\.kr|seoul\.go\.kr|myhome\.go\.kr|kimsangdeok\.github\.io)(\/|$)/i;
   function fromHash(){ var h = location.hash || '', m = h.match(/[&?]seen=([^&]+)/); if (!m) return; var k = ''; try { k = decodeURIComponent(m[1]); } catch (e) {} if (/^(sh|lh|ya):[A-Za-z0-9_-]{1,40}$/.test(k)) mark(k); var g = h.match(/[&?]go=([^&]+)/), nt = h.match(/[&?]nt=([^&]+)/);
@@ -4639,9 +4650,9 @@ window.addEventListener('beforeinstallprompt', function(e){ e.preventDefault(); 
   }
   fetch('data/alerts.json?t=' + Date.now(), { cache: 'no-store' }).then(function(r){ return r.ok ? r.json() : null; }).catch(function(){ return null; }).then(function(j){
     var cut = new Date(Date.now() - 90 * 86400000).toISOString().slice(0, 10), dup = {};
-    items = ((j && j.log) || []).filter(function(e){ if (!(e && e.send && e.key && e.at) || String(e.at).slice(0, 10) < cut || dup[e.key]) return false; dup[e.key] = 1; return true; });
-    items.sort(function(a, b){ return String(b.at).localeCompare(String(a.at)); });
-    A.items = items; render();
+    all = ((j && j.log) || []).filter(function(e){ if (!(e && e.send && e.key && e.at) || String(e.at).slice(0, 10) < cut || dup[e.key]) return false; dup[e.key] = 1; return true; });
+    all.sort(function(a, b){ return String(b.at).localeCompare(String(a.at)); });
+    items = all.filter(rv); A.items = items; render();
   });
   setTimeout(function(){ if (!window.nmMap) render(); }, 6000);   // 지도(네이버 스크립트)가 끝내 안 떠도 SH 공고·알림 공고만으로 목록을 그림
 })();
@@ -4649,7 +4660,7 @@ window.addEventListener('beforeinstallprompt', function(e){ e.preventDefault(); 
 // ===== 새로고침 (2026-11-04) — 아이폰 홈 화면 앱엔 새로고침 버튼이 없어 껐다 켜야 했음 =====
 // ① 지도 말고 다른 화면 맨 위에서 아래로 당겼다 놓으면 새로고침(홈 화면 앱에서만 — 브라우저 탭은 자체 기능이 있음)
 // ② 앱으로 돌아올 때·30분마다 새 버전(version.json)·새 공고 자료(data/notices.json)를 확인 → 바뀌었으면 맨 위 띠 '눌러서 새로고침'
-var SITE_BUILD = '3362325a0a0e';
+var SITE_BUILD = '7e6bdf8bd194';
 function nwSig(j){ var s = JSON.stringify([(j && j.items) || [], (j && j.list_ids) || {}]), h = 0; for (var i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0; return h + ':' + s.length; }
 (function(){
   var sa = navigator.standalone === true || (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches);
@@ -4691,7 +4702,7 @@ function nwSig(j){ var s = JSON.stringify([(j && j.items) || [], (j && j.list_id
     last = Date.now(); var t = '?t=' + Date.now();
     fetch('version.json' + t, { cache: 'no-store' }).then(function(r){ return r.ok ? r.json() : null; }).then(function(v){ if (v && v.build && v.build !== SITE_BUILD) { news = true; idle(); } }).catch(function(){});
     if (window.CNOTES_U !== undefined) fetch('data/claude_notes.json' + t, { cache: 'no-store' }).then(function(r){ return r.ok ? r.json() : null; }).then(function(j){ if (j && (j.updated || '') !== window.CNOTES_U) { news = true; idle(); } }).catch(function(){});
-    if (window.__NSIG) fetch('data/notices.json' + t, { cache: 'no-store' }).then(function(r){ return r.ok ? r.json() : null; }).then(function(j){ if (j && nwSig(j) !== window.__NSIG) { news = true; idle(); } }).catch(function(){});
+    if (false && window.__NSIG) fetch('data/notices.json' + t, { cache: 'no-store' }).then(function(r){ return r.ok ? r.json() : null; }).then(function(j){ if (j && nwSig(j) !== window.__NSIG) { news = true; idle(); } }).catch(function(){});
   }
   window.__ptrCheck = check;
   setTimeout(check, 8000);   // 첫 화면이 캐시(최대 10분)에서 떴을 때도 잡음
