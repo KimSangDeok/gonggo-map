@@ -27,7 +27,22 @@ def load(f, default):
     try: return json.load(open(f, encoding='utf-8'))
     except Exception: return default
 
-def clean(t): return re.sub(r'[ \t ]+', ' ', re.sub(r'\n{3,}', '\n\n', t or '')).strip()
+def clean(t):
+    t = re.sub(r'[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]', '', t or '')        # PDF 에서 섞여 나오는 제어 문자(grep 이 이진 파일로 봄)
+    return re.sub(r'[ \t\u00a0]+', ' ', re.sub(r'\n{3,}', '\n\n', t)).strip()
+
+# 가구원수별 월평균소득 표(도시근로자 소득 기준)의 금액은 사본에서 가림 — 판단엔 '소득 120% 이하' 같은 비율만 쓰고,
+# 사이트 규칙상 가구원수별 기준 금액은 공개 파일에 두지 않음. 임대조건 표(보증금 수천만 원·월세 수십만 원)는 그대로 둠
+AMT = re.compile(r'\d{1,2},\d{3},\d{3}')
+def _inc(a): v = int(a.replace(',', '')); return 3_000_000 <= v < 15_000_000
+def mask_income(t):
+    out = []
+    for ln in t.split('\n'):
+        a = [x for x in AMT.findall(ln) if _inc(x)]
+        if a and (len(a) >= 2 or re.search(r'소득|가구|%', ln)):
+            ln = AMT.sub(lambda m: '○,○○○,○○○' if _inc(m.group(0)) else m.group(0), ln)
+        out.append(ln)
+    return '\n'.join(out)
 
 def pick(files):
     """files = [(이름, 받는 함수)] → 공고문 PDF 먼저, 최대 2개. 나머지는 이름만"""
@@ -116,7 +131,8 @@ def fetch(e):
     head = '\n'.join([f'공고 key: {key}', f"제목: {e.get('title') or ''}", f'주소: {url}', f"출처: {e.get('src') or ''} · 게시 {e.get('posted') or '?'}" + (f" · 접수 {e['apply']}" if e.get('apply') else ''),
                       f"받은 시각: {NOW.strftime('%Y-%m-%d %H:%M KST')} (GitHub 러너가 공고 사이트에서 받음 — tools/notice_docs.py)",
                       ('받지 않은 첨부(이름만): ' + ' / '.join(other)) if other else '', ('받기 실패: ' + ' / '.join(errs)) if errs else ''])
-    txt = clean(head) + '\n\n== 게시글 본문 ==\n' + clean(body)[:20000] + ('\n\n' + '\n\n'.join(parts) if parts else '\n\n(첨부 공고문 PDF 없음 — 본문만)')
+    txt = clean(head) + '\n(가구원수별 월평균소득 표의 금액은 ○,○○○,○○○ 로 가림 — 공고문 원문 참고)\n\n== 게시글 본문 ==\n' + clean(body)[:20000] + ('\n\n' + '\n\n'.join(parts) if parts else '\n\n(첨부 공고문 PDF 없음 — 본문만)')
+    txt = mask_income(txt)
     if len(txt) > MAX_CHARS: txt = txt[:MAX_CHARS] + '\n\n(… 15만 자에서 자름)'
     return txt, pdfs, errs
 
