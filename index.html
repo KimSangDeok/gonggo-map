@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="ko">
+<html lang="ko" data-theme="light" style="color-scheme:only light">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="color-scheme" content="light dark">
+<meta name="color-scheme" content="only light">
 <meta name="robots" content="noindex,nofollow">
 <title>공고 지도</title>
 <link rel="manifest" href="manifest.webmanifest">
@@ -4673,7 +4673,7 @@ window.addEventListener('beforeinstallprompt', function(e){ e.preventDefault(); 
   function render(){
     var un = items.filter(function(e){ return !seen[e.key]; });
     if (badge) { badge.hidden = !un.length; badge.textContent = un.length; }
-    try { if (navigator.setAppBadge) { if (un.length) navigator.setAppBadge(un.length); else navigator.clearAppBadge(); } } catch (e) {}
+    try { if (navigator.clearAppBadge) navigator.clearAppBadge(); } catch (e) {}   // 홈 화면 아이콘 배지(빨간 숫자)는 안 씀 — 2026-11-05 사용자 "뱃지 알림표시 하지마". 예전에 붙은 숫자도 앱을 열면 지움
     if (sum) sum.textContent = un.length ? ' · 🔔 새 알림 ' + un.length + '건' : '';
     if (window.renderNoticePanel) window.renderNoticePanel();
   }
@@ -4689,7 +4689,8 @@ window.addEventListener('beforeinstallprompt', function(e){ e.preventDefault(); 
 // ===== 새로고침 (2026-11-04) — 아이폰 홈 화면 앱엔 새로고침 버튼이 없어 껐다 켜야 했음 =====
 // ① 지도 말고 다른 화면 맨 위에서 아래로 당겼다 놓으면 새로고침(홈 화면 앱에서만 — 브라우저 탭은 자체 기능이 있음)
 // ② 앱으로 돌아올 때·30분마다 새 버전(version.json)·새 공고 자료(data/notices.json)를 확인 → 바뀌었으면 맨 위 띠 '눌러서 새로고침'
-var SITE_BUILD = 'da52ee453f01';
+var SITE_BUILD = '46757e27922e';
+try { if (navigator.clearAppBadge) navigator.clearAppBadge(); } catch (e) {}   // 열자마자 아이콘 배지 지움(알림 자료를 못 읽어도)
 function nwSig(j){ var s = JSON.stringify([(j && j.items) || [], (j && j.list_ids) || {}]), h = 0; for (var i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0; return h + ':' + s.length; }
 (function(){
   var sa = navigator.standalone === true || (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches);
