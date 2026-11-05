@@ -3519,11 +3519,14 @@ function noticeListHtml(){
       '<div class="nf-ft"><button type="button" class="nf-map">지도 필터 그대로 가져오기</button><button type="button" class="nf-reset">초기화</button></div>' +
     '</div></div>';
   // 맨 위 '지금 할 일': 지금 신청할 것 → 다음 볼 것(볼 만함 먼저) — 판단 한 줄 그대로
-  var vtxt = function(o){ return (o.w.lab ? '<span class="n2-vl sm t-' + o.w.tone + '">' + o.w.lab + '</span>' : '') + hesc(o.w.why || ''); };
-  var nextPool = sIn.concat(eIn), next = nextPool.filter(function(o){ return o.w.tone !== 'low'; })[0] || nextPool[0] || null;
-  var todo = oIn.length ? '지금 신청할 것 <b>' + oIn.length + '건</b>' : '지금 신청할 것 없음';
-  var line = function(t, o){ return '<p class="n2-nx"><span class="n2-nk">' + t + '</span><b>' + hesc(o.title) + '</b> · ' + hesc(o.when) + (o.w.why ? '<br>' + vtxt(o) : '') + (o.fout ? '<br><span class="n2-fo">지도 필터 밖 — ' + hesc(o.fout) + '</span>' : '') + '</p>'; };
-  var oAll = oIn;
+  // Claude가 공고문을 보고 '조건 밖'이라 한 공고는 맨 위 '지금 할 일'에서 뺌(카드는 판단과 같이 그대로) · 판단 줄도 Claude 판단을 먼저 (2026-11-05)
+  var cnV = function(o){ var c = o && o.key ? CN[o.key] : null; return c && c.verdict ? String(c.verdict) : ''; }, cnOut = function(o){ return /^조건 밖/.test(cnV(o)); };
+  var vtxt = function(o){ var v = cnV(o); if (v) return '<span class="n2-vl sm">Claude</span>' + hesc(v); return (o.w.lab ? '<span class="n2-vl sm t-' + o.w.tone + '">' + o.w.lab + '</span>' : '') + hesc(o.w.why || ''); };
+  var nextPool = sIn.concat(eIn).filter(function(o){ return !cnOut(o); }), next = nextPool.filter(function(o){ return /^넣을 만함/.test(cnV(o)); })[0] || nextPool.filter(function(o){ return o.w.tone !== 'low'; })[0] || nextPool[0] || null;   // Claude '넣을 만함' 먼저
+  var oDo = oIn.filter(function(o){ return !cnOut(o); });
+  var todo = oDo.length ? '지금 신청할 것 <b>' + oDo.length + '건</b>' : '지금 신청할 것 없음';
+  var line = function(t, o){ return '<p class="n2-nx"><span class="n2-nk">' + t + '</span><b>' + hesc(o.title) + '</b> · ' + hesc(o.when) + (o.w.why || cnV(o) ? '<br>' + vtxt(o) : '') + (o.fout ? '<br><span class="n2-fo">지도 필터 밖 — ' + hesc(o.fout) + '</span>' : '') + '</p>'; };
+  var oAll = oDo;
   var cnRecent = Object.keys(CN).filter(function(k){ var d = nrDate(String(CN[k].at || '').slice(0, 10)); return d && (new Date() - d) < 2 * 864e5; }), cnAt = (window.CNOTES && window.CNOTES.updated) || '';
   var cnLine = cnRecent.length ? '<p class="n2-cl">Claude가 공고문 확인 ' + hesc(String(cnAt).replace(/^\d{4}-(\d\d)-(\d\d)\s+(\d\d:\d\d).*$/, '$1.$2 $3')) + ' · ' + cnRecent.length + '건 — 카드의 \'Claude 확인\' 줄</p>' : '';
   var sum = '<div class="n2-sum"><p class="n2-todo">' + todo + '</p>' + cnLine + (oAll.length ? line('마감 먼저', oAll.slice().sort(function(a, b){ return (a.r.a1 || 0) - (b.r.a1 || 0); })[0]) : '') + (next ? line(oAll.length ? '다음' : '다음 볼 것', next) : (oAll.length ? '' : '<p class="n2-nx">필터에 맞는 다음 공고도 없음</p>')) +
@@ -4689,7 +4692,7 @@ window.addEventListener('beforeinstallprompt', function(e){ e.preventDefault(); 
 // ===== 새로고침 (2026-11-04) — 아이폰 홈 화면 앱엔 새로고침 버튼이 없어 껐다 켜야 했음 =====
 // ① 지도 말고 다른 화면 맨 위에서 아래로 당겼다 놓으면 새로고침(홈 화면 앱에서만 — 브라우저 탭은 자체 기능이 있음)
 // ② 앱으로 돌아올 때·30분마다 새 버전(version.json)·새 공고 자료(data/notices.json)를 확인 → 바뀌었으면 맨 위 띠 '눌러서 새로고침'
-var SITE_BUILD = '46757e27922e';
+var SITE_BUILD = 'af225e91b411';
 try { if (navigator.clearAppBadge) navigator.clearAppBadge(); } catch (e) {}   // 열자마자 아이콘 배지 지움(알림 자료를 못 읽어도)
 function nwSig(j){ var s = JSON.stringify([(j && j.items) || [], (j && j.list_ids) || {}]), h = 0; for (var i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0; return h + ':' + s.length; }
 (function(){
