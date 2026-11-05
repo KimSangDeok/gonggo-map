@@ -1,0 +1,47 @@
+name: notice-docs
+# 알림 대상 공고의 공고문 사본만 바로 받기(tools/notice_docs.py) — 보통은 update-notices 가 알림 기록 직후 같이 돌림.
+# 매일 Claude 요약이 공고 사이트(SH·서울시 청년안심·LH)를 직접 열지 않게(사용자가 매번 '웹사이트 허용'을 눌러야 해서, 2026-11-05)
+on:
+  workflow_dispatch:
+    inputs:
+      keys:
+        description: '공고 key 를 쉼표로(예: ya:6721,sh:312053) — 비우면 최근 45일 알림 대상 전부'
+        required: false
+        type: string
+        default: ''
+      force:
+        description: '이미 받은 것도 다시 받기'
+        type: boolean
+        default: false
+permissions:
+  contents: write
+concurrency:
+  group: notice-docs
+  cancel-in-progress: false
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.12' }
+      - run: pip install -q requests beautifulsoup4 pdfplumber
+      - name: notice docs
+        env:
+          KEYS: ${{ inputs.keys }}
+          FORCE: ${{ inputs.force }}
+        run: |
+          set -- 
+          [ "$FORCE" = "true" ] && set -- "$@" --force
+          k=$(printf '%s' "$KEYS" | tr -cd 'a-z0-9:,')
+          [ -n "$k" ] && set -- "$@" --key "$k"
+          python tools/notice_docs.py "$@"
+      - name: commit
+        run: |
+          git config user.name 'gonggo-bot'; git config user.email 'gonggo-bot@users.noreply.github.com'
+          git add -A data/notice_docs
+          git diff --cached --quiet && { echo 'no change'; exit 0; }
+          git commit -m "data: 공고문 사본 $(date -u +%F)"
+          for i in 1 2 3; do git pull --rebase -X theirs origin gh-pages && git push && exit 0; git rebase --abort 2>/dev/null; sleep 15; done
+          exit 1
