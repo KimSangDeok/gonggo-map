@@ -1,6 +1,6 @@
 {
  "about": "알림 대상 공고의 공고문 사본(tools/notice_docs.py, GitHub 러너가 받음) — 매일 Claude 요약이 웹사이트를 열지 않고 이걸로 확인. [p.N] = 첨부 공고문 N쪽",
- "updated": "2026-11-05 17:50 KST",
+ "updated": "2026-11-05 18:01 KST",
  "items": {
   "sh:312053": {
    "file": "data/notice_docs/sh-312053.txt",
@@ -15,51 +15,6 @@
    ],
    "chars": 24896,
    "tries": 2,
-   "err": ""
-  },
-  "ya:6708": {
-   "file": "data/notice_docs/ya-6708.txt",
-   "title": "[민간임대] 노량진역 더써밋타워 추가모집공고",
-   "url": "https://soco.seoul.go.kr/youth/bbs/BMSR00015/view.do?boardId=6708&menuNo=400008",
-   "fetched": "2026-11-05 17:47 KST",
-   "pdfs": [
-    {
-     "name": "민간_261029_노량진역_더써밋타워_청년안심주택 추가모집공고문.pdf",
-     "pages": 4
-    }
-   ],
-   "chars": 12634,
-   "tries": 1,
-   "err": ""
-  },
-  "ya:6714": {
-   "file": "data/notice_docs/ya-6714.txt",
-   "title": "[민간임대] 강변역 비바힐스강변 추가모집공고",
-   "url": "https://soco.seoul.go.kr/youth/bbs/BMSR00015/view.do?boardId=6714&menuNo=400008",
-   "fetched": "2026-11-05 17:47 KST",
-   "pdfs": [
-    {
-     "name": "민간_261029_강변역_비바힐스강변_청년안심주택 추가모집공고문.pdf",
-     "pages": 4
-    }
-   ],
-   "chars": 9621,
-   "tries": 1,
-   "err": ""
-  },
-  "ya:6717": {
-   "file": "data/notice_docs/ya-6717.txt",
-   "title": "[민간임대] 연신내역 루미노816 추가모집공고",
-   "url": "https://soco.seoul.go.kr/youth/bbs/BMSR00015/view.do?boardId=6717&menuNo=400008",
-   "fetched": "2026-11-05 17:47 KST",
-   "pdfs": [
-    {
-     "name": "민간_261029_연신내역_루미노816_청년안심주택 추가모집공고문.pdf",
-     "pages": 4
-    }
-   ],
-   "chars": 12861,
-   "tries": 1,
    "err": ""
   },
   "ya:6708": {
