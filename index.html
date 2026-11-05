@@ -1011,6 +1011,7 @@ td.k-fold.k-on > .k-tg{margin-bottom:2px}
 .nlist .n2-grp span{color:var(--muted);font-weight:700;margin-left:2px}
 .nlist .n2-grp:first-child{margin-top:4px}
 .n2-empty{margin:0 0 8px;color:var(--muted);font-size:14px}
+.n2-cl{margin:6px 0 0;font-size:13px;line-height:1.5;color:var(--accent-ink);font-weight:600;word-break:keep-all}
 .nc.n2.v2.f-out{border-style:dashed}
 .n2-fo{margin:0;font-size:13.5px;font-weight:700;line-height:1.45;color:var(--warn);word-break:keep-all}
 .nlist .nc.n2{display:grid;grid-template-columns:100px minmax(0,1fr) auto;word-break:keep-all;overflow-wrap:anywhere;gap:10px 16px;align-items:center;margin:0 0 10px;padding:14px 16px;border:1px solid var(--line);border-radius:16px;background:var(--surface);cursor:pointer;transition:border-color .12s,box-shadow .12s}
@@ -3425,11 +3426,13 @@ function noticeListHtml(){
     if (NF.low && o.w && o.w.tone === 'low') rs.push('기대 낮음');
     return rs.join(' · '); };
   var nfSplit = function(arr){ var a = [], h = []; arr.forEach(function(o){ o.nfx = nfWhy(o); (o.nfx ? h : a).push(o); }); return [a, h]; };
+  // Claude 확인: 매일 17:30 Claude가 그날 알림 간 공고의 공고문을 열어 본 것(접수 기간·대상·면적·금액 → 한 줄 판단) — 알림 key로 맞춤
+  var CN = (window.CNOTES && window.CNOTES.items) || {}, cnOf = function(o){ var c = o && o.key ? CN[o.key] : null; if (!c) return ''; return [c.chk, c.verdict].filter(Boolean).join(' → ') + (c.at ? ' (' + String(c.at).replace(/^\d{4}-(\d\d)-(\d\d)\s+(\d\d:\d\d).*$/, '$1.$2 $3') + ')' : ''); };
   var go = function(n, t){ return n ? '<span class="n2-go">' + (t || '지도에서 ' + n + '곳 보기') + ' →</span>' : ''; };
   var srcHtml = function(src){ src = src.filter(function(s){ return s && s[0]; }); return src.length ? '<details class="n2-src"><summary>근거</summary><ul>' + src.map(function(s){ return '<li>' + hesc(s[0]) + (s[1] ? ' <a href="' + s[1] + '" target="_blank" rel="noopener">↗</a>' : '') + '</li>'; }).join('') + '</ul></details>' : ''; };
   // 카드 한 장: [언제] 제목 → 판단 한 줄 → 근거 3줄(내 순위 · 지난 결과 · 내 필터) → 먼저 볼 곳 → [지도에서 n곳] · 근거(출처)
   var full = function(o){ var w = o.w, n = o.ms.length;
-    var rows = [['내 순위', w.rank], ['지난 결과', w.past], [w.fitLab, w.fit]].filter(function(x){ return x[1]; });
+    var rows = [['내 순위', w.rank], ['지난 결과', w.past], [w.fitLab, w.fit], ['Claude 확인', cnOf(o)]].filter(function(x){ return x[1]; });
     return '<div class="nc n2 v2 ' + o.st + (w.tone ? ' t-' + w.tone : '') + (o.nw ? ' unseen' : '') + (o.fout ? ' f-out' : '') + '" data-id="' + hesc(o.id) + '"' + (o.key ? ' data-key="' + hesc(o.key) + '"' : '') + ' role="button" tabindex="0">' +
       '<div class="n2-hd"><span class="n2-w">' + hesc(o.when) + '</span>' + (o.nw ? '<span class="n2c new">새 알림</span>' : '') + (o.url ? '<a class="nc-link n2-doc" href="' + o.url + '" target="_blank" rel="noopener">' + (o.urlTxt || '공고문') + ' ↗</a>' : '') + '</div>' +
       '<b class="n2-t">' + hesc(o.title) + '</b>' + (o.fout ? '<p class="n2-fo">지도 필터 밖 — ' + hesc(o.fout) + '</p>' : '') +
@@ -3476,7 +3479,7 @@ function noticeListHtml(){
       '<div class="nf-s"><b>종류</b><div class="nf-opts">' + NF_CATS.map(function(x){ return '<label><input type="checkbox" data-nfcat="' + x[0] + '"' + ck(NF.cats[x[0]] !== false) + '> ' + x[1] + '</label>'; }).join('') + '</div></div>' +
       '<div class="nf-s"><b>월부담</b> <small class="k">월세 + 보증금 대출 이자 · 단지 하나라도 맞으면 남김</small><div class="nf-opts"><select data-nf="burd" aria-label="월부담">' + NF_BURD.map(function(v){ return '<option value="' + v + '"' + (NF.burd === v ? ' selected' : '') + '>' + (v ? v + '만 이하' : '전체') + '</option>'; }).join('') + '</select><label><input type="checkbox" data-nf="unk"' + ck(NF.unk) + '> 월부담 모름도 남김</label></div></div>' +
       '<div class="nf-s"><b>구</b> <small class="k">단지 하나라도 고른 구에 있으면 남김</small><div class="nf-opts nf-gu">' + GU25.map(function(g){ return '<label><input type="checkbox" data-nfgu="' + g + '"' + ck(!NF.gu.length || NF.gu.indexOf(g) >= 0) + '> ' + guShort(g) + '</label>'; }).join('') + '</div><div class="nf-ft nf-ft2"><button type="button" class="nf-gu-all">구 전체</button><button type="button" class="nf-gu-none">구 전체 해제</button></div></div>' +
-      '<div class="nf-s"><b>그 밖</b><div class="nf-opts"><label><input type="checkbox" data-nf="low"' + ck(NF.low) + '> 기대 낮음 빼기 <small class="k">(청년안심 공공·청년 매입)</small></label></div></div>' +
+      '<div class="nf-s"><b>그 밖</b><div class="nf-opts"><label><input type="checkbox" data-nf="low"' + ck(NF.low) + '> 기대 낮음 빼기 <small class="k">(지난 회차 내 순위 0호 · 예비자만)</small></label></div></div>' +
       '<div class="nf-ft"><button type="button" class="nf-map">지도 필터 그대로 가져오기</button><button type="button" class="nf-reset">초기화</button></div>' +
     '</div></div>';
   // 맨 위 '지금 할 일': 지금 신청할 것 → 다음 볼 것(볼 만함 먼저) — 판단 한 줄 그대로
@@ -3485,7 +3488,9 @@ function noticeListHtml(){
   var todo = oIn.length ? '지금 신청할 것 <b>' + oIn.length + '건</b>' : '지금 신청할 것 없음';
   var line = function(t, o){ return '<p class="n2-nx"><span class="n2-nk">' + t + '</span><b>' + hesc(o.title) + '</b> · ' + hesc(o.when) + (o.w.why ? '<br>' + vtxt(o) : '') + (o.fout ? '<br><span class="n2-fo">지도 필터 밖 — ' + hesc(o.fout) + '</span>' : '') + '</p>'; };
   var oAll = oIn;
-  var sum = '<div class="n2-sum"><p class="n2-todo">' + todo + '</p>' + (oAll.length ? line('마감 먼저', oAll.slice().sort(function(a, b){ return (a.r.a1 || 0) - (b.r.a1 || 0); })[0]) : '') + (next ? line(oAll.length ? '다음' : '다음 볼 것', next) : (oAll.length ? '' : '<p class="n2-nx">필터에 맞는 다음 공고도 없음</p>')) +
+  var cnRecent = Object.keys(CN).filter(function(k){ var d = nrDate(String(CN[k].at || '').slice(0, 10)); return d && (new Date() - d) < 2 * 864e5; }), cnAt = (window.CNOTES && window.CNOTES.updated) || '';
+  var cnLine = cnRecent.length ? '<p class="n2-cl">Claude가 공고문 확인 ' + hesc(String(cnAt).replace(/^\d{4}-(\d\d)-(\d\d)\s+(\d\d:\d\d).*$/, '$1.$2 $3')) + ' · ' + cnRecent.length + '건 — 카드의 \'Claude 확인\' 줄</p>' : '';
+  var sum = '<div class="n2-sum"><p class="n2-todo">' + todo + '</p>' + cnLine + (oAll.length ? line('마감 먼저', oAll.slice().sort(function(a, b){ return (a.r.a1 || 0) - (b.r.a1 || 0); })[0]) : '') + (next ? line(oAll.length ? '다음' : '다음 볼 것', next) : (oAll.length ? '' : '<p class="n2-nx">필터에 맞는 다음 공고도 없음</p>')) +
     nfHtml + '</div>';
   var head = function(t, n){ return '<div class="n2-grp">' + t + ' <span>' + n + '</span></div>'; };
   var restParts = [   // [소제목, 접힌 줄 요약 이름, 카드들]
@@ -3503,7 +3508,7 @@ function noticeListHtml(){
     (restN ? '<details class="n2-more"><summary>그 밖 ' + restN + '건 <small>' + restParts.map(function(x){ return x[1] + ' ' + x[2].length; }).join(' · ') + '</small></summary>' + restParts.map(function(x){ return '<div class="n2-sub">' + x[0] + ' <span>' + x[2].length + '</span></div>' + x[2].join(''); }).join('') + '</details>' : '') +
     (unseen ? '<p class="nl-foot"><button type="button" class="al-all">🔔 새 알림 공고 모두 확인</button></p>' : '') +
     '<details class="n2-help"><summary>ⓘ 판단은 어떻게?</summary><p class="src">카드 굵은 한 줄 = 지난 회차의 실제 숫자(SH 경쟁률 PDF). 행복주택·국민임대는 내 조건 단지 중 <b>지난 경쟁률이 가장 낮은 곳</b>과 내가 1순위인 곳 수, \'먼저 볼 곳\' = 지난 경쟁률 낮은 순. <b>기대 낮음</b> = 지난 회차를 순위 순으로 나눠 보면 내 순위(3순위)까지 내려온 집이 0호(청년안심 공공·청년 매입임대), 또는 전부 예비자 모집. 지난 결과가 없는 새 공고·민간임대·LH는 \'자료 없음\'. 내 순위는 본인 소득·자산만 봄(부모를 보는 순위는 뺌). 카드의 \'근거\'를 누르면 공고문 쪽수·PDF 출처.</p>' +
-    '<p class="src">목록은 SH(행복·국민·매입임대)·서울시 청년안심·LH 공고를 접수 상태로 묶고, <b>지도 필터와 따로</b> — 내 조건(청년·8평↑·복층 빼기, 알림과 같은 기준)에 맞는 공고를 전부 보이고, 단지 수·월부담·먼저 볼 곳도 내 조건 단지로 셈. 지도 필터(평형 9·10평·월부담·구·건물 종류·주차·준공)는 지도 화면에만. 대신 <b>공고 필터</b>(평형·종류·월부담·구·기대 낮음)가 따로 있고, 숨긴 공고는 맨 위에 몇 건인지(접수 중·곧 접수·새 알림이 섞였는지) 보이며 \'그 밖\'에 까닭과 같이 있음. 공고·먼저 볼 곳을 누르면 지도가 <b>\'공고 보기\'</b>로 바뀌어 그 단지를 지도 필터와 상관없이 보여 줌(지도 위 띠의 \'× 끝\'로 끝내면 지도 필터·보던 자리로). 다음 공고(예상·공급계획) 중 내 조건 단지가 지도에 없는 것은 \'그 밖\'. \'다음 공고\'의 예상 = 지난해 같은 공고 날짜로 짐작(기관 발표 아님), 공고 전 = SH·LH가 미리 발표한 공급계획. 🔔 새 알림 = 알림을 켠 뒤 새로 올라와 알림을 보낸 공고(카드를 누르면 확인). 카드를 누르면 지도에서 그 공고 단지만(목록 위 ✕로 해제), \'먼저 볼 곳\'을 누르면 그 단지 상세.</p>' +
+    '<p class="src">목록은 SH(행복·국민·매입임대)·서울시 청년안심·LH 공고를 접수 상태로 묶고, <b>지도 필터와 따로</b> — 내 조건(청년·8평↑·복층 빼기, 알림과 같은 기준)에 맞는 공고를 전부 보이고, 단지 수·월부담·먼저 볼 곳도 내 조건 단지로 셈. 지도 필터(평형 9·10평·월부담·구·건물 종류·주차·준공)는 지도 화면에만. 대신 <b>공고 필터</b>(평형·종류·월부담·구·기대 낮음)가 따로 있고, 숨긴 공고는 맨 위에 몇 건인지(접수 중·곧 접수·새 알림이 섞였는지) 보이며 \'그 밖\'에 까닭과 같이 있음. <b>Claude 확인</b> 줄 = 매일 17:30 Claude가 그날 알림 간 공고의 공고문을 열어 본 것(접수 기간·대상·면적·금액 → 한 줄 판단, 개인 정보는 안 올림). 공고·먼저 볼 곳을 누르면 지도가 <b>\'공고 보기\'</b>로 바뀌어 그 단지를 지도 필터와 상관없이 보여 줌(지도 위 띠의 \'× 끝\'로 끝내면 지도 필터·보던 자리로). 다음 공고(예상·공급계획) 중 내 조건 단지가 지도에 없는 것은 \'그 밖\'. \'다음 공고\'의 예상 = 지난해 같은 공고 날짜로 짐작(기관 발표 아님), 공고 전 = SH·LH가 미리 발표한 공급계획. 🔔 새 알림 = 알림을 켠 뒤 새로 올라와 알림을 보낸 공고(카드를 누르면 확인). 카드를 누르면 지도에서 그 공고 단지만(목록 위 ✕로 해제), \'먼저 볼 곳\'을 누르면 그 단지 상세.</p>' +
     (outN ? '<p class="src">내 조건 밖 공고 ' + outN + '건은 뺌 — 지도에 올라간 단지가 전부 \'해당 없음\'(청년 자격 형이 ' + belowTxt() + '뿐 등)인 공고</p>' : '') + '</details>';
 }
 window.renderNoticePanel = function(){
@@ -4421,6 +4426,7 @@ function applyLive(){
     if (st) { st.innerHTML = String(j.updated || '').replace(/^\d{4}-(\d\d)-(\d\d)\s+(\d\d:\d\d).*$/, '$1.$2 $3') + ' 업데이트' + (added ? ' · <b>새 공고 ' + added + '건 감지(단지 자료는 아직)</b>' : ''); st.title = '자동 갱신: 공고 ' + j.updated + ' · SH 게시판 재확인 ' + touched + '건'; }
     buildNoticeSelect(); buildNoticeTable();
   });
+  fetch('data/claude_notes.json?t=' + Date.now(), { cache: 'no-store' }).then(function(r){ return r.ok ? r.json() : null; }).catch(function(){ return null; }).then(function(j){ window.CNOTES_U = (j && j.updated) || ''; if (j && j.items) { window.CNOTES = j; if (window.renderNoticePanel) window.renderNoticePanel(); } });
   liveFetch('data/fact.json').then(function(j){ if (j && j.fact) { Object.keys(j.fact).forEach(function(k){ FACT[k] = j.fact[k]; }); window.FACT_UPDATED = j.updated; } });
   liveFetch('data/pamphlets.json').then(function(j){ if (j && j.items) window.PAM = j; });
   liveFetch('data/thumbs.json').then(function(j){ if (j && j.items) window.THUMBS = j.items; });   // 사진 띠용 작은 그림(원본은 수 MB)
@@ -4643,7 +4649,7 @@ window.addEventListener('beforeinstallprompt', function(e){ e.preventDefault(); 
 // ===== 새로고침 (2026-11-04) — 아이폰 홈 화면 앱엔 새로고침 버튼이 없어 껐다 켜야 했음 =====
 // ① 지도 말고 다른 화면 맨 위에서 아래로 당겼다 놓으면 새로고침(홈 화면 앱에서만 — 브라우저 탭은 자체 기능이 있음)
 // ② 앱으로 돌아올 때·30분마다 새 버전(version.json)·새 공고 자료(data/notices.json)를 확인 → 바뀌었으면 맨 위 띠 '눌러서 새로고침'
-var SITE_BUILD = '9142e17b8f11';
+var SITE_BUILD = '3362325a0a0e';
 function nwSig(j){ var s = JSON.stringify([(j && j.items) || [], (j && j.list_ids) || {}]), h = 0; for (var i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0; return h + ':' + s.length; }
 (function(){
   var sa = navigator.standalone === true || (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches);
@@ -4684,6 +4690,7 @@ function nwSig(j){ var s = JSON.stringify([(j && j.items) || [], (j && j.list_id
   function check(){
     last = Date.now(); var t = '?t=' + Date.now();
     fetch('version.json' + t, { cache: 'no-store' }).then(function(r){ return r.ok ? r.json() : null; }).then(function(v){ if (v && v.build && v.build !== SITE_BUILD) { news = true; idle(); } }).catch(function(){});
+    if (window.CNOTES_U !== undefined) fetch('data/claude_notes.json' + t, { cache: 'no-store' }).then(function(r){ return r.ok ? r.json() : null; }).then(function(j){ if (j && (j.updated || '') !== window.CNOTES_U) { news = true; idle(); } }).catch(function(){});
     if (window.__NSIG) fetch('data/notices.json' + t, { cache: 'no-store' }).then(function(r){ return r.ok ? r.json() : null; }).then(function(j){ if (j && nwSig(j) !== window.__NSIG) { news = true; idle(); } }).catch(function(){});
   }
   window.__ptrCheck = check;
