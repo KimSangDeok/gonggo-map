@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-06 23:25 KST",
+ "updated": "2026-11-07 15:14 KST",
  "source": "https://www.i-sh.co.kr/app/lay2/program/S1T294C295/www/brd/m_241/list.do",
  "known": {
   "304864": "H26-1",
@@ -412,14 +412,15 @@
   "SH list page 1: 10 rows",
   "SH list page 2: 10 rows",
   "SH list page 3: 10 rows",
-  "LH 서울특별시: 17 rows (all types)",
-  "LH details: 5 notices, 7 complexes",
+  "LH 서울특별시: 0 rows (all types)",
+  "LH sample: <!DOCTYPE html>\r\n<html lang=\"ko\">\r\n<head>\r\n<meta charset=\"UTF-8\">\r\n<title>íêµ­í ì§ì£¼íê³µì¬ ììíì´ì§</title>\r\n</head>\r\n<body>\r\n<div style=\"display: flex; justify-content: center; align-items: center;\">\r\n\t<img src=\"test.png\">\r\n<div>\r\n</body>\r\n</html>",
+  "LH details: 0 notices, 0 complexes",
   "청년안심 공고: 30",
   "청년안심 단지 목록: 101",
   "청년안심 단지(좌표 있음): 100",
   "SH plan 행복주택 2 rows 2026.10. 현재",
   "SH plan 국민임대 1 rows ",
   "SH plan 청년안심주택(공공임대) 7 rows 2026년 4월 기준",
-  "LH plan 서울특별시 3 rows"
+  "LH plan 서울특별시 0 rows"
  ]
 }
