@@ -663,6 +663,7 @@ td .bt-i,.iw-t .bt-i{width:20px;height:20px;line-height:18px;font-size:11.5px;ma
   .side:not(.full){touch-action:none}
   .side:not(.full){overflow:hidden}
   .side:not(.full) .lst,.side:not(.full) .detail,.side:not(.full) .nlist{overflow:hidden}
+  .side.half .lst,.side.half .detail,.side.half .nlist{overflow:auto!important;touch-action:pan-y!important;padding-bottom:calc(var(--sh-hid,0px) + 12px)}   /* 반 높이: 안쪽 스크롤 — 화면 밖으로 밀린 만큼 아래 여백을 줘 끝까지 보이게 */
   .side.hidden-sheet .nmbar,.side.hidden-sheet .lst,.side.hidden-sheet .detail,.side.hidden-sheet #nm-msg,.side.hidden-sheet .nlist,.side.hidden-sheet .side-tabs{visibility:hidden}
   .side.full .lst,.side.full .detail,.side.full .nlist{overflow:auto}
   .side.show-detail .nmbar,.side.show-detail #nm-msg,.side.show-detail .lg-sum{display:none}
@@ -1186,6 +1187,9 @@ html.pano-open,html.pano-open body{overflow:hidden}
 .det-hero .dh-b{flex-basis:100%}
 .det-hero .dh-b b{font-size:17px}
 .det-hero .dh-bs{font-size:13.5px;color:var(--muted);word-break:keep-all}
+.pill.nt-go{cursor:pointer;text-decoration:underline;text-underline-offset:2px}
+.ls-gu{font-size:12px;font-weight:500;color:var(--muted);margin-left:1px;white-space:nowrap}
+.pill.nt-go:active{filter:brightness(.92)}
 /* 폰 필터: 시트 전체를 필터로, 아래에 'n곳 보기' */
 .lg-apply{display:none}
 @media (max-width:760px){
@@ -2346,6 +2350,7 @@ var GU25 = ['강남구','강동구','강북구','강서구','관악구','광진�
 var GU_FIND = GU25.slice().sort(function(a, b){ return b.length - a.length; });
 function guClean(v){ if (!Array.isArray(v)) return []; if (v.indexOf('-') >= 0) return ['-']; var a = GU25.filter(function(g){ return v.indexOf(g) >= 0; }); return a.length === GU25.length ? [] : a; }
 var GU_ON = guClean(PREF.get('gu'));   // 지도에 나오는 구: [] = 25개 구 전부(기본) · ['-'] = 하나도 없음 · 그 밖 = 고른 구만 — PREF 'gu'(기기 동기화)
+function guTag(p){ var g = ''; try { g = guOf(p); } catch(e) {} return g ? ' <span class="ls-gu">' + g + '</span>' : ''; }
 function guOf(p){ if (p.__gu !== undefined) return p.__gu; var g = ''; if (p.gu && GU25.indexOf(p.gu + '구') >= 0) g = p.gu + '구';
   if (!g) { var t = [p.gu, p.addr, p.comp && p.comp.addr, p.comp && p.comp.gu, p.plan && p.plan.gu, p.plan && p.plan.name].filter(Boolean).join(' '); g = GU_FIND.find(function(x){ return t.indexOf(x) >= 0; }) || ''; }
   p.__gu = g; return g; }
@@ -2683,10 +2688,10 @@ var sheet = (function(){
   function snaps(){ var half = Math.round(side.parentNode.clientHeight * 0.5), pk = Math.min(peekH(), half); return [minH(), pk, half, maxH()]; }   // 범례가 화면 절반보다 길면 '범례' 높이 = 절반(높이가 위·아래로 뒤집히지 않게)
   var state = 2; // 0 숨김(손잡이만), 1 지도+범례(peek), 2 반, 3 전체
   var curH = 0;   // 지금 보이는 시트 높이(px) — 시트 자체는 최대 높이이고 transform 으로 아래로 밀어 둠
-  function setH(px){ if (!mobile()) { side.style.removeProperty('transform'); return; } curH = Math.max(minH(), Math.min(maxH(), px)); side.style.transform = 'translate3d(0,' + Math.round(maxH() - curH) + 'px,0)'; }
+  function setH(px){ if (!mobile()) { side.style.removeProperty('transform'); return; } curH = Math.max(minH(), Math.min(maxH(), px)); side.style.transform = 'translate3d(0,' + Math.round(maxH() - curH) + 'px,0)'; side.style.setProperty('--sh-hid', Math.max(0, Math.round(maxH() - curH)) + 'px'); }   // --sh-hid = 화면 밖으로 밀린 시트 아래쪽 높이(반 높이에서 목록 끝까지 스크롤되게)
   function visH(){ return mobile() ? curH : side.getBoundingClientRect().height; }
   function label(){ if (!btn) return; btn.textContent = state === 3 ? '지도 보기 ▼' : (state === 0 ? '범례·목록 ▲' : (state === 1 ? '목록 펼치기 ▲' : '전체로 펼치기 ▲')); }
-  function go(s){ state = Math.max(0, Math.min(3, s)); setH(snaps()[state]); side.classList.toggle('full', state === 3); side.classList.toggle('hidden-sheet', state === 0); label(); }
+  function go(s){ state = Math.max(0, Math.min(3, s)); setH(snaps()[state]); side.classList.toggle('full', state === 3); side.classList.toggle('half', state === 2); side.classList.toggle('hidden-sheet', state === 0); label(); }
   if (handle) {
     handle.setAttribute('role', 'button'); handle.setAttribute('tabindex', '0'); handle.setAttribute('aria-label', '목록 펼치기·접기');
     handle.addEventListener('click', function(e){ if (!mobile() || e.target.closest('button')) return; e.stopPropagation(); go(state === 3 ? 2 : 3); });
@@ -2695,13 +2700,14 @@ var sheet = (function(){
     btn.addEventListener('click', function(e){ e.stopPropagation(); go(state === 3 ? 1 : 3); });
     if (hideBtn) hideBtn.addEventListener('click', function(e){ e.stopPropagation(); go(0); });   // 숨기기: 손잡이만 남김(지도 전체)
     // 2) 접힌 상태(반)에서는 시트 어디를 눌러도 전체로 펼침 (체크박스·선택상자·링크 제외). 숨김·범례 상태에선 버튼으로만
-    side.addEventListener('click', function(e){ if (!mobile() || state !== 2) return; if (e.target.closest('input,select,button,a,label,#detail-back,.handle')) return; go(3); });
+    side.addEventListener('click', function(e){ if (!mobile() || state !== 2) return; if (e.target.closest('input,select,button,a,label,#detail-back,.handle,.lst,.detail,.nlist')) return; go(3); });   // 목록·상세를 눌러도 시트가 안 올라감(단지를 누르면 상세만)
     // 3) 끌기: 접힌 상태에서는 시트 전체가 끌기 면, 전체 상태에서는 손잡이·필터 줄만(내용은 스크롤)
     var st = { on: false, y: 0, h: 0, moved: false, id: null, ly: 0, lt: 0, v: 0 };
     function dragStart(e){
       if (!mobile() || e.pointerType === 'mouse' && e.button !== 0) return;
       if (e.target.closest('select,input,a') || (e.target.closest('button') && !e.target.closest('.handle'))) return;   // 손잡이의 버튼 위에서 시작한 끌기는 허용(폰은 가는 막대 대신 버튼이 눌리는 일이 많음)
       if (state === 3 && !e.target.closest('.handle,.detail-bar,.lg-sum') && !(e.target.closest('.nmbar') && !side.classList.contains('lg-open'))) return;
+      if (state === 2 && e.target.closest('.lst,.detail,.nlist') && !e.target.closest('.detail-bar')) return;   // 반 높이: 목록·상세 위는 그 안 스크롤 — 시트는 손잡이·머리줄로
       st.on = true; st.moved = false; st.y = e.clientY; st.h = curH; st.id = e.pointerId; st.ly = e.clientY; st.lt = e.timeStamp; st.v = 0;
     }
     function dragMove(e){
@@ -3529,7 +3535,7 @@ function noticeListHtml(){
   var oAll = oDo;
   var cnRecent = Object.keys(CN).filter(function(k){ var d = nrDate(String(CN[k].at || '').slice(0, 10)); return d && (new Date() - d) < 2 * 864e5; }), cnAt = (window.CNOTES && window.CNOTES.updated) || '';
   var cnLine = cnRecent.length ? '<p class="n2-cl">Claude가 공고문 확인 ' + hesc(String(cnAt).replace(/^\d{4}-(\d\d)-(\d\d)\s+(\d\d:\d\d).*$/, '$1.$2 $3')) + ' · ' + cnRecent.length + '건 — 카드의 \'Claude 확인\' 줄</p>' : '';
-  var sum = '<div class="n2-sum"><p class="n2-todo">' + todo + '</p>' + cnLine + (oAll.length ? line('마감 먼저', oAll.slice().sort(function(a, b){ return (a.r.a1 || 0) - (b.r.a1 || 0); })[0]) : '') + (next ? line(next.st === 'exp' ? '다음 공고(예상)' : '다음 접수', next) : (oAll.length ? '' : '<p class="n2-nx">필터에 맞는 다음 공고도 없음</p>'))   // 지금 넣을 게 없을 때 '언제 다시 보면 되나' — 이름을 '다음 볼 것' 대신 무엇인지 그대로(2026-11-05) +
+  var sum = '<div class="n2-sum"><p class="n2-todo">' + todo + '</p>' + cnLine + (oAll.length ? line('마감 먼저', oAll.slice().sort(function(a, b){ return (a.r.a1 || 0) - (b.r.a1 || 0); })[0]) : '') + (next ? line(next.st === 'exp' ? '다음 공고(예상)' : '다음 접수', next) : (oAll.length ? '' : '<p class="n2-nx">필터에 맞는 다음 공고도 없음</p>')) +   // 지금 넣을 게 없을 때 '언제 다시 보면 되나' — 이름을 '다음 볼 것' 대신 무엇인지 그대로(2026-11-05)
     nfHtml + '</div>';
   var head = function(t, n){ return '<div class="n2-grp">' + t + ' <span>' + n + '</span></div>'; };
   var restParts = [   // [소제목, 접힌 줄 요약 이름, 카드들]
@@ -3949,7 +3955,7 @@ function nmInit(){
       var rents = ok.map(function(x){ return x.rent != null ? x.rent : (x.p23 && x.p23.rent); }).filter(function(v){ return v != null; });
       var loM = null; ok.forEach(function(x){ var rr = x.rent != null ? x.rent : (x.p23 && x.p23.rent), dd = x.rent != null ? x.dep : (x.p23 && x.p23.dep); if (rr != null && (!loM || rr < loM.r)) loM = { r: rr, d: dd }; });
       it.dataset.pr = loM ? Math.round(loM.r / 1000) / 10 : ''; it.dataset.pd = loM && loM.d != null ? Math.round(loM.d / 10000) : ''; it.dataset.pm = rents.length && Math.max.apply(null, rents) !== Math.min.apply(null, rents) ? '1' : '';
-      it.innerHTML = '<span class="dot lh" style="--c:' + colOf() + ';margin-top:3px">매</span><div><b>' + p.name + ' <span class="pill ' + (p.cat === 'na' ? 'warn' : (live ? 'ok' : 'info')) + '" style="font-size:11px;padding:0 7px">' + (p.cat === 'na' ? '내 조건 밖' : (r ? nrStateTxt(r) + (live ? ' · ' + nrApplyTxt(r).replace(/^접수 /, '') : '') : '')) + '</span>' + (p.cat !== 'na' && !p.units ? ' <span class="pill rk warn" title="내 순위">3순위</span>' : '') + '</b><small>' + (p.gu || '') + ' · ' +
+      it.innerHTML = '<span class="dot lh" style="--c:' + colOf() + ';margin-top:3px">매</span><div><b>' + p.name + guTag(p) + ' <span class="pill ' + (p.cat === 'na' ? 'warn' : (live ? 'ok' : 'info')) + '" style="font-size:11px;padding:0 7px">' + (p.cat === 'na' ? '내 조건 밖' : (r ? nrStateTxt(r) + (live ? ' · ' + nrApplyTxt(r).replace(/^접수 /, '') : '') : '')) + '</span>' + (p.cat !== 'na' && !p.units ? ' <span class="pill rk warn" title="내 순위">3순위</span>' : '') + '</b><small>' + (p.gu || '') + ' · ' +
         (p.units ? '특화형(운영 ' + p.sp.operator + ') · ' + p.units.map(function(u){ return u.room + ' ' + u.ho; }).join('·') : (ok.length ? selLabel() + ' 주택형 ' + ok.length + '개 ' + ok.reduce(function(a, g){ return a + g.n; }, 0) + '호' : (p.na || ''))) +
         (m2.length ? ' · 전용 ' + lo + (hi !== lo ? '~' + hi : '') + '㎡(' + py(lo) + (hi !== lo ? '~' + py(hi) : '') + ')' : '') + (p.units ? '' : ' · 2026 1차(' + (p.src && p.src.result ? p.src.result.replace(/ 예정$/, '') : '') + ')') + btTag(p) + pkTag(p) + stTag(p) + '</small></div><div class="num">' + (rents.length ? '월 ' + Math.round(Math.min.apply(null, rents) / 1000) / 10 + '만' : '') + '</div>'; };
     it.__render(); it.__mk = mk; it.addEventListener('click', function(){ nmFocusMarker(mk); });
@@ -4001,10 +4007,11 @@ function nmInit(){
         var it = document.createElement('div'); it.className = 'it'; it.setAttribute('data-key', k);
         it.setAttribute('data-nid', p.nid);
         it.__render = function(){ it.dataset.cat = p.cat; if (p.kind === '행복주택' && p.rent) { it.dataset.pd = manwon(p.dep || ''); it.dataset.pr = parseFloat(p.rent); it.dataset.pm = ''; }
-          it.innerHTML = '<span class="dot' + nmCls(p) + '" style="--c:' + nmColor(p) + ';margin-top:3px"></span><div><b>' + p.name + ' <span class="pill ' + (p.cat === 'na' ? 'warn' : 'info') + '" style="font-size:11px;padding:0 7px">' + (p.cat === 'na' ? (p.kind === '행복주택' ? naPill(p) : (p.na0 ? '지금 해당 없음' : '기준 미만')) : p.kind === '국민임대' ? '26년 국민임대 ' + (p.ok26 || []).map(function(a){ return a.replace(/^(\d+)㎡$/, function(_, n){ return n + '㎡(' + py(n) + ')'; }); }).join('·') : NOTICES[p.nid].short) + '</span>' + (p.cat !== 'na' ? rankChip(p.rank) : '') + '</b><small>' + (p.kind === '행복주택' ? p.m2 + '㎡ ' + p.py + ' · ' + hhShort(p) + ' · 공가 ' + p.vac + (p.wait ? ' · 예비 ' + p.wait : '') : hhShort(p) + (rankRest(p.rank) ? ' · ' + rankRest(p.rank) : '')) + btTag(p) + pkTag(p) + stTag(p) + '</small></div><div class="num">' + (p.kind === '행복주택' ? '<b class="n1">월세 ' + p.rent + '</b><small class="n2">보증금 ' + p.dep + '</small>' : '') + '</div>'; };
+          var ntGo = p.cat !== 'na' && p.nid && NREG[p.nid];
+          it.innerHTML = '<span class="dot' + nmCls(p) + '" style="--c:' + nmColor(p) + ';margin-top:3px"></span><div><b>' + p.name + guTag(p) + ' <span class="pill ' + (p.cat === 'na' ? 'warn' : 'info') + (ntGo ? ' nt-go" role="button" data-nid="' + p.nid + '" title="이 공고의 단지를 지도에서 보기"' : '"') + ' style="font-size:11px;padding:0 7px">' + (p.cat === 'na' ? (p.kind === '행복주택' ? naPill(p) : (p.na0 ? '지금 해당 없음' : '기준 미만')) : p.kind === '국민임대' ? '26년 국민임대 ' + (p.ok26 || []).map(function(a){ return a.replace(/^(\d+)㎡$/, function(_, n){ return n + '㎡(' + py(n) + ')'; }); }).join('·') : NOTICES[p.nid].short) + (ntGo ? ' <span aria-hidden="true">›</span>' : '') + '</span>' + (p.cat !== 'na' ? rankChip(p.rank) : '') + '</b><small>' + (p.kind === '행복주택' ? p.m2 + '㎡ ' + p.py + ' · ' + hhShort(p) + ' · 공가 ' + p.vac + (p.wait ? ' · 예비 ' + p.wait : '') : hhShort(p) + (rankRest(p.rank) ? ' · ' + rankRest(p.rank) : '')) + btTag(p) + pkTag(p) + stTag(p) + '</small></div><div class="num">' + (p.kind === '행복주택' ? '<b class="n1">월세 ' + p.rent + '</b><small class="n2">보증금 ' + p.dep + '</small>' : '') + '</div>'; };
         it.__render();
         it.__mk = mk;
-        it.addEventListener('click', function(){ nmFocusMarker(mk); });
+        it.addEventListener('click', function(e){ var ng = e.target.closest && e.target.closest('.nt-go'); if (ng) { e.stopPropagation(); window.nmNoticeGo(ng.getAttribute('data-nid')); return; } nmFocusMarker(mk); });
         var g = groupEl[p.cat]; var ref = g.nextSibling; while (ref && ref.className === 'it') ref = ref.nextSibling; list.insertBefore(it, ref);
       }
       done++; status.textContent = done + ' / ' + PLACES.length + ' 좌표 변환 중…';
@@ -4213,7 +4220,7 @@ function nmInit(){
     lgBtn.addEventListener('click', function(e){ e.stopPropagation();
       if (!MQ.matches && sideEl.classList.contains('show-detail') && !fltShown()) { hideDetail(); if (sideEl.classList.contains('lg-closed')) { sideEl.classList.remove('lg-closed'); try { localStorage.setItem('kkk-lg-pc2', 'open'); } catch(e2) {} } lgSync(); return; }   // 상세가 필터 자리를 가리고 있으면: 상세 닫고 필터
       if (!MQ.matches) { var closed = !sideEl.classList.contains('lg-closed'); sideEl.classList.toggle('lg-closed', closed); try { localStorage.setItem('kkk-lg-pc2', closed ? 'closed' : 'open'); } catch(e2) {} lgSync(); return; }
-      var open = !sideEl.classList.contains('lg-open'); sideEl.classList.toggle('lg-open', open); lgSync(); if (open) sheet.go(3); else sheet.refit(); });   // 필터를 펼치면 늘 시트 전체로(반 높이면 필터 아래쪽이 화면 밖이라 못 닿음)
+      var open = !sideEl.classList.contains('lg-open'); if (open && sideEl.classList.contains('show-detail')) hideDetail(); sideEl.classList.toggle('lg-open', open); lgSync(); if (open) sheet.go(3); else sheet.refit(); });   // 필터를 펼치면 늘 시트 전체로(반 높이면 필터 아래쪽이 화면 밖이라 못 닿음)
     if (MQ.addEventListener) MQ.addEventListener('change', lgSync); if (W3.addEventListener) W3.addEventListener('change', lgSync); lgSync();
     var qfMore = document.getElementById('qf-more'); if (qfMore) qfMore.addEventListener('click', function(e){ e.stopPropagation(); lgBtn.click(); });
     var lgBody = document.getElementById('lg-body'); if (lgBody && !document.getElementById('lg-apply')) { var la = document.createElement('div'); la.className = 'lg-apply'; la.innerHTML = '<button type="button" id="lg-apply">결과 보기</button>'; lgBody.appendChild(la);
@@ -4284,6 +4291,10 @@ function nmInit(){
     else if (ms.length > 1) { try { var b = new naver.maps.LatLngBounds(ms[0].getPosition(), ms[0].getPosition()); ms.forEach(function(mk){ b.extend(mk.getPosition()); }); nmMap.fitBounds(b, { top: 60, right: 60, bottom: 60, left: 60 + mapPadL() }); } catch(e) {} if (sheet.mobile() && sheet.state() < 2) sheet.go(2); }
     else if (sheet.mobile() && sheet.state() < 2) sheet.go(2);
     return ms.length;
+  };
+  window.nmNoticeGo = function(id){ if (!id || !NREG[id]) return;
+    var n = window.mapNotice(id);
+    if (sheet.mobile() && n !== 1) { sheet.go(1); setTimeout(function(){ if (window.nmFocusFit) window.nmFocusFit(); }, 380); }   // 목록이 지도를 덮지 않게 '지도+범례' 높이로 내리고 단지들에 맞춤(1곳이면 그 단지 상세)
   };
   window.__applyFilter = applyFilter;
   // 단지 종류 체크(행복·국민·청년안심·LH·매입임대·해당 없음) — PREF 'cats'에 기억(기기 동기화)
@@ -4692,7 +4703,7 @@ window.addEventListener('beforeinstallprompt', function(e){ e.preventDefault(); 
 // ===== 새로고침 (2026-11-04) — 아이폰 홈 화면 앱엔 새로고침 버튼이 없어 껐다 켜야 했음 =====
 // ① 지도 말고 다른 화면 맨 위에서 아래로 당겼다 놓으면 새로고침(홈 화면 앱에서만 — 브라우저 탭은 자체 기능이 있음)
 // ② 앱으로 돌아올 때·30분마다 새 버전(version.json)·새 공고 자료(data/notices.json)를 확인 → 바뀌었으면 맨 위 띠 '눌러서 새로고침'
-var SITE_BUILD = 'b2c92691a934';
+var SITE_BUILD = '566614114da4';
 try { if (navigator.clearAppBadge) navigator.clearAppBadge(); } catch (e) {}   // 열자마자 아이콘 배지 지움(알림 자료를 못 읽어도)
 function nwSig(j){ var s = JSON.stringify([(j && j.items) || [], (j && j.list_ids) || {}]), h = 0; for (var i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0; return h + ':' + s.length; }
 (function(){
