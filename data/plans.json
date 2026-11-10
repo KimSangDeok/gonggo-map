@@ -1,31 +1,7 @@
 {
- "updated": "2026-11-10 16:59 KST",
+ "updated": "2026-11-10 17:10 KST",
  "about": "기관이 미리 밝힌 공급계획(아직 공고 전) — SH 인터넷청약 청약 공급계획 · LH 청약플러스 공급계획(임대주택, 서울). 이미 공고가 났는지·계획 시기가 지났는지는 지도 화면에서 판정",
  "items": [
-  {
-   "src": "SH",
-   "prog": "happy",
-   "type": "행복주택",
-   "name": "두산위브더프레스티지",
-   "gu": "구로구",
-   "hh": "68",
-   "when": "8",
-   "kind": "매입형",
-   "basis": "2026.10. 현재",
-   "url": "https://www.i-sh.co.kr/main/lay2/S1T243C1045/contents.do"
-  },
-  {
-   "src": "SH",
-   "prog": "happy",
-   "type": "행복주택",
-   "name": "창경궁롯데캐슬시그니처",
-   "gu": "성북구",
-   "hh": "86",
-   "when": "8",
-   "kind": "매입형",
-   "basis": "2026.10. 현재",
-   "url": "https://www.i-sh.co.kr/main/lay2/S1T243C1045/contents.do"
-  },
   {
    "src": "SH",
    "prog": "kook",
