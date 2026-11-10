@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-10 17:10 KST",
+ "updated": "2026-11-11 00:02 KST",
  "source": "https://www.i-sh.co.kr/app/lay2/program/S1T294C295/www/brd/m_241/list.do",
  "known": {
   "304864": "H26-1",
@@ -398,9 +398,10 @@
   "SH list page 3: 10 rows",
   "LH 서울특별시: 17 rows (all types)",
   "LH details: 5 notices, 7 complexes",
-  "YA notices failed: ConnectTimeout(MaxRetryError(\"HTTPSConnectionPool(host='soco.seoul.go.kr', port=443): Max retries exceeded with url: /youth/pgm/home/yohome/bbsListJson.json (Caused by ConnectTimeoutError(<HTTPSConnection(host='soco.seoul.go.kr', port=443) at 0x7f40f4c7bad0>, 'Connection to soco.seoul.go.kr timed out. (connect timeout=60)'))\"))",
-  "YA complexes failed: ConnectTimeout(MaxRetryError(\"HTTPSConnectionPool(host='soco.seoul.go.kr', port=443): Max retries exceeded with url: /youth/pgm/home/yohome/yoHomeListJson.json (Caused by ConnectTimeoutError(<HTTPSConnection(host='soco.seoul.go.kr', port=443) at 0x7f40f4c7bf80>, 'Connection to soco.seoul.go.kr timed out. (connect timeout=60)'))\"))",
-  "SH plan failed 행복주택 HTTPError('502 Server Error: Bad Gateway for url: https://www.i-sh.co.kr/main/lay2/S1T243C1045/contents.do')",
+  "청년안심 공고: 30",
+  "청년안심 단지 목록: 101",
+  "청년안심 단지(좌표 있음): 100",
+  "SH plan 행복주택 2 rows 2026.10. 현재",
   "SH plan 국민임대 1 rows ",
   "SH plan 청년안심주택(공공임대) 7 rows 2026년 4월 기준",
   "LH plan 서울특별시 3 rows"
