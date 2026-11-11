@@ -1,6 +1,6 @@
 {
  "about": "알림 대상 공고의 공고문 사본(tools/notice_docs.py, GitHub 러너가 받음) — 매일 Claude 요약이 웹사이트를 열지 않고 이걸로 확인. [p.N] = 첨부 공고문 N쪽",
- "updated": "2026-11-11 12:06 KST",
+ "updated": "2026-11-11 13:40 KST",
  "items": {
   "sh:312053": {
    "file": "data/notice_docs/sh-312053.txt",
