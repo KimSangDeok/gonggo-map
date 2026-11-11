@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-11 09:38 UTC",
+ "updated": "2026-11-11 10:41 UTC",
  "about": "평면도 원본 사본 — Claude 평면도 읽기용(화면은 원본 주소)",
  "items": {
   "https://www.i-sh.co.kr/houseinfo/upload//houseinfo/20251016161448130_4_33A.jpg": {
@@ -249,6 +249,678 @@
    "sw": 931,
    "sh": 807,
    "at": "2026-11-11 09:38 UTC"
+  },
+  "https://www.i-sh.co.kr/houseinfo/upload//lease/20210302092023823_1_40A형.jpg": {
+   "f": "data/plan_src/5ee7f1677fd2b904.jpg",
+   "w": 516,
+   "h": 547,
+   "sw": 516,
+   "sh": 547,
+   "at": "2026-11-11 10:41 UTC"
+  },
+  "https://www.i-sh.co.kr/houseinfo/upload//houseinfo/20250910172118372_1_4-5-1. 39단위세대 평면도.jpg": {
+   "f": "data/plan_src/ae3f3716f38180ca.jpg",
+   "w": 1587,
+   "h": 1122,
+   "sw": 1587,
+   "sh": 1122,
+   "at": "2026-11-11 10:41 UTC"
+  },
+  "https://www.i-sh.co.kr/houseinfo/upload//lease/20221007100150250_344_도면(39A).jpg": {
+   "f": "data/plan_src/dce8d0a4989ede36.jpg",
+   "w": 710,
+   "h": 862,
+   "sw": 710,
+   "sh": 862,
+   "at": "2026-11-11 10:41 UTC"
+  },
+  "https://www.i-sh.co.kr/houseinfo/upload//lease/20220902132902739_18_39형.jpg": {
+   "f": "data/plan_src/e00f3c7d597832a5.jpg",
+   "w": 761,
+   "h": 699,
+   "sw": 761,
+   "sh": 699,
+   "at": "2026-11-11 10:41 UTC"
+  },
+  "https://www.i-sh.co.kr/houseinfo/upload//lease/20211122134240116_9_39형.jpg": {
+   "f": "data/plan_src/065cd2edb683bf65.jpg",
+   "w": 1404,
+   "h": 992,
+   "sw": 1404,
+   "sh": 992,
+   "at": "2026-11-11 10:41 UTC"
+  },
+  "https://www.i-sh.co.kr/houseinfo/upload//lease/202203171110590_4_A-1002 U38A(확장형)임대단위세대평면도(9-1)B.pdf_page_1.jpg": {
+   "f": "data/plan_src/ef1bcc78ea13854c.jpg",
+   "w": 1588,
+   "h": 1123,
+   "sw": 1588,
+   "sh": 1123,
+   "at": "2026-11-11 10:41 UTC"
+  },
+  "https://www.i-sh.co.kr/houseinfo/upload//lease/20221014144753360_172_38.28(A형).png": {
+   "f": "data/plan_src/3c99b70468ebc3f8.jpg",
+   "w": 644,
+   "h": 996,
+   "sw": 644,
+   "sh": 996,
+   "at": "2026-11-11 10:41 UTC"
+  },
+  "https://www.i-sh.co.kr/houseinfo/upload//lease/20220824102814156_1_용산롯데캐슬센터포레(리츠).JPG": {
+   "f": "data/plan_src/a01fdbfa2f11313e.jpg",
+   "w": 427,
+   "h": 578,
+   "sw": 427,
+   "sh": 578,
+   "at": "2026-11-11 10:41 UTC"
+  },
+  "https://www.i-sh.co.kr/houseinfo/upload//houseinfo/20230106153116128_138_일괄편집_36A.jpg": {
+   "f": "data/plan_src/5e76a4ebf260298e.jpg",
+   "w": 1737,
+   "h": 1170,
+   "sw": 1737,
+   "sh": 1170,
+   "at": "2026-11-11 10:41 UTC"
+  },
+  "https://www.i-sh.co.kr/houseinfo/upload/lease/20221024163737703_462_36A.jpg": {
+   "f": "data/plan_src/a07f04a112422121.jpg",
+   "w": 940,
+   "h": 528,
+   "sw": 940,
+   "sh": 528,
+   "at": "2026-11-11 10:41 UTC"
+  },
+  "https://www.i-sh.co.kr/houseinfo/upload//lease/20210118170029609_13_06-장위5구역 재개발임대주택 단위세대평면도(성북구청)_1.jpg": {
+   "f": "data/plan_src/72a3a233bfceb18b.jpg",
+   "w": 2380,
+   "h": 1684,
+   "sw": 2380,
+   "sh": 1684,
+   "at": "2026-11-11 10:41 UTC"
+  },
+  "https://www.i-sh.co.kr/houseinfo/upload/lease/20190514103416748_167_33(3).JPG": {
+   "f": "data/plan_src/5ef53aaa78570898.jpg",
+   "w": 400,
+   "h": 650,
+   "sw": 400,
+   "sh": 650,
+   "at": "2026-11-11 10:41 UTC"
+  },
+  "https://www.i-sh.co.kr/houseinfo/upload//lease/20221017102845813_297_33.jpg": {
+   "f": "data/plan_src/43b137738f555185.jpg",
+   "w": 313,
+   "h": 466,
+   "sw": 313,
+   "sh": 466,
+   "at": "2026-11-11 10:41 UTC"
+  },
+  "https://www.i-sh.co.kr/houseinfo/upload//lease/20211005142316397_4_세대 평면도(32형).jpg": {
+   "f": "data/plan_src/36f26b2a76f51d5a.jpg",
+   "w": 1024,
+   "h": 724,
+   "sw": 1024,
+   "sh": 724,
+   "at": "2026-11-11 10:41 UTC"
+  },
+  "https://www.i-sh.co.kr/houseinfo/upload//houseinfo/20230106152446490_124_일괄편집_32m2A.jpg": {
+   "f": "data/plan_src/4a4aa390d0d2c98d.jpg",
+   "w": 944,
+   "h": 1209,
+   "sw": 944,
+   "sh": 1209,
+   "at": "2026-11-11 10:41 UTC"
+  },
+  "https://www.i-sh.co.kr/houseinfo/upload//lease/20180621095804888_42_32.22평면도.jpg": {
+   "f": "data/plan_src/495ed1cc7231351f.jpg",
+   "w": 3024,
+   "h": 4032,
+   "sw": 1800,
+   "sh": 2400,
+   "at": "2026-11-11 10:41 UTC"
+  },
+  "https://www.i-sh.co.kr/houseinfo/upload/lease/20221024163305219_448_29A.jpg": {
+   "f": "data/plan_src/0d8fd2f4ce887b5f.jpg",
+   "w": 940,
+   "h": 528,
+   "sw": 940,
+   "sh": 528,
+   "at": "2026-11-11 10:41 UTC"
+  },
+  "https://www.i-sh.co.kr/houseinfo/upload//houseinfo/20230106152840446_134_일괄편집_29A.jpg": {
+   "f": "data/plan_src/7eea7bc6b8e44939.jpg",
+   "w": 944,
+   "h": 1209,
+   "sw": 944,
+   "sh": 1209,
+   "at": "2026-11-11 10:41 UTC"
+  },
+  "https://www.i-sh.co.kr/houseinfo/upload//houseinfo/20230106142133106_61_29A 및 29AS.jpg": {
+   "f": "data/plan_src/ee5ff6ef978830d1.jpg",
+   "w": 1737,
+   "h": 1170,
+   "sw": 1737,
+   "sh": 1170,
+   "at": "2026-11-11 10:41 UTC"
+  },
+  "https://www.i-sh.co.kr/houseinfo/upload//houseinfo/20230106153053253_136_일괄편집_29A.jpg": {
+   "f": "data/plan_src/d115e1f19516e1ed.jpg",
+   "w": 1737,
+   "h": 1170,
+   "sw": 1737,
+   "sh": 1170,
+   "at": "2026-11-11 10:41 UTC"
+  },
+  "https://www.i-sh.co.kr/houseinfo/upload/lease/20221025085433248_729_28.JPG": {
+   "f": "data/plan_src/9f6f10fcbcf9ddea.jpg",
+   "w": 940,
+   "h": 528,
+   "sw": 940,
+   "sh": 528,
+   "at": "2026-11-11 10:41 UTC"
+  },
+  "https://www.i-sh.co.kr/houseinfo/upload//lease/20180620162953706_13_26,33 (기본형).jpg": {
+   "f": "data/plan_src/ecd00e9535276a53.jpg",
+   "w": 1524,
+   "h": 2156,
+   "sw": 1524,
+   "sh": 2156,
+   "at": "2026-11-11 10:41 UTC"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=026959a4cebf4445808dae680de47353&fileSn=5": {
+   "f": "data/plan_src/2321d96ad2bf850a.jpg",
+   "w": 1115,
+   "h": 819,
+   "sw": 1115,
+   "sh": 819,
+   "at": "2026-11-11 10:41 UTC"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=026959a4cebf4445808dae680de47353&fileSn=6": {
+   "f": "data/plan_src/577b638a62e28bcf.jpg",
+   "w": 1128,
+   "h": 820,
+   "sw": 1128,
+   "sh": 820,
+   "at": "2026-11-11 10:41 UTC"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=026959a4cebf4445808dae680de47353&fileSn=7": {
+   "f": "data/plan_src/1561eba5df427aba.jpg",
+   "w": 1122,
+   "h": 830,
+   "sw": 1122,
+   "sh": 830,
+   "at": "2026-11-11 10:41 UTC"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=574ff167f8e943d8872c996cbcf652e2&fileSn=13": {
+   "f": "data/plan_src/b06a7f8e26f7f872.jpg",
+   "w": 999,
+   "h": 829,
+   "sw": 999,
+   "sh": 829,
+   "at": "2026-11-11 10:41 UTC"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=574ff167f8e943d8872c996cbcf652e2&fileSn=14": {
+   "f": "data/plan_src/b73e869cbc220fd6.jpg",
+   "w": 1003,
+   "h": 834,
+   "sw": 1003,
+   "sh": 834,
+   "at": "2026-11-11 10:41 UTC"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=137ff6c16185412b856b248cf08b2b25&fileSn=4": {
+   "f": "data/plan_src/06786de15dc97ddc.jpg",
+   "w": 1080,
+   "h": 1080,
+   "sw": 1080,
+   "sh": 1080,
+   "at": "2026-11-11 10:41 UTC"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=137ff6c16185412b856b248cf08b2b25&fileSn=5": {
+   "f": "data/plan_src/51c4582373df1b70.jpg",
+   "w": 1080,
+   "h": 1080,
+   "sw": 1080,
+   "sh": 1080,
+   "at": "2026-11-11 10:41 UTC"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=4ed6311ac1194a6cbe37ff21b81b1041&fileSn=5": {
+   "f": "data/plan_src/ebc4b413cf913c03.jpg",
+   "w": 2550,
+   "h": 3300,
+   "sw": 1855,
+   "sh": 2400,
+   "at": "2026-11-11 10:41 UTC"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=01dccb9cec424549b0f6b671b3e69887&fileSn=9": {
+   "f": "data/plan_src/6fb4ac218fb64efc.jpg",
+   "w": 811,
+   "h": 841,
+   "sw": 811,
+   "sh": 841,
+   "at": "2026-11-11 10:41 UTC"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=3dc0afa680a4458e8f77de172f3b51c2&fileSn=9": {
+   "f": "data/plan_src/3796d63a597ca990.jpg",
+   "w": 822,
+   "h": 735,
+   "sw": 822,
+   "sh": 735,
+   "at": "2026-11-11 10:41 UTC"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=2b1adad7140b45098651ac3ed93e2bee&fileSn=4": {
+   "f": "data/plan_src/086a8e7b37185156.jpg",
+   "w": 935,
+   "h": 805,
+   "sw": 935,
+   "sh": 805,
+   "at": "2026-11-11 10:41 UTC"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=fc5b4ed1a68145919abfcc4d59eaa482&fileSn=5": {
+   "f": "data/plan_src/12b82f898388b9ac.jpg",
+   "w": 1225,
+   "h": 699,
+   "sw": 1225,
+   "sh": 699,
+   "at": "2026-11-11 10:41 UTC"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=fc5b4ed1a68145919abfcc4d59eaa482&fileSn=6": {
+   "f": "data/plan_src/b960ef649fb11f04.jpg",
+   "w": 1225,
+   "h": 702,
+   "sw": 1225,
+   "sh": 702,
+   "at": "2026-11-11 10:41 UTC"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=fc5b4ed1a68145919abfcc4d59eaa482&fileSn=7": {
+   "f": "data/plan_src/231f6c005e57230c.jpg",
+   "w": 1229,
+   "h": 705,
+   "sw": 1229,
+   "sh": 705,
+   "at": "2026-11-11 10:41 UTC"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=7f237c96a67b41209d4ce949bf5ec772&fileSn=4": {
+   "f": "data/plan_src/f779bdd1e5dc0e4c.jpg",
+   "w": 1265,
+   "h": 845,
+   "sw": 1265,
+   "sh": 845,
+   "at": "2026-11-11 10:41 UTC"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=7f237c96a67b41209d4ce949bf5ec772&fileSn=5": {
+   "f": "data/plan_src/1b8d509cd853b8f9.jpg",
+   "w": 1246,
+   "h": 848,
+   "sw": 1246,
+   "sh": 848,
+   "at": "2026-11-11 10:41 UTC"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=80a8b79268094f6d88a95d81a3376973&fileSn=5": {
+   "f": "data/plan_src/102cff5503fc3caf.jpg",
+   "w": 6000,
+   "h": 4243,
+   "sw": 2400,
+   "sh": 1697,
+   "at": "2026-11-11 10:41 UTC"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=d608d0950c2b4172b7bd13bad9fbb56b&fileSn=14": {
+   "f": "data/plan_src/a75576c9bbfc535b.jpg",
+   "w": 4961,
+   "h": 3508,
+   "sw": 2400,
+   "sh": 1697,
+   "at": "2026-11-11 10:41 UTC"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=d608d0950c2b4172b7bd13bad9fbb56b&fileSn=15": {
+   "f": "data/plan_src/b5897d9f9c06e246.jpg",
+   "w": 4961,
+   "h": 3508,
+   "sw": 2400,
+   "sh": 1697,
+   "at": "2026-11-11 10:41 UTC"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=63bbf5888a4245dcb58d6c9be60d93e1&fileSn=12": {
+   "f": "data/plan_src/4e38ecbd77133c56.jpg",
+   "w": 989,
+   "h": 858,
+   "sw": 989,
+   "sh": 858,
+   "at": "2026-11-11 10:41 UTC"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=63bbf5888a4245dcb58d6c9be60d93e1&fileSn=13": {
+   "f": "data/plan_src/429ed90d6d8d72f4.jpg",
+   "w": 989,
+   "h": 858,
+   "sw": 989,
+   "sh": 858,
+   "at": "2026-11-11 10:41 UTC"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=63bbf5888a4245dcb58d6c9be60d93e1&fileSn=14": {
+   "f": "data/plan_src/256fa199e2463fb0.jpg",
+   "w": 989,
+   "h": 858,
+   "sw": 989,
+   "sh": 858,
+   "at": "2026-11-11 10:41 UTC"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=63bbf5888a4245dcb58d6c9be60d93e1&fileSn=15": {
+   "f": "data/plan_src/0f39f2b600046902.jpg",
+   "w": 989,
+   "h": 858,
+   "sw": 989,
+   "sh": 858,
+   "at": "2026-11-11 10:41 UTC"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=63bbf5888a4245dcb58d6c9be60d93e1&fileSn=16": {
+   "f": "data/plan_src/ac8fd0507a7b926c.jpg",
+   "w": 989,
+   "h": 858,
+   "sw": 989,
+   "sh": 858,
+   "at": "2026-11-11 10:41 UTC"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=63bbf5888a4245dcb58d6c9be60d93e1&fileSn=17": {
+   "f": "data/plan_src/d1b02fe15015d31e.jpg",
+   "w": 989,
+   "h": 858,
+   "sw": 989,
+   "sh": 858,
+   "at": "2026-11-11 10:41 UTC"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=63bbf5888a4245dcb58d6c9be60d93e1&fileSn=18": {
+   "f": "data/plan_src/148393f17c08b8a6.jpg",
+   "w": 989,
+   "h": 858,
+   "sw": 989,
+   "sh": 858,
+   "at": "2026-11-11 10:41 UTC"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=22c45710620542fd934bbc9b8c7bca9c&fileSn=8": {
+   "f": "data/plan_src/4a25e45daec7f4f1.jpg",
+   "w": 842,
+   "h": 596,
+   "sw": 842,
+   "sh": 596,
+   "at": "2026-11-11 10:41 UTC"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=22c45710620542fd934bbc9b8c7bca9c&fileSn=9": {
+   "f": "data/plan_src/f6aa315e48f2adea.jpg",
+   "w": 842,
+   "h": 596,
+   "sw": 842,
+   "sh": 596,
+   "at": "2026-11-11 10:41 UTC"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=d12b3eb119184b4899ec0254d0ab4bb8&fileSn=6": {
+   "f": "data/plan_src/11c7f03462a725e4.jpg",
+   "w": 1230,
+   "h": 612,
+   "sw": 1230,
+   "sh": 612,
+   "at": "2026-11-11 10:41 UTC"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=d12b3eb119184b4899ec0254d0ab4bb8&fileSn=7": {
+   "f": "data/plan_src/4f3f02c149ec8f21.jpg",
+   "w": 1230,
+   "h": 612,
+   "sw": 1230,
+   "sh": 612,
+   "at": "2026-11-11 10:41 UTC"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=d12b3eb119184b4899ec0254d0ab4bb8&fileSn=8": {
+   "f": "data/plan_src/4fd1b55338b9cb8c.jpg",
+   "w": 1230,
+   "h": 750,
+   "sw": 1230,
+   "sh": 750,
+   "at": "2026-11-11 10:41 UTC"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=05c0f34755c74176bc900af18a9d8fcc&fileSn=6": {
+   "f": "data/plan_src/b3b41657fed46a1c.jpg",
+   "w": 1470,
+   "h": 857,
+   "sw": 1470,
+   "sh": 857,
+   "at": "2026-11-11 10:41 UTC"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=05c0f34755c74176bc900af18a9d8fcc&fileSn=7": {
+   "f": "data/plan_src/839d1f8ae7ccdf92.jpg",
+   "w": 1472,
+   "h": 877,
+   "sw": 1472,
+   "sh": 877,
+   "at": "2026-11-11 10:41 UTC"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=05c0f34755c74176bc900af18a9d8fcc&fileSn=8": {
+   "f": "data/plan_src/13bafbad89d54541.jpg",
+   "w": 1466,
+   "h": 860,
+   "sw": 1466,
+   "sh": 860,
+   "at": "2026-11-11 10:41 UTC"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=920c57725cbe4855b5722e87f81cbab3&fileSn=8": {
+   "f": "data/plan_src/f8acc08016faac0b.jpg",
+   "w": 1025,
+   "h": 883,
+   "sw": 1025,
+   "sh": 883,
+   "at": "2026-11-11 10:41 UTC"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=920c57725cbe4855b5722e87f81cbab3&fileSn=9": {
+   "f": "data/plan_src/b28815f228f10629.jpg",
+   "w": 1028,
+   "h": 883,
+   "sw": 1028,
+   "sh": 883,
+   "at": "2026-11-11 10:41 UTC"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=920c57725cbe4855b5722e87f81cbab3&fileSn=10": {
+   "f": "data/plan_src/1905fc5756c81a77.jpg",
+   "w": 1025,
+   "h": 884,
+   "sw": 1025,
+   "sh": 884,
+   "at": "2026-11-11 10:41 UTC"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=ec67828a1c43458080f551add34f166c&fileSn=3": {
+   "f": "data/plan_src/71dee15688d017b2.jpg",
+   "w": 1200,
+   "h": 2160,
+   "sw": 1200,
+   "sh": 2160,
+   "at": "2026-11-11 10:41 UTC"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=ec67828a1c43458080f551add34f166c&fileSn=4": {
+   "f": "data/plan_src/353e7467492d15a4.jpg",
+   "w": 1200,
+   "h": 2160,
+   "sw": 1200,
+   "sh": 2160,
+   "at": "2026-11-11 10:41 UTC"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=926a7b6e2e8b4a2f9380541b5ecaa41c&fileSn=4": {
+   "f": "data/plan_src/8b3b275933b89724.jpg",
+   "w": 2480,
+   "h": 2835,
+   "sw": 2099,
+   "sh": 2400,
+   "at": "2026-11-11 10:41 UTC"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=926a7b6e2e8b4a2f9380541b5ecaa41c&fileSn=5": {
+   "f": "data/plan_src/5aa6ec3724089713.jpg",
+   "w": 2480,
+   "h": 2835,
+   "sw": 2099,
+   "sh": 2400,
+   "at": "2026-11-11 10:41 UTC"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=926a7b6e2e8b4a2f9380541b5ecaa41c&fileSn=6": {
+   "f": "data/plan_src/8b0029c3934cbbbe.jpg",
+   "w": 2480,
+   "h": 2835,
+   "sw": 2099,
+   "sh": 2400,
+   "at": "2026-11-11 10:41 UTC"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=6d66ee9b60e6474b824c2361e4c3dacd&fileSn=5": {
+   "f": "data/plan_src/524bb8637c1c21e9.jpg",
+   "w": 1232,
+   "h": 704,
+   "sw": 1232,
+   "sh": 704,
+   "at": "2026-11-11 10:41 UTC"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=6d66ee9b60e6474b824c2361e4c3dacd&fileSn=6": {
+   "f": "data/plan_src/b165047c8156ef3e.jpg",
+   "w": 1245,
+   "h": 709,
+   "sw": 1245,
+   "sh": 709,
+   "at": "2026-11-11 10:41 UTC"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=6d66ee9b60e6474b824c2361e4c3dacd&fileSn=7": {
+   "f": "data/plan_src/2b510f72d08e9d62.jpg",
+   "w": 1249,
+   "h": 693,
+   "sw": 1249,
+   "sh": 693,
+   "at": "2026-11-11 10:41 UTC"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=6d66ee9b60e6474b824c2361e4c3dacd&fileSn=8": {
+   "f": "data/plan_src/9d29a73fb5d17c34.jpg",
+   "w": 1242,
+   "h": 711,
+   "sw": 1242,
+   "sh": 711,
+   "at": "2026-11-11 10:41 UTC"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=325b58ac0eb340e396ccf246b01d53fe&fileSn=4": {
+   "f": "data/plan_src/e0b1cae61130586c.jpg",
+   "w": 1166,
+   "h": 1197,
+   "sw": 1166,
+   "sh": 1197,
+   "at": "2026-11-11 10:41 UTC"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=584ec05014cd47b881388dfc3fe6bed9&fileSn=20": {
+   "f": "data/plan_src/1a40873d2e2f8b1f.jpg",
+   "w": 1280,
+   "h": 720,
+   "sw": 1280,
+   "sh": 720,
+   "at": "2026-11-11 10:41 UTC"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=584ec05014cd47b881388dfc3fe6bed9&fileSn=21": {
+   "f": "data/plan_src/eeb8ea670fe65b34.jpg",
+   "w": 1280,
+   "h": 720,
+   "sw": 1280,
+   "sh": 720,
+   "at": "2026-11-11 10:41 UTC"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=7099383353cc4ba0bdd106fcacc3c467&fileSn=4": {
+   "f": "data/plan_src/4ff7b47065302be9.jpg",
+   "w": 826,
+   "h": 751,
+   "sw": 826,
+   "sh": 751,
+   "at": "2026-11-11 10:41 UTC"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=7099383353cc4ba0bdd106fcacc3c467&fileSn=5": {
+   "f": "data/plan_src/b703fefe9bddd44d.jpg",
+   "w": 828,
+   "h": 751,
+   "sw": 828,
+   "sh": 751,
+   "at": "2026-11-11 10:41 UTC"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=1c91030026d74a9a8bbf703e9f87c72b&fileSn=39": {
+   "f": "data/plan_src/74d90d564118d98e.jpg",
+   "w": 1236,
+   "h": 658,
+   "sw": 1236,
+   "sh": 658,
+   "at": "2026-11-11 10:41 UTC"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=50a4d8b4807d4989a3a43e9b46dd4a81&fileSn=5": {
+   "f": "data/plan_src/2a9c14fc4d646d5b.jpg",
+   "w": 1180,
+   "h": 632,
+   "sw": 1180,
+   "sh": 632,
+   "at": "2026-11-11 10:41 UTC"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=a127e3c0636b4470a20d47e37f7c76eb&fileSn=5": {
+   "f": "data/plan_src/497f8132752c2456.jpg",
+   "w": 838,
+   "h": 783,
+   "sw": 838,
+   "sh": 783,
+   "at": "2026-11-11 10:41 UTC"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=fc8d08def9ff40ba9785ee7be96c1acc&fileSn=12": {
+   "f": "data/plan_src/a15acfb781754dec.jpg",
+   "w": 771,
+   "h": 878,
+   "sw": 771,
+   "sh": 878,
+   "at": "2026-11-11 10:41 UTC"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=73758eda9e5d4d389892785146e89c3b&fileSn=8": {
+   "f": "data/plan_src/3b4799179fde91b0.jpg",
+   "w": 705,
+   "h": 842,
+   "sw": 705,
+   "sh": 842,
+   "at": "2026-11-11 10:41 UTC"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=7747fd7f0f594048b33df60ce5a4ea5f&fileSn=14": {
+   "f": "data/plan_src/59481ab0d66f186d.jpg",
+   "w": 973,
+   "h": 890,
+   "sw": 973,
+   "sh": 890,
+   "at": "2026-11-11 10:41 UTC"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=7747fd7f0f594048b33df60ce5a4ea5f&fileSn=15": {
+   "f": "data/plan_src/023e1fe5c5f5af81.jpg",
+   "w": 948,
+   "h": 883,
+   "sw": 948,
+   "sh": 883,
+   "at": "2026-11-11 10:41 UTC"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=e929d0300d9d48d3b714e2ee1c0f1bbb&fileSn=15": {
+   "f": "data/plan_src/f0d263aaffac2af8.jpg",
+   "w": 4080,
+   "h": 2880,
+   "sw": 2400,
+   "sh": 1694,
+   "at": "2026-11-11 10:41 UTC"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=e929d0300d9d48d3b714e2ee1c0f1bbb&fileSn=16": {
+   "f": "data/plan_src/25f282c0bcfc368a.jpg",
+   "w": 4080,
+   "h": 2880,
+   "sw": 2400,
+   "sh": 1694,
+   "at": "2026-11-11 10:41 UTC"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=944761af0f044c54a682d11b08859f4e&fileSn=5": {
+   "f": "data/plan_src/3256c38c33e0e8c0.jpg",
+   "w": 1488,
+   "h": 837,
+   "sw": 1488,
+   "sh": 837,
+   "at": "2026-11-11 10:41 UTC"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=90714d90e2f140e381768190f139243d&fileSn=9": {
+   "f": "data/plan_src/147a648a0fa43d1d.jpg",
+   "w": 1252,
+   "h": 777,
+   "sw": 1252,
+   "sh": 777,
+   "at": "2026-11-11 10:41 UTC"
   }
  }
 }
