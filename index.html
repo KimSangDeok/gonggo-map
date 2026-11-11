@@ -394,6 +394,33 @@ html.lb-open,html.lb-open body{overflow:hidden!important;overscroll-behavior:non
 #lb .lb-cap a{flex:none}
 #lb .lb-thumbs{position:absolute;left:0;right:0;bottom:0;z-index:2;display:flex;gap:8px;padding:10px 16px 14px;overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:none;touch-action:pan-x;background:linear-gradient(rgba(0,0,0,0),rgba(0,0,0,.45))}
 #lb .lb-thumbs[hidden]{display:none}
+#lb .lb-ov{position:absolute;left:0;top:0;transform-origin:0 0;pointer-events:none;will-change:transform}
+#lb .lb-ov[hidden]{display:none}
+#lb .lb-ov.anim{transition:transform .24s cubic-bezier(.2,.75,.25,1),opacity .24s ease}
+#lb .pm-b{position:absolute;box-sizing:border-box;border:calc(2px * var(--ik,1)) solid #1565c0;background:rgba(30,136,229,.26);border-radius:calc(3px * var(--ik,1))}
+#lb .pm-d{border-color:#2e7d32;background:rgba(67,160,71,.24)}
+#lb .pm-o{border-color:#546e7a;border-style:dashed;background:rgba(84,110,122,.10)}
+#lb .pm-t{position:absolute;left:50%;top:0;transform:translate(-50%,-112%);white-space:nowrap;font:700 calc(11px * var(--ik,1))/1.3 system-ui,-apple-system,sans-serif;font-style:normal;color:#fff;background:#1565c0;padding:0 calc(5px * var(--ik,1));border-radius:calc(7px * var(--ik,1));box-shadow:0 0 0 calc(1px * var(--ik,1)) #fff}
+#lb .pm-d .pm-t{background:#2e7d32}
+#lb .pm-o .pm-t{background:#546e7a}
+#lb .pm-x{position:absolute;transform:translate(-50%,-50%);white-space:nowrap;font:700 calc(11px * var(--ik,1))/1.3 system-ui,-apple-system,sans-serif;color:#fff;background:#e65100;padding:0 calc(5px * var(--ik,1));border-radius:calc(7px * var(--ik,1));box-shadow:0 0 0 calc(1px * var(--ik,1)) #fff}
+#lb .lb-pm{position:absolute;left:10px;right:10px;bottom:90px;z-index:3;max-width:620px;margin:0 auto;background:rgba(255,255,255,.97);color:#1b1f24;border-radius:12px;box-shadow:0 6px 24px rgba(0,0,0,.45);font-size:13px;line-height:1.45;overflow:hidden}
+#lb .lb-pm[hidden]{display:none}
+#lb .lb-pm button{position:static;transform:none;width:auto;height:auto;min-width:0;border-radius:8px;background:none;color:inherit;font:inherit;line-height:inherit;text-align:left;padding:0}
+#lb .lb-pm .lb-pm-h{display:flex;align-items:center;gap:8px;width:100%;padding:9px 12px;min-height:44px;border-radius:0}
+#lb .lb-pm .lb-pm-h:hover{background:rgba(0,0,0,.04)}
+#lb .lb-pm-k{flex:none;font-weight:700;color:#1565c0}
+#lb .lb-pm-s{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#lb .lb-pm-tg{flex:none;color:#5f6b7a;font-size:12px}
+#lb .lb-pm-b{max-height:min(42vh,340px);overflow:auto;padding:0 12px 10px;border-top:1px solid #e3e7ec;overscroll-behavior:contain;touch-action:pan-y}
+#lb .lb-pm-b[hidden]{display:none}
+#lb .lb-pm ul{margin:8px 0;padding-left:18px}
+#lb .lb-pm li{margin:3px 0}
+#lb .lb-pm-lg{margin:8px 0 0;font-size:12px;color:#5f6b7a}
+#lb .lb-pm-lg i{display:inline-block;width:10px;height:10px;border-radius:2px;margin:0 3px -1px 6px}
+#lb .lb-pm-lg .c-w{background:#1e88e5}#lb .lb-pm-lg .c-d{background:#43a047}#lb .lb-pm-lg .c-x{background:#e65100}#lb .lb-pm-lg .c-o{border:1px dashed #546e7a;box-sizing:border-box}
+#lb .lb-pm-f{margin:6px 0 0;font-size:12px;color:#5f6b7a}
+#lb .lb-pm .lb-pm-off{margin-left:6px;padding:4px 10px;border:1px solid #c5ccd5;border-radius:999px;font-size:12px;color:#1b1f24;background:#fff}
 #lb .lb-thumbs::-webkit-scrollbar{display:none}
 #lb .lb-thumbs .lb-t{position:static;transform:none;flex:none;width:76px;height:57px;padding:0;border-radius:8px;overflow:hidden;border:2px solid transparent;background:#2a2d33;opacity:.5;line-height:0;transition:opacity .12s,border-color .12s}
 #lb .lb-thumbs .lb-t img{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none;-webkit-user-drag:none}
@@ -2572,9 +2599,9 @@ var LB = { items: [], i: 0, el: null, z: { k: 1, fit: 1, x: 0, y: 0, nw: 0, nh: 
 function lbEnsure(){
   if (LB.el) return LB.el;
   var d = document.createElement('div'); d.id = 'lb'; d.hidden = true;
-  d.innerHTML = '<div class="lb-stage"><img alt="" draggable="false"></div><button type="button" class="lb-x" aria-label="닫기">×</button><button type="button" class="lb-prev" aria-label="이전">‹</button><button type="button" class="lb-next" aria-label="다음">›</button>' +
-    '<div class="lb-zoom"><button type="button" class="lb-out" aria-label="축소">−</button><span class="lb-pct"></span><button type="button" class="lb-in" aria-label="확대">+</button><button type="button" class="lb-fit">화면 맞춤</button></div><div class="lb-cap"><span></span><a target="_blank" rel="noopener">원본 새 창</a></div><div class="lb-thumbs" aria-label="사진 고르기"></div>';
-  document.body.appendChild(d); LB.el = d;
+  d.innerHTML = '<div class="lb-stage"><img alt="" draggable="false"><div class="lb-ov" hidden aria-hidden="true"></div></div><button type="button" class="lb-x" aria-label="닫기">×</button><button type="button" class="lb-prev" aria-label="이전">‹</button><button type="button" class="lb-next" aria-label="다음">›</button>' +
+    '<div class="lb-zoom"><button type="button" class="lb-out" aria-label="축소">−</button><span class="lb-pct"></span><button type="button" class="lb-in" aria-label="확대">+</button><button type="button" class="lb-fit">화면 맞춤</button></div><div class="lb-cap"><span></span><a target="_blank" rel="noopener">원본 새 창</a></div><div class="lb-pm" hidden></div><div class="lb-thumbs" aria-label="사진 고르기"></div>';
+  document.body.appendChild(d); LB.el = d; LB.ov = d.querySelector('.lb-ov'); LB.pm = d.querySelector('.lb-pm'); LB.pm.addEventListener('click', lbPmClick);
   var stage = d.querySelector('.lb-stage'), img = stage.querySelector('img'), Z = LB.z;
   d.querySelector('.lb-x').addEventListener('click', lbClose);
   d.querySelector('.lb-prev').addEventListener('click', function(e){ e.stopPropagation(); lbStep(-1); });
@@ -2609,7 +2636,7 @@ function lbEnsure(){
       var mx = e.clientX - g.sx, my = e.clientY - g.sy; if (Math.abs(mx) + Math.abs(my) > 6) g.moved = true;
       var dt = e.timeStamp - (g.lt || e.timeStamp); if (dt > 0) g.v = 0.7 * ((e.clientX - (g.lx || e.clientX)) / dt) + 0.3 * (g.v || 0); g.lx = e.clientX; g.lt = e.timeStamp;
       if (Z.k > Z.fit * 1.02) { Z.x = g.x0 + mx; Z.y = g.y0 + my; lbApply(); stage.classList.add('zoomed'); }
-      else if (g.moved && (g.swipe || Math.abs(mx) > Math.abs(my))) { g.swipe = true; img.classList.remove('anim'); img.style.transform = 'translate(' + (Z.x + mx) + 'px,' + Z.y + 'px) scale(' + Z.k + ')'; img.style.opacity = String(1 - Math.min(1, Math.abs(mx) / innerWidth) * 0.4); }
+      else if (g.moved && (g.swipe || Math.abs(mx) > Math.abs(my))) { g.swipe = true; img.classList.remove('anim'); img.style.transform = 'translate(' + (Z.x + mx) + 'px,' + Z.y + 'px) scale(' + Z.k + ')'; img.style.opacity = String(1 - Math.min(1, Math.abs(mx) / innerWidth) * 0.4); lbOvSync(); }
     }
   });
   function up(e){
@@ -2632,19 +2659,52 @@ function lbEnsure(){
   window.addEventListener('resize', function(){ if (!d.hidden && Z.nw) lbFit(); });
   return d;
 }
+// 평면도 읽기(data/plan_marks.json, 2026-11-11): Claude가 평면도 그림 기호(창 = 벽 속 가는 평행선, 문 = 열리는 방향 호)를 보고 적은 창·현관·창 없는 곳 — 크게 보기에서 그림 위에 겹쳐 그림.
+// 자리는 그림 크기 비율(0~1)이라 원본 크기와 무관. 그림과 같은 transform 을 따라가고(확대·이동·넘기기), 글자·테두리는 1/배율(--ik)로 화면 크기 그대로
+function pmKey(u){ var s = String(u || ''); try { s = decodeURI(s); } catch(e) {} var i = s.indexOf('/data/'); if (i >= 0 && s.indexOf(location.origin) === 0) return s.slice(i + 1).split(/[?#]/)[0]; return s; }
+function pmOf(u){ var P = window.PLANM; return (P && P.items && P.items[pmKey(u)]) || null; }
+function pmOff(){ try { return localStorage.getItem('kkk-pm-off') === '1'; } catch(e) { return false; } }
+function lbPmSet(it){
+  var ov = LB.ov, pn = LB.pm, pm = it ? pmOf(it.u) : null, has = !!(pm && pm.m && pm.m.length);
+  LB.z.pz = has && pm.pb ? pm.pb : null;
+  if (ov) {
+    ov.innerHTML = has ? pm.m.map(function(m){
+      if (m.p) return '<span class="pm-x" style="left:' + (m.p[0] * 100) + '%;top:' + (m.p[1] * 100) + '%">' + hesc(m.t) + '</span>';
+      var b = m.b, lab = m.k === 'w' ? '창' + (m.n || '') : (m.k === 'd' ? '현관' : m.t);
+      return '<span class="pm-b pm-' + m.k + '" style="left:' + (b[0] * 100) + '%;top:' + (b[1] * 100) + '%;width:' + ((b[2] - b[0]) * 100) + '%;height:' + ((b[3] - b[1]) * 100) + '%"><i class="pm-t">' + hesc(lab) + '</i></span>';
+    }).join('') : '';
+    ov.hidden = !has || pmOff();
+  }
+  if (!pn) return;
+  if (!pm) { pn.hidden = true; pn.innerHTML = ''; return; }
+  pn.innerHTML = '<button type="button" class="lb-pm-h" aria-expanded="false"><span class="lb-pm-k">평면도 읽기</span><span class="lb-pm-s">' + hesc(pm.s || '') + '</span><span class="lb-pm-tg">자세히 ▾</span></button>' +
+    '<div class="lb-pm-b" hidden>' + (has ? '<p class="lb-pm-lg"><i class="c-w"></i>창 <i class="c-d"></i>현관 <i class="c-x"></i>창 없음 <i class="c-o"></i>실외기 등 — 창 번호는 아래 줄과 같음</p>' : '') +
+    '<ul>' + (pm.notes || []).map(function(n){ return '<li>' + hesc(n) + '</li>'; }).join('') + '</ul>' +
+    '<p class="lb-pm-f">근거: Claude가 그림 기호를 보고 읽음(문은 열리는 방향을 호로, 창은 벽 속 가는 평행선으로 그림) · 크기는 그림에 적힌 치수 · 실제와 다를 수 있어 원본으로 확인' + (has ? ' <button type="button" class="lb-pm-off">' + (pmOff() ? '표시 켜기' : '표시 끄기') + '</button>' : '') + '</p></div>';
+  var th = LB.el.querySelector('.lb-thumbs'); pn.style.bottom = (th && !th.hidden ? th.offsetHeight + 4 : 10) + 'px';
+  pn.hidden = false;
+}
+function lbPmClick(e){
+  e.stopPropagation();
+  var pn = LB.pm, h = e.target.closest('.lb-pm-h'), off = e.target.closest('.lb-pm-off');
+  if (h) { var b = pn.querySelector('.lb-pm-b'), open = b.hidden; b.hidden = !open; h.setAttribute('aria-expanded', open ? 'true' : 'false'); h.querySelector('.lb-pm-tg').textContent = open ? '접기 ▴' : '자세히 ▾'; return; }
+  if (off) { var now = !pmOff(); try { localStorage.setItem('kkk-pm-off', now ? '1' : '0'); } catch(x) {} if (LB.ov) LB.ov.hidden = now || !LB.ov.innerHTML; off.textContent = now ? '표시 켜기' : '표시 끄기'; lbOvSync(); }
+}
+function lbOvSync(){ var ov = LB.ov; if (!ov || ov.hidden) return; var img = LB.el.querySelector('.lb-stage img'), Z = LB.z; ov.classList.toggle('anim', img.classList.contains('anim')); ov.style.width = (Z.nw || 0) + 'px'; ov.style.height = (Z.nh || 0) + 'px'; ov.style.transform = img.style.transform; ov.style.opacity = img.style.opacity; ov.style.setProperty('--ik', String(1 / (Z.k || 1))); }
 function lbClampK(k){ var Z = LB.z; return Math.max(Z.fit, Math.min(Math.max(Z.fit * 8, 3), k)); }   // 맞춤 ~ (맞춤 8배 · 원본 3배 중 큰 쪽)
 function lbApply(clampPan){
   var Z = LB.z, img = LB.el.querySelector('.lb-stage img'), W = innerWidth, H = innerHeight, w = Z.nw * Z.k, h = Z.nh * Z.k;
   if (w <= W) Z.x = (W - w) / 2; else Z.x = Math.min(0, Math.max(W - w, Z.x));   // 화면보다 작으면 가운데, 크면 가장자리 밖으로 안 나가게
-  var pd = lbPad(), av = H - pd.t - pd.b; if (h <= av) Z.y = pd.t + (av - h) / 2; else if (h <= H) Z.y = (H - h) / 2; else Z.y = Math.min(0, Math.max(H - h, Z.y));
-  img.style.transform = 'translate(' + Z.x + 'px,' + Z.y + 'px) scale(' + Z.k + ')';
+  var pd = lbPad(), av = H - pd.t - pd.b; if (h <= av) Z.y = pd.t + (av - h) / 2; else Z.y = Math.min(pd.t, Math.max(H - pd.b - h, Z.y));   // 위 줄·아래 썸네일(·평면도 요약)에 가리는 끝부분까지 끌어 볼 수 있게
+  img.style.transform = 'translate(' + Z.x + 'px,' + Z.y + 'px) scale(' + Z.k + ')'; lbOvSync();
   var zoomed = Z.k > Z.fit * 1.02; LB.el.querySelector('.lb-stage').classList.toggle('zoomed', zoomed);
   LB.el.querySelector('.lb-pct').textContent = Z.nw ? Math.round(Z.k * 100) + '%' : '';
   LB.el.querySelector('.lb-fit').disabled = !zoomed; LB.el.querySelector('.lb-out').disabled = !zoomed;
 }
-function lbPad(){ var th = LB.el && LB.el.querySelector('.lb-thumbs'); return { t: 58, b: th && !th.hidden ? th.offsetHeight + 6 : 16 }; }   // 위 줄 · 아래 썸네일 줄 높이
+function lbPad(){ var th = LB.el && LB.el.querySelector('.lb-thumbs'), pn = LB.pm, ph = pn && !pn.hidden ? (pn.querySelector('.lb-pm-h') || pn).offsetHeight + 10 : 0; return { t: 58, b: (th && !th.hidden ? th.offsetHeight + 6 : 16) + ph }; }   // 위 줄 · 아래 썸네일 줄 높이
 function lbFit(){ var Z = LB.z; if (!Z.nw) return; var W = innerWidth, H = innerHeight, img = LB.el.querySelector('.lb-stage img'), pd = lbPad(); Z.fit = Math.min(W * 0.96 / Z.nw, (H - pd.t - pd.b) / Z.nh); Z.k = Z.fit; Z.x = (W - Z.nw * Z.k) / 2; Z.y = pd.t + (H - pd.t - pd.b - Z.nh * Z.k) / 2;
-  if (Z.enter) { var dir = Z.enter; Z.enter = 0; img.classList.remove('anim'); img.style.opacity = '0'; img.style.transform = 'translate(' + (Z.x + dir * W * 0.6) + 'px,' + Z.y + 'px) scale(' + Z.k + ')'; void img.offsetWidth; img.classList.add('anim'); img.style.opacity = '1'; }
+  if (Z.pz) { var pb = Z.pz, av = H - pd.t - pd.b, bw = (pb[2] - pb[0]) * Z.nw, bh = (pb[3] - pb[1]) * Z.nh; Z.pz = null; var kz = lbClampK(Math.min(W * 0.96 / bw, av / bh)); if (kz > Z.fit * 1.05) { Z.k = kz; Z.x = W / 2 - (pb[0] + pb[2]) / 2 * Z.nw * kz; Z.y = pd.t + av / 2 - (pb[1] + pb[3]) / 2 * Z.nh * kz; } }   // 표시 있는 평면도: 처음엔 평면도 부분만 크게('화면 맞춤'은 쪽 전체)
+  if (Z.enter) { var dir = Z.enter; Z.enter = 0; img.classList.remove('anim'); img.style.opacity = '0'; img.style.transform = 'translate(' + (Z.x + dir * W * 0.6) + 'px,' + Z.y + 'px) scale(' + Z.k + ')'; lbOvSync(); if (LB.ov) void LB.ov.offsetWidth; void img.offsetWidth; img.classList.add('anim'); img.style.opacity = '1'; }
   else { img.classList.add('anim'); img.style.opacity = '1'; }
   lbApply(); }
 function lbZoomAt(cx, cy, k, anim){ var Z = LB.z; if (!Z.nw) return; LB.el.querySelector('.lb-stage img').classList.toggle('anim', !!anim); k = lbClampK(k); var ix = (cx - Z.x) / Z.k, iy = (cy - Z.y) / Z.k; Z.k = k; Z.x = cx - ix * k; Z.y = cy - iy * k; lbApply(); }
@@ -2652,7 +2712,7 @@ function lbOpen(items, i){ var d = lbEnsure(); LB.items = items; LB.i = i;
   var th = d.querySelector('.lb-thumbs'); th.innerHTML = items.map(function(x, j){ return '<button type="button" class="lb-t" data-i="' + j + '" aria-label="' + (j + 1) + '번째 사진"><img src="' + hesc(x.th || x.u) + '" alt="" loading="lazy" decoding="async" draggable="false"></button>'; }).join(''); th.hidden = items.length < 2;
   d.hidden = false; document.documentElement.classList.add('lb-open'); lbShow(); }
 function lbGo(j){ var n = LB.items.length; if (!n || j === LB.i || j < 0 || j >= n || LB.sliding) return; var dir = j > LB.i ? 1 : -1, img = LB.el.querySelector('.lb-stage img'), Z = LB.z; LB.sliding = true;
-  img.classList.add('anim'); img.style.opacity = '0'; img.style.transform = 'translate(' + (Z.x - dir * innerWidth * 0.6) + 'px,' + Z.y + 'px) scale(' + Z.k + ')';
+  img.classList.add('anim'); img.style.opacity = '0'; img.style.transform = 'translate(' + (Z.x - dir * innerWidth * 0.6) + 'px,' + Z.y + 'px) scale(' + Z.k + ')'; lbOvSync();
   setTimeout(function(){ LB.i = j; lbShow(dir); LB.sliding = false; }, 200); }   // 뒷화면 스크롤 잠금
 function lbClose(){ if (LB.el) LB.el.hidden = true; document.documentElement.classList.remove('lb-open'); }
 function lbStep(k){ lbSlide(k); }
@@ -2660,10 +2720,10 @@ function lbStep(k){ lbSlide(k); }
 function lbSlide(dir){
   var n = LB.items.length; if (!n || LB.sliding) return; var img = LB.el.querySelector('.lb-stage img'), Z = LB.z, W = innerWidth;
   if (n < 2) return; LB.sliding = true;
-  img.classList.add('anim'); img.style.opacity = '0'; img.style.transform = 'translate(' + (Z.x - dir * W * 0.6) + 'px,' + Z.y + 'px) scale(' + Z.k + ')';
+  img.classList.add('anim'); img.style.opacity = '0'; img.style.transform = 'translate(' + (Z.x - dir * W * 0.6) + 'px,' + Z.y + 'px) scale(' + Z.k + ')'; lbOvSync();
   setTimeout(function(){ LB.i = (LB.i + dir + n) % n; lbShow(dir); LB.sliding = false; }, 200);
 }
-function lbShow(dir){ var d = LB.el, it = LB.items[LB.i]; if (!it) return; var img = d.querySelector('.lb-stage img'); LB.z.nw = 0; LB.z.enter = dir || 0; img.classList.remove('anim'); img.style.opacity = dir ? '0' : '1'; img.style.transform = 'translate(-9999px,0)'; img.src = it.u; img.alt = it.t; if (img.complete && img.naturalWidth) { LB.z.nw = img.naturalWidth; LB.z.nh = img.naturalHeight; lbFit(); }
+function lbShow(dir){ var d = LB.el, it = LB.items[LB.i]; if (!it) return; var img = d.querySelector('.lb-stage img'); LB.z.nw = 0; LB.z.enter = dir || 0; img.classList.remove('anim'); img.style.opacity = dir ? '0' : '1'; img.style.transform = 'translate(-9999px,0)'; img.src = it.u; img.alt = it.t; lbPmSet(it); lbOvSync(); if (img.complete && img.naturalWidth) { LB.z.nw = img.naturalWidth; LB.z.nh = img.naturalHeight; lbFit(); }
   d.querySelector('.lb-cap span').textContent = (LB.i + 1) + ' / ' + LB.items.length + ' · ' + it.t + ' · 두 손가락·두 번 탭으로 확대'; d.querySelector('.lb-cap a').href = it.u;
   d.querySelector('.lb-prev').disabled = LB.items.length < 2; d.querySelector('.lb-next').disabled = LB.items.length < 2;
   var th = d.querySelector('.lb-thumbs'), cur = null; th.querySelectorAll('.lb-t').forEach(function(b, j){ var on = j === LB.i; b.classList.toggle('on', on); if (on) { b.setAttribute('aria-current', 'true'); cur = b; } else b.removeAttribute('aria-current'); });
@@ -4481,6 +4541,7 @@ function applyLive(){
   fetch('data/claude_notes.json?t=' + Date.now(), { cache: 'no-store' }).then(function(r){ return r.ok ? r.json() : null; }).catch(function(){ return null; }).then(function(j){ window.CNOTES_U = (j && j.updated) || ''; if (j && j.items) { window.CNOTES = j; if (window.ALERTS && window.ALERTS.refilter) window.ALERTS.refilter(); if (window.__applyFilter && window.nmMarkers && window.nmMarkers.length) window.__applyFilter(); else if (window.renderNoticePanel) window.renderNoticePanel(); if (window.YA && window.renderYaLive) window.renderYaLive(window.YA); if (window.LH_DATA && window.renderLhLive) window.renderLhLive(window.LH_DATA); } });
   liveFetch('data/fact.json').then(function(j){ if (j && j.fact) { Object.keys(j.fact).forEach(function(k){ FACT[k] = j.fact[k]; }); window.FACT_UPDATED = j.updated; } });
   liveFetch('data/pamphlets.json').then(function(j){ if (j && j.items) window.PAM = j; });
+  liveFetch('data/plan_marks.json').then(function(j){ if (!j || !j.items) return; window.PLANM = j; if (LB.el && !LB.el.hidden && LB.items[LB.i]) { lbPmSet(LB.items[LB.i]); if (LB.z.nw && LB.z.k <= LB.z.fit * 1.02) lbFit(); else lbOvSync(); } });   // 평면도 읽기(창·현관 표시)
   liveFetch('data/thumbs.json').then(function(j){ if (j && j.items) window.THUMBS = j.items; });   // 사진 띠용 작은 그림(원본은 수 MB)
   liveFetch('data/ya_plans.json').then(function(j){ if (j && j.items) window.YA_PLANS = j; });
   liveFetch('data/plans.json').then(function(j){ window.PLANS_J = j; tryPlans(); });   // 공고 예정(기관 발표 공급계획)
@@ -4703,7 +4764,7 @@ window.addEventListener('beforeinstallprompt', function(e){ e.preventDefault(); 
 // ===== 새로고침 (2026-11-04) — 아이폰 홈 화면 앱엔 새로고침 버튼이 없어 껐다 켜야 했음 =====
 // ① 지도 말고 다른 화면 맨 위에서 아래로 당겼다 놓으면 새로고침(홈 화면 앱에서만 — 브라우저 탭은 자체 기능이 있음)
 // ② 앱으로 돌아올 때·30분마다 새 버전(version.json)·새 공고 자료(data/notices.json)를 확인 → 바뀌었으면 맨 위 띠 '눌러서 새로고침'
-var SITE_BUILD = '566614114da4';
+var SITE_BUILD = 'eb1fe7b1c8f6';
 try { if (navigator.clearAppBadge) navigator.clearAppBadge(); } catch (e) {}   // 열자마자 아이콘 배지 지움(알림 자료를 못 읽어도)
 function nwSig(j){ var s = JSON.stringify([(j && j.items) || [], (j && j.list_ids) || {}]), h = 0; for (var i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0; return h + ':' + s.length; }
 (function(){
