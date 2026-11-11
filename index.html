@@ -282,6 +282,8 @@ main section.view{margin-top:0}
 .lst .grp{position:sticky;top:0;background:color-mix(in srgb,var(--accent-soft) 70%,var(--surface));color:var(--accent-ink);font-size:12px;font-weight:600;padding:6px 12px;letter-spacing:.03em}
 .lst .it{padding:9px 12px;border-bottom:1px solid var(--line);cursor:pointer;font-size:13px;display:grid;grid-template-columns:14px 1fr auto;gap:8px;align-items:start}
 .lst .it:hover,.lst .it.on{background:var(--accent-soft)}
+.lst .it .num .ls-det{display:block;margin:6px 0 0 auto;min-height:44px;min-width:64px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--surface,#fff);color:var(--accent);font:inherit;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap}
+.lst .it .num .ls-det:active{filter:brightness(.94)}
 .lst .it b{display:block;font-weight:600}
 .lst .it small{color:var(--muted)}
 .lst .it .num{font-family:var(--font-mono);font-size:12px;white-space:nowrap;text-align:right}
@@ -403,6 +405,8 @@ html.lb-open,html.lb-open body{overflow:hidden!important;overscroll-behavior:non
 #lb .pm-t{position:absolute;left:50%;top:0;transform:translate(-50%,-112%);white-space:nowrap;font:700 calc(11px * var(--ik,1))/1.3 system-ui,-apple-system,sans-serif;font-style:normal;color:#fff;background:#1565c0;padding:0 calc(5px * var(--ik,1));border-radius:calc(7px * var(--ik,1));box-shadow:0 0 0 calc(1px * var(--ik,1)) #fff}
 #lb .pm-d .pm-t{background:#2e7d32}
 #lb .pm-o .pm-t{background:#546e7a}
+#lb .pm-m{border-color:#7b1fa2;border-style:dashed;background:rgba(123,31,162,.12)}
+#lb .pm-m .pm-t{background:#7b1fa2}
 #lb .pm-x{position:absolute;transform:translate(-50%,-50%);white-space:nowrap;font:700 calc(11px * var(--ik,1))/1.3 system-ui,-apple-system,sans-serif;color:#fff;background:#e65100;padding:0 calc(5px * var(--ik,1));border-radius:calc(7px * var(--ik,1));box-shadow:0 0 0 calc(1px * var(--ik,1)) #fff}
 #lb .lb-pm{position:absolute;left:10px;right:10px;bottom:90px;z-index:3;max-width:620px;margin:0 auto;background:rgba(255,255,255,.97);color:#1b1f24;border-radius:12px;box-shadow:0 6px 24px rgba(0,0,0,.45);font-size:13px;line-height:1.45;overflow:hidden}
 #lb .lb-pm[hidden]{display:none}
@@ -418,7 +422,7 @@ html.lb-open,html.lb-open body{overflow:hidden!important;overscroll-behavior:non
 #lb .lb-pm li{margin:3px 0}
 #lb .lb-pm-lg{margin:8px 0 0;font-size:12px;color:#5f6b7a}
 #lb .lb-pm-lg i{display:inline-block;width:10px;height:10px;border-radius:2px;margin:0 3px -1px 6px}
-#lb .lb-pm-lg .c-w{background:#1e88e5}#lb .lb-pm-lg .c-d{background:#43a047}#lb .lb-pm-lg .c-x{background:#e65100}#lb .lb-pm-lg .c-o{border:1px dashed #546e7a;box-sizing:border-box}
+#lb .lb-pm-lg .c-w{background:#1e88e5}#lb .lb-pm-lg .c-d{background:#43a047}#lb .lb-pm-lg .c-x{background:#e65100}#lb .lb-pm-lg .c-o{border:1px dashed #546e7a;box-sizing:border-box}#lb .lb-pm-lg .c-m{border:1px dashed #7b1fa2;background:rgba(123,31,162,.15);box-sizing:border-box}
 #lb .lb-pm-f{margin:6px 0 0;font-size:12px;color:#5f6b7a}
 #lb .lb-pm .lb-pm-off{margin-left:6px;padding:4px 10px;border:1px solid #c5ccd5;border-radius:999px;font-size:12px;color:#1b1f24;background:#fff}
 #lb .lb-thumbs::-webkit-scrollbar{display:none}
@@ -686,6 +690,7 @@ td .bt-i,.iw-t .bt-i{width:20px;height:20px;line-height:18px;font-size:11.5px;ma
   .handle .hb{display:flex;gap:6px;margin-top:4px;align-items:center}
   #sheet-btn,#sheet-hide{min-height:36px;padding:0 16px;border:1px solid var(--line);border-radius:999px;background:var(--bg);color:var(--fg);font:inherit;font-size:13px;font-weight:600;cursor:pointer}
   #sheet-hide{padding:0 12px;color:var(--muted)}
+#sheet-max{display:none}
   .side.hidden-sheet #sheet-hide{display:none}
   .side:not(.full){touch-action:none}
   .side:not(.full){overflow:hidden}
@@ -1255,6 +1260,9 @@ html.pano-open,html.pano-open body{overflow:hidden}
   .mapchips #qf-more{order:-1}
   .handle{padding:8px 0 10px}
   .handle .hb{display:none}
+  .handle{position:relative}
+  #sheet-max{display:block;position:absolute;right:6px;top:50%;transform:translateY(-50%);min-height:44px;min-width:76px;padding:0 12px;border:0;border-radius:999px;background:none;color:var(--muted);font:inherit;font-size:12px;font-weight:700;cursor:pointer;z-index:2}
+  #sheet-max:active{background:rgba(0,0,0,.06)}
   .side-tabs{margin:0 16px 2px}
   .side-tabs button{min-height:36px}
 }
@@ -1291,7 +1299,7 @@ html.pano-open,html.pano-open body{overflow:hidden}
       </div>
     </div></div>
     <aside class="side" id="side">
-      <div class="handle" id="sheet-handle"><i></i><div class="hb"><button type="button" id="sheet-btn" aria-label="시트 펼치기/접기">목록 펼치기 ▲</button><button type="button" id="sheet-hide" aria-label="시트 숨기기(지도만 보기)">숨기기 ▼</button></div></div>
+      <div class="handle" id="sheet-handle"><i></i><button type="button" id="sheet-max" aria-label="목록 화면 위까지 펼치기">펼치기 ▲</button><div class="hb"><button type="button" id="sheet-btn" aria-label="시트 펼치기/접기">목록 펼치기 ▲</button><button type="button" id="sheet-hide" aria-label="시트 숨기기(지도만 보기)">숨기기 ▼</button></div></div>
       <div class="side-tabs" id="side-tabs" role="tablist"><button type="button" data-tab="list" class="on" role="tab" aria-selected="true">단지 목록</button><button type="button" data-tab="notice" role="tab" aria-selected="false">공고 <span id="st-live" class="pill ok" hidden></span></button></div>
       <div class="lg-sum" id="lg-sum"><span id="lg-sum-txt"></span><button type="button" class="bt-i" data-bt="sec-quick" aria-label="필터 설명">ⓘ</button><button type="button" id="lg-toggle" aria-expanded="false">상세 필터 ▾</button></div>
       <div class="lg-body" id="lg-body">
@@ -2670,7 +2678,7 @@ function lbPmSet(it){
   if (ov) {
     ov.innerHTML = has ? pm.m.map(function(m){
       if (m.p) return '<span class="pm-x" style="left:' + (m.p[0] * 100) + '%;top:' + (m.p[1] * 100) + '%">' + hesc(m.t) + '</span>';
-      var b = m.b, lab = m.k === 'w' ? '창' + (m.n || '') : (m.k === 'd' ? '현관' : m.t);
+      var b = m.b, lab = m.k === 'w' ? '창' + (m.n || '') : (m.k === 'd' ? '현관' : (m.k === 'm' ? '문(미닫이)' : m.t));
       return '<span class="pm-b pm-' + m.k + '" style="left:' + (b[0] * 100) + '%;top:' + (b[1] * 100) + '%;width:' + ((b[2] - b[0]) * 100) + '%;height:' + ((b[3] - b[1]) * 100) + '%"><i class="pm-t">' + hesc(lab) + '</i></span>';
     }).join('') : '';
     ov.hidden = !has || pmOff();
@@ -2678,9 +2686,9 @@ function lbPmSet(it){
   if (!pn) return;
   if (!pm) { pn.hidden = true; pn.innerHTML = ''; return; }
   pn.innerHTML = '<button type="button" class="lb-pm-h" aria-expanded="false"><span class="lb-pm-k">평면도 읽기</span><span class="lb-pm-s">' + hesc(pm.s || '') + '</span><span class="lb-pm-tg">자세히 ▾</span></button>' +
-    '<div class="lb-pm-b" hidden>' + (has ? '<p class="lb-pm-lg"><i class="c-w"></i>창 <i class="c-d"></i>현관 <i class="c-x"></i>창 없음 <i class="c-o"></i>실외기 등 — 창 번호는 아래 줄과 같음</p>' : '') +
+    '<div class="lb-pm-b" hidden>' + (has ? '<p class="lb-pm-lg"><i class="c-w"></i>창 <i class="c-d"></i>현관 <i class="c-m"></i>미닫이문 <i class="c-x"></i>창 없음 <i class="c-o"></i>실외기 등 — 창 번호는 아래 줄과 같음</p>' : '') +
     '<ul>' + (pm.notes || []).map(function(n){ return '<li>' + hesc(n) + '</li>'; }).join('') + '</ul>' +
-    '<p class="lb-pm-f">근거: Claude가 그림 기호를 보고 읽음(문은 열리는 방향을 호로, 창은 벽 속 가는 평행선으로 그림) · 크기는 그림에 적힌 치수 · 실제와 다를 수 있어 원본으로 확인' + (has ? ' <button type="button" class="lb-pm-off">' + (pmOff() ? '표시 켜기' : '표시 끄기') + '</button>' : '') + '</p></div>';
+    '<p class="lb-pm-f"><b>기호 읽는 법</b>: 호(¼원) = 여닫이문이 열리며 지나가는 길(호 쪽으로 열림) · 방과 방 사이 벽 속 가는 두 줄 = 미닫이문(옆으로 밀어 엶) · 바깥벽·발코니 쪽 벽 속 가는 두 줄 = 창 · X 친 네모 = 배관 통로(PD)·실외기 자리</p>' + '<p class="lb-pm-f">근거: Claude가 그림 기호를 보고 읽음(문은 열리는 방향을 호로, 창은 벽 속 가는 평행선으로 그림) · 크기는 그림에 적힌 치수 · 실제와 다를 수 있어 원본으로 확인' + (has ? ' <button type="button" class="lb-pm-off">' + (pmOff() ? '표시 켜기' : '표시 끄기') + '</button>' : '') + '</p></div>';
   var th = LB.el.querySelector('.lb-thumbs'); pn.style.bottom = (th && !th.hidden ? th.offsetHeight + 4 : 10) + 'px';
   pn.hidden = false;
 }
@@ -2750,7 +2758,7 @@ var sheet = (function(){
   var curH = 0;   // 지금 보이는 시트 높이(px) — 시트 자체는 최대 높이이고 transform 으로 아래로 밀어 둠
   function setH(px){ if (!mobile()) { side.style.removeProperty('transform'); return; } curH = Math.max(minH(), Math.min(maxH(), px)); side.style.transform = 'translate3d(0,' + Math.round(maxH() - curH) + 'px,0)'; side.style.setProperty('--sh-hid', Math.max(0, Math.round(maxH() - curH)) + 'px'); }   // --sh-hid = 화면 밖으로 밀린 시트 아래쪽 높이(반 높이에서 목록 끝까지 스크롤되게)
   function visH(){ return mobile() ? curH : side.getBoundingClientRect().height; }
-  function label(){ if (!btn) return; btn.textContent = state === 3 ? '지도 보기 ▼' : (state === 0 ? '범례·목록 ▲' : (state === 1 ? '목록 펼치기 ▲' : '전체로 펼치기 ▲')); }
+  function label(){ var mx = document.getElementById('sheet-max'); if (mx) { mx.textContent = state === 3 ? '접기 ▼' : '펼치기 ▲'; mx.setAttribute('aria-label', state === 3 ? '목록 반으로 접기' : '목록 화면 위까지 펼치기'); } if (!btn) return; btn.textContent = state === 3 ? '지도 보기 ▼' : (state === 0 ? '범례·목록 ▲' : (state === 1 ? '목록 펼치기 ▲' : '전체로 펼치기 ▲')); }
   function go(s){ state = Math.max(0, Math.min(3, s)); setH(snaps()[state]); side.classList.toggle('full', state === 3); side.classList.toggle('half', state === 2); side.classList.toggle('hidden-sheet', state === 0); label(); }
   if (handle) {
     handle.setAttribute('role', 'button'); handle.setAttribute('tabindex', '0'); handle.setAttribute('aria-label', '목록 펼치기·접기');
@@ -2758,7 +2766,8 @@ var sheet = (function(){
     handle.addEventListener('keydown', function(e){ if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(state === 3 ? 2 : 3); } });
     // 1) 버튼: 접혀 있으면 전체로, 전체면 범례만(지도 보기) (탭 한 번). 손잡이(막대)를 누르면 한 단계 아래로(숨김까지)
     btn.addEventListener('click', function(e){ e.stopPropagation(); go(state === 3 ? 1 : 3); });
-    if (hideBtn) hideBtn.addEventListener('click', function(e){ e.stopPropagation(); go(0); });   // 숨기기: 손잡이만 남김(지도 전체)
+    if (hideBtn) hideBtn.addEventListener('click', function(e){ e.stopPropagation(); go(0); });
+    var mxb = document.getElementById('sheet-max'); if (mxb) mxb.addEventListener('click', function(e){ e.stopPropagation(); go(state === 3 ? 2 : 3); });   // 끝까지 펼치기 ↔ 반(끌기 없이 한 번 누르기 — WCAG 2.5.7)   // 숨기기: 손잡이만 남김(지도 전체)
     // 2) 접힌 상태(반)에서는 시트 어디를 눌러도 전체로 펼침 (체크박스·선택상자·링크 제외). 숨김·범례 상태에선 버튼으로만
     side.addEventListener('click', function(e){ if (!mobile() || state !== 2) return; if (e.target.closest('input,select,button,a,label,#detail-back,.handle,.lst,.detail,.nlist')) return; go(3); });   // 목록·상세를 눌러도 시트가 안 올라감(단지를 누르면 상세만)
     // 3) 끌기: 접힌 상태에서는 시트 전체가 끌기 면, 전체 상태에서는 손잡이·필터 줄만(내용은 스크롤)
@@ -3848,6 +3857,24 @@ function nmMeasure(html){   // 팝업 HTML을 화면 밖에서 그려 높이만 
   var probe = document.createElement('div'); probe.style.cssText = 'position:absolute;left:-9999px;top:0;visibility:hidden;pointer-events:none';
   probe.innerHTML = html; document.body.appendChild(probe); var h = probe.firstChild ? probe.firstChild.offsetHeight : 0; probe.remove(); return h;
 }
+// 목록 줄 누르기 = 지도에서 그 단지 보기(상세 안 엶) · 상세는 줄 오른쪽 '상세 ›' 버튼(사용자 요청 2026-11-11).
+// 버튼은 줄 오른쪽 따로 된 칸(머티리얼: 보조 동작은 오른쪽 별도 대상) · 높이 44px(애플 HIG 최소 44pt)
+function lsDet(it){ if (!it || it.querySelector('.ls-det')) return; var n = null; for (var c = it.firstElementChild; c; c = c.nextElementSibling) if (c.classList.contains('num')) n = c; if (!n) { n = document.createElement('div'); n.className = 'num'; it.appendChild(n); } var b = document.createElement('button'); b.type = 'button'; b.className = 'ls-det'; b.textContent = '상세 ›'; b.setAttribute('aria-label', '이 단지 상세 보기'); n.appendChild(b); }
+function rowRender(it){ it.__render(); lsDet(it); }
+function nmRowClick(e, mk){ if (e && e.target && e.target.closest && e.target.closest('.ls-det')) { e.stopPropagation(); return nmFocusMarker(mk); } return nmPeek(mk); }
+function nmPeek(mk){
+  nmSelect(mk); try { nmInfo.close(); } catch(e) {}
+  document.querySelectorAll('.lst .it').forEach(function(it){ it.classList.toggle('on', it.__mk === mk); });
+  var pos = mk.getPosition(), Z = (nmMap.getZoom && nmMap.getZoom()) || 15;
+  if (sheet.mobile()) {
+    if (sheet.state() === 3) sheet.go(2);   // 끝까지 올린 목록이면 반으로 — 위에 지도가 보이게
+    var sideH = Math.round(sheet.visH());
+    nmMap.setCenter(new naver.maps.LatLng(latPlusPx(pos.lat(), Math.round(sideH / 2), Z), pos.lng()));   // 시트 위 보이는 지도 가운데
+    return true;
+  }
+  if (!mapSees(pos)) { try { nmMap.panTo(pos); } catch(e) { nmMap.setCenter(pos); } }   // PC: 지도 칸 안에 보이면 안 움직임
+  return true;
+}
 function nmFocusMarker(mk){
   nmSelect(mk);
   var pos = mk.getPosition(), Z = (nmMap.getZoom && nmMap.getZoom()) || 15;   // 줌은 지금 보던 그대로 — 단지가 시트·패널에 안 가리게 옮기기만
@@ -3933,8 +3960,8 @@ function nmInit(){
         var youth = (c.rows || []).filter(function(r){ return /청년|대학생/.test(r.ty); });
         var it = document.createElement('div'); it.className = 'it'; it.setAttribute('data-key', k); it.setAttribute('data-nid', 'LH');
         it.__render = function(){ var lf2 = lhFit(c); it.dataset.cat = p.cat; it.innerHTML = '<span class="dot lh" style="--c:' + lcolOf() + ';margin-top:3px">LH</span><div><b>' + p.name + ' <span class="pill ' + (p.cat === 'na' ? 'warn' : (open ? 'ok' : 'info')) + '" style="font-size:11px;padding:0 7px">' + (p.cat === 'na' ? '내 조건 밖' : (n0.type || 'LH') + ' · ' + (n0.status || '')) + '</span></b><small>' + (c.addr ? c.addr.replace(/^경기도 |^서울특별시 /, '') : '') + (c.hh ? ' · ' + c.hh + '세대' : ' · 세대수 미기재') + (p.cat === 'na' ? ' · ' + (p.na || '').replace(/ → 내 조건.*$/, '') : (lf2.ok.length ? ' · ' + selLabel() + ' 형 ' + lf2.ok.map(function(r){ return r.ty.split(' ')[0] + ' ' + r.m2 + '㎡(' + py(r.m2) + ')'; }).join('/') : '')) + ' · 게시 ' + (n0.posted || '') + btTag(p) + pkTag(p) + stTag(p) + '</small></div><div class="num"></div>'; };
-        it.__render();
-        it.__mk = mk; it.addEventListener('click', function(){ nmFocusMarker(mk); });
+        rowRender(it);
+        it.__mk = mk; it.addEventListener('click', function(e){ nmRowClick(e, mk); });
         var g = groupEl[p.cat]; var ref = g.nextSibling; while (ref && ref.className === 'it') ref = ref.nextSibling; list.insertBefore(it, ref);
       }
       if (c.lat && c.lng) place([c.lat, c.lng], false);
@@ -3960,7 +3987,7 @@ function nmInit(){
         naver.maps.Event.addListener(mk, 'click', function(){ nmMkClick(mk); });
         var it = document.createElement('div'); it.className = 'it'; it.setAttribute('data-key', k); it.setAttribute('data-nid', 'PL');
         it.__render = function(){ var st = x.st || {}; it.dataset.cat = 'plan'; it.innerHTML = '<span class="dot plan" style="margin-top:3px">예정</span><div><b>' + hesc(p.name) + ' <span class="pill plan" style="font-size:11px;padding:0 7px">' + (st.pd ? planTxt(st) : '공고 예정') + '</span></b><small>' + hesc(x.src + ' ' + x.type) + (x.kind ? ' · ' + hesc(x.kind) : '') + (x.hh ? ' · ' + hesc(x.hh) + '호' : '') + (x.m2 ? ' · 전용 ' + hesc(x.m2) + '㎡(' + py(x.m2) + ')' : (x.prog === 'yapub' ? ' · 전용 57㎡(17.2평) 이하' : '')) + (x.movein ? ' · 입주 ' + hesc(x.movein) : '') + ' · ' + hesc(x.src + ' ' + planBasis(x)) + (approx ? ' · 위치 대략(동 단위)' : '') + '</small></div><div class="num"></div>'; };
-        it.__render(); it.__mk = mk; it.addEventListener('click', function(){ nmFocusMarker(mk); });
+        rowRender(it); it.__mk = mk; it.addEventListener('click', function(e){ nmRowClick(e, mk); });
         var g = groupEl.plan; var ref = g.nextSibling; while (ref && ref.className === 'it') ref = ref.nextSibling; list.insertBefore(it, ref);
         applyFilter(); });
     });
@@ -3991,8 +4018,8 @@ function nmInit(){
       it.dataset.pr = loR ? Math.round(loR.rent / 10000) : ''; it.dataset.pd = loR && loR.dep != null ? Math.round(loR.dep / 10000) : ''; it.dataset.pm = rents.length && Math.max.apply(null, rents) !== Math.min.apply(null, rents) ? '1' : '';
       it.innerHTML = '<span class="dot ya" style="--c:' + col + ';margin-top:3px"></span><div><b>' + c.name + ' <span class="pill ' + (p.cat === 'na' ? 'warn' : (ns.length ? 'ok' : 'info')) + '" style="font-size:11px;padding:0 7px">' + (p.cat === 'na' ? '내 조건 밖' : (ns.length ? '공고 ' + ns.length + '건' : '공고 없음')) + '</span>' + (p.cat !== 'na' ? ' <span class="pill rk info" title="내 순위">' + yaRankTxt(c) + '</span>' : '') + (split.ok.length && split.ok.every(function(r){ return r.border; }) ? ' <span class="pill info" style="font-size:11px;padding:0 7px">' + split.ok[0].bpy + '평 경계(' + split.ok[0].bm2 + '㎡대)</span>' : '') + '</b><small>' + (c.gu || '') + (c.station ? ' · ' + c.station : '') + (c.scale && c.scale.total != null ? ' · 총 ' + c.scale.total + '세대(공공 ' + c.scale.pub + '·민간 ' + c.scale.priv + ')' : (c.scale_tot ? ' · 총 ' + c.scale_tot + '세대' : ' · 세대수 미기재')) +
         (p.cat === 'na' ? ' · ' + p.na.replace(/ → 내 조건.*$/, '') : (okTys.length ? ' · 내 조건 형 ' + split.ok.length + '개 · 전용 ' + okTys[0] + (okTys.length > 1 ? '~' + okTys[okTys.length - 1] : '') + '㎡(' + py(okTys[0]) + (okTys.length > 1 ? '~' + py(okTys[okTys.length - 1]) : '') + ')' : ' · 형별 표 없음(면적 확인 불가)')) + (c.movein ? ' · 입주 ' + c.movein.slice(0, 7) : '') + btTag(p) + pkTag(p) + stTag(p) + '</small></div><div class="num">' + (rents.length ? '월 ' + Math.round(Math.min.apply(null, rents) / 10000) + (Math.max.apply(null, rents) !== Math.min.apply(null, rents) ? '~' + Math.round(Math.max.apply(null, rents) / 10000) : '') + '만' : '') + '</div>'; };
-      it.__render();
-      it.__mk = mk; it.addEventListener('click', function(){ nmFocusMarker(mk); });
+      rowRender(it);
+      it.__mk = mk; it.addEventListener('click', function(e){ nmRowClick(e, mk); });
       var g = groupEl[p.cat]; var ref = g.nextSibling; while (ref && ref.className === 'it' && (p.cat === 'na' || ref.dataset.open === '1' || !ns.length)) ref = ref.nextSibling; list.insertBefore(it, ref);
     });
     buildNoticeSelect(); applyFilter(); tryPending();
@@ -4018,7 +4045,7 @@ function nmInit(){
       it.innerHTML = '<span class="dot lh" style="--c:' + colOf() + ';margin-top:3px">매</span><div><b>' + p.name + guTag(p) + ' <span class="pill ' + (p.cat === 'na' ? 'warn' : (live ? 'ok' : 'info')) + '" style="font-size:11px;padding:0 7px">' + (p.cat === 'na' ? '내 조건 밖' : (r ? nrStateTxt(r) + (live ? ' · ' + nrApplyTxt(r).replace(/^접수 /, '') : '') : '')) + '</span>' + (p.cat !== 'na' && !p.units ? ' <span class="pill rk warn" title="내 순위">3순위</span>' : '') + '</b><small>' + (p.gu || '') + ' · ' +
         (p.units ? '특화형(운영 ' + p.sp.operator + ') · ' + p.units.map(function(u){ return u.room + ' ' + u.ho; }).join('·') : (ok.length ? selLabel() + ' 주택형 ' + ok.length + '개 ' + ok.reduce(function(a, g){ return a + g.n; }, 0) + '호' : (p.na || ''))) +
         (m2.length ? ' · 전용 ' + lo + (hi !== lo ? '~' + hi : '') + '㎡(' + py(lo) + (hi !== lo ? '~' + py(hi) : '') + ')' : '') + (p.units ? '' : ' · 2026 1차(' + (p.src && p.src.result ? p.src.result.replace(/ 예정$/, '') : '') + ')') + btTag(p) + pkTag(p) + stTag(p) + '</small></div><div class="num">' + (rents.length ? '월 ' + Math.round(Math.min.apply(null, rents) / 1000) / 10 + '만' : '') + '</div>'; };
-    it.__render(); it.__mk = mk; it.addEventListener('click', function(){ nmFocusMarker(mk); });
+    rowRender(it); it.__mk = mk; it.addEventListener('click', function(e){ nmRowClick(e, mk); });
     var g = groupEl[p.cat]; var ref = g.nextSibling; if (!p.units) while (ref && ref.className === 'it') ref = ref.nextSibling; list.insertBefore(it, ref);   // 특화형(접수 중)은 묶음 맨 위
   }
   function miPump(){
@@ -4069,9 +4096,9 @@ function nmInit(){
         it.__render = function(){ it.dataset.cat = p.cat; if (p.kind === '행복주택' && p.rent) { it.dataset.pd = manwon(p.dep || ''); it.dataset.pr = parseFloat(p.rent); it.dataset.pm = ''; }
           var ntGo = p.cat !== 'na' && p.nid && NREG[p.nid];
           it.innerHTML = '<span class="dot' + nmCls(p) + '" style="--c:' + nmColor(p) + ';margin-top:3px"></span><div><b>' + p.name + guTag(p) + ' <span class="pill ' + (p.cat === 'na' ? 'warn' : 'info') + (ntGo ? ' nt-go" role="button" data-nid="' + p.nid + '" title="이 공고의 단지를 지도에서 보기"' : '"') + ' style="font-size:11px;padding:0 7px">' + (p.cat === 'na' ? (p.kind === '행복주택' ? naPill(p) : (p.na0 ? '지금 해당 없음' : '기준 미만')) : p.kind === '국민임대' ? '26년 국민임대 ' + (p.ok26 || []).map(function(a){ return a.replace(/^(\d+)㎡$/, function(_, n){ return n + '㎡(' + py(n) + ')'; }); }).join('·') : NOTICES[p.nid].short) + (ntGo ? ' <span aria-hidden="true">›</span>' : '') + '</span>' + (p.cat !== 'na' ? rankChip(p.rank) : '') + '</b><small>' + (p.kind === '행복주택' ? p.m2 + '㎡ ' + p.py + ' · ' + hhShort(p) + ' · 공가 ' + p.vac + (p.wait ? ' · 예비 ' + p.wait : '') : hhShort(p) + (rankRest(p.rank) ? ' · ' + rankRest(p.rank) : '')) + btTag(p) + pkTag(p) + stTag(p) + '</small></div><div class="num">' + (p.kind === '행복주택' ? '<b class="n1">월세 ' + p.rent + '</b><small class="n2">보증금 ' + p.dep + '</small>' : '') + '</div>'; };
-        it.__render();
+        rowRender(it);
         it.__mk = mk;
-        it.addEventListener('click', function(e){ var ng = e.target.closest && e.target.closest('.nt-go'); if (ng) { e.stopPropagation(); window.nmNoticeGo(ng.getAttribute('data-nid')); return; } nmFocusMarker(mk); });
+        it.addEventListener('click', function(e){ var ng = e.target.closest && e.target.closest('.nt-go'); if (ng) { e.stopPropagation(); window.nmNoticeGo(ng.getAttribute('data-nid')); return; } nmRowClick(e, mk); });
         var g = groupEl[p.cat]; var ref = g.nextSibling; while (ref && ref.className === 'it') ref = ref.nextSibling; list.insertBefore(it, ref);
       }
       done++; status.textContent = done + ' / ' + PLACES.length + ' 좌표 변환 중…';
@@ -4416,7 +4443,7 @@ function nmInit(){
     nmMarkers.forEach(function(mk){ var p = mk.__p; if (p.__classify) p.__classify(); if (mk.__icon && mk.setIcon) { try { mk.setIcon(mk.__icon()); } catch(e) {} } });
     // 목록: 다시 그리고 분류별 묶음 아래로 옮김(순서 유지)
     var items = Array.prototype.slice.call(list.querySelectorAll('.it'));
-    items.forEach(function(it){ if (it.__render) it.__render(); });
+    items.forEach(function(it){ if (it.__render) rowRender(it); });
     Object.keys(groupEl).forEach(function(cat){ var g = groupEl[cat], mine = items.filter(function(it){ return it.dataset.cat === cat; }); var ref = g.nextSibling; while (ref && ref.className === 'it') ref = ref.nextSibling; mine.forEach(function(it){ list.insertBefore(it, ref); }); });
     sortGen(); buildNoticeSelect(); applyFilter(); minPyNote();
     if (window.YA) renderYaLive(window.YA); if (window.LH_DATA) renderLhLive(window.LH_DATA); if (window.YAN) renderYan(window.YAN); if (window.MI) renderMi(window.MI);
@@ -4764,7 +4791,7 @@ window.addEventListener('beforeinstallprompt', function(e){ e.preventDefault(); 
 // ===== 새로고침 (2026-11-04) — 아이폰 홈 화면 앱엔 새로고침 버튼이 없어 껐다 켜야 했음 =====
 // ① 지도 말고 다른 화면 맨 위에서 아래로 당겼다 놓으면 새로고침(홈 화면 앱에서만 — 브라우저 탭은 자체 기능이 있음)
 // ② 앱으로 돌아올 때·30분마다 새 버전(version.json)·새 공고 자료(data/notices.json)를 확인 → 바뀌었으면 맨 위 띠 '눌러서 새로고침'
-var SITE_BUILD = 'eb1fe7b1c8f6';
+var SITE_BUILD = 'a9bfcfd0f4cc';
 try { if (navigator.clearAppBadge) navigator.clearAppBadge(); } catch (e) {}   // 열자마자 아이콘 배지 지움(알림 자료를 못 읽어도)
 function nwSig(j){ var s = JSON.stringify([(j && j.items) || [], (j && j.list_ids) || {}]), h = 0; for (var i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0; return h + ':' + s.length; }
 (function(){
