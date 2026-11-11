@@ -792,6 +792,16 @@ h1,h2,h3{letter-spacing:-.02em}
 .nf-none{font-size:13px;color:var(--muted);word-break:keep-all}
 .nf-c{display:inline-flex;align-items:center;gap:2px;padding:2px 2px 2px 10px;border:1.5px solid var(--accent);border-radius:999px;background:var(--accent-soft);color:var(--accent-ink);font-size:13px;font-weight:700}
 .nf-c button{border:0;background:none;color:inherit;font-size:16px;line-height:1;padding:4px 8px;cursor:pointer}
+#qf-off::before{content:none!important}
+.qf-c#qf-off[aria-pressed="true"],.mapchips .qf-c#qf-off[aria-pressed="true"]{background-color:#e65100;border-color:transparent;color:#fff}
+#view-map.foff .qf-row .qf-c:not(#qf-off):not(#qf-more),#view-map.foff .qf-row .qf-seg{opacity:.45}
+.af-c.dim,.nf-c.dim{opacity:.5;text-decoration:line-through}
+.af-reset.af-off{color:#e65100;font-weight:700}
+.af-offnote{font-size:12.5px;font-weight:700;color:#e65100;white-space:nowrap;margin-right:2px}
+.nf .nf-off{margin-left:auto;min-height:36px;border:1.5px solid var(--line);border-radius:999px;background:var(--surface);color:var(--fg);font:inherit;font-size:13px;font-weight:700;padding:0 14px;cursor:pointer;white-space:nowrap}
+.nf .nf-off[aria-pressed="true"]{background:#e65100;border-color:#e65100;color:#fff}
+.nf .nf-off + .nf-tg{margin-left:6px}
+.nf-hid.nf-offnote{color:#e65100;font-weight:700}
 .nf-tg{margin-left:auto;min-height:36px;border:1.5px solid var(--line);border-radius:999px;background:var(--surface);color:var(--fg);font:inherit;font-size:13px;font-weight:700;padding:0 14px;cursor:pointer}
 .nf-hid{margin:8px 0 0;font-size:13px;line-height:1.5;color:var(--warn);word-break:keep-all}
 .nf-pan{margin-top:10px;display:grid;gap:14px}
@@ -1259,7 +1269,9 @@ html.pano-open,html.pano-open body{overflow:hidden}
   .lg-sum > .bt-i,.lg-sum #lg-toggle{display:none!important}   /* 필터는 지도 위 '필터' 칩 */
   .lst .grp{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:8px 20px 6px}
   .lg-sum{padding:4px 12px 4px 20px!important}
-  .mapchips #qf-more{order:-1}
+  .mapchips #qf-more{order:-2}
+  .mapchips #qf-off{order:-1}
+  .mapchips #qf-off[aria-pressed="false"]{display:none!important}   /* 폰: 끄기는 목록 위 요약 줄에서(지도 칩 줄 2줄 유지) · 꺼진 동안만 지도 위에 '필터 다시 켜기' */
   .handle{padding:8px 0 10px}
   .handle .hb{display:none}
   .handle{position:relative}
@@ -1297,7 +1309,7 @@ html.pano-open,html.pano-open body{overflow:hidden}
         <button type="button" class="qf-c" id="qf-gu" aria-pressed="false" aria-haspopup="dialog" title="서울 구를 골라 그 구의 단지만"><span class="qf-l">구 전체</span> <span class="qf-n"></span> ▾</button>
         <button type="button" class="qf-c" id="qf-pk" aria-pressed="false" title="세대당 주차면 1대 이상">주차 넉넉만 <span class="qf-n"></span></button>
         <button type="button" class="qf-c" id="qf-ao" aria-pressed="false" title="건축물대장 주용도가 아파트·오피스텔인 곳만">아파트·오피스텔만 <span class="qf-n"></span></button>
-        <button type="button" class="qf-c qf-more" id="qf-more" title="상세 필터 열기"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h10"/><path d="M18 7h2"/><circle cx="16" cy="7" r="2"/><path d="M4 17h2"/><path d="M10 17h10"/><circle cx="8" cy="17" r="2"/></svg>필터</button>
+        <button type="button" class="qf-c qf-off" id="qf-off" aria-pressed="false" hidden title="저장된 필터는 그대로 두고 잠깐 전부 보기 — 다시 누르면 원래 필터">필터 잠깐 끄기</button><button type="button" class="qf-c qf-more" id="qf-more" title="상세 필터 열기"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h10"/><path d="M18 7h2"/><circle cx="16" cy="7" r="2"/><path d="M4 17h2"/><path d="M10 17h10"/><circle cx="8" cy="17" r="2"/></svg>필터</button>
       </div>
     </div></div>
     <aside class="side" id="side">
@@ -1749,6 +1761,7 @@ var PREF = (function(){
 function m2ofPy(v){ return Math.round(v * 3.3058 * 100) / 100; }   // 1평 = 3.3058㎡ → 8평 26.45 · 9평 29.75 · 10평 33.06㎡
 var PY_BANDS = [{ k: 8, lo: 8, hi: 9, name: '8평대' }, { k: 9, lo: 9, hi: 10, name: '9평대' }, { k: 10, lo: 10, hi: null, name: '10평 이상' }];
 var FLOOR_M2 = m2ofPy(8);
+var FOFF = false, NFOFF = false;   // 필터 잠깐 끄기(지도·공고 따로) — 저장 안 함 · 앱 다시 열면 원래대로(사용자 요청 2026-11-11)
 var PY_MIN = 8, PY_SEL = { 8: true, 9: true, 10: true };   // 최소 평수 하나(라디오) → 그 이상 구간 전부가 선택
 function setMin(k){ PY_MIN = k; PY_SEL = { 8: k <= 8, 9: k <= 9, 10: true }; }
 (function(){ try {
@@ -1983,8 +1996,8 @@ function burdBasis(ps){ var B = ps.map(function(p){ return burdInfo(p); }).filte
   var nl = B.filter(function(b){ return b.nl; }).length, ln = B.length - nl, mx = B.filter(function(b){ return b.mx; }).length;
   return [ln ? '월세 + 대출 이자 · 대출 = 보증금의 80%(최대 1.5억) · 연 ' + LOAN.rate + '%(청년 버팀목, 공고 상관없이 같음)' : '', ln ? (mx === ln ? '보증금은 최대로 올린 금액(월세 가장 낮음)' : mx ? '보증금은 올릴 수 있는 곳은 최대, 아니면 공고 금액' : '보증금은 공고 금액') : '', nl ? (nl === B.length ? '대출 안 됨(공고문) → 월세만' : '대출 안 되는 ' + nl + '곳은 월세만') : ''].filter(Boolean).join(' · '); }
 function burdOf(p){ var b = burdInfo(p); return b ? Math.round(b.tot / 1000) / 10 : null; }
-function burdOk(p){ if (!BURD.min && !BURD.max) return true; var b = burdOf(p); return b === null ? BURD.unk : (!BURD.min || b >= BURD.min) && (!BURD.max || b <= BURD.max); }
-function builtOk(p){ if (!BUILT.max) return true; var a = builtAge(p); return a === null ? BUILT.unk : a <= BUILT.max; }
+function burdOk(p){ if (FOFF || (!BURD.min && !BURD.max)) return true; var b = burdOf(p); return b === null ? BURD.unk : (!BURD.min || b >= BURD.min) && (!BURD.max || b <= BURD.max); }
+function builtOk(p){ if (FOFF || !BUILT.max) return true; var a = builtAge(p); return a === null ? BUILT.unk : a <= BUILT.max; }
 // ===== 건물 종류 필터 — 마커마다 근거: 건축물대장 주용도(청년안심·LH·행복·국민) · 공고문 '1. 공급주택' 표(매입임대 1차) · K-apt 단지분류(대장을 못 찾은 큰 아파트 단지) =====
 var BT_KINDS = [{ k: 'apt', name: '아파트' }, { k: 'opst', name: '오피스텔' }, { k: 'dosi', name: '도시형생활주택' }, { k: 'dase', name: '다세대주택' }, { k: 'yeon', name: '연립주택' }, { k: 'dagu', name: '다가구주택' }, { k: 'gisuk', name: '기숙사' }, { k: 'unk', name: '종류 모름' }];
 var BT_NAME = {}, BT_ALL = {}; BT_KINDS.forEach(function(x){ BT_NAME[x.k] = x.name; BT_ALL[x.k] = true; });
@@ -2010,7 +2023,7 @@ function btGroupKeys(g){ var t = btSort(btFromText(g.bld)); return t.length ? t 
 function btKeys(p){
   if (p.mi && !p.units && p.groups) { var u = []; btMiGroups(p).forEach(function(g){ btGroupKeys(g).forEach(function(k){ if (u.indexOf(k) < 0) u.push(k); }); }); return btSort(u); }
   var b = btOf(p); return b.t.length ? b.t : ['unk']; }
-function btOk(p){   // 여러 종류가 섞인 건물(아파트+도시형 등)은 그 종류가 다 켜져 있어야 보임. 매입임대는 내 조건 주택형 중 하나라도 종류가 다 켜져 있으면
+function btOk(p){ if (FOFF) return true;   // 여러 종류가 섞인 건물(아파트+도시형 등)은 그 종류가 다 켜져 있어야 보임. 매입임대는 내 조건 주택형 중 하나라도 종류가 다 켜져 있으면
   if (p.mi && !p.units && p.groups) return btMiGroups(p).some(function(g){ return btGroupKeys(g).every(function(k){ return BT_ON[k]; }); });
   return btKeys(p).every(function(k){ return BT_ON[k]; }); }
 function btCountKeys(p){   // 숫자 = 그 종류를 켜면(켜져 있으면 지금) 보이는 곳 중 그 종류가 든 곳 — 다른 섞인 종류가 꺼져 있으면 안 셈
@@ -2041,7 +2054,7 @@ function pkOf(p){
   return b && b.per != null ? Object.assign({ s: 'bld' }, b) : null;
 }
 function pkLevel(p){ var r = pkOf(p); return !r ? 'unk' : r.per >= 1 ? 'ok' : r.per >= 0.7 ? 'mid' : 'low'; }
-function pkOk(p){ return !!PK_ON[pkLevel(p)]; }
+function pkOk(p){ return FOFF || !!PK_ON[pkLevel(p)]; }
 function pkNum(v){ return (Math.round(v * 100) / 100).toString(); }
 function pkTag(p){ var lv = pkLevel(p); if (lv === 'unk') return ''; return ' · <span class="pk-tag ' + lv + '" title="세대당 주차면"><i>P</i>' + PK_SHORT[lv] + ' ' + pkNum(pkOf(p).per) + '</span>'; }
 var PK_BADGE = false;   // 지도 마커 오른쪽 위 P 배지(초록 넉넉·노랑 보통·빨강 부족, 모름은 없음)
@@ -2391,7 +2404,7 @@ function guTag(p){ var g = ''; try { g = guOf(p); } catch(e) {} return g ? ' <sp
 function guOf(p){ if (p.__gu !== undefined) return p.__gu; var g = ''; if (p.gu && GU25.indexOf(p.gu + '구') >= 0) g = p.gu + '구';
   if (!g) { var t = [p.gu, p.addr, p.comp && p.comp.addr, p.comp && p.comp.gu, p.plan && p.plan.gu, p.plan && p.plan.name].filter(Boolean).join(' '); g = GU_FIND.find(function(x){ return t.indexOf(x) >= 0; }) || ''; }
   p.__gu = g; return g; }
-function guOk(p){ return !GU_ON.length || (GU_ON[0] !== '-' && GU_ON.indexOf(guOf(p)) >= 0); }
+function guOk(p){ return FOFF || !GU_ON.length || (GU_ON[0] !== '-' && GU_ON.indexOf(guOf(p)) >= 0); }
 function guIsOn(g){ return !GU_ON.length || (GU_ON[0] !== '-' && GU_ON.indexOf(g) >= 0); }
 function guSel(){ return !GU_ON.length ? GU25.slice() : (GU_ON[0] === '-' ? [] : GU_ON.slice()); }
 function guToggle(g){ var a = guSel(), i = a.indexOf(g); if (i >= 0) a.splice(i, 1); else a.push(g); GU_ON = a.length ? guClean(a) : ['-']; }
@@ -3532,7 +3545,7 @@ function noticeListHtml(){
   // 내 조건 단지(청년·8평↑ — 해당 없음 아닌 곳)만 셈. 지도 필터는 안 씀(지도 화면에만)
   var ready = !!window.__placesDone && (window.nmMarkers || []).length > 0;
   var okMs = function(ms){ return ms.filter(function(m){ return m.__p.cat !== 'na'; }); };
-  var NF = nfGet(), nfMs = function(ms){ return ms.filter(function(m){ return nfMsOk(m, NF); }); };
+  var NF = NFOFF ? nfDef() : nfGet(), nfMs = function(ms){ return ms.filter(function(m){ return nfMsOk(m, NF); }); };
   // 공고 필터로 숨길지: 종류 · (내 조건 단지가 있으면) 단지 전부가 평형·구·월부담에 걸림 · 기대 낮음 — 단지 자료가 없는 공고는 종류만 봄
   var nfWhy = function(o){ var rs = [], c = nfCatOf(o.prog); if (c && NF.cats[c] === false) rs.push(nfCatName(c) + ' 숨김');
     var mine = o.mine || []; if (mine.length && !(o.ms || []).length) { var w0 = nfMsWhy(mine, NF); if (w0) rs.push(w0); }
@@ -3581,11 +3594,11 @@ function noticeListHtml(){
   var SETS = {}, rec = function(o){ if (!o || !o.id) return; var src = (o.ms && o.ms.length) ? o.ms : (o.mine || []), ids = {}; src.forEach(function(m){ if (m.__p && m.__p.__mkid) ids[m.__p.__mkid] = 1; }); SETS[o.id] = { title: o.title, ids: ids }; };
   oIn.concat(oHid, sIn, sHid, eIn, eHid).forEach(rec); window.__nwSets = SETS;
   var hid = oHid.concat(sHid, eHid, pHid), hidAct = oHid.length + sHid.length, hidNew = hid.filter(function(o){ return o.nw; }).length;
-  var nfOpen = !!window.__nfOpen, chips = nfChips(NF), ck = function(b){ return b ? ' checked' : ''; };
+  var nfOpen = !!window.__nfOpen, chips = nfChips(nfGet()), ck = function(b){ return b ? ' checked' : ''; };
   var nfHtml = '<div class="nf"><div class="nf-row"><span class="nf-k">공고 필터</span>' +
-      (chips.length ? chips.map(function(c){ return '<span class="nf-c">' + hesc(c[1]) + '<button type="button" class="nf-x" data-nfx="' + c[0] + '" aria-label="' + hesc(c[1]) + ' 끄기">×</button></span>'; }).join('') : '<span class="nf-none">없음 · 내 조건 공고 전부</span>') +
-      '<button type="button" class="nf-tg" aria-expanded="' + (nfOpen ? 'true' : 'false') + '">' + (nfOpen ? '접기 ▴' : '바꾸기 ▾') + '</button></div>' +
-    (hid.length ? '<p class="nf-hid">공고 필터로 숨긴 공고 ' + hid.length + '건' + (hidAct ? ' — <b>접수 중·곧 접수 ' + hidAct + '건 포함</b>' : '') + (hidNew ? ' · 새 알림 ' + hidNew + '건' : '') + ' (맨 아래 \'그 밖\')</p>' : '') +
+      (chips.length ? chips.map(function(c){ return '<span class="nf-c' + (NFOFF ? ' dim' : '') + '">' + hesc(c[1]) + '<button type="button" class="nf-x" data-nfx="' + c[0] + '" aria-label="' + hesc(c[1]) + ' 끄기">×</button></span>'; }).join('') : '<span class="nf-none">없음 · 내 조건 공고 전부</span>') +
+      (chips.length || NFOFF ? '<button type="button" class="nf-off" aria-pressed="' + (NFOFF ? 'true' : 'false') + '">' + (NFOFF ? '필터 다시 켜기' : '잠깐 끄기') + '</button>' : '') + '<button type="button" class="nf-tg" aria-expanded="' + (nfOpen ? 'true' : 'false') + '">' + (nfOpen ? '접기 ▴' : '바꾸기 ▾') + '</button></div>' +
+    (NFOFF ? '<p class="nf-hid nf-offnote">공고 필터 잠깐 꺼짐 — 숨긴 것 없이 전부 보는 중 · 저장된 필터는 그대로</p>' : '') + (hid.length ? '<p class="nf-hid">공고 필터로 숨긴 공고 ' + hid.length + '건' + (hidAct ? ' — <b>접수 중·곧 접수 ' + hidAct + '건 포함</b>' : '') + (hidNew ? ' · 새 알림 ' + hidNew + '건' : '') + ' (맨 아래 \'그 밖\')</p>' : '') +
     '<div class="nf-pan"' + (nfOpen ? '' : ' hidden') + '>' +
       '<p class="nf-note">지도 필터와 따로 · 기본은 내 조건(청년·8평↑·복층 빼기, 알림과 같은 기준) 공고 전부 · 바꾸면 바로 적용</p>' +
       '<div class="nf-s"><b>평형</b><div class="nf-opts">' + [8, 9, 10].map(function(v){ return '<button type="button" class="nf-pyb" data-v="' + v + '" aria-pressed="' + (NF.py === v ? 'true' : 'false') + '">' + v + '평 이상</button>'; }).join('') + '</div></div>' +
@@ -3630,11 +3643,13 @@ function noticeListHtml(){
 window.renderNoticePanel = function(){
   var html = null;   // 한 번만 계산해 두 상자(지도 사이드바 '공고' 탭 · 공고 화면)에 — '먼저 볼 곳' 번호(__nwPicks)도 둘이 같게
   ['nm-notices', 'alerts-list'].forEach(function(bid){ var box = document.getElementById(bid); if (!box) return; var cal = bid === 'alerts-list';
-    if (html === null) { var nf0 = nfGet(); (window.nmMarkers || []).forEach(function(mk){ mk.__nfPy = true; }); if (nf0.py > 8) withMyCond(function(){ (window.nmMarkers || []).forEach(function(mk){ mk.__nfPy = mk.__p.cat !== 'na'; }); }, nf0.py); html = withMyCond(noticeListHtml); }
+    if (html === null) { var nf0 = NFOFF ? nfDef() : nfGet(); (window.nmMarkers || []).forEach(function(mk){ mk.__nfPy = true; }); if (nf0.py > 8) withMyCond(function(){ (window.nmMarkers || []).forEach(function(mk){ mk.__nfPy = mk.__p.cat !== 'na'; }); }, nf0.py); html = withMyCond(noticeListHtml); }
     box.innerHTML = html;
     var nfB = box.querySelector('.nf'); if (nfB) {
       var stop = function(e){ e.stopPropagation(); };
       var tg = nfB.querySelector('.nf-tg'); if (tg) tg.onclick = function(e){ stop(e); window.__nfOpen = !window.__nfOpen; window.renderNoticePanel(); };
+      var nfo = nfB.querySelector('.nf-off'); if (nfo) nfo.onclick = function(e){ stop(e); NFOFF = !NFOFF; window.renderNoticePanel(); };   // 공고 필터 잠깐 끄기(저장 안 함)
+      ['click', 'change'].forEach(function(ev){ nfB.addEventListener(ev, function(e){ if (NFOFF && e.target.closest('.nf-x,.nf-tg,.nf-pan input,.nf-pan select,.nf-pan button')) NFOFF = false; }, true); });   // 꺼 둔 채 필터를 바꾸면 먼저 원래대로
       nfB.querySelectorAll('.nf-x').forEach(function(b){ b.onclick = function(e){ stop(e); var o = nfGet(), d = nfDef(), k = b.dataset.nfx; o[k] = d[k]; if (k === 'burd') o.unk = true; nfSet(o); }; });
       nfB.querySelectorAll('.nf-pyb').forEach(function(b){ b.onclick = function(e){ stop(e); var o = nfGet(); o.py = +b.dataset.v; nfSet(o); }; });
       var nfRd = function(){ var o = nfGet();
@@ -4115,7 +4130,7 @@ function nmInit(){
     var ref = g.nextSibling; while (ref && ref.className === 'it' && ref.dataset.cat === 'gen') ref = ref.nextSibling; its.forEach(function(it){ list.insertBefore(it, ref); });
   }
   function catsOn(){ var on = {}; document.querySelectorAll('.nmbar input[data-cat]').forEach(function(c){ on[c.dataset.cat] = c.checked; }); return on; }
-  function liveOk(p){ return !LIVE || nrLive(p) || (PLAN_ON && !!(p.plan && p.plan.st && !p.plan.st.done)) || (EXP_ON && !!expOf(p)); }
+  function liveOk(p){ return FOFF || !LIVE || nrLive(p) || (PLAN_ON && !!(p.plan && p.plan.st && !p.plan.st.done)) || (EXP_ON && !!expOf(p)); }
   window.liveOk = liveOk;
   // '이 칩을 켜면 몇 곳' — 지금 다른 필터는 그대로 두고 그 칩만 바꿔 셈(마커 기준)
   function qfCount(o){ var on = catsOn(), nid = document.getElementById('nm-notice').value, sv = { live: LIVE, exp: EXP_ON, plan: PLAN_ON, bt: BT_ON, pk: PK_ON, gu: GU_ON };
@@ -4132,8 +4147,9 @@ function nmInit(){
     set('qf-live', LIVE, (LIVE ? cur : qfCount({ live: true })) + '곳');
     var ex = document.getElementById('qf-exp'); if (ex) { ex.hidden = !LIVE; if (LIVE) { set('qf-exp', EXP_ON, '+' + (qfCount({ exp: true }) - qfCount({ exp: false })) + '곳'); var wh = expWhens(); ex.querySelector('.qf-l').textContent = '공고 예상' + (wh ? ' ' + wh : '') + '(추정)'; } }
     var pl = document.getElementById('qf-plan'); if (pl) { pl.hidden = !LIVE; if (LIVE) set('qf-plan', PLAN_ON, '+' + (qfCount({ plan: true }) - qfCount({ plan: false })) + '곳'); }
-    document.querySelectorAll('#qf-py button').forEach(function(b){ b.setAttribute('aria-pressed', +b.dataset.py === PY_MIN ? 'true' : 'false'); });
-    var ps = document.querySelector('#qf-pysel select'); if (ps) { ps.value = String(PY_MIN); document.getElementById('qf-pysel').classList.toggle('on', PY_MIN !== 8); }
+    var pyShow = FOFF ? ([8, 9, 10].indexOf(+PREF.get('pymin', 8)) >= 0 ? +PREF.get('pymin', 8) : 8) : PY_MIN;   // 잠깐 끄기 중엔 저장된 값
+    document.querySelectorAll('#qf-py button').forEach(function(b){ b.setAttribute('aria-pressed', +b.dataset.py === pyShow ? 'true' : 'false'); });
+    var ps = document.querySelector('#qf-pysel select'); if (ps) { ps.value = String(pyShow); document.getElementById('qf-pysel').classList.toggle('on', pyShow !== 8); }
     var c2 = document.getElementById('nm-live2'); if (c2) c2.checked = LIVE;
     var gt = document.getElementById('nm-gu-txt'); if (gt) gt.textContent = guDesc(4);
     var cp = document.getElementById('nm-plan'); if (cp) { cp.checked = PLAN_ON; cp.disabled = !LIVE; }
@@ -4150,7 +4166,7 @@ function nmInit(){
     var pw = priWorkOn(); if (window.__priW === undefined) window.__priW = pw; else if (pw !== window.__priW) { window.__priW = pw; if (window.refreshMinPy) setTimeout(window.refreshMinPy, 0); }   // 2월 1일·공고 자료가 늦게 와서 1순위 지역이 바뀌면 다시 분류
     var el = document.getElementById('lg-sum-txt'); if (!el) return;
     var on = catsOn(), vis = Array.prototype.filter.call(document.querySelectorAll('.lst .it'), function(it){ return it.style.display !== 'none'; }).length;
-    var chips = [], x = function(t, act){ chips.push('<span class="af-c">' + t + '<button type="button" data-af="' + act + '" aria-label="' + t + ' 해제">×</button></span>'); };
+    var chips = [], x = function(t, act){ chips.push('<span class="af-c' + (FOFF ? ' dim' : '') + '">' + t + '<button type="button" data-af="' + act + '" aria-label="' + t + ' 해제">×</button></span>'); };
     var offC = Object.keys(CAT_NAMES).filter(function(k){ return on[k] === false; }); if (offC.length === Object.keys(CAT_NAMES).length) x('단지 종류 전부 숨김', 'catall'); else offC.forEach(function(k){ x(CAT_NAMES[k] + ' 숨김', 'cat:' + k); });
     if (on.na) x('해당 없음 보임', 'cat:na');
     if (BUILT.max) x('준공 ' + BUILT.max + '년차 이내' + (BUILT.unk ? '' : '(모름 뺌)'), 'built');
@@ -4161,7 +4177,8 @@ function nmInit(){
     if (!NO_DUP) x('복층·2층형 포함', 'dup');
     if (GU_ON.length) x(guDesc(4), 'gu');
     var dirty = chips.length || LIVE || !EXP_ON || !PLAN_ON || PY_MIN !== 8 || !allBt || !allPk || GU_ON.length;
-    el.innerHTML = '<b>' + vis + '곳</b> ' + chips.join('') + (dirty ? '<button type="button" class="af-reset" data-af="reset">초기화</button>' : '');
+    el.innerHTML = '<b>' + vis + '곳</b> ' + (FOFF ? '<span class="af-offnote">필터 잠깐 꺼짐</span><button type="button" class="af-reset" data-af="on">다시 켜기</button> ' : (dirty ? '<button type="button" class="af-reset af-off" data-af="off">잠깐 끄기</button> ' : '')) + chips.join('') + (dirty && !FOFF ? '<button type="button" class="af-reset" data-af="reset">초기화</button>' : '');
+    var qo = document.getElementById('qf-off'); if (qo) { qo.hidden = !(dirty || FOFF); qo.setAttribute('aria-pressed', FOFF ? 'true' : 'false'); qo.textContent = FOFF ? '필터 다시 켜기' : '필터 잠깐 끄기'; }
     var tg = document.getElementById('lg-toggle'); if (tg) tg.dataset.n = chips.length;
     var nHid = (offC.length === Object.keys(CAT_NAMES).length ? 1 : offC.length) + (on.na ? 1 : 0) + (BUILT.max ? 1 : 0) + (allBt ? 0 : 1) + (allPk ? 0 : 1) + (NO_DUP ? 0 : 1) + (LIVE && !PLAN_ON ? 1 : 0) + (LIVE && !EXP_ON ? 1 : 0);
     var qm = document.getElementById('qf-more'); if (qm) qm.dataset.n = nHid;
@@ -4192,6 +4209,8 @@ function nmInit(){
       else if (a === 'dup') { var d = document.getElementById('nm-nodup'); if (d && !d.checked) d.click(); }
       else if (a === 'gu') { GU_ON = []; PREF.set('gu', []); applyFilter(); }
       else if (a === 'catall') { var ca = document.querySelector('[data-all="cat:1"]'); if (ca) ca.click(); }
+      else if (a === 'on') window.mapFoff(false);
+      else if (a === 'off') window.mapFoff(true);
       else if (a === 'reset') qfReset(); });
     var q = function(id, fn){ var b = document.getElementById(id); if (b) b.addEventListener('click', function(e){ e.stopPropagation(); fn(); }); };
     var lgb = document.getElementById('lg-body'); if (lgb) lgb.addEventListener('click', function(e){ var b = e.target.closest('[data-all]'); if (!b) return; e.stopPropagation(); var a = b.dataset.all.split(':'), v = a[1] === '1';
@@ -4202,6 +4221,12 @@ function nmInit(){
     q('qf-live', function(){ var lv = document.getElementById('nm-live'); if (lv) lv.click(); });
     q('qf-exp', function(){ EXP_ON = !EXP_ON; PREF.set('exp', EXP_ON); applyFilter(); pkRefreshIcons(); });
     q('qf-plan', function(){ PLAN_ON = false; applyFilter(); });
+    // 필터 잠깐 끄기: 저장된 필터(PREF)는 그대로 두고 화면에서만 전부 — 다시 누르면 원래대로. 최소 평형도 잠깐 8평(기본)
+    window.mapFoff = function(off){ off = !!off; if (off === FOFF) return; FOFF = off; var vm = document.getElementById('view-map'); if (vm) vm.classList.toggle('foff', off);
+      var sv = +PREF.get('pymin', 8), want = off ? 8 : ([8, 9, 10].indexOf(sv) >= 0 ? sv : 8);
+      if (PY_MIN !== want) { setMin(want); window.refreshMinPy(); } else applyFilter(); };
+    q('qf-off', function(){ window.mapFoff(!FOFF); });
+    ['mapchips', 'lg-sum-txt', 'lg-body'].forEach(function(id){ var el = document.getElementById(id); if (!el) return; ['click', 'change'].forEach(function(ev){ el.addEventListener(ev, function(e){ if (FOFF && e.target.closest('button,input,select,label') && !e.target.closest('#qf-off,[data-af="on"]')) window.mapFoff(false); }, true); }); });   // 꺼 둔 채 다른 필터를 만지면 먼저 원래 필터로
     // 폰: 지도 위 칩을 2줄로 줄이면서 뺀 칩(공고 예정·예상·주차·아파트·오피스텔)은 상세 필터에서 — 같은 동작을 부름 (2026-11-04)
     q('nm-gu-open', function(){ var g = document.getElementById('qf-gu'); if (g) g.click(); });   // 상세 필터에도 구(지도 위 구 칩과 같은 창)
     [['nm-live2', 'qf-live'], ['nm-plan', 'qf-plan'], ['nm-exp', 'qf-exp']].forEach(function(p){ var c = document.getElementById(p[0]); if (c) c.addEventListener('change', function(){ var b = document.getElementById(p[1]); if (b) b.click(); }); });
@@ -4319,7 +4344,7 @@ function nmInit(){
       var ob = document.createElement('button'); ob.type = 'button'; ob.id = 'nm-offs'; ob.className = 'pr-off'; ob.hidden = true; mch.appendChild(ob); ob.addEventListener('click', function(e){ e.stopPropagation(); nmFitAll(); }); }
   }
   function applyFilter(){
-    var on = {}; document.querySelectorAll('.nmbar input[data-cat]').forEach(function(c){ on[c.dataset.cat] = c.checked; });
+    var on = {}; document.querySelectorAll('.nmbar input[data-cat]').forEach(function(c){ on[c.dataset.cat] = c.checked; }); if (FOFF) Object.keys(on).forEach(function(k){ on[k] = k !== 'na'; });   // 잠깐 끄기: 단지 종류도 기본(해당 없음만 뺌)
     var nid = document.getElementById('nm-notice').value, FX = (window.__FOC && window.__FOC.ids && !nid) ? window.__FOC.ids : null;   // '공고 보기' 단지 묶음
     function vis0(p){ if (p.planOnly && (!p.plan.st || p.plan.st.done)) return false; if (!revOk(p)) return false; return on[p.cat] && guOk(p) && builtOk(p) && burdOk(p) && liveOk(p); }
     function inN(p){ if (FX) return !!FX[p.__mkid]; return !nid || (p.nids || [p.nid]).indexOf(nid) >= 0; }   // 공고를 골랐으면(공고 탭·공고 일정·알림에서 '지도에서') 그 공고 단지는 필터와 상관없이 다 보임 — 지금 필터 밖은 p.__out(흐리게)
@@ -4793,7 +4818,7 @@ window.addEventListener('beforeinstallprompt', function(e){ e.preventDefault(); 
 // ===== 새로고침 (2026-11-04) — 아이폰 홈 화면 앱엔 새로고침 버튼이 없어 껐다 켜야 했음 =====
 // ① 지도 말고 다른 화면 맨 위에서 아래로 당겼다 놓으면 새로고침(홈 화면 앱에서만 — 브라우저 탭은 자체 기능이 있음)
 // ② 앱으로 돌아올 때·30분마다 새 버전(version.json)·새 공고 자료(data/notices.json)를 확인 → 바뀌었으면 맨 위 띠 '눌러서 새로고침'
-var SITE_BUILD = 'cd361c2f1247';
+var SITE_BUILD = '041e57a3b954';
 try { if (navigator.clearAppBadge) navigator.clearAppBadge(); } catch (e) {}   // 열자마자 아이콘 배지 지움(알림 자료를 못 읽어도)
 function nwSig(j){ var s = JSON.stringify([(j && j.items) || [], (j && j.list_ids) || {}]), h = 0; for (var i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0; return h + ':' + s.length; }
 (function(){
