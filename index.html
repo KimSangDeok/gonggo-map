@@ -406,6 +406,8 @@ html.lb-open,html.lb-open body{overflow:hidden!important;overscroll-behavior:non
 #lb .pm-d .pm-t{background:#2e7d32}
 #lb .pm-o .pm-t{background:#546e7a}
 #lb .pm-m{border-color:#7b1fa2;border-style:dashed;background:rgba(123,31,162,.12)}
+#lb .pm-s{border-color:#7b1fa2;background:rgba(123,31,162,.16)}
+#lb .pm-s .pm-t{background:#7b1fa2}
 #lb .pm-m .pm-t{background:#7b1fa2}
 #lb .pm-x{position:absolute;transform:translate(-50%,-50%);white-space:nowrap;font:700 calc(11px * var(--ik,1))/1.3 system-ui,-apple-system,sans-serif;color:#fff;background:#e65100;padding:0 calc(5px * var(--ik,1));border-radius:calc(7px * var(--ik,1));box-shadow:0 0 0 calc(1px * var(--ik,1)) #fff}
 #lb .lb-pm{position:absolute;left:10px;right:10px;bottom:90px;z-index:3;max-width:620px;margin:0 auto;background:rgba(255,255,255,.97);color:#1b1f24;border-radius:12px;box-shadow:0 6px 24px rgba(0,0,0,.45);font-size:13px;line-height:1.45;overflow:hidden}
@@ -422,7 +424,7 @@ html.lb-open,html.lb-open body{overflow:hidden!important;overscroll-behavior:non
 #lb .lb-pm li{margin:3px 0}
 #lb .lb-pm-lg{margin:8px 0 0;font-size:12px;color:#5f6b7a}
 #lb .lb-pm-lg i{display:inline-block;width:10px;height:10px;border-radius:2px;margin:0 3px -1px 6px}
-#lb .lb-pm-lg .c-w{background:#1e88e5}#lb .lb-pm-lg .c-d{background:#43a047}#lb .lb-pm-lg .c-x{background:#e65100}#lb .lb-pm-lg .c-o{border:1px dashed #546e7a;box-sizing:border-box}#lb .lb-pm-lg .c-m{border:1px dashed #7b1fa2;background:rgba(123,31,162,.15);box-sizing:border-box}
+#lb .lb-pm-lg .c-w{background:#1e88e5}#lb .lb-pm-lg .c-d{background:#43a047}#lb .lb-pm-lg .c-x{background:#e65100}#lb .lb-pm-lg .c-o{border:1px dashed #546e7a;box-sizing:border-box}#lb .lb-pm-lg .c-m{border:1px dashed #7b1fa2;background:rgba(123,31,162,.15);box-sizing:border-box}#lb .lb-pm-lg .c-s{background:#7b1fa2}
 #lb .lb-pm-f{margin:6px 0 0;font-size:12px;color:#5f6b7a}
 #lb .lb-pm .lb-pm-off{margin-left:6px;padding:4px 10px;border:1px solid #c5ccd5;border-radius:999px;font-size:12px;color:#1b1f24;background:#fff}
 #lb .lb-thumbs::-webkit-scrollbar{display:none}
@@ -2678,7 +2680,7 @@ function lbPmSet(it){
   if (ov) {
     ov.innerHTML = has ? pm.m.map(function(m){
       if (m.p) return '<span class="pm-x" style="left:' + (m.p[0] * 100) + '%;top:' + (m.p[1] * 100) + '%">' + hesc(m.t) + '</span>';
-      var b = m.b, lab = m.k === 'w' ? '창' + (m.n || '') : (m.k === 'd' ? '현관' : (m.k === 'm' ? '문(미닫이)' : m.t));
+      var b = m.b, lab = m.k === 'w' ? '창' + (m.n || '') : (m.k === 'd' ? '현관' : m.t);   // 문(s 여닫이 · m 미닫이)은 t 에 '침실2 문'처럼 방 이름까지
       return '<span class="pm-b pm-' + m.k + '" style="left:' + (b[0] * 100) + '%;top:' + (b[1] * 100) + '%;width:' + ((b[2] - b[0]) * 100) + '%;height:' + ((b[3] - b[1]) * 100) + '%"><i class="pm-t">' + hesc(lab) + '</i></span>';
     }).join('') : '';
     ov.hidden = !has || pmOff();
@@ -2686,7 +2688,7 @@ function lbPmSet(it){
   if (!pn) return;
   if (!pm) { pn.hidden = true; pn.innerHTML = ''; return; }
   pn.innerHTML = '<button type="button" class="lb-pm-h" aria-expanded="false"><span class="lb-pm-k">평면도 읽기</span><span class="lb-pm-s">' + hesc(pm.s || '') + '</span><span class="lb-pm-tg">자세히 ▾</span></button>' +
-    '<div class="lb-pm-b" hidden>' + (has ? '<p class="lb-pm-lg"><i class="c-w"></i>창 <i class="c-d"></i>현관 <i class="c-m"></i>미닫이문 <i class="c-x"></i>창 없음 <i class="c-o"></i>실외기 등 — 창 번호는 아래 줄과 같음</p>' : '') +
+    '<div class="lb-pm-b" hidden>' + (has ? '<p class="lb-pm-lg"><i class="c-w"></i>창 <i class="c-d"></i>현관 <i class="c-s"></i>방문(여닫이) <i class="c-m"></i>미닫이문 <i class="c-x"></i>창 없음 <i class="c-o"></i>실외기 등 — 창 번호는 아래 줄과 같음 · 문은 방·욕실·다용도실 출입문 모두(실외기 칸 문은 뺌)</p>' : '') +
     '<ul>' + (pm.notes || []).map(function(n){ return '<li>' + hesc(n) + '</li>'; }).join('') + '</ul>' +
     '<p class="lb-pm-f"><b>기호 읽는 법</b>: 호(¼원) = 여닫이문이 열리며 지나가는 길(호 쪽으로 열림) · 방과 방 사이 벽 속 가는 두 줄 = 미닫이문(옆으로 밀어 엶) · 바깥벽·발코니 쪽 벽 속 가는 두 줄 = 창 · X 친 네모 = 배관 통로(PD)·실외기 자리</p>' + '<p class="lb-pm-f">근거: Claude가 그림 기호를 보고 읽음(문은 열리는 방향을 호로, 창은 벽 속 가는 평행선으로 그림) · 크기는 그림에 적힌 치수 · 실제와 다를 수 있어 원본으로 확인' + (has ? ' <button type="button" class="lb-pm-off">' + (pmOff() ? '표시 켜기' : '표시 끄기') + '</button>' : '') + '</p></div>';
   var th = LB.el.querySelector('.lb-thumbs'); pn.style.bottom = (th && !th.hidden ? th.offsetHeight + 4 : 10) + 'px';
@@ -4791,7 +4793,7 @@ window.addEventListener('beforeinstallprompt', function(e){ e.preventDefault(); 
 // ===== 새로고침 (2026-11-04) — 아이폰 홈 화면 앱엔 새로고침 버튼이 없어 껐다 켜야 했음 =====
 // ① 지도 말고 다른 화면 맨 위에서 아래로 당겼다 놓으면 새로고침(홈 화면 앱에서만 — 브라우저 탭은 자체 기능이 있음)
 // ② 앱으로 돌아올 때·30분마다 새 버전(version.json)·새 공고 자료(data/notices.json)를 확인 → 바뀌었으면 맨 위 띠 '눌러서 새로고침'
-var SITE_BUILD = 'a9bfcfd0f4cc';
+var SITE_BUILD = 'cd361c2f1247';
 try { if (navigator.clearAppBadge) navigator.clearAppBadge(); } catch (e) {}   // 열자마자 아이콘 배지 지움(알림 자료를 못 읽어도)
 function nwSig(j){ var s = JSON.stringify([(j && j.items) || [], (j && j.list_ids) || {}]), h = 0; for (var i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0; return h + ':' + s.length; }
 (function(){
