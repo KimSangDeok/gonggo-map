@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-11 06:33 UTC",
+ "updated": "2026-11-11 09:38 UTC",
  "about": "평면도 원본 사본 — Claude 평면도 읽기용(화면은 원본 주소)",
  "items": {
   "https://www.i-sh.co.kr/houseinfo/upload//houseinfo/20251016161448130_4_33A.jpg": {
@@ -217,6 +217,38 @@
    "sw": 1197,
    "sh": 666,
    "at": "2026-11-11 06:33 UTC"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=8f39c996b3b040e199872ac3679fea04&fileSn=3": {
+   "f": "data/plan_src/84641781b80b85eb.jpg",
+   "w": 932,
+   "h": 801,
+   "sw": 932,
+   "sh": 801,
+   "at": "2026-11-11 09:38 UTC"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=8f39c996b3b040e199872ac3679fea04&fileSn=4": {
+   "f": "data/plan_src/b45d59f397a3b972.jpg",
+   "w": 930,
+   "h": 803,
+   "sw": 930,
+   "sh": 803,
+   "at": "2026-11-11 09:38 UTC"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=8f39c996b3b040e199872ac3679fea04&fileSn=5": {
+   "f": "data/plan_src/ddf97dfdc3458388.jpg",
+   "w": 932,
+   "h": 805,
+   "sw": 932,
+   "sh": 805,
+   "at": "2026-11-11 09:38 UTC"
+  },
+  "https://soco.seoul.go.kr/cohome/cmmn/file/fileDown.do?atchFileId=8f39c996b3b040e199872ac3679fea04&fileSn=6": {
+   "f": "data/plan_src/5c46a34dff0db62e.jpg",
+   "w": 931,
+   "h": 807,
+   "sw": 931,
+   "sh": 807,
+   "at": "2026-11-11 09:38 UTC"
   }
  }
 }
