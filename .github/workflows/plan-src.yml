@@ -1,0 +1,38 @@
+name: plan-src
+# 평면도 원본 사본(tools/plan_src.py) — Claude가 창·현관 표시(data/plan_marks.json)를 만들 때 보는 사본. list.json 을 올리면 돎
+on:
+  workflow_dispatch:
+    inputs:
+      force:
+        description: '이미 받은 것도 다시 받기'
+        type: boolean
+        default: false
+  push:
+    paths: ['data/plan_src/list.json', 'tools/plan_src.py', '.github/workflows/plan-src.yml']
+permissions:
+  contents: write
+concurrency:
+  group: plan-src
+  cancel-in-progress: false
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.12' }
+      - run: pip install -q requests pillow
+      - name: plan copies
+        env:
+          FORCE: ${{ inputs.force }}
+        run: |
+          if [ "$FORCE" = "true" ]; then python tools/plan_src.py --force; else python tools/plan_src.py; fi
+      - name: commit
+        run: |
+          git config user.name 'gonggo-bot'; git config user.email 'gonggo-bot@users.noreply.github.com'
+          git add -A data/plan_src
+          git diff --cached --quiet && { echo 'no change'; exit 0; }
+          git commit -m "data: 평면도 원본 사본 $(date -u +%F)"
+          for i in 1 2 3; do git pull --rebase -X theirs origin gh-pages && git push && exit 0; git rebase --abort 2>/dev/null; sleep 15; done
+          exit 1
