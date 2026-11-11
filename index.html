@@ -416,6 +416,7 @@ html.lb-open,html.lb-open body{overflow:hidden!important;overscroll-behavior:non
 #lb .lb-pm .lb-pm-h{display:flex;align-items:center;gap:8px;width:100%;padding:9px 12px;min-height:44px;border-radius:0}
 #lb .lb-pm .lb-pm-h:hover{background:rgba(0,0,0,.04)}
 #lb .lb-pm-k{flex:none;font-weight:700;color:#1565c0}
+#lb .lb-pm-k.lb-pm-k0{color:#5f6b7a}
 #lb .lb-pm-s{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 #lb .lb-pm-tg{flex:none;color:#5f6b7a;font-size:12px}
 #lb .lb-pm-b{max-height:min(42vh,340px);overflow:auto;padding:0 12px 10px;border-top:1px solid #e3e7ec;overscroll-behavior:contain;touch-action:pan-y}
@@ -2699,7 +2700,12 @@ function lbPmSet(it){
     ov.hidden = !has || pmOff();
   }
   if (!pn) return;
-  if (!pm) { pn.hidden = true; pn.innerHTML = ''; return; }
+  if (!pm) {   // 아직 안 읽은 평면도: 표시가 없다고 창이 없는 게 아님을 분명히(2026-11-11 — 표시 없는 평면도를 '창 없음'으로 읽게 만든 것 고침)
+    if (!it || !/평면도/.test(it.t || '')) { pn.hidden = true; pn.innerHTML = ''; return; }
+    pn.innerHTML = '<button type="button" class="lb-pm-h" aria-expanded="false"><span class="lb-pm-k lb-pm-k0">평면도 읽기</span><span class="lb-pm-s">아직 안 읽은 평면도 — 표시가 없다고 창이 없는 게 아님</span><span class="lb-pm-tg">자세히 ▾</span></button>' +
+      '<div class="lb-pm-b" hidden><p class="lb-pm-f">Claude가 이 평면도는 아직 읽지 않아 창·문 칸 표시가 없음 — 그림에서 직접 보는 법은 아래</p>' +
+      '<p class="lb-pm-f"><b>기호 읽는 법</b>: 바깥벽·발코니 쪽 벽 속 가는 두 줄 = 창 · 방과 방 사이 벽 속 가는 두 줄 = 미닫이문(옆으로 밀어 엶) · 호(¼원) = 여닫이문이 열리며 지나가는 길(호 쪽으로 열림) · X 친 네모 = 배관 통로(PD)·실외기 자리</p></div>';
+    var th0 = LB.el.querySelector('.lb-thumbs'); pn.style.bottom = (th0 && !th0.hidden ? th0.offsetHeight + 4 : 10) + 'px'; pn.hidden = false; return; }
   pn.innerHTML = '<button type="button" class="lb-pm-h" aria-expanded="false"><span class="lb-pm-k">평면도 읽기</span><span class="lb-pm-s">' + hesc(pm.s || '') + '</span><span class="lb-pm-tg">자세히 ▾</span></button>' +
     '<div class="lb-pm-b" hidden>' + (has ? '<p class="lb-pm-lg"><i class="c-w"></i>창 <i class="c-d"></i>현관 <i class="c-s"></i>방문(여닫이) <i class="c-m"></i>미닫이문 <i class="c-x"></i>창 없음 <i class="c-o"></i>실외기 등 — 창 번호는 아래 줄과 같음 · 문은 방·욕실·다용도실 출입문 모두(실외기 칸 문은 뺌)</p>' : '') +
     '<ul>' + (pm.notes || []).map(function(n){ return '<li>' + hesc(n) + '</li>'; }).join('') + '</ul>' +
@@ -4818,7 +4824,7 @@ window.addEventListener('beforeinstallprompt', function(e){ e.preventDefault(); 
 // ===== 새로고침 (2026-11-04) — 아이폰 홈 화면 앱엔 새로고침 버튼이 없어 껐다 켜야 했음 =====
 // ① 지도 말고 다른 화면 맨 위에서 아래로 당겼다 놓으면 새로고침(홈 화면 앱에서만 — 브라우저 탭은 자체 기능이 있음)
 // ② 앱으로 돌아올 때·30분마다 새 버전(version.json)·새 공고 자료(data/notices.json)를 확인 → 바뀌었으면 맨 위 띠 '눌러서 새로고침'
-var SITE_BUILD = '041e57a3b954';
+var SITE_BUILD = '8758cf733e3b';
 try { if (navigator.clearAppBadge) navigator.clearAppBadge(); } catch (e) {}   // 열자마자 아이콘 배지 지움(알림 자료를 못 읽어도)
 function nwSig(j){ var s = JSON.stringify([(j && j.items) || [], (j && j.list_ids) || {}]), h = 0; for (var i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0; return h + ':' + s.length; }
 (function(){
