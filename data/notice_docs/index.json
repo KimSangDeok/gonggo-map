@@ -1,6 +1,6 @@
 {
  "about": "알림 대상 공고의 공고문 사본(tools/notice_docs.py, GitHub 러너가 받음) — 매일 Claude 요약이 웹사이트를 열지 않고 이걸로 확인. [p.N] = 첨부 공고문 N쪽",
- "updated": "2026-11-11 00:04 KST",
+ "updated": "2026-11-11 09:05 KST",
  "items": {
   "sh:312053": {
    "file": "data/notice_docs/sh-312053.txt",
@@ -15,6 +15,25 @@
    ],
    "chars": 24896,
    "tries": 2,
+   "err": ""
+  },
+  "sh:312903": {
+   "file": "data/notice_docs/sh-312903.txt",
+   "title": "[청년형] 특화형 매입임대주택 입주자 모집 공고(운영기관 : 한지붕 협동조합)",
+   "url": "https://www.i-sh.co.kr/app/lay2/program/S1T294C295/www/brd/m_241/view.do?multi_itm_seqs=1%2C2%2C4%2C8%2C16%2C32%2C64%2C128%2C256&seq=312903",
+   "fetched": "2026-11-11 09:05 KST",
+   "pdfs": [
+    {
+     "name": "[한지붕협동조합]SH특화형 매입임대주택(청년) 입주자 모집 공고문_구천면로 46길 38 리츠하우스 401호.pdf",
+     "pages": 23
+    },
+    {
+     "name": "[한지붕협동조합]SH특화형 매입임대주택(청년) 입주자 모집 공고문_독산로22길 75 은행나무 A동 302호.pdf",
+     "pages": 23
+    }
+   ],
+   "chars": 49820,
+   "tries": 1,
    "err": ""
   },
   "ya:6708": {
