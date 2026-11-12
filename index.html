@@ -4305,20 +4305,23 @@ function nmInit(){
     var pys = document.querySelector('#qf-pysel select'); if (pys) { pys.addEventListener('click', function(e){ e.stopPropagation(); }); pys.addEventListener('change', function(){ pySet(selOfArr(pys.value.split(','))); }); }
     // 구 고르기: 칠한 구 = 지도에 나오는 구(기본 25개 구 전부). 다른 필터와 상관없이 어느 구든 눌러서 넣고 빼기 · 누를 때마다 바로 적용(지도·목록·숫자 같이 바뀜)
     // 창 안 지도 = 실제 네이버 지도 위 구 경계(한 번 만든 지도를 다시 씀). 네이버 지도를 못 쓰면(인증 실패·오프라인) 작은 SVG 모형. 닫을 때 고른 구가 바뀌었으면 큰 지도를 그 단지들에 맞춤
-    var gpop = null, gOpen = false, gStart = '', gNv = null, GU_C = '#1E5CA6', GU_OFF = '#5f6670';
+    var gpop = null, gOpen = false, gStart = '', gNv = null, GU_C = '#1E5CA6', GU_LN = '#0f3566', GU_OFF = '#4b525c';   // 칠 = 파랑 · 경계선 = 더 진한 남색(칠과 같은 색이면 선이 칠에 묻힘)
     var guDec = function(str){ var i = 0, lat = 0, lng = 0, out = []; while (i < str.length) { for (var k = 0; k < 2; k++) { var b, sh = 0, r = 0; do { b = str.charCodeAt(i++) - 63; r |= (b & 31) << sh; sh += 5; } while (b >= 32 && i < str.length); var dd = (r & 1) ? ~(r >> 1) : (r >> 1); if (k === 0) lat += dd; else lng += dd; } out.push(new naver.maps.LatLng(lat / 1e5, lng / 1e5)); } return out; };
     var guNvOk = function(){ try { return typeof GU_NV === 'object' && !!(window.naver && naver.maps && naver.maps.Map && naver.maps.Polygon && naver.maps.LatLngBounds && naver.maps.Marker && naver.maps.Size && naver.maps.Event) && !window.__nmAuthFail; } catch (e) { return false; } };
     var guSvgHtml = function(){ return '<div class="gu-map"><svg viewBox="0 0 ' + GU_MAP.w + ' ' + GU_MAP.h + '" role="group" aria-label="서울 구 지도">' + GU25.map(function(g){ var v = GU_MAP.gu[g]; return v ? '<path class="gu-p" data-g="' + g + '" d="' + v.d + '" tabindex="0" role="button"><title>' + g + '</title></path>' : ''; }).join('') +
         GU25.map(function(g){ var v = GU_MAP.gu[g]; return v ? '<text class="gu-t" data-g="' + g + '" x="' + v.c[0] + '" y="' + v.c[1] + '">' + guShort(g) + '</text><text class="gu-n" data-g="' + g + '" x="' + v.c[0] + '" y="' + (v.c[1] + 9) + '"></text>' : ''; }).join('') + '</svg></div>'; };
     var gNvStyle = function(g){ var pg = gNv && gNv.poly[g]; if (!pg) return; var on = guIsOn(g), h = gNv.hov === g, k = (on ? 1 : 0) + '' + (h ? 1 : 0); if (pg.__k === k) return; pg.__k = k;
-      try { pg.setOptions({ fillColor: on ? GU_C : GU_OFF, fillOpacity: on ? (h ? 0.34 : 0.2) : (h ? 0.12 : 0.02), strokeColor: on ? GU_C : GU_OFF, strokeOpacity: on ? 0.9 : 0.6, strokeWeight: on ? 1.6 : 1, strokeStyle: on ? 'solid' : 'shortdash' }); } catch (e) {} };
+      try { pg.setOptions({ fillColor: on ? GU_C : GU_OFF, fillOpacity: on ? (h ? 0.36 : 0.22) : (h ? 0.14 : 0.04), strokeColor: on ? GU_LN : GU_OFF, strokeOpacity: 1, strokeWeight: on ? 2.6 : 1.8, strokeStyle: 'solid', zIndex: on ? 12 : 11 }); } catch (e) {} };   // 넣은 구가 위 — 맞닿은 경계는 남색으로
     var gNvBuild = function(el){
       var bb = GU_NV.b, bd = new naver.maps.LatLngBounds(new naver.maps.LatLng(bb[0], bb[1]), new naver.maps.LatLng(bb[2], bb[3]));
       var inn = document.createElement('div'); inn.className = 'gu-nin'; el.appendChild(inn); var sz = gNvScale(el, inn);
       var map = new naver.maps.Map(inn, { size: new naver.maps.Size(sz[0], sz[1]), center: new naver.maps.LatLng((bb[0] + bb[2]) / 2, (bb[1] + bb[3]) / 2), zoom: 10, zoomControl: false, mapTypeControl: false, scaleControl: false, logoControl: true, mapDataControl: true, draggable: false, pinchZoom: false, scrollWheel: false, keyboardShortcuts: false, disableDoubleClickZoom: true, disableDoubleTapZoom: true, disableTwoFingerTapZoom: true });
-      var nv = { map: map, bd: bd, poly: {}, hov: null, el: el, inn: inn };
-      GU25.forEach(function(g){ var v = GU_NV.gu[g]; if (!v) return;
-        var pg = new naver.maps.Polygon({ map: map, paths: v.e.map(guDec), clickable: true, fillColor: GU_C, fillOpacity: 0.2, strokeColor: GU_C, strokeOpacity: 0.9, strokeWeight: 1.6 });
+      var nv = { map: map, bd: bd, poly: {}, hov: null, el: el, inn: inn }, LL = naver.maps.LatLng, vb = [bb[0] - 0.6, bb[1] - 0.8, bb[2] + 0.6, bb[3] + 0.8];
+      // 경계선이 길·글자에 묻히지 않게(2026-11-12 '구 구분선 너무 안 보여'): ① 바탕 지도 위에 흰 막 40%(길·지명은 옅게 남김) ② 구마다 경계 밑에 흰 테두리 6px ③ 선은 칠보다 진한 남색 2.6px
+      try { new naver.maps.Polygon({ map: map, paths: [[new LL(vb[0], vb[1]), new LL(vb[0], vb[3]), new LL(vb[2], vb[3]), new LL(vb[2], vb[1])]], clickable: false, fillColor: '#ffffff', fillOpacity: 0.4, strokeWeight: 0, strokeOpacity: 0, zIndex: 1 }); } catch (e) {}
+      GU25.forEach(function(g){ var v = GU_NV.gu[g]; if (!v) return; var rings = v.e.map(guDec);
+        if (naver.maps.Polyline) rings.forEach(function(r){ try { new naver.maps.Polyline({ map: map, path: r.concat([r[0]]), clickable: false, strokeColor: '#ffffff', strokeOpacity: 0.95, strokeWeight: 6, strokeLineJoin: 'round', strokeLineCap: 'round', zIndex: 5 }); } catch (e) {} });
+        var pg = new naver.maps.Polygon({ map: map, paths: rings, clickable: true, fillColor: GU_C, fillOpacity: 0.22, strokeColor: GU_LN, strokeOpacity: 1, strokeWeight: 2.6, strokeLineJoin: 'round', zIndex: 12 });
         naver.maps.Event.addListener(pg, 'click', function(){ guToggle(g); PREF.set('gu', GU_ON.slice()); applyFilter(); });
         naver.maps.Event.addListener(pg, 'mouseover', function(){ nv.hov = g; gNvStyle(g); });
         naver.maps.Event.addListener(pg, 'mouseout', function(){ if (nv.hov === g) nv.hov = null; gNvStyle(g); });
@@ -4903,7 +4906,7 @@ window.addEventListener('beforeinstallprompt', function(e){ e.preventDefault(); 
 // ===== 새로고침 (2026-11-04) — 아이폰 홈 화면 앱엔 새로고침 버튼이 없어 껐다 켜야 했음 =====
 // ① 지도 말고 다른 화면 맨 위에서 아래로 당겼다 놓으면 새로고침(홈 화면 앱에서만 — 브라우저 탭은 자체 기능이 있음)
 // ② 앱으로 돌아올 때·30분마다 새 버전(version.json)·새 공고 자료(data/notices.json)를 확인 → 바뀌었으면 맨 위 띠 '눌러서 새로고침'
-var SITE_BUILD = '1aa5a6e61456';
+var SITE_BUILD = 'c69e38dcab53';
 try { if (navigator.clearAppBadge) navigator.clearAppBadge(); } catch (e) {}   // 열자마자 아이콘 배지 지움(알림 자료를 못 읽어도)
 function nwSig(j){ var s = JSON.stringify([(j && j.items) || [], (j && j.list_ids) || {}]), h = 0; for (var i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0; return h + ':' + s.length; }
 (function(){
