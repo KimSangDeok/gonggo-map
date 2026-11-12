@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-12 10:00 KST",
+ "updated": "2026-11-12 16:03 KST",
  "source": "https://www.i-sh.co.kr/app/lay2/program/S1T294C295/www/brd/m_241/list.do",
  "known": {
   "304864": "H26-1",
@@ -8,6 +8,14 @@
   "292541": "K25"
  },
  "items": [
+  {
+   "seq": "313233",
+   "title": "[당첨자발표] 청년 매입임대주택 예비자 공급 계약대상자 발표(2025년 1차 예비6차) 및 계약안내",
+   "date": "2026-11-12",
+   "kind": "안내",
+   "url": "https://www.i-sh.co.kr/app/lay2/program/S1T294C295/www/brd/m_241/view.do?multi_itm_seqs=1%2C2%2C4%2C8%2C16%2C32%2C64%2C128%2C256&seq=313233",
+   "cat": "매입임대"
+  },
   {
    "seq": "313221",
    "title": "[입주안내문] 동작보라매역 프리센트(제50차 장기전세)",
@@ -70,14 +78,6 @@
    "kind": "안내",
    "url": "https://www.i-sh.co.kr/app/lay2/program/S1T294C295/www/brd/m_241/view.do?multi_itm_seqs=1%2C2%2C4%2C8%2C16%2C32%2C64%2C128%2C256&seq=312726",
    "cat": "매입임대"
-  },
-  {
-   "seq": "312806",
-   "title": "제50차 장기전세주택1 [엘리프미아역] 당첨자 주택공개(사전방문) 실시 안내",
-   "date": "2026-11-04",
-   "kind": "안내",
-   "url": "https://www.i-sh.co.kr/app/lay2/program/S1T294C295/www/brd/m_241/view.do?multi_itm_seqs=1%2C2%2C4%2C8%2C16%2C32%2C64%2C128%2C256&seq=312806",
-   "cat": "장기전세"
   },
   {
    "seq": "308340",
@@ -234,6 +234,7 @@
  ],
  "list_ids": {
   "sh": [
+   "313233",
    "313221",
    "313220",
    "313180",
@@ -262,8 +263,7 @@
    "312668",
    "312914",
    "312883",
-   "312726",
-   "312806"
+   "312726"
   ],
   "lh": [
    "2015122300020843",
@@ -285,6 +285,14 @@
    "2015122300020211"
   ],
   "ya": [
+   "6732",
+   "6731",
+   "6730",
+   "6729",
+   "6728",
+   "6727",
+   "6726",
+   "6725",
    "6724",
    "6722",
    "6721",
@@ -306,15 +314,7 @@
    "6703",
    "6702",
    "6701",
-   "6700",
-   "6699",
-   "6698",
-   "6697",
-   "6696",
-   "6695",
-   "6694",
-   "6693",
-   "6692"
+   "6700"
   ]
  },
  "first_seen": {
@@ -353,14 +353,6 @@
   "ya:6702": null,
   "ya:6701": null,
   "ya:6700": null,
-  "ya:6699": null,
-  "ya:6698": null,
-  "ya:6697": null,
-  "ya:6696": null,
-  "ya:6695": null,
-  "ya:6694": null,
-  "ya:6693": null,
-  "ya:6692": null,
   "sh:312806": "2026-11-04 16:00",
   "sh:312804": "2026-11-04 16:00",
   "sh:312793": "2026-11-04 17:00",
@@ -404,7 +396,16 @@
   "sh:313176": "2026-11-11 17:24",
   "sh:313187": "2026-11-12 09:07",
   "sh:313220": "2026-11-12 09:35",
-  "sh:313221": "2026-11-12 10:03"
+  "sh:313221": "2026-11-12 10:03",
+  "sh:313233": "2026-11-12 16:05",
+  "ya:6732": "2026-11-12 16:05",
+  "ya:6731": "2026-11-12 16:05",
+  "ya:6730": "2026-11-12 16:05",
+  "ya:6729": "2026-11-12 16:05",
+  "ya:6728": "2026-11-12 16:05",
+  "ya:6727": "2026-11-12 16:05",
+  "ya:6726": "2026-11-12 16:05",
+  "ya:6725": "2026-11-12 16:05"
  },
  "log": [
   "SH list page 1: 10 rows",
@@ -412,8 +413,9 @@
   "SH list page 3: 10 rows",
   "LH 서울특별시: 17 rows (all types)",
   "LH details: 5 notices, 7 complexes",
-  "YA notices failed: ConnectTimeout(MaxRetryError(\"HTTPSConnectionPool(host='soco.seoul.go.kr', port=443): Max retries exceeded with url: /youth/pgm/home/yohome/bbsListJson.json (Caused by ConnectTimeoutError(<HTTPSConnection(host='soco.seoul.go.kr', port=443) at 0x7f61a3e5f020>, 'Connection to soco.seoul.go.kr timed out. (connect timeout=60)'))\"))",
-  "YA complexes failed: ConnectTimeout(MaxRetryError(\"HTTPSConnectionPool(host='soco.seoul.go.kr', port=443): Max retries exceeded with url: /youth/pgm/home/yohome/yoHomeListJson.json (Caused by ConnectTimeoutError(<HTTPSConnection(host='soco.seoul.go.kr', port=443) at 0x7f61a3e5eb40>, 'Connection to soco.seoul.go.kr timed out. (connect timeout=60)'))\"))",
+  "청년안심 공고: 30",
+  "청년안심 단지 목록: 101",
+  "청년안심 단지(좌표 있음): 100",
   "SH plan 행복주택 2 rows 2026.10. 현재",
   "SH plan 국민임대 1 rows ",
   "SH plan 청년안심주택(공공임대) 7 rows 2026년 4월 기준",

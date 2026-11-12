@@ -1,6 +1,6 @@
 {
  "about": "알림 대상 공고의 공고문 사본(tools/notice_docs.py, GitHub 러너가 받음) — 매일 Claude 요약이 웹사이트를 열지 않고 이걸로 확인. [p.N] = 첨부 공고문 N쪽",
- "updated": "2026-11-12 10:04 KST",
+ "updated": "2026-11-12 16:05 KST",
  "items": {
   "sh:312053": {
    "file": "data/notice_docs/sh-312053.txt",
@@ -124,6 +124,81 @@
    ],
    "chars": 9267,
    "tries": 2,
+   "err": ""
+  },
+  "ya:6725": {
+   "file": "data/notice_docs/ya-6725.txt",
+   "title": "[민간임대] 서울대입구역 BX201 추가모집공고",
+   "url": "https://soco.seoul.go.kr/youth/bbs/BMSR00015/view.do?boardId=6725&menuNo=400008",
+   "fetched": "2026-11-12 16:05 KST",
+   "pdfs": [
+    {
+     "name": "민간_261112_서울대입구역_bx201_청년안심주택 추가모집공고문.pdf",
+     "pages": 6
+    }
+   ],
+   "chars": 9322,
+   "tries": 1,
+   "err": ""
+  },
+  "ya:6726": {
+   "file": "data/notice_docs/ya-6726.txt",
+   "title": "[민간임대] 종암경찰서역(예정) 라온프라이빗 종암 추가모집공고",
+   "url": "https://soco.seoul.go.kr/youth/bbs/BMSR00015/view.do?boardId=6726&menuNo=400008",
+   "fetched": "2026-11-12 16:05 KST",
+   "pdfs": [
+    {
+     "name": "민간_261112_종암경찰서역_라온프라이빗종암_청년안심주택 추가모집공고문.pdf",
+     "pages": 3
+    }
+   ],
+   "chars": 9583,
+   "tries": 1,
+   "err": ""
+  },
+  "ya:6727": {
+   "file": "data/notice_docs/ya-6727.txt",
+   "title": "[민간임대] 화곡역 보눔하우스 화곡 추가모집공고",
+   "url": "https://soco.seoul.go.kr/youth/bbs/BMSR00015/view.do?boardId=6727&menuNo=400008",
+   "fetched": "2026-11-12 16:05 KST",
+   "pdfs": [
+    {
+     "name": "민간_261112_화곡역_보눔하우스_청년안심주택 추가모집공고문.pdf",
+     "pages": 3
+    }
+   ],
+   "chars": 9206,
+   "tries": 1,
+   "err": ""
+  },
+  "ya:6728": {
+   "file": "data/notice_docs/ya-6728.txt",
+   "title": "[민간임대] 숭곡초교역(예정) 성북펠릭스 추가모집공고",
+   "url": "https://soco.seoul.go.kr/youth/bbs/BMSR00015/view.do?boardId=6728&menuNo=400008",
+   "fetched": "2026-11-12 16:05 KST",
+   "pdfs": [
+    {
+     "name": "민간_261112_숭곡초교역_성북펠릭스_청년안심주택 추가모집공고문.pdf",
+     "pages": 3
+    }
+   ],
+   "chars": 9251,
+   "tries": 1,
+   "err": ""
+  },
+  "ya:6730": {
+   "file": "data/notice_docs/ya-6730.txt",
+   "title": "[민간임대] 동묘앞역 청계로벤하임 추가모집공고",
+   "url": "https://soco.seoul.go.kr/youth/bbs/BMSR00015/view.do?boardId=6730&menuNo=400008",
+   "fetched": "2026-11-12 16:05 KST",
+   "pdfs": [
+    {
+     "name": "민간_261112_동묘앞역_청계로벤하임_청년안심주택 추가모집공고문.pdf",
+     "pages": 3
+    }
+   ],
+   "chars": 9660,
+   "tries": 1,
    "err": ""
   }
  }
