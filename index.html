@@ -931,7 +931,15 @@ h1,h2,h3{letter-spacing:-.02em}
 .nm-mkw.pr-on.pr-mini.pr-2l .pr-a{display:none}
 .nm-mkw.pr-on.pr-mini .nm-pr .pr-b{font-size:13.5px}
 .nm-mkw.pr-on.pr-mini.hov{transform:translate(-4px,-3px) scale(1.14)}
-.nm-mkw.pr-on.pr-mini[data-n]::after{top:-13px;right:-9px}
+.nm-mkw.pr-on.pr-mini[data-n]::after{top:-20px;right:-10px}
+.nm-mkw.pr-on.pr-lf{flex-direction:row-reverse;padding:0 8px 0 11px;transform:translate(calc(25px - 100%),-5px)}
+.nm-mkw.pr-on.pr-lf.pr-2l{padding:3px 8px 3px 11px;transform:translate(calc(25px - 100%),-9px)}
+.nm-mkw.pr-on.pr-lf.pr-2l .nm-pr{align-items:flex-end}
+.nm-mkw.pr-on.pr-lf.pr-mini,.nm-mkw.pr-on.pr-lf.pr-mini.pr-2l{padding:0 7px 0 9px;transform:translate(calc(21px - 100%),-3px)}
+.nm-mkw.pr-on.pr-lf.hov{transform:translate(calc(25px - 100%),-5px) scale(1.14)}
+.nm-mkw.pr-on.pr-lf.pr-2l.hov{transform:translate(calc(25px - 100%),-9px) scale(1.14)}
+.nm-mkw.pr-on.pr-lf.pr-mini.hov{transform:translate(calc(21px - 100%),-3px) scale(1.14)}
+.nm-mkw.pr-on.pr-lf[data-n]::after{right:auto;left:-9px}
 .nm-mkw.pr-on .nm-mk{width:13px!important;height:13px!important;min-width:0!important;padding:0!important;border:0!important;outline:0!important;box-shadow:none!important;transform:none!important;font-size:0!important;line-height:0!important;flex:none;background:var(--c)!important}
 .nm-mkw.pr-on .nm-mk.ya{width:11px!important;height:11px!important;border-radius:2px!important;transform:rotate(45deg)!important}
 .nm-mkw.pr-on .nm-mk.hl{background:#fff!important;box-shadow:inset 0 0 0 3px var(--c)!important}
@@ -1284,8 +1292,8 @@ html.pano-open,html.pano-open body{overflow:hidden}
 }
 /* 겹쳐서 묶인 핀: 숨기고, 묶음 대표에 숫자 배지 */
 .nm-mkw.pr-hid{visibility:hidden}
-.nm-mkw[data-n]::after{content:attr(data-n);position:absolute;top:-9px;right:-11px;min-width:19px;height:19px;padding:0 5px;box-sizing:border-box;border-radius:10px;background:#15181D;color:#fff;font:800 11.5px/19px var(--font-body);text-align:center;box-shadow:0 0 0 2px #fff;pointer-events:none;z-index:2}
-.nm-mkw.pr-on[data-n]::after{top:-15px;right:-7px}   /* 알약은 글자 위로 비켜서 */
+.nm-mkw[data-n]::after{content:attr(data-n);position:absolute;top:-11px;right:-14px;min-width:22px;height:23px;padding:0 7px;box-sizing:border-box;border-radius:12px;background:#E8590C;color:#fff;font:800 13px/23px var(--font-body);text-align:center;box-shadow:0 0 0 2px #fff;pointer-events:none;z-index:2}
+.nm-mkw.pr-on[data-n]::after{top:-21px;right:-10px}   /* 글자를 안 가리게 핀 위로 */   /* 알약은 글자 위로 비켜서 */
 /* 알약이 아닌 핀 = 색 점 — 'LH'·'매' 글자는 알약일 때만, 공고 예상 점선은 목록·상세에서
    2026-11-18 '너무 안보여': 점을 1.3배(20px → 26px) + 흰 테두리 밖에 짙은 테두리 → 지도 색(도로·건물·글자) 위에서도 또렷하게 */
 .nm-mkw:not(.pr-on) .nm-mk{transform:scale(1.3);box-shadow:0 0 0 2px #fff,0 0 0 3.5px rgba(21,24,29,.78),0 2px 6px rgba(0,0,0,.45)}
@@ -2217,7 +2225,7 @@ function rowBurd(it, p){ var n = null; for (var c = it.firstElementChild; c; c =
 function prParse(it){ var n = it.querySelector('.num'); if (!n) return ''; var m = n.textContent.replace(/\s+/g, ' ').match(/월\s*([\d.]+)(?:\s*~\s*([\d.]+))?\s*만/); if (!m) return ''; return m[2] ? (Math.round(+m[1]) + '만~') : (m[1] + '만'); }
 function prW(t){ var w = 0; t = String(t || ''); if (t.indexOf('월세 ') >= 0) { t = t.replace('월세 ', ''); w += 27; } if (t.indexOf('월부담 ') >= 0) { t = t.replace('월부담 ', ''); w += 40; } for (var i = 0; i < t.length; i++) { var c = t.charCodeAt(i); w += (c >= 48 && c <= 57) ? 8.5 : (c === 46 || c === 44 ? 4 : (c === 47 ? 6.5 : (c === 126 ? 9 : (c === 32 ? 4 : 14.5)))); } return w + 38; }
 // 핀 배치(알약·점·묶음)는 지도 전체 좌표로 한 번 계산해 두고, 줌·필터가 바뀔 때만 다시 계산 — 끌어서 옮기기만 하면 그대로(전엔 멈출 때마다 화면 안 핀으로 다시 계산해 알약이 점으로, 점이 알약으로 바뀌며 흔들렸음)
-var PR_CACHE = { key: '', st: {}, n: {}, zt: {} };
+var PR_CACHE = { key: '', st: {}, n: {}, zt: {}, lf: {} };
 function prLayout(force){
   if (!window.nmMap || !nmMap.getZoom) return; var el = document.getElementById('nmap'); if (!el || !el.clientWidth) return;
   var z = nmMap.getZoom(), key = z + '|' + (window.__prVer || 0);
@@ -2248,14 +2256,19 @@ function prCompute(z, key){
       k: lv ? 0 : (p.cat === 'pri' ? 1 : (p.cat === 'na' || p.__out ? 4 : 2)), r: p.__prr || 999 }); });
   all.sort(function(a, b){ return a.k - b.k || a.r - b.r || (a.id < b.id ? -1 : 1); });
   var hit = function(r, q, g){ return !(r.l > q.r + g || r.r < q.l - g || r.t > q.b + g || r.b < q.t - g); };
-  var pills = [], st = {}, zt = {};
-  all.forEach(function(o){ if (!o.pr) return; var r = o.h2 ? { l: o.x - 15, t: o.y - 21, r: o.x - 15 + o.w, b: o.y + 21 } : { l: o.x - 15, t: o.y - 17, r: o.x - 15 + o.w, b: o.y + 15 };
-    if (o.f) { var cx = o.x - 15 + o.w / 2; r.t = o.y - (o.h2 ? 58 : 54); r.l = Math.min(r.l, cx - 50); r.r = Math.max(r.r, cx + 50); }
-    var free = function(q){ for (var i = 0; i < pills.length; i++) if (hit(q, pills[i].b, 3)) return false; return true; };
-    if (free(r)) { pills.push({ o: o, b: r, m: [o.mk] }); st[o.id] = 'pill'; zt[o.id] = o.lv ? 70 : 60; return; }
-    // 두 줄이 안 들어가면 한 줄(월부담만, 높이 26px)
-    var q = { l: o.x - 14, t: o.y - 15, r: o.x - 14 + o.wm, b: o.y + 13 }; if (o.f) { var cq = o.x - 14 + o.wm / 2; q.t = o.y - 52; q.l = Math.min(q.l, cq - 50); q.r = Math.max(q.r, cq + 50); }
-    if (free(q)) { pills.push({ o: o, b: q, m: [o.mk], mini: true }); st[o.id] = 'mini'; zt[o.id] = o.lv ? 70 : 60; } });
+  var pills = [], st = {}, zt = {}, lf = {};
+  var free = function(q){ for (var i = 0; i < pills.length; i++) if (hit(q, pills[i].b, 3)) return false; return true; };
+  // 다른 단지 자리 둘레(점 ±16px · 위 15·아래 13px = 한 줄 핀이 들어갈 최소 자리)를 덮는지
+  var pts = all.filter(function(o){ return o.pr; }), covers = function(q, me){ for (var i = 0; i < pts.length; i++) { var t = pts[i]; if (t !== me && hit(q, { l: t.x - 16, t: t.y - 15, r: t.x + 16, b: t.y + 13 }, 0)) return true; } return false; };
+  // 자리 후보: 두 줄(점 오른쪽으로 펼침) → 두 줄(점 왼쪽으로) → 한 줄 오른쪽 → 한 줄 왼쪽 — 먼저 들어가는 자리에 놓음
+  all.forEach(function(o){ if (!o.pr) return; var t0 = o.h2 ? 21 : 17, b0 = o.h2 ? 21 : 15;
+    var cand = [{ k: 'pill', lf: 0, b: { l: o.x - 15, t: o.y - t0, r: o.x - 15 + o.w, b: o.y + b0 } }, { k: 'pill', lf: 1, b: { l: o.x + 15 - o.w, t: o.y - t0, r: o.x + 15, b: o.y + b0 } },
+      { k: 'mini', lf: 0, b: { l: o.x - 14, t: o.y - 15, r: o.x - 14 + o.wm, b: o.y + 13 } }, { k: 'mini', lf: 1, b: { l: o.x + 14 - o.wm, t: o.y - 15, r: o.x + 14, b: o.y + 13 } }];
+    var pick = null;
+    for (var c = 0; c < cand.length; c++) { var q = cand[c].b, mi = cand[c].k === 'mini';
+      if (o.f) { var cx = (q.l + q.r) / 2; q.t = o.y - (mi ? 52 : (o.h2 ? 58 : 54)); q.l = Math.min(q.l, cx - 50); q.r = Math.max(q.r, cx + 50); }
+      if (!free(q)) continue; if (!covers(q, o)) { pick = cand[c]; break; } if (!pick) pick = cand[c]; }   // 다른 단지 자리(점)를 덮지 않는 자리를 먼저 — 덮으면 그 단지가 묶여 버림(2026-11-18 '이정도는 따로 보여줘도')
+    if (pick) { pills.push({ o: o, b: pick.b, m: [o.mk], mini: pick.k === 'mini' }); st[o.id] = pick.k; if (pick.lf) lf[o.id] = 1; zt[o.id] = o.lv ? 70 : 60; } });
   // 금액이 있는데 한 줄도 안 들어가는 곳: 점으로 두지 않고 가장 가까운 글자 핀에 묶음('+N' · 누르면 갈라질 만큼 확대) — 접수 중은 늘 보이게 겹쳐도 한 줄로
   all.forEach(function(o){ if (st[o.id] || !o.pr) return;
     if (o.lv) { pills.push({ o: o, b: { l: o.x - 14, t: o.y - 15, r: o.x - 14 + o.wm, b: o.y + 13 }, m: [o.mk], mini: true }); st[o.id] = 'mini'; zt[o.id] = 70; return; }
@@ -2271,14 +2284,14 @@ function prCompute(z, key){
     reps.push({ o: o, b: r, m: [o.mk] }); st[o.id] = 'dot'; });
   var n = {}; pills.concat(reps).forEach(function(g){ if (g.m.length > 1) { n[g.o.id] = g.m.length; g.o.mk.__cl = g.m; if (!zt[g.o.id]) zt[g.o.id] = 50; } });
   var rp = {}; pills.concat(reps).forEach(function(g){ g.m.forEach(function(mk){ if (mk.__p) rp[mk.__p.__mkid] = g.o.mk; }); });   // 묶인 곳 → 그 묶음의 보이는 핀
-  PR_CACHE = { key: key, st: st, n: n, zt: zt, rp: rp };
+  PR_CACHE = { key: key, st: st, n: n, zt: zt, rp: rp, lf: lf };
   window.__prRep = {}; pills.forEach(function(g){ window.__prRep[g.o.id] = 1; });
   window.__prOn = pills.length; window.__clN = Object.keys(n).length; window.__hidN = Object.keys(st).filter(function(k){ return st[k] === 'hid'; }).length;
 }
 function prApply(){   // 계산해 둔 상태를 지금 그려진 핀에 입힘(바뀐 것만 건드림)
-  var st = PR_CACHE.st, n = PR_CACHE.n, zt = PR_CACHE.zt;
+  var st = PR_CACHE.st, n = PR_CACHE.n, zt = PR_CACHE.zt, lf = PR_CACHE.lf || {};
   document.querySelectorAll('#nmap .nm-mkw[data-mk]').forEach(function(w){ var id = w.dataset.mk, sv = st[id], on = sv === 'pill' || sv === 'mini', hd = sv === 'hid', mn = sv === 'mini';
-    var nv = n[id] ? '+' + (n[id] - 1) : null; if (w.classList.contains('pr-mini') !== mn && !w.__tmpFull) w.classList.toggle('pr-mini', mn);   // '+2' = 이 핀 밑에 2곳 더(전엔 '3' = 핀 포함이라 더하면 안 맞았음 — 2026-11-04)
+    var nv = n[id] ? '+' + (n[id] - 1) + '곳' : null, lfv = !!lf[id]; if (w.classList.contains('pr-mini') !== mn && !w.__tmpFull) w.classList.toggle('pr-mini', mn); if (w.classList.contains('pr-lf') !== lfv) w.classList.toggle('pr-lf', lfv);   // '+2' = 이 핀 밑에 2곳 더(전엔 '3' = 핀 포함이라 더하면 안 맞았음 — 2026-11-04)
     if (w.classList.contains('pr-on') !== on) w.classList.toggle('pr-on', on); if (w.classList.contains('pr-hid') !== hd) w.classList.toggle('pr-hid', hd);
     if (w.getAttribute('data-n') !== nv) { if (nv) w.setAttribute('data-n', nv); else w.removeAttribute('data-n'); } });
   (window.nmMarkers || []).forEach(function(mk){ var p = mk.__p; if (!p || mk === window.nmSelected || mk.__hov || !mk.setZIndex || !mk.getZIndex) return; var zc = mk.getZIndex(), t = zt[p.__mkid];
@@ -4558,7 +4571,7 @@ function nmInit(){
     var qfMore = document.getElementById('qf-more'); if (qfMore) qfMore.addEventListener('click', function(e){ e.stopPropagation(); lgBtn.click(); });
     var lgBody = document.getElementById('lg-body'); if (lgBody && !document.getElementById('lg-apply')) { var la = document.createElement('div'); la.className = 'lg-apply'; la.innerHTML = '<button type="button" id="lg-apply">결과 보기</button>'; lgBody.appendChild(la);
       la.querySelector('button').addEventListener('click', function(e){ e.stopPropagation(); if (sheet.mobile()) { if (sideEl.classList.contains('lg-open')) lgBtn.click(); sheet.go(2); } else if (!sideEl.classList.contains('lg-closed')) lgBtn.click(); }); }
-    var mch = document.getElementById('mapchips'); if (mch && !document.getElementById('pr-legend')) { var pl = document.createElement('div'); pl.id = 'pr-legend'; pl.className = 'pr-legend'; pl.innerHTML = '핀 = <b>공고 보증금/월세</b> · 아랫줄 <b>월부담</b>(월세+이자, 가장 싼 조합) · 자리가 좁으면 월부담만 · <b>+2</b> = 겹친 2곳 더 · 만 원'; pl.title = '월부담 = 월세 + 보증금 대출 이자(청년 버팀목 80%·연 2.5%) · 행복·국민임대는 보증금을 최대로 올려 월세를 가장 낮춘 조합이라 윗줄(공고 기본) 월세와 다를 수 있음'; mch.appendChild(pl);
+    var mch = document.getElementById('mapchips'); if (mch && !document.getElementById('pr-legend')) { var pl = document.createElement('div'); pl.id = 'pr-legend'; pl.className = 'pr-legend'; pl.innerHTML = '핀 = <b>공고 보증금/월세</b> · 아랫줄 <b>월부담</b>(월세+이자, 가장 싼 조합) · 자리가 좁으면 월부담만 · <b style="background:#E8590C;color:#fff;border-radius:9px;padding:0 5px">+2곳</b> = 겹쳐서 묶인 2곳(누르면 확대) · 만 원'; pl.title = '월부담 = 월세 + 보증금 대출 이자(청년 버팀목 80%·연 2.5%) · 행복·국민임대는 보증금을 최대로 올려 월세를 가장 낮춘 조합이라 윗줄(공고 기본) 월세와 다를 수 있음'; mch.appendChild(pl);
       var fb0 = document.createElement('div'); fb0.id = 'nm-focus'; fb0.className = 'nm-focus'; fb0.hidden = true; mch.insertBefore(fb0, mch.firstChild); focBanner();
       var ob = document.createElement('button'); ob.type = 'button'; ob.id = 'nm-offs'; ob.className = 'pr-off'; ob.hidden = true; mch.appendChild(ob); ob.addEventListener('click', function(e){ e.stopPropagation(); nmFitAll(); }); }
   }
@@ -5042,7 +5055,7 @@ window.addEventListener('beforeinstallprompt', function(e){ e.preventDefault(); 
 // ===== 새로고침 (2026-11-04) — 아이폰 홈 화면 앱엔 새로고침 버튼이 없어 껐다 켜야 했음 =====
 // ① 지도 말고 다른 화면 맨 위에서 아래로 당겼다 놓으면 새로고침(홈 화면 앱에서만 — 브라우저 탭은 자체 기능이 있음)
 // ② 앱으로 돌아올 때·30분마다 새 버전(version.json)·새 공고 자료(data/notices.json)를 확인 → 바뀌었으면 맨 위 띠 '눌러서 새로고침'
-var SITE_BUILD = '0b59046e3402';
+var SITE_BUILD = 'b7118787ffce';
 try { if (navigator.clearAppBadge) navigator.clearAppBadge(); } catch (e) {}   // 열자마자 아이콘 배지 지움(알림 자료를 못 읽어도)
 function nwSig(j){ var s = JSON.stringify([(j && j.items) || [], (j && j.list_ids) || {}]), h = 0; for (var i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0; return h + ':' + s.length; }
 (function(){
