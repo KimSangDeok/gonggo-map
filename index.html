@@ -1279,16 +1279,23 @@ html.pano-open,html.pano-open body{overflow:hidden}
 .nm-mkw.pr-hid{visibility:hidden}
 .nm-mkw[data-n]::after{content:attr(data-n);position:absolute;top:-9px;right:-11px;min-width:19px;height:19px;padding:0 5px;box-sizing:border-box;border-radius:10px;background:#15181D;color:#fff;font:800 11.5px/19px var(--font-body);text-align:center;box-shadow:0 0 0 2px #fff;pointer-events:none;z-index:2}
 .nm-mkw.pr-on[data-n]::after{top:-15px;right:-7px}   /* 알약은 글자 위로 비켜서 */
-/* 알약이 아닌 핀 = 색 점(20px) — 'LH'·'매' 글자는 알약일 때만, 공고 예상 점선은 목록·상세에서 */
-.nm-mkw:not(.pr-on) .nm-mk{transform:none;box-shadow:0 0 0 2px #fff,0 1px 5px rgba(0,0,0,.4)}
-.nm-mkw:not(.pr-on) .nm-mk.hl{box-shadow:inset 0 0 0 4.5px var(--c),0 0 0 2px #fff,0 1px 5px rgba(0,0,0,.4)}
-.nm-mkw:not(.pr-on) .nm-mk.ya{transform:rotate(45deg);box-shadow:inset 0 0 0 3.5px var(--c),0 0 0 2px #fff,0 1px 5px rgba(0,0,0,.4)}
-.nm-mkw:not(.pr-on) .nm-mk.lh{font-size:0;transform:scale(.84)}
-.nm-mkw:not(.pr-on) .nm-mk.lh.live{transform:scale(.95)}
+/* 알약이 아닌 핀 = 색 점 — 'LH'·'매' 글자는 알약일 때만, 공고 예상 점선은 목록·상세에서
+   2026-11-18 '너무 안보여': 점을 1.3배(20px → 26px) + 흰 테두리 밖에 짙은 테두리 → 지도 색(도로·건물·글자) 위에서도 또렷하게 */
+.nm-mkw:not(.pr-on) .nm-mk{transform:scale(1.3);box-shadow:0 0 0 2px #fff,0 0 0 3.5px rgba(21,24,29,.78),0 2px 6px rgba(0,0,0,.45)}
+.nm-mkw:not(.pr-on) .nm-mk.hl{box-shadow:inset 0 0 0 4.5px var(--c),0 0 0 2px #fff,0 0 0 3.5px rgba(21,24,29,.78),0 2px 6px rgba(0,0,0,.45)}
+.nm-mkw:not(.pr-on) .nm-mk.ya{transform:rotate(45deg) scale(1.3);box-shadow:inset 0 0 0 3.5px var(--c),0 0 0 2px #fff,0 0 0 3.5px rgba(21,24,29,.78),0 2px 6px rgba(0,0,0,.4)}
+.nm-mkw:not(.pr-on) .nm-mk.lh{font-size:0;transform:scale(1.05);box-shadow:0 0 0 2px #fff,0 0 0 3.5px rgba(21,24,29,.78),0 2px 6px rgba(0,0,0,.45)}
+.nm-mkw:not(.pr-on) .nm-mk.lh.live{transform:scale(1.15)}
+.nm-mkw:not(.pr-on) .nm-mk.sm{transform:scale(1.75)}   /* 작은 형 행복주택(14px)도 거의 같은 크기로 — 사용자 화면의 '너무 안 보이는' 점이 이것 */
+.nm-mkw:not(.pr-on) .nm-mk.sm.live{transform:scale(1.85)}
+.nm-mkw:not(.pr-on) .nm-mk.na{transform:none;box-shadow:0 0 0 1.5px rgba(0,0,0,.35),0 2px 5px rgba(0,0,0,.35)}
+.nm-mkw:not(.pr-on) .nm-mk.ya.na{transform:rotate(45deg);box-shadow:inset 0 0 0 3.5px var(--c),0 0 0 1.5px rgba(0,0,0,.35),0 2px 5px rgba(0,0,0,.35)}
+.nm-mkw:not(.pr-on) .nm-mk.out{transform:none}
+.nm-mkw:not(.pr-on) .nm-mk.ya.out{transform:rotate(45deg)}
 .nm-mkw:not(.pr-on)::before{content:'';position:absolute;inset:-7px}   /* 누르는 자리는 점보다 넓게(약 34px) */
 .nm-mkw:not(.pr-on) .nm-mk.exp{outline:0}
-.nm-mkw:not(.pr-on) .nm-mk.live{transform:scale(1.1);box-shadow:0 0 0 2.5px #fff,0 0 0 5px #12805A,0 2px 6px rgba(0,0,0,.4)}
-.nm-mkw:not(.pr-on) .nm-mk.ya.live{transform:rotate(45deg) scale(1.1);box-shadow:inset 0 0 0 3.5px var(--c),0 0 0 2.5px #fff,0 0 0 5px #12805A,0 2px 6px rgba(0,0,0,.4)}
+.nm-mkw:not(.pr-on) .nm-mk.live{transform:scale(1.35);box-shadow:0 0 0 2.5px #fff,0 0 0 5px #12805A,0 2px 6px rgba(0,0,0,.4)}
+.nm-mkw:not(.pr-on) .nm-mk.ya.live{transform:rotate(45deg) scale(1.35);box-shadow:inset 0 0 0 3.5px var(--c),0 0 0 2.5px #fff,0 0 0 5px #12805A,0 2px 6px rgba(0,0,0,.4)}
 .nm-mkw:not(.pr-on) .nm-mk.plan{transform:none}
 /* 폰 시트 머리: 손잡이만(누르면 펼치기·접기) · 분절 단추 낮게 */
 @media (max-width:760px){
@@ -2187,6 +2194,12 @@ function mkWrap(inner, p){ var f = nmFlag(p), e = expMk(p) ? expOf(p) : null, lv
 function prDep(n){ n = Math.round(+n); return n >= 10000 ? Math.floor(n / 10000) + '억' + (n % 10000 ? ' ' + (n % 10000).toLocaleString() : '') : n.toLocaleString(); }
 function prText(it){ var r = it.dataset.pr; if (r === undefined || r === '' || isNaN(+r)) return ''; var rs = String(Math.round(+r * 10) / 10), d = it.dataset.pd, m = it.dataset.pm ? '~' : '';
   return (d !== undefined && d !== '' && +d > 0) ? prDep(d) + '/월세 ' + rs + m : '월세 ' + rs + '만' + m; }   // '월세'를 핀에 직접(월부담과 헷갈리지 않게, 2026-11-18)
+// 국민임대 공고 금액: 2026 공고문 단지표(KOOK_ROWS 셋째 칸 '…<br>5,974~6,644만<br>월 37.8~39.8만') 중 내 형 — 월세 가장 낮은 형의 보증금·월세, 형·범위가 여럿이면 '~'
+function kookPrice(p){ var mine = myTys(p) || [], best = null, multi = false;
+  (KOOK_ROWS[p.name] || []).forEach(function(r){ if (mine.indexOf(String(Math.floor(parseFloat(r[0])))) < 0) return; var t = String(r[2] || '').replace(/<[^>]+>/g, ' ');
+    var m = t.match(/([\d,]+)(?:\s*~\s*([\d,]+))?\s*만\s+월\s*([\d.]+)(?:\s*~\s*([\d.]+))?\s*만/); if (!m) return;
+    var d = +m[1].replace(/,/g, ''), rt = +m[3]; if (m[2] || m[4] || best) multi = true; if (!best || rt < best.r) best = { d: d, r: rt }; });
+  return best ? { d: best.d, r: best.r, m: multi } : null; }
 function prHtml(t){ return hesc(t).replace('월세 ', '<small class="pr-l">월세</small>').replace('월부담 ', '<small class="pr-l">월부담</small>'); }
 // 월부담(만 원) 글자 — 핀 둘째 줄·목록 값 칸 (2026-11-18 '월부담금도 표기해라') · 여러 형이면 가장 낮은 값 + '~'
 function pbText(p){ var b = burdInfo(p); if (!b) return ''; return '월부담 ' + Math.round(b.tot / 1000) / 10 + (b.hi && b.hi - b.tot >= 1000 ? '~' : ''); }
@@ -2235,7 +2248,7 @@ function prCompute(z, key){
     pills.push({ o: o, b: r, m: [o.mk] }); st[o.id] = 'pill'; zt[o.id] = o.lv ? 70 : 60; });
   var reps = [];
   all.forEach(function(o){ if (st[o.id]) return;
-    var r = o.pl ? { l: o.x - 20, t: o.y - 12, r: o.x + 28, b: o.y + 12 } : { l: o.x - 12, t: o.y - 12, r: o.x + 12, b: o.y + 12 };
+    var r = o.pl ? { l: o.x - 20, t: o.y - 12, r: o.x + 28, b: o.y + 12 } : { l: o.x - 14, t: o.y - 14, r: o.x + 14, b: o.y + 14 };
     if (!o.lv) { var g = null, i;
       for (i = 0; i < pills.length && !g; i++) if (hit(r, pills[i].b, -2)) g = pills[i];
       for (i = 0; i < reps.length && !g; i++) if (hit(r, reps[i].b, -2)) g = reps[i];
@@ -4277,9 +4290,10 @@ function nmInit(){
         naver.maps.Event.addListener(mk, 'click', function(){ nmMkClick(mk); });
         var it = document.createElement('div'); it.className = 'it'; it.setAttribute('data-key', k);
         it.setAttribute('data-nid', p.nid);
-        it.__render = function(){ it.dataset.cat = p.cat; if (p.kind === '행복주택' && p.rent) { it.dataset.pd = manwon(p.dep || ''); it.dataset.pr = parseFloat(p.rent); it.dataset.pm = ''; }
+        it.__render = function(){ it.dataset.cat = p.cat; var kp = p.kind === '국민임대' ? kookPrice(p) : null; if (p.kind === '행복주택' && p.rent) { it.dataset.pd = manwon(p.dep || ''); it.dataset.pr = parseFloat(p.rent); it.dataset.pm = ''; }
+          else if (kp) { it.dataset.pd = kp.d; it.dataset.pr = kp.r; it.dataset.pm = kp.m ? '1' : ''; } else if (p.kind === '국민임대') { it.dataset.pd = ''; it.dataset.pr = ''; it.dataset.pm = ''; }
           var ntGo = p.cat !== 'na' && p.nid && NREG[p.nid];
-          it.innerHTML = '<span class="dot' + nmCls(p) + '" style="--c:' + nmColor(p) + ';margin-top:3px"></span><div><b>' + p.name + guTag(p) + ' <span class="pill ' + (p.cat === 'na' ? 'warn' : 'info') + (ntGo ? ' nt-go" role="button" data-nid="' + p.nid + '" title="이 공고의 단지를 지도에서 보기"' : '"') + ' style="font-size:11px;padding:0 7px">' + (p.cat === 'na' ? (p.kind === '행복주택' ? naPill(p) : (p.na0 ? '지금 해당 없음' : '기준 미만')) : p.kind === '국민임대' ? '26년 국민임대 ' + (p.ok26 || []).map(function(a){ return a.replace(/^(\d+)㎡$/, function(_, n){ return n + '㎡(' + py(n) + ')'; }); }).join('·') : NOTICES[p.nid].short) + (ntGo ? ' <span aria-hidden="true">›</span>' : '') + '</span>' + (p.cat !== 'na' ? rankChip(p.rank) : '') + '</b><small>' + (p.kind === '행복주택' ? p.m2 + '㎡ ' + p.py + ' · ' + hhShort(p) + ' · 공가 ' + p.vac + (p.wait ? ' · 예비 ' + p.wait : '') : hhShort(p) + (rankRest(p.rank) ? ' · ' + rankRest(p.rank) : '')) + rmTag(p) + btTag(p) + pkTag(p) + stTag(p) + '</small></div><div class="num">' + (p.kind === '행복주택' ? '<b class="n1">월세 ' + p.rent + '</b><small class="n2">보증금 ' + p.dep + '</small>' : '') + '</div>'; };
+          it.innerHTML = '<span class="dot' + nmCls(p) + '" style="--c:' + nmColor(p) + ';margin-top:3px"></span><div><b>' + p.name + guTag(p) + ' <span class="pill ' + (p.cat === 'na' ? 'warn' : 'info') + (ntGo ? ' nt-go" role="button" data-nid="' + p.nid + '" title="이 공고의 단지를 지도에서 보기"' : '"') + ' style="font-size:11px;padding:0 7px">' + (p.cat === 'na' ? (p.kind === '행복주택' ? naPill(p) : (p.na0 ? '지금 해당 없음' : '기준 미만')) : p.kind === '국민임대' ? '26년 국민임대 ' + (p.ok26 || []).map(function(a){ return a.replace(/^(\d+)㎡$/, function(_, n){ return n + '㎡(' + py(n) + ')'; }); }).join('·') : NOTICES[p.nid].short) + (ntGo ? ' <span aria-hidden="true">›</span>' : '') + '</span>' + (p.cat !== 'na' ? rankChip(p.rank) : '') + '</b><small>' + (p.kind === '행복주택' ? p.m2 + '㎡ ' + p.py + ' · ' + hhShort(p) + ' · 공가 ' + p.vac + (p.wait ? ' · 예비 ' + p.wait : '') : hhShort(p) + (rankRest(p.rank) ? ' · ' + rankRest(p.rank) : '')) + rmTag(p) + btTag(p) + pkTag(p) + stTag(p) + '</small></div><div class="num">' + (p.kind === '행복주택' ? '<b class="n1">월세 ' + p.rent + '</b><small class="n2">보증금 ' + p.dep + '</small>' : (kp ? '<b class="n1">월세 ' + kp.r + '만' + (kp.m ? '~' : '') + '</b><small class="n2">보증금 ' + fmtMan(kp.d) + (kp.m ? '~' : '') + '</small>' : '')) + '</div>'; };
         rowRender(it);
         it.__mk = mk;
         it.addEventListener('click', function(e){ var ng = e.target.closest && e.target.closest('.nt-go'); if (ng) { e.stopPropagation(); window.nmNoticeGo(ng.getAttribute('data-nid')); return; } nmRowClick(e, mk); });
@@ -4528,7 +4542,7 @@ function nmInit(){
     var qfMore = document.getElementById('qf-more'); if (qfMore) qfMore.addEventListener('click', function(e){ e.stopPropagation(); lgBtn.click(); });
     var lgBody = document.getElementById('lg-body'); if (lgBody && !document.getElementById('lg-apply')) { var la = document.createElement('div'); la.className = 'lg-apply'; la.innerHTML = '<button type="button" id="lg-apply">결과 보기</button>'; lgBody.appendChild(la);
       la.querySelector('button').addEventListener('click', function(e){ e.stopPropagation(); if (sheet.mobile()) { if (sideEl.classList.contains('lg-open')) lgBtn.click(); sheet.go(2); } else if (!sideEl.classList.contains('lg-closed')) lgBtn.click(); }); }
-    var mch = document.getElementById('mapchips'); if (mch && !document.getElementById('pr-legend')) { var pl = document.createElement('div'); pl.id = 'pr-legend'; pl.className = 'pr-legend'; pl.innerHTML = '핀 = <b>공고 보증금/월세</b> · 아랫줄 <b>월부담</b>(월세 + 대출 이자) · 만 원 · <b>+2</b> = 밑에 2곳 더'; mch.appendChild(pl);
+    var mch = document.getElementById('mapchips'); if (mch && !document.getElementById('pr-legend')) { var pl = document.createElement('div'); pl.id = 'pr-legend'; pl.className = 'pr-legend'; pl.innerHTML = '핀 = <b>공고 보증금/월세</b> · 아랫줄 <b>월부담</b>(월세+이자, 가장 싼 조합) · 만 원 · <b>+2</b> = 밑에 2곳 더'; pl.title = '월부담 = 월세 + 보증금 대출 이자(청년 버팀목 80%·연 2.5%) · 행복·국민임대는 보증금을 최대로 올려 월세를 가장 낮춘 조합이라 윗줄(공고 기본) 월세와 다를 수 있음'; mch.appendChild(pl);
       var fb0 = document.createElement('div'); fb0.id = 'nm-focus'; fb0.className = 'nm-focus'; fb0.hidden = true; mch.insertBefore(fb0, mch.firstChild); focBanner();
       var ob = document.createElement('button'); ob.type = 'button'; ob.id = 'nm-offs'; ob.className = 'pr-off'; ob.hidden = true; mch.appendChild(ob); ob.addEventListener('click', function(e){ e.stopPropagation(); nmFitAll(); }); }
   }
@@ -5012,7 +5026,7 @@ window.addEventListener('beforeinstallprompt', function(e){ e.preventDefault(); 
 // ===== 새로고침 (2026-11-04) — 아이폰 홈 화면 앱엔 새로고침 버튼이 없어 껐다 켜야 했음 =====
 // ① 지도 말고 다른 화면 맨 위에서 아래로 당겼다 놓으면 새로고침(홈 화면 앱에서만 — 브라우저 탭은 자체 기능이 있음)
 // ② 앱으로 돌아올 때·30분마다 새 버전(version.json)·새 공고 자료(data/notices.json)를 확인 → 바뀌었으면 맨 위 띠 '눌러서 새로고침'
-var SITE_BUILD = '58d64258dc3f';
+var SITE_BUILD = '7c45115c4b28';
 try { if (navigator.clearAppBadge) navigator.clearAppBadge(); } catch (e) {}   // 열자마자 아이콘 배지 지움(알림 자료를 못 읽어도)
 function nwSig(j){ var s = JSON.stringify([(j && j.items) || [], (j && j.list_ids) || {}]), h = 0; for (var i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0; return h + ':' + s.length; }
 (function(){
