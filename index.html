@@ -848,7 +848,7 @@ h1,h2,h3{letter-spacing:-.02em}
 .nm-focus small{display:block;margin-top:2px;font-size:12.5px;line-height:1.4;color:rgba(255,255,255,.8);word-break:keep-all}
 .nm-focus button{flex:none;min-height:40px;padding:0 14px;border:0;border-radius:999px;background:#fff;color:#15181D;font:800 14px/1 var(--font-body);cursor:pointer}
 @media (max-width:760px){ .nm-focus{margin:0 12px} }
-#view-map.focusing .mapchips .qf-row,#view-map.focusing #pr-legend{display:none!important}
+#view-map.focusing .mapchips .qf-row{display:none!important}
 #view-map.focusing #lg-sum-txt .af-c,#view-map.focusing #lg-sum-txt .af-reset{display:none!important}   /* 공고 보기 중엔 지도 필터 칩 숨김(안 먹으니까) */
 #view-map.focusing #lg-sum-txt > b::after{content:' · 공고 보기';font-weight:600;color:var(--muted);font-size:.8em}
 .nm-gu-open{border:1.5px solid var(--line);border-radius:999px;background:var(--bg);color:var(--fg);font:inherit;font-weight:600;padding:7px 14px;cursor:pointer}
@@ -950,9 +950,9 @@ h1,h2,h3{letter-spacing:-.02em}
 .nm-mkw.pr-on.pr-pri .nm-mk,.nm-mkw.pr-on.pr-live .nm-mk{background:#fff!important;box-shadow:none!important}
 .nm-flag{background:#12805A;color:#fff;border-color:#fff}.nm-flag::after{border-top-color:#12805A}
 .nm-flag.soon{background:#E5F5EE;color:#0D6B4A}.nm-flag.soon::after{border-top-color:#E5F5EE}
-.pr-legend{display:inline-block;margin-top:6px;padding:5px 11px;border-radius:999px;background:rgba(255,255,255,.94);color:#4B5462;font:500 12.5px/1.35 var(--font-body);box-shadow:0 1px 4px rgba(21,24,29,.16);pointer-events:none;max-width:calc(100% - 24px)}
-.pr-legend b{color:#15181D;font-weight:700}   /* 지도는 늘 밝은 색이라 어두운 모드에서도 같은 색 */
-@media (max-width:760px){.pr-legend{margin-left:12px;font-size:12px}}
+.pin-help{display:block;margin:8px 12px 2px;padding:8px 10px;border-radius:10px;background:var(--accent-soft);color:var(--fg);font-size:12.5px;line-height:1.45}
+.pin-help .pb{display:inline-block;background:#E8590C;color:#fff;border-radius:9px;padding:0 6px;font-weight:800}
+@media (max-width:760px){.pin-help{margin:2px 16px 6px}}
 .pr-off{display:block;width:max-content;min-height:36px;margin:6px 0 0;padding:0 14px;border:0;border-radius:999px;background:rgba(255,255,255,.96);color:#1E5AA8;font:700 13px/36px var(--font-body);box-shadow:0 1px 4px rgba(21,24,29,.22);pointer-events:auto;cursor:pointer}
 .pr-off[hidden]{display:none}
 @media (max-width:760px){.pr-off{margin-left:12px}}
@@ -1372,6 +1372,7 @@ html.pano-open,html.pano-open body{overflow:hidden}
       <div class="side-tabs" id="side-tabs" role="tablist"><button type="button" data-tab="list" class="on" role="tab" aria-selected="true">단지 목록</button><button type="button" data-tab="notice" role="tab" aria-selected="false">공고 <span id="st-live" class="pill ok" hidden></span></button></div>
       <div class="lg-sum" id="lg-sum"><span id="lg-sum-txt"></span><button type="button" class="bt-i" data-bt="sec-quick" aria-label="필터 설명">ⓘ</button><button type="button" id="lg-toggle" aria-expanded="false">상세 필터 ▾</button></div>
       <div class="lg-body" id="lg-body">
+      <small class="k pin-help" id="pin-help" title="월부담 = 월세 + 보증금 대출 이자(청년 버팀목 보증금 80%·연 2.5%) · 행복·국민임대는 보증금을 최대로 올려 월세를 가장 낮춘 조합이라 윗줄(공고 기본) 월세와 다를 수 있음"><b>지도 핀 보는 법</b> — 윗줄 공고 보증금/월세 · 아랫줄 월부담(월세 + 보증금 대출 이자, 가장 싼 조합) · 자리가 좁으면 월부담만 · <span class="pb">+2곳</span> = 겹쳐서 묶인 곳(누르면 확대) · 단위 만 원</small>
       <div class="nmbar">
         <span class="lg-h">단지 종류 <span class="lg-all"><button type="button" data-all="cat:1">전체 선택</button><button type="button" data-all="cat:0">전체 해제</button></span></span>
         <span class="bt-it"><label><input type="checkbox" data-cat="pri" checked> <span class="dot" style="--c:#D32F2F"></span> <span class="pri-lab">행복주택 · 강서·동대문(1월까지)</span></label><button type="button" class="bt-i" data-bt="cat-pri" aria-label="행복주택 우선공급 1순위 지역 설명">ⓘ</button></span>
@@ -4645,7 +4646,7 @@ function nmInit(){
     var qfMore = document.getElementById('qf-more'); if (qfMore) qfMore.addEventListener('click', function(e){ e.stopPropagation(); lgBtn.click(); });
     var lgBody = document.getElementById('lg-body'); if (lgBody && !document.getElementById('lg-apply')) { var la = document.createElement('div'); la.className = 'lg-apply'; la.innerHTML = '<button type="button" id="lg-apply">결과 보기</button>'; lgBody.appendChild(la);
       la.querySelector('button').addEventListener('click', function(e){ e.stopPropagation(); if (sheet.mobile()) { if (sideEl.classList.contains('lg-open')) lgBtn.click(); sheet.go(2); } else if (!sideEl.classList.contains('lg-closed')) lgBtn.click(); }); }
-    var mch = document.getElementById('mapchips'); if (mch && !document.getElementById('pr-legend')) { var pl = document.createElement('div'); pl.id = 'pr-legend'; pl.className = 'pr-legend'; pl.innerHTML = '핀 = <b>공고 보증금/월세</b> · 아랫줄 <b>월부담</b>(월세+이자, 가장 싼 조합) · 자리가 좁으면 월부담만 · <b style="background:#E8590C;color:#fff;border-radius:9px;padding:0 5px">+2곳</b> = 겹쳐서 묶인 2곳(누르면 확대) · 만 원'; pl.title = '월부담 = 월세 + 보증금 대출 이자(청년 버팀목 80%·연 2.5%) · 행복·국민임대는 보증금을 최대로 올려 월세를 가장 낮춘 조합이라 윗줄(공고 기본) 월세와 다를 수 있음'; mch.appendChild(pl);
+    var mch = document.getElementById('mapchips'); if (mch && !document.getElementById('nm-focus')) {   // 핀 설명은 지도 위가 아니라 상세 필터 맨 위(#pin-help) — 2026-11-18 '필터 아래가 좁다'
       var fb0 = document.createElement('div'); fb0.id = 'nm-focus'; fb0.className = 'nm-focus'; fb0.hidden = true; mch.insertBefore(fb0, mch.firstChild); focBanner();
       var ob = document.createElement('button'); ob.type = 'button'; ob.id = 'nm-offs'; ob.className = 'pr-off'; ob.hidden = true; mch.appendChild(ob); ob.addEventListener('click', function(e){ e.stopPropagation(); nmFitAll(); }); }
   }
@@ -5129,7 +5130,7 @@ window.addEventListener('beforeinstallprompt', function(e){ e.preventDefault(); 
 // ===== 새로고침 (2026-11-04) — 아이폰 홈 화면 앱엔 새로고침 버튼이 없어 껐다 켜야 했음 =====
 // ① 지도 말고 다른 화면 맨 위에서 아래로 당겼다 놓으면 새로고침(홈 화면 앱에서만 — 브라우저 탭은 자체 기능이 있음)
 // ② 앱으로 돌아올 때·30분마다 새 버전(version.json)·새 공고 자료(data/notices.json)를 확인 → 바뀌었으면 맨 위 띠 '눌러서 새로고침'
-var SITE_BUILD = 'eedd4eb2864f';
+var SITE_BUILD = 'c5ba5b256a18';
 try { if (navigator.clearAppBadge) navigator.clearAppBadge(); } catch (e) {}   // 열자마자 아이콘 배지 지움(알림 자료를 못 읽어도)
 function nwSig(j){ var s = JSON.stringify([(j && j.items) || [], (j && j.list_ids) || {}]), h = 0; for (var i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0; return h + ':' + s.length; }
 (function(){
