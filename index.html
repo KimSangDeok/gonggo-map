@@ -2412,6 +2412,18 @@ function yaRankTxt(c){ var t = yaParts(c); return [t.pub ? '공공 3순위' : ''
 function myRankTxt(p){ if (!p) return ''; if (p.rank) return rankHead(p.rank); if (p.ya && p.comp) return yaRankTxt(p.comp); if (p.mi && !p.units) return '3순위'; return ''; }
 var RANK_YA = '<b>공공임대(SH) 3순위</b> — 본인 소득·자산만 봄(부모 안 봄. 부모를 보는 2순위는 뺌) · 1순위는 수급자·보호대상 한부모·차상위만 → 임대료 B구간(시세 50%) <small class="k">근거: SH 2026 2차 청년안심주택 공고문 32~33쪽(순위: 2순위 = 본인+부모 소득, 3순위 = 본인 소득) · 17·27쪽(임대료 구간)</small>';
 var RANK_YA2 = '<b>민간임대 특별공급</b> 자격 됨 — 소득 120% · 자산 2억 5,100만 · 자동차 4,542만 이하(소득 있는 청년은 본인 세대 기준 · 자산은 본인 — 따로 사는 부모 안 봄) · 일반공급은 소득·자산 제한 없음 <small class="k">근거: 서울시 청년안심주택 입주자격 · 서울시 2022.5 역세권 청년주택 기준 개정 발표</small>';
+// 청년안심 '내 순위' — 한 건물에 공공임대(SH가 모집)·민간임대(사업자가 모집)가 섞여 공고·접수가 따로 → 내는 공고에 따라 순위가 다름 (2026-11-18 '둘 중 어떤 거라는 거야, 헷갈려')
+// pr = 위 요약 상자에 금액이 있음(서울시 단지정보 형별 표 = 민간임대 금액)
+function yaRankHtml(c, pr){
+  var t = yaParts(c), sc = c.scale || {}, n = function(v){ return v != null ? ' ' + v + '세대' : ''; };
+  var pb = '<b>공공임대</b>' + n(sc.pub) + ' · SH 공고로 내면 → <b>3순위</b> (임대료 시세 50%)';
+  var pv = '<b>민간임대</b>' + n(sc.priv) + ' · 사업자 공고로 내면 → <b>특별공급</b> 자격 됨' + (pr ? ' <span class="tag">위 금액</span>' : '');
+  var src = '<small class="k">공공: 1순위 = 수급자·보호대상 한부모·차상위 · 2순위 = 본인+부모 소득을 봄 → 빼고, 본인 소득·자산만 보는 3순위 · 1순위가 아니면 임대료 B구간(시세 50%) — <a href="https://www.i-sh.co.kr/app/lay2/program/S1T294C295/www/brd/m_241/view.do?multi_itm_seqs=1%2C2%2C4%2C8%2C16%2C32%2C64%2C128%2C256&seq=309925" target="_blank" rel="noopener">SH 2026 2차 청년안심주택 공고문</a> 32~33쪽(순위)·17·27쪽(임대료 구간).<br>' +
+    '민간: 특별공급 = 소득 120% · 자산 2억 5,100만 · 자동차 4,542만 이하(소득 있는 청년은 본인 세대 기준, 따로 사는 부모 안 봄) · 일반공급은 소득·자산 제한 없음 — 서울시 청년안심주택 입주자격 · 서울시 2022.5 역세권 청년주택 기준 개정 발표.<br>' +
+    '두 갈래: "공공임대주택과 민간임대주택이 혼합 … 공공임대주택은 공공이, 민간임대주택은 사업자가 임대차계약 및 세대를 운영·관리" — <a href="https://soco.seoul.go.kr/youth/bbs/BMSR00015/view.do?boardId=6727&menuNo=400008" target="_blank" rel="noopener">민간 공고문(화곡역 보눔하우스 2026.11.12)</a> 1쪽' + (pr ? ' · 위 금액 = 서울시 단지정보 형별 표(민간임대 특별·일반공급 금액)' : '') + '</small>';
+  if (t.pub && t.priv) return '<b>모집이 둘로 나뉨</b> — 같은 건물이지만 공고·접수가 따로라 <b>내는 공고에 따라</b> 순위가 다름<br>① ' + pb + '<br>② ' + pv + '<br>' + src;
+  return (t.pub ? pb : pv) + '<br>' + src;
+}
 var RANK_MI = '<b>3순위</b> — 본인 소득·자산만 봄(부모 안 봄. 부모를 보는 2순위와 가점 \'부모 무주택 2점\'은 뺌) · 1순위는 수급자·차상위·한부모만 <small class="k">근거: SH 2026 1차 청년 매입임대 공고문(2순위 = 본인+부모 소득 · 27쪽 가점)</small>';
 function rankScore(p){ if (p && !p.rank) { if (p.ya && p.comp) return yaParts(p.comp).pub ? 4.5 : 3; if (p.mi && !p.units) return 4.5; return null; } var h = rankHead(p && p.rank); if (!h) return null; if (/우선 1순위|거주 1순위/.test(h)) return 1; if (/1순위/.test(h)) return 2; if (/추첨/.test(h)) return 3; if (/2순위/.test(h)) return 4; if (/예비/.test(h)) return 5; return 6; }
 // ===== 단지 목록 정렬: 묶음(행복주택 강서·동대문 / 그 외 서울 / 국민임대 …) 안에서, 누른 기준 순서대로 우선 적용 =====
@@ -3359,7 +3371,7 @@ function yaHtml(p){
     '</table></div>';
   var body = (p.na ? '<div class="iw-nophoto" style="border-color:#e0a800;background:#fff8e1;color:#5d4a00"><b>내 조건 밖</b> — ' + p.na + '. 단지 정보는 참고용으로 둠.</div>' : '') + '<table class="iw-t">' +
     '<tr><th>규모</th><td>' + (sc.total != null ? '<b>총 ' + sc.total + '세대</b> · 공공임대 <b>' + (sc.pub == null ? '미기재' : sc.pub) + '</b> · 민간임대 ' + (sc.priv == null ? '미기재' : sc.priv) : (c.scale_tot ? '총 ' + c.scale_tot + '세대 (공공·민간 구분 없음)' : '<small class="k">세대수 미기재</small>')) + '</td></tr>' +
-    (p.na ? '' : '<tr><th>내 순위</th><td>' + [yaParts(c).pub ? RANK_YA : '', yaParts(c).priv ? RANK_YA2 : ''].filter(Boolean).join('<br>') + '</td></tr>') +
+    (p.na ? '' : '<tr><th>내 순위</th><td>' + yaRankHtml(c, sp0.ok.some(function(r){ return r.rent != null; })) + '</td></tr>') +
     '<tr><th>공고</th><td>' + (ns.length ? ns.slice(0, 3).map(function(n){ return '<a href="' + n.url + '" target="_blank" rel="noopener">' + n.title + '</a> <small class="k">' + n.kind + (n.stage === '추가' ? '·추가' : '') + ' · 게시 ' + n.posted + (n.apply ? ' · 청약 ' + n.apply : '') + '</small>'; }).join('<br>') : '<small class="k">서울시 공고 게시판 최근 30건에 이 단지 공고 없음</small>') + '</td></tr>' +
     '</table>';
   // 사진: 서울시 단지정보 상세 페이지 이미지(대표 · 평면도). 투시도(조감도)는 데이터로만
@@ -3932,7 +3944,7 @@ function detHero(p){
     sub.unshift('<span class="dh-b">월부담 <b>' + Math.round(bi.tot / 1000) / 10 + '만</b> <span class="dh-bs">' + (bi.nl ? '대출 안 됨 → 월세만 · 보증금 ' + bd + ' 전부 내 돈' : (bi.mx ? '보증금 ' + bd + '으로 올리면' : '공고 보증금 ' + bd + ' 그대로') + ' · ' + burdCalc(p, true)) + '</span> <small class="k">' +
       (bi.nl ? '공고문 1쪽: 시중은행 전세자금대출 대상 아님(운영기관이 전대하는 주택) → 이자 0, 기본 보증금 기준' : (bi.mx ? '공고문 전환 규정대로 월세를 보증금으로 최대한 돌린 조합(월세가 가장 낮음) · ' : '보증금 전환 자료가 없어 공고 금액 · ') + '대출 ' + fmtMan(bi.L / 10000) + ' = 보증금의 80% · 연 2.5%(청년 버팀목, 모든 공고 같음) · 내 돈 ' + fmtMan(Math.round((bi.dep - bi.L) / 10000)) + ' · 표는 아래 \'대출 쓰면\'') + '</small></span>'); }
   return '<div class="det-hero"><div class="dh-m">' + (d ? '<span>보증금</span><b>' + fmtMan(d) + '</b><i>/</i>' : '') + '<span>월세</span><b>' + r + '만' + (m ? '~' : '') + '</b></div>' +
-    '<div class="dh-s">' + (m ? '월세 가장 싼 형 기준 · 형마다 다름(아래 표)' : '공고에 적힌 기본 조합 · 보증금을 올리거나 내리면 월세가 바뀜(아래 임대조건)') + '</div>' +
+    '<div class="dh-s">' + (it.dataset.pk ? '<b>' + it.dataset.pk + '</b> 금액 · ' : '') + (m ? '월세 가장 싼 형 기준 · 형마다 다름(아래 표)' : '공고에 적힌 기본 조합 · 보증금을 올리거나 내리면 월세가 바뀜(아래 임대조건)') + '</div>' +
     (sub.length ? '<div class="dh-t">' + sub.join(' ') + '</div>' : '') + '</div>';
 }
 // 근거·덧말(작은 회색 글씨)은 접어 두고 단추로 펼침 — 칸(표 칸·요약·다음 공고 상자)마다 '근거', 섹션 아래 설명 줄은 '설명 보기'
@@ -4165,6 +4177,7 @@ function nmInit(){
       var okTys = split.ok.map(function(r){ return tyExact(r.ty) || yaTyNum(r.ty); }).filter(Boolean).sort(function(a, b){ return a - b; });
       var rents = split.ok.map(function(r){ return r.rent; }).filter(function(v){ return v != null; });
       var loR = null; split.ok.forEach(function(r){ if (r.rent != null && (!loR || r.rent < loR.rent)) loR = r; });   // 알약: 월세 가장 싼 형의 보증금/월세
+      it.dataset.pk = loR ? '민간임대 ' + (loR.kind === '특별' ? '특별공급' : '일반공급') : '';   // 서울시 단지정보 형별 표 = 민간임대 금액(공공임대 금액은 SH 공고문)
       it.dataset.pr = loR ? Math.round(loR.rent / 10000) : ''; it.dataset.pd = loR && loR.dep != null ? Math.round(loR.dep / 10000) : ''; it.dataset.pm = rents.length && Math.max.apply(null, rents) !== Math.min.apply(null, rents) ? '1' : '';
       it.innerHTML = '<span class="dot ya" style="--c:' + col + ';margin-top:3px"></span><div><b>' + c.name + ' <span class="pill ' + (p.cat === 'na' ? 'warn' : (ns.length ? 'ok' : 'info')) + '" style="font-size:11px;padding:0 7px">' + (p.cat === 'na' ? '내 조건 밖' : (ns.length ? '공고 ' + ns.length + '건' : '공고 없음')) + '</span>' + (p.cat !== 'na' ? ' <span class="pill rk info" title="내 순위">' + yaRankTxt(c) + '</span>' : '') + (split.ok.length && split.ok.every(function(r){ return r.border; }) ? ' <span class="pill info" style="font-size:11px;padding:0 7px">' + split.ok[0].bpy + '평 경계(' + split.ok[0].bm2 + '㎡대)</span>' : '') + '</b><small>' + (c.gu || '') + (c.station ? ' · ' + c.station : '') + (c.scale && c.scale.total != null ? ' · 총 ' + c.scale.total + '세대(공공 ' + c.scale.pub + '·민간 ' + c.scale.priv + ')' : (c.scale_tot ? ' · 총 ' + c.scale_tot + '세대' : ' · 세대수 미기재')) +
         (p.cat === 'na' ? ' · ' + p.na.replace(/ → 내 조건.*$/, '') : (okTys.length ? ' · 내 조건 형 ' + split.ok.length + '개 · 전용 ' + okTys[0] + (okTys.length > 1 ? '~' + okTys[okTys.length - 1] : '') + '㎡(' + py(okTys[0]) + (okTys.length > 1 ? '~' + py(okTys[okTys.length - 1]) : '') + ')' : ' · 형별 표 없음(면적 확인 불가)')) + (c.movein ? ' · 입주 ' + c.movein.slice(0, 7) : '') + rmTag(p) + btTag(p) + pkTag(p) + stTag(p) + '</small></div><div class="num">' + (rents.length ? '월 ' + Math.round(Math.min.apply(null, rents) / 10000) + (Math.max.apply(null, rents) !== Math.min.apply(null, rents) ? '~' + Math.round(Math.max.apply(null, rents) / 10000) : '') + '만' : '') + '</div>'; };
@@ -4978,7 +4991,7 @@ window.addEventListener('beforeinstallprompt', function(e){ e.preventDefault(); 
 // ===== 새로고침 (2026-11-04) — 아이폰 홈 화면 앱엔 새로고침 버튼이 없어 껐다 켜야 했음 =====
 // ① 지도 말고 다른 화면 맨 위에서 아래로 당겼다 놓으면 새로고침(홈 화면 앱에서만 — 브라우저 탭은 자체 기능이 있음)
 // ② 앱으로 돌아올 때·30분마다 새 버전(version.json)·새 공고 자료(data/notices.json)를 확인 → 바뀌었으면 맨 위 띠 '눌러서 새로고침'
-var SITE_BUILD = '5894b5962200';
+var SITE_BUILD = 'dc8fe3f9b490';
 try { if (navigator.clearAppBadge) navigator.clearAppBadge(); } catch (e) {}   // 열자마자 아이콘 배지 지움(알림 자료를 못 읽어도)
 function nwSig(j){ var s = JSON.stringify([(j && j.items) || [], (j && j.list_ids) || {}]), h = 0; for (var i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0; return h + ':' + s.length; }
 (function(){
