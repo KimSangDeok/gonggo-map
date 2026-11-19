@@ -1,7 +1,22 @@
 {
  "about": "알림 대상 공고의 공고문 사본(tools/notice_docs.py, GitHub 러너가 받음) — 매일 Claude 요약이 웹사이트를 열지 않고 이걸로 확인. [p.N] = 첨부 공고문 N쪽",
- "updated": "2026-11-19 10:14 KST",
+ "updated": "2026-11-19 16:42 KST",
  "items": {
+  "lh:2015122300021098": {
+   "file": "data/notice_docs/lh-2015122300021098.txt",
+   "title": "서울삼전,강동천호,LH수서1,LH수서2 행복주택 예비입주자 모집공고",
+   "url": "https://apply.lh.or.kr/lhapply/apply/wt/wrtanc/selectWrtancInfo.do?mi=1026&panId=2015122300021098&ccrCnntSysDsCd=03&uppAisTpCd=06&aisTpCd=10",
+   "fetched": "2026-11-19 16:42 KST",
+   "pdfs": [
+    {
+     "name": "LH수서1(수서역세권A1BL)행복주택팸플릿.pdf",
+     "pages": 14
+    }
+   ],
+   "chars": 5795,
+   "tries": 1,
+   "err": "공고문 ★서울삼전,강동천호,LH수서1,LH수서2,행복주택예비입주자모집공고(2026.11.19).pdf: 첨부가 너무 큼(46MB)"
+  },
   "sh:312053": {
    "file": "data/notice_docs/sh-312053.txt",
    "title": "[청년형] 특화형 매입임대주택(구로구) 입주자 모집 공고(운영기관 : 마을과집 협동조합)",
@@ -198,6 +213,96 @@
     }
    ],
    "chars": 9660,
+   "tries": 1,
+   "err": ""
+  },
+  "ya:6799": {
+   "file": "data/notice_docs/ya-6799.txt",
+   "title": "[민간임대] 강변역 비바힐스강변 추가모집공고",
+   "url": "https://soco.seoul.go.kr/youth/bbs/BMSR00015/view.do?boardId=6799&menuNo=400008",
+   "fetched": "2026-11-19 16:42 KST",
+   "pdfs": [
+    {
+     "name": "민간_261119_강변역_비바힐스강변_청년안심주택 추가모집공고문.pdf",
+     "pages": 4
+    }
+   ],
+   "chars": 11132,
+   "tries": 1,
+   "err": ""
+  },
+  "ya:6801": {
+   "file": "data/notice_docs/ya-6801.txt",
+   "title": "[민간임대] 개봉역 세이지움 개봉 추가모집공고",
+   "url": "https://soco.seoul.go.kr/youth/bbs/BMSR00015/view.do?boardId=6801&menuNo=400008",
+   "fetched": "2026-11-19 16:42 KST",
+   "pdfs": [
+    {
+     "name": "민간_261119_개봉역_세이지움개봉_청년안심주택 추가모집공고문.pdf",
+     "pages": 4
+    }
+   ],
+   "chars": 12401,
+   "tries": 1,
+   "err": ""
+  },
+  "ya:6802": {
+   "file": "data/notice_docs/ya-6802.txt",
+   "title": "[민간임대] 구로디지털단지역 유벤투스 240 추가모집공고",
+   "url": "https://soco.seoul.go.kr/youth/bbs/BMSR00015/view.do?boardId=6802&menuNo=400008",
+   "fetched": "2026-11-19 16:42 KST",
+   "pdfs": [
+    {
+     "name": "민간_261119_구로디지털단지역_유벤투스240_청년안심주택 추가모집공고문.pdf",
+     "pages": 6
+    }
+   ],
+   "chars": 9363,
+   "tries": 1,
+   "err": ""
+  },
+  "ya:6803": {
+   "file": "data/notice_docs/ya-6803.txt",
+   "title": "[민간임대] 쌍문역 인히어쌍문 추가모집공고",
+   "url": "https://soco.seoul.go.kr/youth/bbs/BMSR00015/view.do?boardId=6803&menuNo=400008",
+   "fetched": "2026-11-19 16:42 KST",
+   "pdfs": [
+    {
+     "name": "민간_261119_쌍문역_인히어쌍문_청년안심주택 추가모집공고문.pdf",
+     "pages": 5
+    }
+   ],
+   "chars": 12798,
+   "tries": 1,
+   "err": ""
+  },
+  "ya:6804": {
+   "file": "data/notice_docs/ya-6804.txt",
+   "title": "[민간임대] 상봉역 제이스타상봉 추가모집공고",
+   "url": "https://soco.seoul.go.kr/youth/bbs/BMSR00015/view.do?boardId=6804&menuNo=400008",
+   "fetched": "2026-11-19 16:42 KST",
+   "pdfs": [
+    {
+     "name": "민간_261119_상봉역_제이스타상봉_청년안심주택 추가모집공고문.pdf",
+     "pages": 7
+    }
+   ],
+   "chars": 9846,
+   "tries": 1,
+   "err": ""
+  },
+  "ya:6805": {
+   "file": "data/notice_docs/ya-6805.txt",
+   "title": "[민간임대] 동묘앞역 청계로벤하임 추가모집공고",
+   "url": "https://soco.seoul.go.kr/youth/bbs/BMSR00015/view.do?boardId=6805&menuNo=400008",
+   "fetched": "2026-11-19 16:42 KST",
+   "pdfs": [
+    {
+     "name": "민간_261119_동묘앞역_청계로벤하임_청년안심주택 추가모집공고문.pdf",
+     "pages": 3
+    }
+   ],
+   "chars": 9753,
    "tries": 1,
    "err": ""
   }
