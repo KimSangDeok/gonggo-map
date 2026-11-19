@@ -6,16 +6,20 @@ SH 주택정보·서울시 청년안심주택 사진은 원본이 수 MB(수천 
 이미 만든 것은 다시 받지 않음(원본 URL 기준). 지금 화면에 안 쓰는 썸네일은 지움.
 결과: data/thumbs/<원본 URL 해시 16자>.jpg, data/thumbs.json {updated, count, items: {원본 URL: {t, w, h, kb}}}
 한 장에 여러 형이 든 청년안심 평면도(data/ya_fix.json plans[URL].crops — 사람이 형마다 영역을 적어 둠)는 형별로 잘라
-data/thumbs/<해시>_c<i>.jpg(크게 보기용, 가로 최대 1600px) + _c<i>_t.jpg(띠용)도 만듦 → items[URL].crops = [{f, t, w, h}], cs = 영역 서명"""
+data/thumbs/<해시>_c<i>.jpg(크게 보기용, 가로 최대 1600px) + _c<i>_t.jpg(띠용)도 만듦 → items[URL].crops = [{f, t, w, h}], cs = 영역 서명
+크게 보기용 줄인 그림(2026-11-19): 원본이 긴 변 4096px·420만 화소·1.5MB 중 하나라도 넘으면 data/thumbs/<해시>_d.jpg(긴 변 ≤4096px·≤420만 화소,
+JPEG 80, 사진 회전 정보 반영)를 만들어 items[URL].d·dw·dh·dkb 에 적음 — 폰 Safari가 크게 보기에서 넘길 때마다 원본(최대 3,300만 화소)을 풀다
+메모리가 모자라 탭을 다시 여는 것을 막음. 원본은 '원본 새 창' 링크로 그대로 엶"""
 import json, os, io, hashlib, time, datetime
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import requests
-from PIL import Image
+from PIL import Image, ImageOps
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 D = lambda *p: os.path.join(ROOT, 'data', *p)
 OUTD, IDX = D('thumbs'), D('thumbs.json')
 TW, TH, Q = 384, 288, 70
+DL, DPX, DKB, DQ = 4096, 4_200_000, 1500, 80   # 크게 보기용 줄인 그림: 긴 변·화소 상한, 원본 용량 기준, 품질
 BUDGET = int(os.environ.get('THUMB_BUDGET_SEC', '1500'))
 UA = 'Mozilla/5.0 (gonggo-map; +https://kimsangdeok.github.io/gonggo-map/)'
 REF = {'i-sh.co.kr': 'https://www.i-sh.co.kr/houseinfo/main/mainPage.do',
@@ -65,6 +69,22 @@ def make_crops(u, content, cr):
         out.append({'f': rf, 't': rt, 'w': cw, 'h': ch})
     return out
 
+def need_disp(w, h, kb): return max(w, h) > DL or w * h > DPX or kb > DKB
+
+def disp_files(u): return 'data/thumbs/' + key(u) + '_d.jpg'
+
+def make_disp(u, content, w, h):
+    """크게 보기용: 긴 변 ≤DL·≤DPX 화소로 줄이고 사진 회전 정보(EXIF) 반영 — 브라우저가 원본에 하던 것과 같게 보이게"""
+    s = min(1.0, DL / max(w, h), (DPX / float(w * h)) ** 0.5)
+    im = Image.open(io.BytesIO(content))
+    if im.format == 'JPEG': im.draft('RGB', (max(1, int(w * s)), max(1, int(h * s))))   # 큰 JPEG는 필요한 만큼만 풀기
+    im = ImageOps.exif_transpose(im).convert('RGB')
+    sw, sh = im.size; full = (w, h) if (sw >= sh) == (w >= h) else (h, w)   # 회전으로 가로세로가 바뀌었으면 원본 크기도 바꿔 계산
+    tw, th = max(1, round(full[0] * s)), max(1, round(full[1] * s))
+    if (tw, th) != (sw, sh): im = im.resize((tw, th), Image.LANCZOS)
+    rel = disp_files(u); im.save(os.path.join(ROOT, rel), 'JPEG', quality=DQ, optimize=True, progressive=True)
+    return {'d': rel, 'dw': tw, 'dh': th, 'dkb': round(os.path.getsize(os.path.join(ROOT, rel)) / 1024)}
+
 def make(u, pos, cr=None):
     host = next((h for h in REF if h in u), None)
     r = requests.get(u, headers={'User-Agent': UA, **({'Referer': REF[host]} if host else {})}, timeout=60)
@@ -81,7 +101,9 @@ def make(u, pos, cr=None):
     im = im.crop(box).resize((TW, TH), Image.LANCZOS)
     rel = 'data/thumbs/' + key(u) + '.jpg'
     im.save(os.path.join(ROOT, rel), 'JPEG', quality=Q, optimize=True, progressive=True)
-    return {'t': rel, 'w': w, 'h': h, 'kb': round(len(r.content) / 1024), **extra}
+    kb = round(len(r.content) / 1024)
+    if need_disp(w, h, kb): extra.update(make_disp(u, r.content, w, h))
+    return {'t': rel, 'w': w, 'h': h, 'kb': kb, **extra}
 
 def main():
     os.makedirs(OUTD, exist_ok=True)
@@ -92,6 +114,7 @@ def main():
         ok = o and os.path.exists(os.path.join(ROOT, o['t']))
         if ok and cr: ok = o.get('cs') == crop_sig(cr) and all(os.path.exists(os.path.join(ROOT, f)) for p in crop_files(u, len(cr)) for f in p)
         if ok and not cr and o.get('crops'): ok = False   # 자르기를 없앴으면 다시 만들어 crops 정보를 지움
+        if ok and need_disp(o['w'], o['h'], o.get('kb', 0)) and not (o.get('d') and os.path.exists(os.path.join(ROOT, o['d']))): ok = False   # 크게 보기용 줄인 그림이 아직 없음
         if ok: items[u] = o
         else: todo.append((u, pos, cr))
     print('wanted', len(want), 'cached', len(items), 'todo', len(todo), 'crops', sum(1 for t in todo if t[2]), flush=True)
@@ -107,7 +130,7 @@ def main():
                 for g in futs: g.cancel()
                 break
     # 화면에 안 쓰는 썸네일 파일 지움
-    keep = {os.path.basename(v['t']) for u, v in items.items() if u in want} | {os.path.basename(c[k]) for u, v in items.items() if u in want for c in v.get('crops') or [] for k in ('f', 't')}
+    keep = {os.path.basename(v['t']) for u, v in items.items() if u in want} | {os.path.basename(c[k]) for u, v in items.items() if u in want for c in v.get('crops') or [] for k in ('f', 't')} | {os.path.basename(v['d']) for u, v in items.items() if u in want and v.get('d')}
     gone = [f for f in os.listdir(OUTD) if f.endswith('.jpg') and f not in keep]
     for f in gone: os.remove(os.path.join(OUTD, f))
     items = {u: items[u] for u in want if u in items}
@@ -115,9 +138,10 @@ def main():
     big = sorted(items.values(), key=lambda v: -v['kb'])[:5]
     stat = {'orig_mb': round(sum(kb) / 1024, 1), 'orig_kb_avg': round(sum(kb) / max(1, len(kb))), 'orig_kb_max': max(kb or [0]),
             'orig_px_max': max((v['w'] * v['h'] for v in items.values()), default=0),
-            'thumb_mb': round(sum(os.path.getsize(os.path.join(ROOT, v['t'])) for v in items.values()) / 1048576, 1)}
+            'thumb_mb': round(sum(os.path.getsize(os.path.join(ROOT, v['t'])) for v in items.values()) / 1048576, 1),
+            'disp_n': sum(1 for v in items.values() if v.get('d')), 'disp_mb': round(sum(v.get('dkb', 0) for v in items.values()) / 1024, 1)}
     json.dump({'updated': datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9))).strftime('%Y-%m-%d %H:%M KST'),
-               'note': '사진 띠용 384×288 썸네일(칸에 보이는 부분만). 크게 보기는 원본 URL', 'count': len(items), 'stat': stat,
+               'note': '사진 띠용 384×288 썸네일(칸에 보이는 부분만). 크게 보기는 원본 URL — 원본이 크면(긴 변 4096px·420만 화소·1.5MB 넘음) 줄인 그림 d(_d.jpg)', 'count': len(items), 'stat': stat,
                'items': items}, open(IDX, 'w', encoding='utf-8'), ensure_ascii=False, separators=(',', ':'))
     print('done', len(items), 'new', len(todo) - len(fail), 'fail', len(fail), 'removed', len(gone), stat, 'biggest', big, flush=True)
 

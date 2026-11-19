@@ -394,6 +394,14 @@ html.lb-open,html.lb-open body{overflow:hidden!important;overscroll-behavior:non
 #lb .lb-cap{position:absolute;left:0;right:0;top:0;height:58px;display:flex;align-items:center;gap:10px;color:#fff;font-size:14px;padding:0 340px 0 18px;text-shadow:0 1px 2px #000;z-index:2;pointer-events:none}
 #lb .lb-cap span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 #lb .lb-cap a{flex:none}
+#lb .lb-msg{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);max-width:min(86vw,420px);padding:14px 16px;border-radius:12px;background:rgba(20,22,26,.92);color:#fff;font-size:14px;line-height:1.5;text-align:center;z-index:3;pointer-events:none}
+.err-dlg ol{margin:0;padding:0 0 0 20px;font-size:12.5px;line-height:1.45;max-height:58vh;overflow:auto}
+.err-dlg li{margin:0 0 8px;word-break:break-all}
+.err-dlg li b{font-weight:700}
+.err-dlg .err-bt{display:flex;gap:8px;justify-content:flex-end;padding:10px 14px;border-top:1px solid var(--line)}
+.err-dlg .err-h{padding:14px 16px 6px;font-size:15px;font-weight:700}
+.err-dlg .err-s{padding:0 16px 10px;font-size:12.5px;color:var(--muted,#667)}
+.err-dlg .err-b{padding:0 16px 8px}
 #lb .lb-thumbs{position:absolute;left:0;right:0;bottom:0;z-index:2;display:flex;gap:8px;padding:10px 16px 14px;overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:none;touch-action:pan-x;background:linear-gradient(rgba(0,0,0,0),rgba(0,0,0,.45))}
 #lb .lb-thumbs[hidden]{display:none}
 #lb .lb-ov{position:absolute;left:0;top:0;transform-origin:0 0;pointer-events:none;will-change:transform}
@@ -1683,7 +1691,7 @@ html.pano-open,html.pano-open body{overflow:hidden}
       <div class="err" id="me-err"></div>
     </div>
     <div id="me-content" hidden></div>
-    <p class="src" style="margin-top:18px;text-align:right"><a href="#" id="me-forget">이 기기에서 암호 잊기</a></p>
+    <p class="src" style="margin-top:18px;text-align:right"><a href="#" id="err-open">오류 기록</a> · <a href="#" id="me-forget">이 기기에서 암호 잊기</a></p>
   </div></section>
 
   <section class="view" id="view-sources"><div class="wrap">
@@ -2884,7 +2892,43 @@ dragScroll(document.querySelector('.tabs'));
 })();
 // ===== 사진 크게 보기(라이트박스): 띠의 사진 하나를 누르면 그 띠의 사진 전부를 ‹ › · 키보드 ←→ · 스와이프로 넘김.
 // 확대: 두 손가락 벌리기 · 두 번 탭(2.5배 ↔ 화면 맞춤) · 마우스 휠 · + / − 버튼. 원본 파일(해상도 그대로)을 확대하고, 확대 중엔 한 손가락으로 이동 =====
+// ===== 오류 기록(2026-11-19 사용자 '이미지 넘겨서 보는데 계속 오류나 — 로그 봐 봐') =====
+// 폰 브라우저 콘솔은 밖에서 못 보므로, 이 기기(localStorage)에 최근 50건을 남겨 '내 조건' 맨 아래 '오류 기록'(또는 주소 끝 #log)에서 보고 복사함. 서버로는 안 보냄
+var ERRK = 'kkk-errlog';
+function errGet(){ try { return JSON.parse(localStorage.getItem(ERRK) || '[]') || []; } catch(e) { return []; } }
+function errLog(kind, msg, extra){
+  try { var a = errGet(), mem = (window.performance && performance.memory) ? Math.round(performance.memory.usedJSHeapSize / 1048576) + 'MB' : '';
+    a.push({ t: new Date().toISOString(), k: kind, m: String(msg || '').slice(0, 300), x: String(extra || '').slice(0, 400), b: String(typeof SITE_BUILD !== 'undefined' ? SITE_BUILD : ''), mem: mem, w: innerWidth + 'x' + innerHeight });
+    if (a.length > 50) a = a.slice(-50); localStorage.setItem(ERRK, JSON.stringify(a)); } catch(e) {}
+  var b = document.getElementById('err-open'); if (b) b.textContent = '오류 기록 ' + errGet().length + '건'; }
+window.addEventListener('error', function(e){ if (!e || (e.target && e.target !== window && e.target.tagName)) return;   // 그림 못 불러온 것(자원 오류)은 여기 말고 크게 보기에서 따로 적음
+  errLog('js', e.message, String(e.filename || '').split('/').pop() + ':' + (e.lineno || 0) + ':' + (e.colno || 0) + (e.error && e.error.stack ? ' | ' + String(e.error.stack).split('\n').slice(0, 3).join(' | ') : '')); });
+window.addEventListener('unhandledrejection', function(e){ var r = e && e.reason; errLog('promise', r && r.message ? r.message : String(r), r && r.stack ? String(r.stack).split('\n').slice(0, 2).join(' | ') : ''); });
+// 크게 보기 중 페이지가 통째로 다시 열림 = 폰 Safari가 메모리가 모자라 탭을 다시 연 것(정상 이동·새로고침은 pagehide 에서 표시를 지움)
+(function(){ try { var s = sessionStorage.getItem('kkk-lb-live'); if (s) { sessionStorage.removeItem('kkk-lb-live'); var o = JSON.parse(s) || {};
+  errLog('reload', '크게 보기 중 페이지가 다시 열림(브라우저가 메모리 부족으로 탭을 다시 연 것으로 보임)', (o.i || '?') + '/' + (o.n || '?') + '번째 · ' + (o.px || '') + ' · ' + (o.u || '') + ' · ' + Math.round((Date.now() - (o.t || Date.now())) / 1000) + '초 전'); } } catch(e) {} })();
+window.addEventListener('pagehide', function(){ try { sessionStorage.removeItem('kkk-lb-live'); } catch(e) {} });
+function errShow(){
+  var d = document.getElementById('err-dlg'); if (!d) { d = document.createElement('dialog'); d.id = 'err-dlg'; d.className = 'sync-dlg err-dlg'; document.body.appendChild(d); }
+  var a = errGet().slice().reverse(), K = { js: '스크립트 오류', promise: '스크립트 오류(비동기)', reload: '페이지 다시 열림', 'lb-img': '크게 보기 그림' };
+  d.innerHTML = '<div class="err-h">오류 기록 ' + a.length + '건</div><div class="err-s">이 기기에만 저장(최근 50건) · 화면을 캡처하거나 "복사"해서 보내 주세요 · 사이트 판 ' + hesc(String(typeof SITE_BUILD !== 'undefined' ? SITE_BUILD : '')) + '</div>' +
+    '<div class="err-b">' + (a.length ? '<ol>' + a.map(function(x){ var t = new Date(x.t); return '<li><b>' + hesc(K[x.k] || x.k) + '</b> · ' + (isNaN(t) ? hesc(x.t) : (t.getMonth() + 1) + '/' + t.getDate() + ' ' + ('0' + t.getHours()).slice(-2) + ':' + ('0' + t.getMinutes()).slice(-2)) + '<br>' + hesc(x.m) + (x.x ? '<br><small>' + hesc(x.x) + '</small>' : '') + '<br><small>판 ' + hesc(x.b || '') + ' · 화면 ' + hesc(x.w || '') + (x.mem ? ' · JS ' + hesc(x.mem) : '') + '</small></li>'; }).join('') + '</ol>' : '<p class="src">기록된 오류 없음</p>') + '</div>' +
+    '<div class="err-bt"><button type="button" data-a="copy">복사</button><button type="button" data-a="clear">지우기</button><button type="button" data-a="close">닫기</button></div>';
+  d.onclick = function(e){ var b = e.target.closest && e.target.closest('button[data-a]'); if (!b) { if (e.target === d) d.close(); return; } var act = b.dataset.a;
+    if (act === 'close') d.close();
+    else if (act === 'clear') { try { localStorage.removeItem(ERRK); } catch(x) {} errShow(); var o = document.getElementById('err-open'); if (o) o.textContent = '오류 기록 0건'; }
+    else if (act === 'copy') { var txt = JSON.stringify({ build: (typeof SITE_BUILD !== 'undefined' ? SITE_BUILD : ''), ua: navigator.userAgent, log: errGet() }, null, 1); var done = function(){ b.textContent = '복사됨'; };
+      try { navigator.clipboard.writeText(txt).then(done, function(){ prompt('복사', txt); }); } catch(x) { try { prompt('복사', txt); } catch(y) {} } } };
+  try { if (!d.open) d.showModal(); } catch(e) { d.setAttribute('open', ''); } }
+// 크게 보기 그림 주소: 원본이 큰 것(긴 변 4096px·420만 화소·1.5MB 넘음)은 하루 한 번 만드는 줄인 그림(data/thumbs/*_d.jpg). '원본 새 창'은 원본
+function LBU(u){ var t = window.THUMBS && window.THUMBS[u]; return t && t.d ? t.d : u; }
+function lbHuge(u){ var t = window.THUMBS && window.THUMBS[u]; return !!(t && !t.d && t.w * t.h > 8e6); }   // 줄인 그림이 아직 없는 큰 원본 — 미리 받기 안 함
+function lbPx(u){ var t = window.THUMBS && window.THUMBS[u]; return t ? (t.d ? '줄인 그림 ' + t.dw + '×' + t.dh + '(원본 ' + t.w + '×' + t.h + ', ' + t.kb + 'KB)' : '원본 ' + t.w + '×' + t.h + ', ' + t.kb + 'KB') : ''; }
 var LB = { items: [], i: 0, el: null, z: { k: 1, fit: 1, x: 0, y: 0, nw: 0, nh: 0 } };
+document.addEventListener('click', function(e){ var a = e.target.closest && e.target.closest('#err-open'); if (!a) return; e.preventDefault(); errShow(); });
+(function(){ var go = function(){ var o = document.getElementById('err-open'); if (o) o.textContent = '오류 기록 ' + errGet().length + '건'; if (/[#&]log\b/.test(location.hash || '')) errShow(); };
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', go); else setTimeout(go, 0);
+  window.addEventListener('hashchange', function(){ if (/[#&]log\b/.test(location.hash || '')) errShow(); }); })();
 function lbEnsure(){
   if (LB.el) return LB.el;
   var d = document.createElement('div'); d.id = 'lb'; d.hidden = true;
@@ -2901,7 +2945,12 @@ function lbEnsure(){
   d.querySelector('.lb-thumbs').addEventListener('click', function(e){ var b = e.target.closest('.lb-t'); if (!b) return; e.stopPropagation(); lbGo(+b.dataset.i); });
   document.addEventListener('keydown', function(e){ if (d.hidden) return; if (e.key === 'Escape') lbClose(); else if (e.key === 'ArrowLeft') lbStep(-1); else if (e.key === 'ArrowRight') lbStep(1); else if (e.key === '+' || e.key === '=') lbZoomAt(innerWidth / 2, innerHeight / 2, Z.k * 1.6); else if (e.key === '-') lbZoomAt(innerWidth / 2, innerHeight / 2, Z.k / 1.6, true); });
   d.addEventListener('gesturestart', function(e){ e.preventDefault(); });   // iOS: 페이지 전체 확대 대신 사진만
-  img.addEventListener('load', function(){ Z.nw = img.naturalWidth; Z.nh = img.naturalHeight; lbFit(); });
+  img.referrerPolicy = 'no-referrer';
+  img.addEventListener('load', function(){ Z.nw = img.naturalWidth; Z.nh = img.naturalHeight; lbMsg(''); lbFit(); });
+  img.addEventListener('error', function(){ var it = LB.items[LB.i]; if (!it || !img.getAttribute('src')) return;
+    if (it.o && it.u !== it.o && !it.fb) { it.fb = 1; errLog('lb-img', '줄인 그림을 못 불러와 원본으로 바꿈', it.u); it.u = it.o; img.src = it.o; return; }
+    errLog('lb-img', '그림을 못 불러옴', (LB.i + 1) + '/' + LB.items.length + ' · ' + (it.raw || it.o || it.u));
+    lbMsg('이 그림을 못 불러왔어요 — 위 "원본 새 창"으로 열어 보세요'); });
   stage.addEventListener('wheel', function(e){ e.preventDefault(); img.classList.remove('anim'); lbZoomAt(e.clientX, e.clientY, Z.k * Math.exp(-e.deltaY * 0.0015)); }, { passive: false });
   // 손가락·마우스: 1개 = 이동(확대 중) 또는 넘기기(맞춤 상태), 2개 = 벌려서 확대
   var P = {}, g = null, lastTap = 0, lastXY = null;
@@ -2954,7 +3003,7 @@ function pmKey(u){ var s = String(u || ''); try { s = decodeURI(s); } catch(e) {
 function pmOf(u){ var P = window.PLANM; return (P && P.items && P.items[pmKey(u)]) || null; }
 function pmOff(){ try { return localStorage.getItem('kkk-pm-off') === '1'; } catch(e) { return false; } }
 function lbPmSet(it){
-  var ov = LB.ov, pn = LB.pm, pm = it ? pmOf(it.u) : null, has = !!(pm && pm.m && pm.m.length);
+  var ov = LB.ov, pn = LB.pm, pm = it ? pmOf(it.o || it.u) : null, has = !!(pm && pm.m && pm.m.length);
   LB.z.pz = has && pm.pb ? pm.pb : null;
   if (ov) {
     ov.innerHTML = has ? pm.m.map(function(m){
@@ -3008,7 +3057,8 @@ function lbOpen(items, i){ var d = lbEnsure(); LB.items = items; LB.i = i;
 function lbGo(j){ var n = LB.items.length; if (!n || j === LB.i || j < 0 || j >= n || LB.sliding) return; var dir = j > LB.i ? 1 : -1, img = LB.el.querySelector('.lb-stage img'), Z = LB.z; LB.sliding = true;
   img.classList.add('anim'); img.style.opacity = '0'; img.style.transform = 'translate(' + (Z.x - dir * innerWidth * 0.6) + 'px,' + Z.y + 'px) scale(' + Z.k + ')'; lbOvSync();
   setTimeout(function(){ LB.i = j; lbShow(dir); LB.sliding = false; }, 200); }   // 뒷화면 스크롤 잠금
-function lbClose(){ if (LB.el) LB.el.hidden = true; document.documentElement.classList.remove('lb-open'); }
+function lbClose(){ if (LB.el) LB.el.hidden = true; document.documentElement.classList.remove('lb-open'); try { sessionStorage.removeItem('kkk-lb-live'); } catch(e) {} }
+function lbMsg(t){ var st = LB.el && LB.el.querySelector('.lb-stage'); if (!st) return; var m = st.querySelector('.lb-msg'); if (!t) { if (m) m.remove(); return; } if (!m) { m = document.createElement('div'); m.className = 'lb-msg'; st.appendChild(m); } m.textContent = t; }
 function lbStep(k){ lbSlide(k); }
 // 부드럽게 넘기기: 지금 사진을 밀려난 쪽으로 빼고(0.24초) 다음 사진을 반대쪽에서 들여옴. 이웃 사진은 미리 받아 둠
 function lbSlide(dir){
@@ -3017,19 +3067,21 @@ function lbSlide(dir){
   img.classList.add('anim'); img.style.opacity = '0'; img.style.transform = 'translate(' + (Z.x - dir * W * 0.6) + 'px,' + Z.y + 'px) scale(' + Z.k + ')'; lbOvSync();
   setTimeout(function(){ LB.i = (LB.i + dir + n) % n; lbShow(dir); LB.sliding = false; }, 200);
 }
-function lbShow(dir){ var d = LB.el, it = LB.items[LB.i]; if (!it) return; var img = d.querySelector('.lb-stage img'); LB.z.nw = 0; LB.z.enter = dir || 0; img.classList.remove('anim'); img.style.opacity = dir ? '0' : '1'; img.style.transform = 'translate(-9999px,0)'; img.src = it.u; img.alt = it.t; lbPmSet(it); lbOvSync(); if (img.complete && img.naturalWidth) { LB.z.nw = img.naturalWidth; LB.z.nh = img.naturalHeight; lbFit(); }
-  d.querySelector('.lb-cap span').textContent = (LB.i + 1) + ' / ' + LB.items.length + ' · ' + it.t + ' · 두 손가락·두 번 탭으로 확대'; d.querySelector('.lb-cap a').href = it.u;
+function lbShow(dir){ var d = LB.el, it = LB.items[LB.i]; if (!it) return; var img = d.querySelector('.lb-stage img'); LB.z.nw = 0; LB.z.enter = dir || 0; img.classList.remove('anim'); img.style.opacity = dir ? '0' : '1'; img.style.transform = 'translate(-9999px,0)'; lbMsg('');
+  try { sessionStorage.setItem('kkk-lb-live', JSON.stringify({ i: LB.i + 1, n: LB.items.length, u: String(it.raw || it.o || it.u).slice(-90), px: lbPx(it.raw), t: Date.now() })); } catch(e) {}
+  img.src = it.u; img.alt = it.t; lbPmSet(it); lbOvSync(); if (img.complete && img.naturalWidth) { LB.z.nw = img.naturalWidth; LB.z.nh = img.naturalHeight; lbFit(); }
+  d.querySelector('.lb-cap span').textContent = (LB.i + 1) + ' / ' + LB.items.length + ' · ' + it.t + ' · 두 손가락·두 번 탭으로 확대'; d.querySelector('.lb-cap a').href = it.o || it.u;
   d.querySelector('.lb-prev').disabled = LB.items.length < 2; d.querySelector('.lb-next').disabled = LB.items.length < 2;
   var th = d.querySelector('.lb-thumbs'), cur = null; th.querySelectorAll('.lb-t').forEach(function(b, j){ var on = j === LB.i; b.classList.toggle('on', on); if (on) { b.setAttribute('aria-current', 'true'); cur = b; } else b.removeAttribute('aria-current'); });
   if (cur && th.scrollWidth > th.clientWidth) { var L = cur.offsetLeft - (th.clientWidth - cur.offsetWidth) / 2; try { th.scrollTo({ left: L, behavior: 'smooth' }); } catch(e) { th.scrollLeft = L; } }
-  [LB.i + 1, LB.i - 1].forEach(function(j){ var x = LB.items[(j + LB.items.length) % LB.items.length]; if (x) { var pre = new Image(); pre.src = x.u; } }); }
+  [LB.i + 1, LB.i - 1].forEach(function(j){ var x = LB.items[(j + LB.items.length) % LB.items.length]; if (x && x !== it && !lbHuge(x.raw)) { var pre = new Image(); pre.referrerPolicy = 'no-referrer'; pre.src = x.u; } }); }
 document.addEventListener('click', function(e){
   var a = e.target.closest && e.target.closest('.iw-strip a'); if (!a) return;
   var strip = a.closest('.iw-strip');
   if (window.__stripDragged && window.__stripDragged(strip)) { e.preventDefault(); e.stopPropagation(); strip.__noclick = 0; return; }   // 끌기였으면 열지 않음
   e.preventDefault(); e.stopPropagation();
   var as = Array.prototype.filter.call(strip.querySelectorAll('a'), function(x){ return x.style.display !== 'none'; });
-  lbOpen(as.map(function(x){ var im = x.querySelector('img'); return { u: x.href, t: x.title || '', th: im ? (im.currentSrc || im.src) : '' }; }), Math.max(0, as.indexOf(a)));
+  lbOpen(as.map(function(x){ var im = x.querySelector('img'), raw = x.getAttribute('href') || x.href, u = LBU(raw); return { u: u === raw ? x.href : u, o: x.href, raw: raw, t: x.title || '', th: im ? (im.currentSrc || im.src) : '' }; }), Math.max(0, as.indexOf(a)));
 }, true);
 
 // ===== 모바일 바닥 시트 (지도 위에 목록을 끌어올리는 표준 패턴) =====
@@ -5130,7 +5182,7 @@ window.addEventListener('beforeinstallprompt', function(e){ e.preventDefault(); 
 // ===== 새로고침 (2026-11-04) — 아이폰 홈 화면 앱엔 새로고침 버튼이 없어 껐다 켜야 했음 =====
 // ① 지도 말고 다른 화면 맨 위에서 아래로 당겼다 놓으면 새로고침(홈 화면 앱에서만 — 브라우저 탭은 자체 기능이 있음)
 // ② 앱으로 돌아올 때·30분마다 새 버전(version.json)·새 공고 자료(data/notices.json)를 확인 → 바뀌었으면 맨 위 띠 '눌러서 새로고침'
-var SITE_BUILD = 'c5ba5b256a18';
+var SITE_BUILD = 'ff3fc9e48b09';
 try { if (navigator.clearAppBadge) navigator.clearAppBadge(); } catch (e) {}   // 열자마자 아이콘 배지 지움(알림 자료를 못 읽어도)
 function nwSig(j){ var s = JSON.stringify([(j && j.items) || [], (j && j.list_ids) || {}]), h = 0; for (var i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0; return h + ':' + s.length; }
 (function(){
