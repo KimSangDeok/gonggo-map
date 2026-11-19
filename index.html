@@ -402,6 +402,8 @@ html.lb-open,html.lb-open body{overflow:hidden!important;overscroll-behavior:non
 .err-dlg .err-h{padding:14px 16px 6px;font-size:15px;font-weight:700}
 .err-dlg .err-s{padding:0 16px 10px;font-size:12.5px;color:var(--muted,#667)}
 .err-dlg .err-b{padding:0 16px 8px}
+.err-dlg .err-c{color:var(--muted,#667)}
+.err-dlg #err-up{display:inline-block;margin-top:4px}
 #lb .lb-thumbs{position:absolute;left:0;right:0;bottom:0;z-index:2;display:flex;gap:8px;padding:10px 16px 14px;overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:none;touch-action:pan-x;background:linear-gradient(rgba(0,0,0,0),rgba(0,0,0,.45))}
 #lb .lb-thumbs[hidden]{display:none}
 #lb .lb-ov{position:absolute;left:0;top:0;transform-origin:0 0;pointer-events:none;will-change:transform}
@@ -1774,6 +1776,111 @@ html.pano-open,html.pano-open body{overflow:hidden}
 // 기기 동기화 연결 링크(…#map&sync=토큰, 다른 기기의 QR)로 들어왔으면 가장 먼저 토큰을 이 기기에 저장하고 주소창에서 지움 — 네이버 지도 스크립트 등이 주소를 읽기 전에
 (function(){ var h = location.hash || '', m = h.match(/[#&]sync=([A-Za-z0-9_]{20,255})/); if (!m) return; window.__syncTokFromLink = m[1]; try { localStorage.setItem('kkk-sync-tok', m[1]); } catch(e) {}
   var rest = h.replace(/[#&]sync=[A-Za-z0-9_]+/, '').replace(/^#?&?/, ''); try { history.replaceState(null, '', location.pathname + location.search + '#' + (rest || 'map')); } catch(e) {} })();
+// ===== 오류·동작 기록(2026-11-19 사용자 '이미지 넘겨서 보는데 계속 오류나 — 로그 봐 봐' → '니가 확인할 만한 로그는 전부 추가해') =====
+// 스크립트 맨 앞에서 시작해 그 뒤 모든 오류를 잡음. 이 기기(localStorage 최근 80건)에 남기고, 기기 동기화가 켜져 있으면 같은 GitHub 'prefs' 가지
+// log/<기기 id>.json 에도 올려 Claude 가 gh 로 바로 읽음(아래 기기 동기화의 logPush, 읽는 쪽 tools/read_logs.py).
+// 올리는 건 기술 정보뿐 — 금액·7~8자리 숫자·따옴표 속 긴 글·토큰·바깥 사이트 주소의 경로는 errScrub 이 지우고, '내 조건'·'보증금·대출'·동기화·알림 등록 창 안에서 누른 것은 글자를 안 적음
+var SITE_BUILD = '11328065b9c6';
+var ERRK = 'kkk-errlog', ERR_SID = Math.random().toString(36).slice(2, 8), ERR_Q = {}, ERR_RES = 0, CRK = 'kkk-alive';
+var ERR_PUB = /(^|\.)(i-sh\.co\.kr|seoul\.go\.kr|lh\.or\.kr|pstatic\.net|naver\.com|navercorp\.com|github\.com|githubusercontent\.com|github\.io|jsdelivr\.net)$/;   // 경로까지 적어도 되는 공개 사이트 — 그 밖(알림 서버 등)은 사이트 이름만
+function errUrl(u){ try { var x = new URL(u, location.href), p = x.pathname; try { p = decodeURI(p); } catch(z) {}
+  if (x.origin === location.origin) return p.replace(/^\/gonggo-map\//, '/'); return x.hostname + (ERR_PUB.test(x.hostname) ? p.slice(0, 90) : '/…'); } catch(e) { return '(주소)'; } }
+function errScrub(s){ return String(s == null ? '' : s)
+  .replace(/(github_pat_|gh[pousr]_)[A-Za-z0-9_]{6,}/g, '$1…')
+  .replace(/([#&?]sync=)[^&\s]*/g, '$1…')
+  .replace(/(?:https?:)?\/\/[^\s"'<>)\]]+/g, function(u){ return errUrl(/^\/\//.test(u) ? location.protocol + u : u); })
+  .replace(/"[^"]{24,}"/g, '"…"')                    // JSON 해석 오류 등에 딸려 오는 내용 조각
+  .replace(/\d{1,3}(?:,\d{3})+/g, '#,###')           // 금액
+  .replace(/\d+(?:\.\d+)?\s*만/g, '#만')
+  .replace(/(^|[^\d\/_.=:#-])\d{7,8}(?!\d)/g, '$1#######'); }
+// 직전 동작(빵부스러기) — 이 탭(sessionStorage)에 최근 15개. 탭이 갑자기 다시 열리면 그 전 동작을 기록에 붙임
+function crumbGet(){ try { return JSON.parse(sessionStorage.getItem(CRK) || 'null'); } catch(e) { return null; } }
+function crumb(s){ try { var o = crumbGet(); if (!o || o.s !== ERR_SID) return; var t = Date.now();
+  o.cr.push(Math.round((t - o.t0) / 1000) + 's ' + errScrub(s).replace(/\s+/g, ' ').replace(/›/g, '>').slice(0, 60)); if (o.cr.length > 15) o.cr = o.cr.slice(-15);
+  o.lt = t; o.v = document.visibilityState; sessionStorage.setItem(CRK, JSON.stringify(o)); } catch(e) {} }
+function crumbs(n){ var o = crumbGet(); return o && o.s === ERR_SID && o.cr ? o.cr.slice(-(n || 6)).join(' › ') : ''; }
+function errGet(){ try { var a = JSON.parse(localStorage.getItem(ERRK) || '[]'); return Array.isArray(a) ? a : []; } catch(e) { return []; } }
+// 같은 오류(종류+내용, 또는 opt.key 묶음)는 한 줄에 ×횟수로 모음. 1.5초 안에 되풀이되면 모았다가 한 번에 씀(그리는 중 되풀이 오류로 느려지지 않게)
+function errLog(kind, msg, extra, opt){
+  opt = opt || {}; var m = errScrub(msg).slice(0, 300), x = errScrub(extra).slice(0, 400);
+  if (opt.t) return errWrite(kind, m, x, opt, 1);
+  var key = kind + '|' + (opt.key || m + '|' + x), now = Date.now(), q = ERR_Q[key];
+  if (q && now - q.t < 1500) { q.n++; if (!q.tm) q.tm = setTimeout(function(){ var c = q.n; q.n = 0; q.tm = 0; q.t = Date.now(); errWrite(kind, m, x, opt, c); }, 1500); return; }
+  ERR_Q[key] = { t: now, n: 0, tm: 0 }; errWrite(kind, m, x, opt, 1); }
+function errWrite(kind, m, x, opt, cnt){
+  if (!cnt) return;
+  try { var a = errGet(), g = opt.key || '', e = null, iso = new Date().toISOString(), B = String(opt.b || SITE_BUILD || ''), any = /^(res|net|console|js|promise|slow|map|sync|push|lb-img)$/.test(kind), nowT = Date.now();
+    if (!opt.t) for (var i = a.length - 1; i >= 0 && i >= a.length - 40; i--) { var y = a[i]; if (y.k === kind && (g ? y.g === g : (y.m === m && y.x === x)) && (y.s === ERR_SID || (any && y.b === B && nowT - Date.parse(y.t2 || y.t) < 86400000))) { e = y; break; } }
+    if (e) { e.n = (e.n || 1) + cnt; e.t2 = iso; if (g) { e.m = m; e.x = x; } if (e.s !== ERR_SID) { var c2 = opt.c != null ? opt.c : (/^(js|promise|console|net|lb-img|slow)$/.test(kind) ? crumbs(5) : ''); if (c2) e.c = errScrub(c2).slice(0, 500); e.s = ERR_SID; } }
+    else { e = { t: opt.t || iso, k: kind, m: m, x: x, b: String(opt.b || SITE_BUILD || ''), s: opt.s || ERR_SID, w: innerWidth + 'x' + innerHeight };
+      if (cnt > 1) e.n = cnt; if (g) e.g = g;
+      var c = opt.c != null ? opt.c : (/^(js|promise|console|net|lb-img|slow)$/.test(kind) ? crumbs(5) : ''); if (c) e.c = errScrub(c).slice(0, 500);
+      if (window.performance && performance.memory) e.mem = Math.round(performance.memory.usedJSHeapSize / 1048576) + 'MB';
+      if (navigator.onLine === false) e.off = 1;
+      a.push(e); }
+    if (a.length > 80) a = a.slice(-80); localStorage.setItem(ERRK, JSON.stringify(a)); } catch(z) {}
+  try { var b = document.getElementById('err-open'); if (b) b.textContent = '오류 기록 ' + errGet().length + '건'; } catch(z) {}
+  if (kind !== 'bg' && window.__logKick) try { window.__logKick(); } catch(z) {} }
+// 스크립트 오류 + 그림·스크립트·CSS 파일을 못 불러온 것(자원 오류 — 크게 보기 안 그림은 거기서 따로 적음)
+window.addEventListener('error', function(e){
+  var t = e && e.target;
+  if (t && t !== window && t.tagName) {
+    var src = t.currentSrc || t.src || t.href || ''; if (typeof src !== 'string') src = (src && src.baseVal) || '';   // SVG <image> 는 href 가 객체
+    if (!src || /^(data|blob):/.test(src) || (t.closest && t.closest('#lb'))) return;
+    var u = errUrl(src), out = !/^\//.test(u), host = u.split('/')[0]; ERR_RES++;
+    if (out) errLog('res', t.tagName.toLowerCase() + ' 못 불러옴(바깥 사이트)', host, { key: 'res-out|' + host });
+    else if (ERR_RES <= 15) errLog('res', t.tagName.toLowerCase() + ' 못 불러옴', u);
+    else errLog('res', '사이트 파일을 여러 개 못 불러옴', '15건 넘음 — 첫 15건은 따로 적힘', { key: 'res-many' });
+    return; }
+  var msg = (e && e.message) || ''; if (/ResizeObserver loop/.test(msg)) return;
+  errLog('js', msg, errUrl(String(e.filename || '')) + ':' + (e.lineno || 0) + ':' + (e.colno || 0) + (e.error && e.error.stack ? ' | ' + String(e.error.stack).split('\n').slice(0, 4).join(' | ') : ''));
+}, true);
+window.addEventListener('unhandledrejection', function(e){ var r = e && e.reason; if (r && r.name === 'AbortError') return; errLog('promise', r && r.message ? r.message : String(r), r && r.stack ? String(r.stack).split('\n').slice(0, 3).join(' | ') : ''); });
+(function(){ var ce = console.error; if (!ce || ce.__kkk) return;
+  var w = function(){ try { errLog('console', Array.prototype.map.call(arguments, function(v){ if (v && v.message) return v.message; if (v && typeof v === 'object') { try { return JSON.stringify(v).slice(0, 150); } catch(z) { return String(v); } } return String(v); }).join(' ')); } catch(z) {} return ce.apply(console, arguments); };
+  w.__kkk = 1; console.error = w; })();
+// 자료 요청(fetch): 실패(HTTP 400 넘음·연결 안 됨)와 12초 넘게 걸린 것. GitHub 동기화의 404(파일 첫 생성)·409/422(다른 기기와 겹침)는 정상 흐름이라 뺌
+(function(){ var F = window.fetch; if (!F || F.__kkk) return;
+  var w = function(input){ var u = typeof input === 'string' ? input : (input && input.url) || String(input), t0 = Date.now(), p = F.apply(window, arguments);
+    if (/\/contents\/log\//.test(u)) return p;   // 기록 올리기 자체는 안 적음(되풀이 방지)
+    return p.then(function(r){ var ms = Date.now() - t0, gh = /api\.github\.com/.test(u);
+      if (!r.ok && r.status !== 304 && r.type !== 'opaque' && !(gh && /^(404|409|422)$/.test(String(r.status)))) errLog('net', '자료 요청 실패 ' + r.status, errUrl(u) + ' · ' + ms + 'ms', { key: 'net|' + r.status + '|' + errUrl(u) });
+      else if (ms > 12000) errLog('slow', '느린 요청 ' + Math.round(ms / 1000) + '초', errUrl(u), { key: 'slow|' + errUrl(u) });
+      return r; }, function(er){ if (!(er && er.name === 'AbortError')) errLog('net', '자료 요청 못 함: ' + ((er && er.message) || er) + (navigator.onLine === false ? ' (오프라인)' : ''), errUrl(u) + ' · ' + (Date.now() - t0) + 'ms', { key: 'net|x|' + errUrl(u) }); throw er; }); };
+  w.__kkk = 1; window.fetch = w; })();
+// 갑자기 다시 열림: 탭이 살아 있는 동안 sessionStorage 에 표시를 두고, 정상으로 떠날 때(pagehide — 이동·새로고침·닫기)만 지움.
+// 다음에 열 때 표시가 남아 있으면 그 전 탭이 pagehide 없이 끝난 것 = 보던 중이면 멈춤·메모리 부족(crash), 다른 앱에 가 있던 중이면 브라우저가 정리(bg)
+(function(){ try {
+  var prev = crumbGet(), lb = sessionStorage.getItem('kkk-lb-live'), nav = '';
+  try { nav = (performance.getEntriesByType('navigation')[0] || {}).type || ''; } catch(z) {}
+  sessionStorage.removeItem('kkk-lb-live');
+  if (lb || (prev && prev.s)) { prev = prev || {}; var t0 = prev.t0 || Date.now(), lt = prev.lt || t0, ago = Math.round((Date.now() - lt) / 1000), cr = (prev.cr || []).slice(-8).join(' › '), used = Math.round((lt - t0) / 1000);
+    if (lb) { var o = JSON.parse(lb) || {}; errLog('crash', '크게 보기 중 페이지가 다시 열림(브라우저가 메모리 부족으로 탭을 다시 연 것으로 보임)', (o.i || '?') + '/' + (o.n || '?') + '번째 · ' + (o.px || '') + ' · ' + (o.u || '') + ' · ' + Math.round((Date.now() - (o.t || Date.now())) / 1000) + '초 전', { c: cr }); }
+    else if (prev.v === 'hidden') errLog('bg', '다른 앱·탭에 가 있는 동안 브라우저가 이 탭을 정리해서 다시 열림', '가려진 뒤 ' + ago + '초 · 그 전 ' + used + '초 사용', { c: cr });
+    else errLog('crash', '보던 중 페이지가 갑자기 다시 열림(탭이 멈췄거나 메모리 부족)', '마지막 동작 ' + ago + '초 전 · ' + used + '초 사용 · 다시 열린 방식 ' + (nav || '?'), { c: cr }); }
+  sessionStorage.setItem(CRK, JSON.stringify({ s: ERR_SID, t0: Date.now(), lt: Date.now(), v: document.visibilityState, cr: ['0s 열림 ' + errScrub((location.hash || '#').slice(0, 40)) + (nav ? ' (' + nav + ')' : '')] }));
+} catch(e) {} })();
+window.addEventListener('pagehide', function(){ try { sessionStorage.removeItem(CRK); sessionStorage.removeItem('kkk-lb-live'); } catch(e) {} });
+window.addEventListener('pageshow', function(e){ if (e.persisted) try { sessionStorage.setItem(CRK, JSON.stringify({ s: ERR_SID, t0: Date.now(), lt: Date.now(), v: 'visible', cr: ['0s 다시 보임(뒤로 가기)'] })); } catch(z) {} });
+document.addEventListener('visibilitychange', function(){ crumb(document.visibilityState === 'hidden' ? '가려짐(다른 앱·탭)' : '다시 보임'); });
+window.addEventListener('hashchange', function(){ crumb('화면 ' + (location.hash || '#').slice(0, 40)); });
+window.addEventListener('online', function(){ crumb('인터넷 다시 연결'); });
+window.addEventListener('offline', function(){ crumb('인터넷 끊김'); });
+document.addEventListener('click', function(e){ try { var t = e.target, el = t && t.closest && t.closest('a,button,summary,label,input,select,[role=button],[data-view],.it,.chip'); if (!el) return;
+  var priv = !!el.closest('#view-me,#view-money,#sync-dlg,#err-dlg,#push-reg'), d = el.tagName.toLowerCase() + (el.id ? '#' + el.id : (typeof el.className === 'string' && el.className.trim() ? '.' + el.className.trim().split(/\s+/)[0] : ''));
+  if (el.tagName === 'INPUT') { if (/^(checkbox|radio)$/.test(el.type) && !priv) d += ' ' + (el.name || '') + '=' + String(el.value || '').slice(0, 16) + (el.checked ? ' 켬' : ' 끔'); }
+  else if (!priv && el.tagName !== 'SELECT') { var tx = (el.getAttribute('aria-label') || el.getAttribute('title') || el.textContent || '').replace(/\s+/g, ' ').trim(); if (tx) d += ' 「' + tx.slice(0, 24) + '」'; }
+  crumb('누름 ' + d); } catch(z) {} }, true);
+// 판이 바뀜(배포 뒤 이 기기가 새 판을 처음 엶) — 기록이 올라가는지 확인하는 기준점도 됨
+(function(){ try { var pb = localStorage.getItem('kkk-last-build'); if (pb !== SITE_BUILD) { localStorage.setItem('kkk-last-build', SITE_BUILD); errLog('upd', pb ? '새 판으로 바뀜' : '이 기기 기록 시작', (pb || '—') + ' → ' + SITE_BUILD, { c: '' }); } } catch(e) {} })();
+// 첫 화면이 15초 넘게 걸림
+window.addEventListener('load', function(){ setTimeout(function(){ try { var n = performance.getEntriesByType('navigation')[0]; if (n && n.loadEventEnd > 15000) errLog('slow', '첫 화면 ' + Math.round(n.loadEventEnd / 1000) + '초 걸림', 'DOM 준비 ' + Math.round(n.domContentLoadedEventEnd) + 'ms · 받은 크기 ' + Math.round((n.transferSize || 0) / 1024) + 'KB · ' + (n.type || '')); } catch(e) {} }, 0); });
+// 알림(서비스 워커 sw.js)이 Cache Storage 'kkk-swlog' 에 남긴 기록(알림 받음·누름·실패·구독 만료)을 가져와 합침
+function swLogPull(){ try { if (!window.caches || !caches.has) return; caches.has('kkk-swlog').then(function(h){ if (!h) return;
+  return caches.open('kkk-swlog').then(function(c){ return c.match('log').then(function(r){ return r ? r.json() : []; }).then(function(a){
+    (Array.isArray(a) ? a : []).forEach(function(x){ if (x && x.t && x.m) errLog('sw', x.m, x.x || '', { t: x.t, s: 'sw', c: '' }); }); return caches.delete('kkk-swlog'); }); }); }).catch(function(){}); } catch(e) {} }
+window.addEventListener('load', function(){ setTimeout(swLogPull, 3000); });
+document.addEventListener('visibilitychange', function(){ if (document.visibilityState === 'visible') setTimeout(swLogPull, 1500); });
 // ===== 설정 =====
 var NCP_KEY_ID = '7lizv5y6f1';
 var PLACES = [{"kind":"행복주택","cat":"pri","name":"방화스카이포레","gu":"강서","addr":"서울특별시 강서구 개화동로21길 22","approx":[37.578,126.812],"m2":29.09,"py":"8.8평","vac":4,"wait":8,"dep":"7,272만","rent":"26.6만","notice":"2026 2차","rank":"우선 1순위","q":"방화스카이포레","pick":true,"conv":{"up":[99320,133000],"down":[36360,341700],"pct":50,"pg":54,"rule":17}},{"kind":"행복주택","cat":"pri","name":"이문 아이파크 자이","gu":"동대문","addr":"서울특별시 동대문구 이문로 120","approx":[37.6,127.06],"m2":33.54,"py":"10.1평","vac":5,"wait":7,"dep":"8,208만","rent":"32.1만","notice":"2026 1차","rank":"우선 1순위","q":"이문아이파크자이","pick":true,"conv":{"up":[114180,160500],"down":[41040,406500],"pct":50,"pg":58,"rule":18}},{"kind":"행복주택","cat":"pri","name":"e편한세상 청계센트럴포레","gu":"동대문","addr":"서울특별시 동대문구 무학로 91","approx":[37.577,127.03],"m2":39.92,"py":"12.1평","vac":1,"wait":4,"dep":"1억 1,460만","rent":"41.0만","notice":"2026 2차","rank":"일반 추첨","q":"e편한세상 청계센트럴포레","pick":true,"conv":{"up":[131000,328000],"down":[91680,457700],"pct":20,"pg":54,"rule":17}},{"kind":"행복주택","cat":"small","name":"목동센트럴아이파크위브","gu":"양천","addr":"서울특별시 양천구 남부순환로83길 18","approx":[37.521,126.84],"m2":34.24,"py":"10.4평","vac":18,"wait":34,"dep":"9,851만","rent":"32.0만","notice":"2026 1차","rank":"일반 추첨","q":"목동센트럴아이파크위브 2단지","pick":true,"conv":{"up":[111310,256000],"down":[78800,361000],"pct":20,"pg":60,"rule":18}},{"kind":"행복주택","cat":"small","name":"이든채","gu":"양천","addr":"서울특별시 양천구 신정로7길 75","approx":[37.519,126.853],"m2":31.31,"py":"9.5평","vac":5,"wait":8,"dep":"5,940만","rent":"23.3만","notice":"2026 1차","rank":"일반 추첨","q":"양천구 신정로7길 75","pick":false,"conv":{"up":[68720,186400],"down":[47520,257700],"pct":20,"pg":60,"rule":18}},{"kind":"행복주택","cat":"small","name":"아크로타워스퀘어","gu":"영등포","addr":"서울특별시 영등포구 국회대로54길 10","approx":[37.519,126.909],"m2":26.78,"py":"8.1평","vac":0,"wait":10,"dep":"8,964만","rent":"35.9만","notice":"2026 1차","rank":"예비만","q":"아크로타워스퀘어","pick":false,"conv":{"up":[104000,287200],"down":[71710,396300],"pct":20,"pg":60,"rule":18}},{"kind":"행복주택","cat":"big","name":"천왕이펜하우스8단지","gu":"구로","addr":"서울특별시 구로구 금오로 882","approx":[37.483,126.838],"m2":36.87,"py":"11.2평","vac":11,"wait":21,"dep":"6,552만","rent":"24.6만","notice":"2026 2차","rank":"일반 추첨","q":"천왕이펜하우스8단지","pick":true,"conv":{"up":[90120,123000],"down":[32760,314200],"pct":50,"pg":54,"rule":17}},{"kind":"행복주택","cat":"small","name":"항동 하버라인","gu":"구로","addr":"서울특별시 구로구 항동로 68","approx":[37.48,126.824],"m2":29.69,"py":"9.0평","vac":25,"wait":93,"dep":"5,760만","rent":"21.6만","notice":"2026 2차","rank":"일반 추첨","q":"항동하버라인 9단지","pick":false,"conv":{"up":[79200,108000],"down":[28800,276000],"pct":50,"pg":54,"rule":17}},{"kind":"행복주택","cat":"small","name":"천왕이펜하우스7","gu":"구로","addr":"서울특별시 구로구 천왕로 21","approx":[37.486,126.842],"m2":29.96,"py":"9.1평","vac":10,"wait":54,"dep":"4,536만","rent":"17.0만","notice":"2026 1차","rank":"일반 추첨","q":"천왕이펜하우스7단지","pick":false,"conv":{"up":[62360,85000],"down":[22680,217200],"pct":50,"pg":58,"rule":18}},{"kind":"행복주택","cat":"small","name":"천왕이펜하우스8단지","gu":"구로","addr":"서울특별시 구로구 금오로 882","approx":[37.483,126.838],"m2":29.38,"py":"8.9평","vac":8,"wait":27,"dep":"5,256만","rent":"19.7만","notice":"2026 1차","rank":"일반 추첨","q":"천왕이펜하우스8단지","pick":false,"conv":{"up":[72260,98500],"down":[26280,251700],"pct":50,"pg":58,"rule":18}},{"kind":"행복주택","cat":"small","name":"천왕연지마을1","gu":"구로","addr":"서울특별시 구로구 오류로 36-13","approx":[37.489,126.836],"m2":32.31,"py":"9.8평","vac":0,"wait":11,"dep":"5,040만","rent":"21.5만","notice":"2026 1차","rank":"예비만","q":"천왕연지마을1단지","pick":false,"conv":{"up":[71900,107500],"down":[25200,267500],"pct":50,"pg":58,"rule":18}},{"kind":"행복주택","cat":"small","name":"천왕연지마을2","gu":"구로","addr":"서울특별시 구로구 오리로1102-13","approx":[37.488,126.834],"m2":31.06,"py":"9.4평","vac":0,"wait":6,"dep":"4,824만","rent":"20.5만","notice":"2026 1차","rank":"예비만","q":"천왕연지마을2단지","pick":false,"conv":{"up":[68740,102500],"down":[24120,255200],"pct":50,"pg":58,"rule":18}},{"kind":"행복주택","cat":"small","name":"마포더클래시","gu":"마포","addr":"서울특별시 마포구 신촌로28길 50","approx":[37.556,126.955],"m2":32.89,"py":"9.9평","vac":0,"wait":2,"dep":"9,216만","rent":"36.2만","notice":"2026 1차","rank":"예비만","q":"마포더클래시","pick":false,"conv":{"up":[128360,181000],"down":[46080,458000],"pct":50,"pg":59,"rule":18}},{"kind":"행복주택","cat":"big","name":"공덕동 크로시티","gu":"마포","addr":"서울특별시 마포구 백범로31길 19","approx":[37.545,126.952],"m2":36.67,"py":"11.1평","vac":0,"wait":10,"dep":"1억 3,464만","rent":"52.7만","notice":"2026 2차","rank":"예비만","q":"공덕동 크로시티","pick":false,"ll":[37.5465191,126.9493111],"addr_src":"SH 주택정보(공덕동 크로시티)","conv":{"up":[187340,263500],"down":[67320,667200],"pct":50,"pg":54,"rule":17}},{"kind":"행복주택","cat":"small","name":"마포자이더센트리지","gu":"마포","addr":"서울특별시 마포구 숭문길 98","approx":[37.549,126.946],"m2":34.8,"py":"10.5평","vac":1,"wait":3,"dep":"1억 4,202만","rent":"49.6만","notice":"2026 2차","rank":"일반 추첨","q":"마포자이더센트리지","pick":false,"ll":[37.5511663,126.9495565],"addr_src":"SH 주택정보(마포자이 더센트리지 (염리2))","conv":{"up":[161860,396800],"down":[113610,555100],"pct":20,"pg":55,"rule":17}},{"kind":"행복주택","cat":"small","name":"e편한세상신촌","gu":"서대문","addr":"서울특별시 서대문구 북아현로1길 17","approx":[37.559,126.955],"m2":32.74,"py":"9.9평","vac":11,"wait":43,"dep":"1억 1,271만","rent":"44.1만","notice":"2026 1차","rank":"일반 추첨","q":"e편한세상신촌","pick":false,"conv":{"up":[130350,352800],"down":[90160,487900],"pct":20,"pg":59,"rule":18}},{"kind":"행복주택","cat":"small","name":"홍제센트럴아이파크","gu":"서대문","addr":"서울특별시 서대문구 통일로 395","approx":[37.586,126.942],"m2":34.89,"py":"10.6평","vac":5,"wait":11,"dep":"1억 546만","rent":"40.0만","notice":"2026 1차","rank":"일반 추첨","q":"홍제센트럴아이파크","pick":false,"conv":{"up":[121460,320000],"down":[84360,443900],"pct":20,"pg":59,"rule":18}},{"kind":"행복주택","cat":"small","name":"래미안루센티아","gu":"서대문","addr":"서울특별시 서대문구 거북골로 100","approx":[37.577,126.918],"m2":34.12,"py":"10.3평","vac":4,"wait":14,"dep":"1억 1,151만","rent":"39.5만","notice":"2026 1차","rank":"일반 추첨","q":"래미안루센티아","pick":false,"conv":{"up":[127310,316000],"down":[89200,441400],"pct":20,"pg":59,"rule":18}},{"kind":"행복주택","cat":"big","name":"힐스테이트신촌","gu":"서대문","addr":"서울특별시 서대문구 이화여대8길 123","approx":[37.563,126.953],"m2":37.97,"py":"11.5평","vac":3,"wait":5,"dep":"1억 3,454만","rent":"51.6만","notice":"2026 1차","rank":"일반 추첨","q":"힐스테이트신촌","pick":false,"conv":{"up":[155180,412800],"down":[107630,572000],"pct":20,"pg":59,"rule":18}},{"kind":"행복주택","cat":"small","name":"북한산두산위브","gu":"서대문","addr":"서울특별시 서대문구 홍은중앙로3길 9","approx":[37.593,126.937],"m2":33.05,"py":"10.0평","vac":2,"wait":5,"dep":"1억 1,664만","rent":"43.9만","notice":"2026 2차","rank":"일반 추첨","q":"북한산두산위브","pick":false,"ll":[37.598222,126.9452041],"addr_src":"SH 주택정보(북한산 두산위브 (홍은14))","conv":{"up":[134200,351200],"down":[93310,487600],"pct":20,"pg":55,"rule":17}},{"kind":"행복주택","cat":"small","name":"대치르엘","gu":"강남","addr":"서울특별시 강남구 도곡로93길 23","approx":[37.5,127.06],"m2":35.96,"py":"10.9평","vac":0,"wait":4,"dep":"1억 2,168만","rent":"48.6만","notice":"2026 1차","rank":"예비만","q":"대치르엘","pick":false,"conv":{"up":[170280,243000],"down":[60840,612700],"pct":50,"pg":57,"rule":18}},{"kind":"행복주택","cat":"small","name":"고덕온빛채","gu":"강동","addr":"서울특별시 강동구 아리수로 385","approx":[37.56,127.165],"m2":29.46,"py":"8.9평","vac":0,"wait":12,"dep":"8,568만","rent":"34.3만","notice":"2026 1차","rank":"예비만","q":"고덕온빛채","pick":false,"conv":{"up":[119980,171500],"down":[42840,432200],"pct":50,"pg":58,"rule":18}},{"kind":"행복주택","cat":"big","name":"고덕온빛채","gu":"강동","addr":"서울특별시 강동구 아리수로 385","approx":[37.56,127.165],"m2":36.62,"py":"11.1평","vac":7,"wait":14,"dep":"1억 584만","rent":"42.3만","notice":"2026 2차","rank":"일반 추첨","q":"고덕온빛채","pick":true,"conv":{"up":[148140,211500],"down":[52920,533200],"pct":50,"pg":53,"rule":17}},{"kind":"행복주택","cat":"big","name":"강동리엔파크14단지","gu":"강동","addr":"서울특별시 강동구 고덕로98길 160","approx":[37.555,127.172],"m2":36.87,"py":"11.2평","vac":3,"wait":9,"dep":"1억 440만","rent":"41.8만","notice":"2026 2차","rank":"일반 추첨","q":"강동리엔파크14단지","pick":true,"conv":{"up":[146200,209000],"down":[52200,526700],"pct":50,"pg":53,"rule":17}},{"kind":"행복주택","cat":"small","name":"강동리엔파크11단지","gu":"강동","addr":"서울특별시 강동구 고덕로98길 101","approx":[37.556,127.168],"m2":29.99,"py":"9.1평","vac":0,"wait":6,"dep":"8,496만","rent":"34.0만","notice":"2026 2차","rank":"예비만","q":"강동리엔파크11단지","pick":false,"conv":{"up":[118960,170000],"down":[42480,428500],"pct":50,"pg":53,"rule":17}},{"kind":"행복주택","cat":"small","name":"푸르내","gu":"강동","addr":"서울특별시 강동구 상일로12길 95","approx":null,"m2":28.14,"py":"8.5평","vac":0,"wait":8,"dep":"8,001만","rent":"26.0만","notice":"2026 1차","rank":"예비만","q":"푸르내 행복주택 강동구","pick":false,"ll":[37.5565969,127.172236],"addr_src":"SH 주택정보(강일푸르내)","conv":{"up":[90410,208000],"down":[64000,293300],"pct":20,"pg":58,"rule":18}},{"kind":"행복주택","cat":"big","name":"왕십리자이","gu":"성동","addr":"서울특별시 성동구 난계로 100","approx":[37.564,127.03],"m2":38.19,"py":"11.6평","vac":3,"wait":11,"dep":"1억 4,436만","rent":"59.6만","notice":"2026 2차","rank":"일반 추첨","q":"왕십리자이","pick":false,"ll":[37.5604884,127.024661],"addr_src":"SH 주택정보(왕십리자이 (하왕1-5))","conv":{"up":[168200,476800],"down":[115480,656100],"pct":20,"pg":55,"rule":17}},{"kind":"행복주택","cat":"big","name":"서울숲리버뷰자이","gu":"성동","addr":"서울특별시 성동구 고산자로2길 65","approx":[37.556,127.038],"m2":36.06,"py":"10.9평","vac":2,"wait":5,"dep":"1억 4,553만","rent":"58.2만","notice":"2026 2차","rank":"일반 추첨","q":"서울숲리버뷰자이","pick":false,"ll":[37.5548428,127.0380265],"addr_src":"SH 주택정보(서울숲리버뷰자이(행당6))","conv":{"up":[168810,465600],"down":[116420,642600],"pct":20,"pg":55,"rule":17}},{"kind":"행복주택","cat":"small","name":"꿈의숲코오롱하늘채","gu":"성북","addr":"서울특별시 성북구 돌곶이로 220","approx":[37.615,127.047],"m2":32.22,"py":"9.7평","vac":4,"wait":10,"dep":"9,540만","rent":"37.4만","notice":"2026 1차","rank":"일반 추첨","q":"꿈의숲코오롱하늘채","pick":false,"conv":{"up":[110360,299200],"down":[76320,413700],"pct":20,"pg":60,"rule":18}},{"kind":"행복주택","cat":"small","name":"래미안길음센터피스","gu":"성북","addr":"서울특별시 성북구 숭인로 50","approx":[37.605,127.023],"m2":33.46,"py":"10.1평","vac":0,"wait":8,"dep":"1억 1,808만","rent":"45.1만","notice":"2026 1차","rank":"예비만","q":"래미안길음센터피스","pick":false,"conv":{"up":[136120,360800],"down":[94460,500200],"pct":20,"pg":60,"rule":18}},{"kind":"행복주택","cat":"big","name":"꿈의숲아이파크","gu":"성북","addr":"서울특별시 성북구 돌곶이로40길 46","approx":[37.616,127.052],"m2":39.0,"py":"11.8평","vac":6,"wait":38,"dep":"1억 2,348만","rent":"47.0만","notice":"2026 1차","rank":"일반 추첨","q":"꿈의숲아이파크","pick":false,"conv":{"up":[142280,376000],"down":[98780,521400],"pct":20,"pg":60,"rule":18}},{"kind":"행복주택","cat":"small","name":"보문파크뷰자이","gu":"성북","addr":"서울특별시 성북구 보문사길 111","approx":[37.586,127.02],"m2":29.96,"py":"9.1평","vac":3,"wait":15,"dep":"1억 1,664만","rent":"43.3만","notice":"2026 2차","rank":"일반 추첨","q":"보문파크뷰자이","pick":false,"ll":[37.5802161,127.0188098],"addr_src":"SH 주택정보(보문3구역 (보문파크뷰 자이))","conv":{"up":[133960,346400],"down":[93310,481600],"pct":20,"pg":55,"rule":17}},{"kind":"행복주택","cat":"big","name":"래미안장위퍼스트하이","gu":"성북","addr":"서울특별시 성북구 한천로 713","approx":[37.613,127.058],"m2":36.14,"py":"10.9평","vac":7,"wait":13,"dep":"9,936만","rent":"39.0만","notice":"2026 2차","rank":"일반 추첨","q":"래미안장위퍼스트하이","pick":true,"conv":{"up":[114960,312000],"down":[79480,431400],"pct":20,"pg":55,"rule":17}},{"kind":"행복주택","cat":"big","name":"장위자이레디언트","gu":"성북","addr":"서울특별시 성북구 돌곶이로30길 63","approx":[37.617,127.045],"m2":39.91,"py":"12.1평","vac":5,"wait":14,"dep":"1억 962만","rent":"42.0만","notice":"2026 2차","rank":"일반 추첨","q":"장위자이레디언트","pick":true,"ll":[37.6136041,127.0561602],"addr_src":"SH 주택정보(장위자이레디언트(장위4구역))","conv":{"up":[126420,336000],"down":[87690,465600],"pct":20,"pg":55,"rule":17}},{"kind":"행복주택","cat":"big","name":"창경궁롯데캐슬시그니처","gu":"성북","addr":"서울특별시 성북구 삼선동2가 296","approx":[37.588,127.008],"m2":39.39,"py":"11.9평","vac":30,"wait":0,"dep":"1억 2,096만","rent":"46.3만","notice":"2026 2차","rank":"일반 추첨","q":"창경궁롯데캐슬시그니처","pick":true,"conv":{"up":[139480,370400],"down":[96760,513400],"pct":20,"pg":53,"rule":17}},{"kind":"행복주택","cat":"big","name":"송파시그니처롯데캐슬","gu":"송파","addr":"서울특별시 송파구 거마로 56","approx":[37.495,127.145],"m2":39.9,"py":"12.1평","vac":0,"wait":2,"dep":"1억 2,168만","rent":"44.5만","notice":"2026 1차","rank":"예비만","q":"송파시그니처롯데캐슬","pick":false,"conv":{"up":[166180,222500],"down":[60840,571700],"pct":50,"pg":60,"rule":18}},{"kind":"행복주택","cat":"small","name":"e편한세상송파파크센트럴","gu":"송파","addr":"서울특별시 송파구 오금로 551","approx":[37.497,127.14],"m2":34.93,"py":"10.6평","vac":3,"wait":9,"dep":"1억 2,564만","rent":"44.3만","notice":"2026 1차","rank":"일반 추첨","q":"e편한세상송파파크센트럴","pick":false,"conv":{"up":[143360,354400],"down":[100510,495300],"pct":20,"pg":60,"rule":18}},{"kind":"행복주택","cat":"big","name":"용산롯데캐슬센터포레","gu":"용산","addr":"서울특별시 용산구 백범로 313","approx":[37.546,126.962],"m2":38.17,"py":"11.5평","vac":0,"wait":7,"dep":"1억 6,471만","rent":"61.6만","notice":"2026 1차","rank":"예비만","q":"용산롯데캐슬센터포레","pick":false,"conv":{"up":[189350,492800],"down":[131760,684600],"pct":20,"pg":60,"rule":18}},{"kind":"행복주택","cat":"big","name":"용산센트럴파크 헤링턴스퀘어","gu":"용산","addr":"서울특별시 용산구 서빙고로 17","approx":[37.527,126.962],"m2":40.67,"py":"12.3평","vac":2,"wait":23,"dep":"1억 7,784만","rent":"75.6만","notice":"2026 1차","rank":"일반 추첨","q":"용산센트럴파크 헤링턴스퀘어","pick":false,"conv":{"up":[208080,604800],"down":[142270,830100],"pct":20,"pg":60,"rule":18}},{"kind":"행복주택","cat":"big","name":"경희궁자이","gu":"종로","addr":"서울특별시 종로구 송월길 130","approx":[37.571,126.962],"m2":39.06,"py":"11.8평","vac":4,"wait":21,"dep":"1억 3,910만","rent":"54.5만","notice":"2026 1차","rank":"일반 추첨","q":"경희궁자이","pick":false,"conv":{"up":[160900,436000],"down":[111280,602900],"pct":20,"pg":61,"rule":18}},{"kind":"행복주택","cat":"big","name":"신내 글로리움","gu":"중랑","addr":"서울특별시 중랑구 신내로 208","approx":[37.61,127.1],"m2":36.36,"py":"11.0평","vac":0,"wait":28,"dep":"7,056만","rent":"25.3만","notice":"2026 1차","rank":"예비만","q":"신내글로리움","pick":true,"conv":{"up":[95860,126500],"down":[35280,326500],"pct":50,"pg":61,"rule":18}},{"kind":"행복주택","cat":"small","name":"신내3-3 도시형생활주택","gu":"중랑","addr":"서울특별시 중랑구 신내역로1길 142","approx":[37.614,127.103],"m2":29.84,"py":"9.0평","vac":0,"wait":12,"dep":"5,976만","rent":"25.9만","notice":"2026 1차","rank":"예비만","q":"신내우디안3단지","pick":false,"conv":{"up":[85660,129500],"down":[29880,321200],"pct":50,"pg":61,"rule":18}},{"kind":"행복주택","cat":"small","name":"신내3-4 도시형생활주택","gu":"중랑","addr":"서울특별시 중랑구 신내역로 160","approx":[37.615,127.105],"m2":31.85,"py":"9.6평","vac":0,"wait":30,"dep":"5,832만","rent":"24.3만","notice":"2026 1차","rank":"예비만","q":"신내우디안4단지","pick":false,"conv":{"up":[82620,121500],"down":[29160,303700],"pct":50,"pg":61,"rule":18}},{"kind":"행복주택","cat":"big","name":"래미안베라힐즈","gu":"은평","addr":"서울특별시 은평구 통일로 630","approx":[37.603,126.93],"m2":38.28,"py":"11.6평","vac":27,"wait":38,"dep":"1억 3,248만","rent":"53.0만","notice":"2026 2차","rank":"일반 추첨","q":"래미안베라힐즈","pick":false,"conv":{"up":[153680,424000],"down":[105980,585200],"pct":20,"pg":56,"rule":17}},{"kind":"행복주택","cat":"big","name":"은뜨락","gu":"은평","addr":"서울특별시 은평구 통일로 972","approx":[37.64,126.922],"m2":39.49,"py":"11.9평","vac":25,"wait":41,"dep":"9,720만","rent":"38.9만","notice":"2026 2차","rank":"일반 추첨","q":"은평구 통일로 972","pick":true,"conv":{"up":[112760,311200],"down":[77760,429500],"pct":20,"pg":56,"rule":17}},{"kind":"행복주택","cat":"big","name":"힐스테이트녹번역","gu":"은평","addr":"서울특별시 은평구 은평로 240","approx":[37.602,126.924],"m2":39.12,"py":"11.8평","vac":6,"wait":10,"dep":"1억 1,652만","rent":"40.6만","notice":"2026 2차","rank":"일반 추첨","q":"힐스테이트녹번역","pick":true,"ll":[37.6004227,126.934997],"addr_src":"SH 주택정보(힐스테이트 녹번역 (응암1))","conv":{"up":[132760,324800],"down":[93210,454500],"pct":20,"pg":56,"rule":17}},{"kind":"행복주택","cat":"big","name":"백련산해모로","gu":"은평","addr":"서울특별시 은평구 응암로30길 15","approx":[37.598,126.918],"m2":39.1,"py":"11.8평","vac":3,"wait":5,"dep":"1억 836만","rent":"43.1만","notice":"2026 2차","rank":"일반 추첨","q":"백련산해모로","pick":false,"ll":[37.5963461,126.9220345],"addr_src":"SH 주택정보(백련산해모로 (응암11))","conv":{"up":[125600,344800],"down":[86680,476100],"pct":20,"pg":56,"rule":17}},{"kind":"행복주택","cat":"big","name":"DMCSK뷰","gu":"은평","addr":"서울특별시 은평구 수색로 216","approx":[37.585,126.895],"m2":38.74,"py":"11.7평","vac":1,"wait":3,"dep":"8,751만","rent":"32.0만","notice":"2026 2차","rank":"일반 추첨","q":"DMC SK뷰","pick":true,"ll":[37.5798676,126.8999707],"addr_src":"SH 주택정보(DMC SK뷰(수색9))","conv":{"up":[100310,256000],"down":[70000,356400],"pct":20,"pg":56,"rule":17}},{"kind":"국민임대","cat":"kook","name":"마곡엠밸리 1~15단지","gu":"강서","addr":"서울특별시 강서구 마곡서1로 131","approx":[37.571,126.84],"info":"49㎡ 2025: 29호(공가 5·예비 24) 5,564~6,467만 · 월 38.0~42.1만 / 2026: 일반 없음(주거약자 6호) · 59㎡ 2025: 40호(예비 40 · 기존 대기 7) 5,770~7,525만 · 월 37.6~46.5만 / 2026: 없음","rank":"강서 거주 1순위 (49형 · 전용 49.77㎡ = 15.1평)","q":"마곡엠밸리","pick":true},{"kind":"국민임대","cat":"kook","name":"마곡지구 9단지","gu":"강서","addr":"서울특별시 강서구 공항대로 103","approx":[37.566,126.826],"info":"49㎡ 2025: 4호(예비 4 · 기존 대기 10) 5,799만 · 월 31.9만 / 2026: 일반 없음(주거약자 2호)","rank":"강서 거주 1순위 (49형 · 전용 49.53㎡ = 15평)","q":"마곡엠밸리9단지","pick":true},{"kind":"국민임대","cat":"kook","name":"마곡수명산파크 1~7단지","gu":"강서","addr":"서울특별시 강서구 강서로47길 108","approx":[37.551,126.837],"info":"39㎡ 2025: 18호(예비 18 · 기존 대기 3) 2,451만 · 월 22.2만 / 2026: 없음 · 49㎡ 2025: 22호(공가 4·예비 18) 3,674~3,900만 · 월 26.2~28.7만 / 2026: 없음 · 59㎡ 2025: 27호(공가 11·예비 16) 4,002~4,323만 · 월 29.3~32.2만 / 2026: 40호(예비 40) 4,002~4,323만 · 월 29.3~32.2만","rank":"강서 거주 1순위 (49형 · 전용 49.83㎡ = 15.1평) · 59형(59.76㎡ = 18.1평)은 청약 24회↑ 1순위","q":"마곡수명산파크","pick":true},{"kind":"국민임대","cat":"kook","name":"신정이펜하우스 1~5단지","gu":"양천","addr":"서울특별시 양천구 신정이펜1로 99","approx":[37.514,126.845],"info":"49㎡ 2025: 12호(예비 12 · 기존 대기 7) 4,007~4,987만 · 월 30.4~35.1만 / 2026: 주거약자만 · 59㎡ 2025: 50호(공가 5·예비 45) 4,715~5,864만 · 월 34.4~39.4만 / 2026: 58호(공가 14·예비 44) 4,715~5,864만 · 월 34.4~39.4만","rank":"연접구(강서) 1순위 (49형 · 전용 49.92㎡ = 15.1평) · 59형(59.83㎡ = 18.1평)은 청약 24회↑ 1순위","q":"신정이펜하우스","pick":true},{"kind":"국민임대","cat":"kook","name":"신정숲속마을","gu":"양천","addr":"서울특별시 양천구 신정로 110","approx":[37.512,126.853],"info":"39㎡ 2025: 10호(공가 2·예비 8) 2,832만 · 월 23.7만 / 2026: 4호(예비 4 · 기존 대기 2) 2,832만 · 월 23.7만","rank":"연접구(강서) 1순위 (39형 · 전용 39.92㎡ = 12.1평)","q":"신정숲속마을","pick":true},{"kind":"국민임대","cat":"kook","name":"상암월드컵파크 9~12단지","gu":"마포","addr":"서울특별시 마포구 월드컵북로 501","approx":[37.58,126.89],"info":"49㎡ 2025: 18호(예비 18 · 기존 대기 6) 4,740~5,434만 · 월 32.8~33.8만 / 2026: 주거약자만 · 59㎡ 2025: 29호(공가 5·예비 24) 5,702~6,509만 · 월 37.8~38.6만 / 2026: 15호(예비 15) 5,702~6,509만 · 월 37.8~38.6만","rank":"연접구(강서) 1순위 (49형 · 전용 49.58㎡ = 15평) · 59형(59.37㎡ = 18평)은 청약 24회↑ 1순위","q":"상암월드컵파크","pick":true},{"kind":"국민임대","cat":"kook","name":"상암월드컵8단지","gu":"마포","addr":"서울특별시 마포구 월드컵로42길 12","approx":[37.5778,126.8828],"info":"39㎡ 2025: 19호(공가 4·예비 15) 2,878만 · 월 25.4만 / 2026: 없음 · 49㎡ 2025: 22호(공가 9·예비 13) 4,285만 · 월 30.8만 / 2026: 없음","rank":"연접구(강서) 1순위 (39형 39.76㎡ = 12평 · 49형 49.62㎡ = 15평) — 2026 공고엔 공급 없음","q":"상암월드컵8단지","pick":true},{"kind":"국민임대","cat":"kook","name":"천왕이펜하우스 1~6단지","gu":"구로","addr":"서울특별시 구로구 천왕로 91","approx":[37.485,126.839],"info":"39㎡ 2025: 4호(예비 4) / 2026: 4호(예비 4) 2,875~3,548만·25.0~28.7만 · 49㎡ 2025: 29호(공가 11·예비 18) / 2026: 48호(공가 8·예비 40) 4,371~4,912만·32.5~35.0만 · 59㎡ 2025: 34호(공가 20) / 2026: 62호(공가 22·예비 40) 5,190~5,993만·36.7~39.4만","rank":"강서는 2순위 (39형 39.45㎡ = 11.9평 · 49형 49.58㎡ = 15평) · 59형(59.95㎡ = 18.1평)은 청약 24회↑ 1순위","q":"천왕이펜하우스","pick":true},{"kind":"국민임대","cat":"kook","name":"천왕연지타운 1,2단지","gu":"구로","addr":"서울특별시 구로구 오류로 30","approx":[37.489,126.836],"info":"39㎡ 2025: 2호(예비 2) / 2026: 9호(예비 9) 4,154만·29.3만 · 49㎡ 2025: 12호(공가 6·예비 6) / 2026: 24호(예비 24) 5,439~6,190만·34.7~37.3만 · 59㎡ 2025: 25호(공가 15) / 2026: 36호(공가 2·예비 34) 6,514~7,645만·39.6~44.7만","rank":"강서는 2순위 (39형 39.97㎡ = 12.1평 · 49형 49.34㎡ = 14.9평) · 59형(59.86㎡ = 18.1평)은 청약 24회↑ 1순위","q":"천왕연지타운","pick":true},{"kind":"국민임대","cat":"kook","name":"항동하버라인 2·3·4·8단지","gu":"구로","addr":"서울특별시 구로구 연동로 234","approx":[37.48,126.824],"info":"39㎡ 2025: 14호(공가 5·예비 9) / 2026: 35호(공가 7·예비 28) 3,443~3,789만·25.4~27.0만 · 49㎡ 2025: 18호(공가 6·예비 12) / 2026: 14호(예비 14) 5,165~5,837만·32.3~35.2만 · 59㎡ 2025: 41호(공가 25) / 2026: 41호(공가 6·예비 35) 5,974~6,644만·37.8~39.8만","rank":"강서는 2순위 (39형 39.91㎡ = 12.1평 · 49형 49.86㎡ = 15.1평) · 59형(59.74㎡ = 18.1평)은 청약 24회↑ 1순위","q":"항동하버라인","pick":true}];
@@ -2892,32 +2999,20 @@ dragScroll(document.querySelector('.tabs'));
 })();
 // ===== 사진 크게 보기(라이트박스): 띠의 사진 하나를 누르면 그 띠의 사진 전부를 ‹ › · 키보드 ←→ · 스와이프로 넘김.
 // 확대: 두 손가락 벌리기 · 두 번 탭(2.5배 ↔ 화면 맞춤) · 마우스 휠 · + / − 버튼. 원본 파일(해상도 그대로)을 확대하고, 확대 중엔 한 손가락으로 이동 =====
-// ===== 오류 기록(2026-11-19 사용자 '이미지 넘겨서 보는데 계속 오류나 — 로그 봐 봐') =====
-// 폰 브라우저 콘솔은 밖에서 못 보므로, 이 기기(localStorage)에 최근 50건을 남겨 '내 조건' 맨 아래 '오류 기록'(또는 주소 끝 #log)에서 보고 복사함. 서버로는 안 보냄
-var ERRK = 'kkk-errlog';
-function errGet(){ try { return JSON.parse(localStorage.getItem(ERRK) || '[]') || []; } catch(e) { return []; } }
-function errLog(kind, msg, extra){
-  try { var a = errGet(), mem = (window.performance && performance.memory) ? Math.round(performance.memory.usedJSHeapSize / 1048576) + 'MB' : '';
-    a.push({ t: new Date().toISOString(), k: kind, m: String(msg || '').slice(0, 300), x: String(extra || '').slice(0, 400), b: String(typeof SITE_BUILD !== 'undefined' ? SITE_BUILD : ''), mem: mem, w: innerWidth + 'x' + innerHeight });
-    if (a.length > 50) a = a.slice(-50); localStorage.setItem(ERRK, JSON.stringify(a)); } catch(e) {}
-  var b = document.getElementById('err-open'); if (b) b.textContent = '오류 기록 ' + errGet().length + '건'; }
-window.addEventListener('error', function(e){ if (!e || (e.target && e.target !== window && e.target.tagName)) return;   // 그림 못 불러온 것(자원 오류)은 여기 말고 크게 보기에서 따로 적음
-  errLog('js', e.message, String(e.filename || '').split('/').pop() + ':' + (e.lineno || 0) + ':' + (e.colno || 0) + (e.error && e.error.stack ? ' | ' + String(e.error.stack).split('\n').slice(0, 3).join(' | ') : '')); });
-window.addEventListener('unhandledrejection', function(e){ var r = e && e.reason; errLog('promise', r && r.message ? r.message : String(r), r && r.stack ? String(r.stack).split('\n').slice(0, 2).join(' | ') : ''); });
-// 크게 보기 중 페이지가 통째로 다시 열림 = 폰 Safari가 메모리가 모자라 탭을 다시 연 것(정상 이동·새로고침은 pagehide 에서 표시를 지움)
-(function(){ try { var s = sessionStorage.getItem('kkk-lb-live'); if (s) { sessionStorage.removeItem('kkk-lb-live'); var o = JSON.parse(s) || {};
-  errLog('reload', '크게 보기 중 페이지가 다시 열림(브라우저가 메모리 부족으로 탭을 다시 연 것으로 보임)', (o.i || '?') + '/' + (o.n || '?') + '번째 · ' + (o.px || '') + ' · ' + (o.u || '') + ' · ' + Math.round((Date.now() - (o.t || Date.now())) / 1000) + '초 전'); } } catch(e) {} })();
-window.addEventListener('pagehide', function(){ try { sessionStorage.removeItem('kkk-lb-live'); } catch(e) {} });
+// ===== 오류 기록 창(#log · 내 조건 맨 아래 '오류 기록') — 기록 본체(errLog·errScrub·crumb)는 스크립트 맨 앞 =====
 function errShow(){
   var d = document.getElementById('err-dlg'); if (!d) { d = document.createElement('dialog'); d.id = 'err-dlg'; d.className = 'sync-dlg err-dlg'; document.body.appendChild(d); }
-  var a = errGet().slice().reverse(), K = { js: '스크립트 오류', promise: '스크립트 오류(비동기)', reload: '페이지 다시 열림', 'lb-img': '크게 보기 그림' };
-  d.innerHTML = '<div class="err-h">오류 기록 ' + a.length + '건</div><div class="err-s">이 기기에만 저장(최근 50건) · 화면을 캡처하거나 "복사"해서 보내 주세요 · 사이트 판 ' + hesc(String(typeof SITE_BUILD !== 'undefined' ? SITE_BUILD : '')) + '</div>' +
-    '<div class="err-b">' + (a.length ? '<ol>' + a.map(function(x){ var t = new Date(x.t); return '<li><b>' + hesc(K[x.k] || x.k) + '</b> · ' + (isNaN(t) ? hesc(x.t) : (t.getMonth() + 1) + '/' + t.getDate() + ' ' + ('0' + t.getHours()).slice(-2) + ':' + ('0' + t.getMinutes()).slice(-2)) + '<br>' + hesc(x.m) + (x.x ? '<br><small>' + hesc(x.x) + '</small>' : '') + '<br><small>판 ' + hesc(x.b || '') + ' · 화면 ' + hesc(x.w || '') + (x.mem ? ' · JS ' + hesc(x.mem) : '') + '</small></li>'; }).join('') + '</ol>' : '<p class="src">기록된 오류 없음</p>') + '</div>' +
-    '<div class="err-bt"><button type="button" data-a="copy">복사</button><button type="button" data-a="clear">지우기</button><button type="button" data-a="close">닫기</button></div>';
+  var a = errGet().slice().reverse(), K = { js: '스크립트 오류', promise: '스크립트 오류(비동기)', console: '콘솔 오류', reload: '페이지 다시 열림', crash: '페이지가 갑자기 다시 열림', bg: '백그라운드 정리 뒤 다시 열림', 'lb-img': '크게 보기 그림', res: '파일 못 불러옴', net: '자료 요청 실패', slow: '느림', map: '지도', sync: '기기 동기화', push: '알림 구독', sw: '알림(서비스 워커)', upd: '사이트 판' };
+  var hm = function(s){ var t = new Date(s); return isNaN(t) ? hesc(s) : (t.getMonth() + 1) + '/' + t.getDate() + ' ' + ('0' + t.getHours()).slice(-2) + ':' + ('0' + t.getMinutes()).slice(-2); };
+  var up = window.LOGUP ? LOGUP.st() : '기기 동기화 기능을 못 불러옴 — 이 기기에만 있음';
+  d.innerHTML = '<div class="err-h">오류·동작 기록 ' + a.length + '건</div><div class="err-s">이 기기에 최근 80건 · 사이트 판 ' + hesc(SITE_BUILD) + '<br><span id="err-up">' + up + '</span></div>' +
+    '<div class="err-b">' + (a.length ? '<ol>' + a.map(function(x){ return '<li><b>' + hesc(K[x.k] || x.k) + '</b>' + (x.n > 1 ? ' ×' + x.n : '') + ' · ' + hm(x.t) + (x.t2 ? ' ~ ' + hm(x.t2) : '') + '<br>' + hesc(x.m) + (x.x ? '<br><small>' + hesc(x.x) + '</small>' : '') + (x.c ? '<br><small class="err-c">직전 동작: ' + hesc(x.c) + '</small>' : '') + '<br><small>판 ' + hesc(x.b || '') + ' · 화면 ' + hesc(x.w || '') + (x.mem ? ' · JS ' + hesc(x.mem) : '') + (x.off ? ' · 오프라인' : '') + '</small></li>'; }).join('') + '</ol>' : '<p class="src">기록 없음</p>') + '</div>' +
+    '<div class="err-bt">' + (window.LOGUP && LOGUP.on() ? '<button type="button" data-a="up">지금 올리기</button>' : '') + '<button type="button" data-a="copy">복사</button><button type="button" data-a="clear">지우기</button><button type="button" data-a="close">닫기</button></div>';
   d.onclick = function(e){ var b = e.target.closest && e.target.closest('button[data-a]'); if (!b) { if (e.target === d) d.close(); return; } var act = b.dataset.a;
     if (act === 'close') d.close();
+    else if (act === 'up') { b.textContent = '올리는 중…'; b.disabled = true; LOGUP.now().then(function(){ errShow(); }, function(){ errShow(); }); }
     else if (act === 'clear') { try { localStorage.removeItem(ERRK); } catch(x) {} errShow(); var o = document.getElementById('err-open'); if (o) o.textContent = '오류 기록 0건'; }
-    else if (act === 'copy') { var txt = JSON.stringify({ build: (typeof SITE_BUILD !== 'undefined' ? SITE_BUILD : ''), ua: navigator.userAgent, log: errGet() }, null, 1); var done = function(){ b.textContent = '복사됨'; };
+    else if (act === 'copy') { var txt = JSON.stringify({ build: SITE_BUILD, ua: navigator.userAgent, log: errGet() }, null, 1); var done = function(){ b.textContent = '복사됨'; };
       try { navigator.clipboard.writeText(txt).then(done, function(){ prompt('복사', txt); }); } catch(x) { try { prompt('복사', txt); } catch(y) {} } } };
   try { if (!d.open) d.showModal(); } catch(e) { d.setAttribute('open', ''); } }
 // 크게 보기 그림 주소: 원본이 큰 것(긴 변 4096px·420만 화소·1.5MB 넘음)은 하루 한 번 만드는 줄인 그림(data/thumbs/*_d.jpg). '원본 새 창'은 원본
@@ -2946,7 +3041,8 @@ function lbEnsure(){
   document.addEventListener('keydown', function(e){ if (d.hidden) return; if (e.key === 'Escape') lbClose(); else if (e.key === 'ArrowLeft') lbStep(-1); else if (e.key === 'ArrowRight') lbStep(1); else if (e.key === '+' || e.key === '=') lbZoomAt(innerWidth / 2, innerHeight / 2, Z.k * 1.6); else if (e.key === '-') lbZoomAt(innerWidth / 2, innerHeight / 2, Z.k / 1.6, true); });
   d.addEventListener('gesturestart', function(e){ e.preventDefault(); });   // iOS: 페이지 전체 확대 대신 사진만
   img.referrerPolicy = 'no-referrer';
-  img.addEventListener('load', function(){ Z.nw = img.naturalWidth; Z.nh = img.naturalHeight; lbMsg(''); lbFit(); });
+  img.addEventListener('load', function(){ var ms = Date.now() - (LB.t0 || Date.now()); if (ms > 8000) { var it = LB.items[LB.i]; errLog('slow', '크게 보기 그림 ' + Math.round(ms / 100) / 10 + '초', it ? lbPx(it.raw) + ' · ' + String(it.raw || it.u).slice(-80) : ''); } LB.t0 = 0;
+    Z.nw = img.naturalWidth; Z.nh = img.naturalHeight; lbMsg(''); lbFit(); });
   img.addEventListener('error', function(){ var it = LB.items[LB.i]; if (!it || !img.getAttribute('src')) return;
     if (it.o && it.u !== it.o && !it.fb) { it.fb = 1; errLog('lb-img', '줄인 그림을 못 불러와 원본으로 바꿈', it.u); it.u = it.o; img.src = it.o; return; }
     errLog('lb-img', '그림을 못 불러옴', (LB.i + 1) + '/' + LB.items.length + ' · ' + (it.raw || it.o || it.u));
@@ -3057,7 +3153,7 @@ function lbOpen(items, i){ var d = lbEnsure(); LB.items = items; LB.i = i;
 function lbGo(j){ var n = LB.items.length; if (!n || j === LB.i || j < 0 || j >= n || LB.sliding) return; var dir = j > LB.i ? 1 : -1, img = LB.el.querySelector('.lb-stage img'), Z = LB.z; LB.sliding = true;
   img.classList.add('anim'); img.style.opacity = '0'; img.style.transform = 'translate(' + (Z.x - dir * innerWidth * 0.6) + 'px,' + Z.y + 'px) scale(' + Z.k + ')'; lbOvSync();
   setTimeout(function(){ LB.i = j; lbShow(dir); LB.sliding = false; }, 200); }   // 뒷화면 스크롤 잠금
-function lbClose(){ if (LB.el) LB.el.hidden = true; document.documentElement.classList.remove('lb-open'); try { sessionStorage.removeItem('kkk-lb-live'); } catch(e) {} }
+function lbClose(){ if (LB.el && !LB.el.hidden) crumb('크게 보기 닫음'); if (LB.el) LB.el.hidden = true; document.documentElement.classList.remove('lb-open'); try { sessionStorage.removeItem('kkk-lb-live'); } catch(e) {} }
 function lbMsg(t){ var st = LB.el && LB.el.querySelector('.lb-stage'); if (!st) return; var m = st.querySelector('.lb-msg'); if (!t) { if (m) m.remove(); return; } if (!m) { m = document.createElement('div'); m.className = 'lb-msg'; st.appendChild(m); } m.textContent = t; }
 function lbStep(k){ lbSlide(k); }
 // 부드럽게 넘기기: 지금 사진을 밀려난 쪽으로 빼고(0.24초) 다음 사진을 반대쪽에서 들여옴. 이웃 사진은 미리 받아 둠
@@ -3069,6 +3165,7 @@ function lbSlide(dir){
 }
 function lbShow(dir){ var d = LB.el, it = LB.items[LB.i]; if (!it) return; var img = d.querySelector('.lb-stage img'); LB.z.nw = 0; LB.z.enter = dir || 0; img.classList.remove('anim'); img.style.opacity = dir ? '0' : '1'; img.style.transform = 'translate(-9999px,0)'; lbMsg('');
   try { sessionStorage.setItem('kkk-lb-live', JSON.stringify({ i: LB.i + 1, n: LB.items.length, u: String(it.raw || it.o || it.u).slice(-90), px: lbPx(it.raw), t: Date.now() })); } catch(e) {}
+  LB.t0 = Date.now(); crumb('크게 보기 ' + (LB.i + 1) + '/' + LB.items.length + ' ' + (lbPx(it.raw) || String(it.u).slice(-40)));
   img.src = it.u; img.alt = it.t; lbPmSet(it); lbOvSync(); if (img.complete && img.naturalWidth) { LB.z.nw = img.naturalWidth; LB.z.nh = img.naturalHeight; lbFit(); }
   d.querySelector('.lb-cap span').textContent = (LB.i + 1) + ' / ' + LB.items.length + ' · ' + it.t + ' · 두 손가락·두 번 탭으로 확대'; d.querySelector('.lb-cap a').href = it.o || it.u;
   d.querySelector('.lb-prev').disabled = LB.items.length < 2; d.querySelector('.lb-next').disabled = LB.items.length < 2;
@@ -3154,20 +3251,22 @@ try { nmCache = JSON.parse(localStorage.getItem('geocache-v1') || '{}'); } catch
 var nmGeoWait = [], nmGeoGaveUp = false, nmGeoMiss = 0;
 function nmSvcOk(){ return !!(window.naver && naver.maps && naver.maps.Service && naver.maps.Service.geocode); }
 (function(){
-  var s = document.createElement('script');
+  var s = document.createElement('script'), nmT0 = Date.now();
   s.src = 'https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=' + encodeURIComponent(NCP_KEY_ID) + '&submodules=geocoder,panorama';
   s.onload = function(){
+    var sec = (Date.now() - nmT0) / 1000; crumb('지도 스크립트 ' + sec.toFixed(1) + '초'); if (sec > 10) errLog('slow', '지도 스크립트 받는 데 ' + sec.toFixed(1) + '초', '');
     var started = false, start = function(){ if (started || !(window.naver && naver.maps && naver.maps.Map)) return; started = true; nmInit(); };
+    setTimeout(function(){ if (!started) errLog('map', '지도 스크립트는 받았는데 20초 안에 지도를 못 만듦', (window.naver && naver.maps ? 'naver.maps 있음' : 'naver.maps 없음') + (window.__nmAuthFail ? ' · 인증 실패' : '')); }, 20000);
     var flush = function(){ var q = nmGeoWait; nmGeoWait = []; q.forEach(function(x){ nmGeocode(x[0], x[1]); }); };
     if (window.naver && naver.maps) naver.maps.onJSContentLoaded = function(){ start(); if (nmSvcOk()) flush(); };
     start();
     var tries = 0, t = setInterval(function(){ start(); if (nmSvcOk()) { clearInterval(t); flush(); }
-      else if (++tries > 300) { clearInterval(t); nmGeoGaveUp = true; var q = nmGeoWait; nmGeoWait = []; nmGeoMiss += q.length; q.forEach(function(x){ x[1](null); }); nmGeoNote(); } }, 100);
+      else if (++tries > 300) { clearInterval(t); nmGeoGaveUp = true; var q = nmGeoWait; nmGeoWait = []; nmGeoMiss += q.length; q.forEach(function(x){ x[1](null); }); nmGeoNote(); errLog('map', '주소→좌표(Geocoding) 모듈이 30초 안에 안 뜸', '좌표 못 구한 곳 ' + nmGeoMiss + '곳'); } }, 100);
   };
   s.onerror = function(){ nmFail('지도 스크립트를 못 불러왔습니다 — 인터넷 연결을 확인하고 새로고침하세요.'); };
   document.head.appendChild(s);
 })();
-function nmFail(html){ var m = document.getElementById('nm-msg'); m.innerHTML = '<p>' + html + '</p><button type="button" class="nm-msg-x" aria-label="닫기">✕</button>'; m.hidden = false; m.querySelector('.nm-msg-x').onclick = function(){ m.hidden = true; }; }
+function nmFail(html){ errLog('map', String(html).replace(/<[^>]+>/g, '').slice(0, 200), window.__nmAuthFail ? '인증 실패' : ''); var m = document.getElementById('nm-msg'); m.innerHTML = '<p>' + html + '</p><button type="button" class="nm-msg-x" aria-label="닫기">✕</button>'; m.hidden = false; m.querySelector('.nm-msg-x').onclick = function(){ m.hidden = true; }; }
 function nmGeoNote(){ var el = document.getElementById('nm-geonote'); if (!el) return; el.hidden = !nmGeoMiss; el.textContent = nmGeoMiss ? '이 브라우저에서 주소→좌표 변환(네이버 Geocoding)이 안 떠서, 미리 저장한 좌표가 없는 ' + nmGeoMiss + '곳은 지도에 못 올림(새로고침하면 다시 시도)' : ''; }
 window.navermap_authFailure = function(){ window.__nmAuthFail = true; nmFail('<b>네이버지도 인증 실패.</b> 네이버 클라우드 콘솔 → Maps → Application → 서비스 환경의 Web 서비스 URL에 <code>' + location.protocol + '//' + location.hostname + '</code> 이 등록돼 있는지 확인.'); };
 function nmGeocode(addr, cb){
@@ -4161,6 +4260,7 @@ document.addEventListener('click', function(e){
   else { b.parentNode.classList.toggle('k-on', on); b.textContent = on ? '근거·설명 접기 ▴' : '근거·설명 보기 ▾'; }
 }, true);
 function showDetail(p, approx){
+  crumb('단지 상세 ' + ((p && p.name) || '') + (p && p.m2 ? ' ' + p.m2 + '㎡' : ''));
   setTimeout(function(){ if (window.__lgSync) window.__lgSync(); }, 0);
   var d = document.getElementById('nm-detail'), l = document.getElementById('nm-list'); if (!d) return;
   document.getElementById('side').classList.add('show-detail');   // 폰: 상세를 열면 위쪽 범례·필터를 접어 설명이 시트 전체를 씀(← 목록으로 돌아오면 다시 보임)
@@ -4739,7 +4839,7 @@ function nmInit(){
   var liveBox = document.getElementById('nm-live'); if (liveBox) { liveBox.checked = LIVE; liveBox.addEventListener('change', function(){ LIVE = liveBox.checked; PREF.set('live', LIVE); try { localStorage.setItem('kkk-live', LIVE ? '1' : '0'); } catch(e) {} applyFilter(); pkRefreshIcons(); }); }
   // 사이드바 탭: 단지 목록 | 공고 — 공고를 누르면 지도·목록이 그 공고 단지만
   var tabs = document.getElementById('side-tabs');
-  window.setSideTab = function(t){ var sd = document.getElementById('side'); sd.classList.toggle('tab-notice', t === 'notice'); var nb = document.getElementById('nm-notices'); if (nb) nb.hidden = t !== 'notice';
+  window.setSideTab = function(t){ crumb('옆 칸 ' + t); var sd = document.getElementById('side'); sd.classList.toggle('tab-notice', t === 'notice'); var nb = document.getElementById('nm-notices'); if (nb) nb.hidden = t !== 'notice';
     if (tabs) tabs.querySelectorAll('button[data-tab]').forEach(function(b){ var o = b.dataset.tab === t; b.classList.toggle('on', o); b.setAttribute('aria-selected', o ? 'true' : 'false'); });
     if (t === 'notice') window.renderNoticePanel(); try { if (sheet.mobile()) sheet.refit(); } catch(e) {} };
   if (tabs) tabs.addEventListener('click', function(e){ var b = e.target.closest('button[data-tab]'); if (!b) return; e.stopPropagation(); if (document.getElementById('side').classList.contains('show-detail')) hideDetail(); setSideTab(b.dataset.tab); if (sheet.mobile() && sheet.state() < 2) sheet.go(2); });
@@ -4935,7 +5035,7 @@ buildNoticeTable();
 // ===== 자동 갱신 데이터 (GitHub Actions가 data/*.json 을 매일·매월 다시 씀) =====
 // 사진 띠 칸에는 작은 그림(data/thumbs, 384×288) — 없으면 원본. 크게 보기(라이트박스)는 늘 원본(a href)
 function TH(u){ var t = window.THUMBS && window.THUMBS[u]; return t ? t.t : u; }
-function liveFetch(path){ return fetch(path + '?t=' + Math.floor(Date.now() / 1800000), { cache: 'no-store' }).then(function(r){ return r.ok ? r.json() : null; }).catch(function(){ return null; }); }
+function liveFetch(path){ return fetch(path + '?t=' + Math.floor(Date.now() / 1800000), { cache: 'no-store' }).then(function(r){ return r.ok ? r.json() : null; }).catch(function(e){ if (e && e.name === 'SyntaxError') errLog('net', '자료 파일 형식 오류(JSON)', path); return null; }); }
 function applyLive(){
   liveFetch('data/notices.json').then(function(j){
     var st = document.getElementById('live-stamp');
@@ -5128,7 +5228,7 @@ window.addEventListener('beforeinstallprompt', function(e){ e.preventDefault(); 
       if (sub.options && sub.options.applicationServerKey && !same(sub.options.applicationServerKey, VAPID)) { st.textContent = '서명 키가 바뀌어 다시 구독해야 함 — 버튼을 누르세요'; btn.textContent = '다시 구독하기'; btn.dataset.renew = '1'; return; }
       st.textContent = '이 기기는 구독돼 있음'; btn.textContent = '구독 정보 다시 보기'; show(sub);
     });
-  }).catch(function(){});
+  }).catch(function(e){ errLog('push', '구독 상태 확인 실패: ' + ((e && e.message) || e), ''); });
   btn.addEventListener('click', function(){
     st.textContent = '권한 묻는 중…';
     Promise.resolve(Notification.requestPermission()).then(function(p){
@@ -5138,7 +5238,7 @@ window.addEventListener('beforeinstallprompt', function(e){ e.preventDefault(); 
       return r.pushManager.getSubscription().then(function(sub){
         if (sub && btn.dataset.renew) return sub.unsubscribe().then(function(){ return null; });   // 키가 바뀐 옛 구독은 지우고 새로
         return sub; }).then(function(sub){ return sub || r.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: u8(VAPID) }); });
-    }).then(function(sub){ st.textContent = '구독됨 ✓'; show(sub); }).catch(function(e){ st.textContent = '안 됨: ' + ((e && e.message) || e); });
+    }).then(function(sub){ st.textContent = '구독됨 ✓'; show(sub); errLog('push', '알림 구독됨', ''); }).catch(function(e){ st.textContent = '안 됨: ' + ((e && e.message) || e); errLog('push', '알림 구독 안 됨: ' + ((e && e.message) || e), 'Notification ' + (window.Notification ? Notification.permission : '없음')); });
   });
 })();
 
@@ -5182,7 +5282,6 @@ window.addEventListener('beforeinstallprompt', function(e){ e.preventDefault(); 
 // ===== 새로고침 (2026-11-04) — 아이폰 홈 화면 앱엔 새로고침 버튼이 없어 껐다 켜야 했음 =====
 // ① 지도 말고 다른 화면 맨 위에서 아래로 당겼다 놓으면 새로고침(홈 화면 앱에서만 — 브라우저 탭은 자체 기능이 있음)
 // ② 앱으로 돌아올 때·30분마다 새 버전(version.json)·새 공고 자료(data/notices.json)를 확인 → 바뀌었으면 맨 위 띠 '눌러서 새로고침'
-var SITE_BUILD = 'ff3fc9e48b09';
 try { if (navigator.clearAppBadge) navigator.clearAppBadge(); } catch (e) {}   // 열자마자 아이콘 배지 지움(알림 자료를 못 읽어도)
 function nwSig(j){ var s = JSON.stringify([(j && j.items) || [], (j && j.list_ids) || {}]), h = 0; for (var i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0; return h + ':' + s.length; }
 (function(){
@@ -5290,9 +5389,57 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
   async function sync(){
     if (!tok) { render(); return; } if (busy) { again = true; return; } busy = true; lastTry = Date.now(); render();
     try { for (var i = 0; i < 4; i++) { var R = await pull(); if (R) { var ch = PREF.merge(R); if (ch.length) PREF.apply(ch); if (!PREF.ahead(R) && !dirty) break; } else if (!dirty) break; if (await push()) break; } err = ''; }
-    catch(e) { err = (e && e.message) || String(e); if (/Failed to fetch|NetworkError|Load failed/i.test(err)) err = '인터넷 연결 또는 GitHub 접속 문제 — 잠시 뒤 다시 맞춤'; }
+    catch(e) { err = (e && e.message) || String(e); if (/Failed to fetch|NetworkError|Load failed/i.test(err)) err = '인터넷 연결 또는 GitHub 접속 문제 — 잠시 뒤 다시 맞춤'; errLog('sync', err, ''); }
     busy = false; render(); if (again) { again = false; setTimeout(sync, 400); } }
   window.SYNC = { now: sync, on: function(){ return !!tok; } };
+  // ===== 오류·동작 기록 올리기(2026-11-19 사용자 '니가 확인할 만한 로그는 전부 추가해') — 이 토큰으로 같은 'prefs' 가지 log/<기기 id>.json 에 씀 → Claude 가 gh 로 읽음(tools/read_logs.py)
+  // 올리는 것: 기록(errScrub 거친 기술 정보)·기기 종류(UA·화면)·알림 권한/구독 여부·첫 화면 시간. 새 기록이 생기면 20초 뒤(직전에 올렸으면 3분 간격), 같은 오류 횟수만 늘면 30분 간격
+  var lBusy = false, lTimer = null, lLast = 0, lErr = '', lBack = 0;
+  function devName(){ var u = navigator.userAgent || '', os = /iPhone/.test(u) ? '아이폰' : (/iPad/.test(u) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)) ? '아이패드' : /Android/.test(u) ? '안드로이드' : /Windows/.test(u) ? '윈도우' : /Mac OS X/.test(u) ? '맥' : '기타';
+    var br = /KAKAOTALK/i.test(u) ? '카카오톡' : /NAVER\(inapp/i.test(u) ? '네이버앱' : /SamsungBrowser/.test(u) ? '삼성인터넷' : /Whale/.test(u) ? '웨일' : /Edg(A|iOS)?\//.test(u) ? '엣지' : /CriOS|Chrome\//.test(u) ? '크롬' : /FxiOS|Firefox/.test(u) ? '파이어폭스' : /Safari/.test(u) ? 'Safari' : '브라우저?';
+    var sa = navigator.standalone === true || (window.matchMedia && matchMedia('(display-mode: standalone)').matches); return os + ' ' + br + (sa ? '(홈 화면 앱)' : ''); }
+  function devId(){ var id = ''; try { id = localStorage.getItem('kkk-dev-id') || ''; } catch(e) {}
+    if (!/^[a-z]+-[a-z0-9]{6}$/.test(id)) { var u = navigator.userAgent || '', r = (Math.random().toString(36) + '000000').slice(2, 8);
+      id = (/iPhone/.test(u) ? 'iphone' : (/iPad/.test(u) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)) ? 'ipad' : /Android/.test(u) ? 'android' : /Windows/.test(u) ? 'win' : /Mac OS X/.test(u) ? 'mac' : 'etc') + '-' + r;
+      try { localStorage.setItem('kkk-dev-id', id); } catch(e) {} } return id; }
+  async function devInfo(){ var o = { id: devId(), name: devName(), ua: navigator.userAgent, scr: screen.width + 'x' + screen.height + '@' + (window.devicePixelRatio || 1), win: innerWidth + 'x' + innerHeight, lang: navigator.language, mem: navigator.deviceMemory || null, cpu: navigator.hardwareConcurrency || null, online: navigator.onLine, sw: !!(navigator.serviceWorker && navigator.serviceWorker.controller), notif: window.Notification ? Notification.permission : '없음', build: SITE_BUILD };
+    try { var r = navigator.serviceWorker && await navigator.serviceWorker.getRegistration('./'); o.push = r && r.pushManager ? !!(await r.pushManager.getSubscription()) : false; } catch(e) { o.push = '확인 실패'; }
+    try { var n = performance.getEntriesByType('navigation')[0]; if (n) o.perf = { type: n.type, dcl: Math.round(n.domContentLoadedEventEnd), load: Math.round(n.loadEventEnd), kb: Math.round((n.transferSize || 0) / 1024) }; } catch(e) {}
+    try { if (navigator.storage && navigator.storage.estimate) { var es = await navigator.storage.estimate(); o.store = Math.round((es.usage || 0) / 1048576) + '/' + Math.round((es.quota || 0) / 1048576) + 'MB'; } } catch(e) {}
+    return o; }
+  function lClean(x){ var o = {}; Object.keys(x || {}).forEach(function(k){ var v = x[k]; o[k] = typeof v === 'string' && /^[mxcg]$/.test(k) ? errScrub(v) : v; }); return o; }
+  function lKey(x){ return x.t + '|' + x.k + '|' + (x.g || x.m); }   // 처음 생긴 때·종류·내용 — 횟수·마지막 때·세션이 바뀌어도 같은 줄
+  function upMark(){ try { return +(localStorage.getItem('kkk-errlog-up') || 0); } catch(e) { return 0; } }
+  function upTxt(){ if (!tok) return '기기 동기화가 꺼져 있어 이 기기에만 있음 — 기기 동기화를 켜면 Claude 가 GitHub 에서 바로 봄';
+    var t = ''; try { t = localStorage.getItem('kkk-errlog-upt') || ''; } catch(e) {}
+    return 'Claude 확인용으로 GitHub 에 올림(prefs 가지 log/' + hesc(devId()) + '.json)' + (t ? ' · 마지막 ' + hesc(hm(Date.parse(t))) : ' · 아직 안 올림') + (lBusy ? ' · 올리는 중…' : '') + (lErr ? ' · ⚠ ' + hesc(lErr) : ''); }
+  async function logPush(force){
+    if (!tok) return 'off'; if (lBusy) return 'busy'; if (!force && Date.now() < lBack) return 'wait';
+    var L = errGet(), up = upMark(), snap = Date.now(), newer = L.filter(function(x){ return Date.parse(x.t) > up && x.k !== 'bg'; }).length, bumped = L.filter(function(x){ return x.t2 && Date.parse(x.t2) > up; }).length;
+    if (!force && !newer && !(bumped && snap - up > 1800000)) return 'none';
+    lBusy = true; lLast = snap; lErr = ''; var el = document.getElementById('err-up'); if (el) el.innerHTML = upTxt();
+    try { var path = 'https://api.github.com/repos/' + REPO + '/contents/log/' + devId() + '.json';
+      for (var i = 0; i < 3; i++) {
+        var r = await fetch(path + '?ref=' + BR, { headers: H(), cache: 'no-store' }), sh = null, old = [];
+        if (r.ok) { var j = await r.json(); sh = j.sha; try { old = (JSON.parse(dec(j.content)) || {}).logs || []; } catch(e) {} }
+        else if (r.status !== 404) throw new Error(why(r));
+        var M = {}, all = [];
+        old.concat(L.map(lClean)).forEach(function(x){ var k = lKey(x); if (k in M) all[M[k]] = x; else { M[k] = all.length; all.push(x); } });
+        all.sort(function(a, b){ return a.t < b.t ? -1 : a.t > b.t ? 1 : 0; }); all = all.slice(-150);
+        var doc = { about: '공고 지도 기기 오류·동작 기록 — 사이트(index.html errLog)가 기기 동기화 토큰으로 올림. 기술 정보만(금액·토큰·바깥 주소 경로는 지움). Claude 가 tools/read_logs.py 로 읽음', dev: await devInfo(), up: new Date().toISOString(), logs: all };
+        var body = { message: 'log: ' + devName() + ' 새 기록 ' + newer + '건', content: enc(JSON.stringify(doc)), branch: BR }; if (sh) body.sha = sh;
+        var p = await fetch(path, { method: 'PUT', headers: Object.assign(H(), { 'Content-Type': 'application/json' }), body: JSON.stringify(body) });
+        if (p.status === 409 || p.status === 422) continue;
+        if (!p.ok) throw new Error(why(p));
+        try { localStorage.setItem('kkk-errlog-up', String(snap)); localStorage.setItem('kkk-errlog-upt', new Date().toISOString()); } catch(e) {}
+        break; }
+    } catch(e) { lErr = (e && e.message) || String(e); if (/Failed to fetch|NetworkError|Load failed/i.test(lErr)) lErr = '인터넷 연결 문제 — 다음에 다시 올림'; else if (/토큰|저장소를 못 찾음/.test(lErr)) lBack = Date.now() + 1800000; }
+    lBusy = false; el = document.getElementById('err-up'); if (el) el.innerHTML = upTxt();
+    if (errGet().some(function(x){ return Date.parse(x.t) > snap && x.k !== 'bg'; })) window.__logKick();   // 올리는 사이 새로 생긴 것
+    return lErr ? 'err' : 'ok'; }
+  window.__logKick = function(){ if (!tok || lTimer) return; lTimer = setTimeout(function(){ lTimer = null; logPush(false); }, Math.max(20000, 180000 - (Date.now() - lLast))); };
+  window.LOGUP = { now: function(){ return logPush(true); }, on: function(){ return !!tok; }, id: devId, st: upTxt };
+
   PREF.onChange(function(){ dirty = true; if (!tok) return; clearTimeout(deb); deb = setTimeout(sync, 1500); });
   document.addEventListener('visibilitychange', function(){ if (document.visibilityState === 'visible' && Date.now() - lastTry > 5000) sync(); });
   window.addEventListener('focus', function(){ if (Date.now() - lastTry > 5000) sync(); });
@@ -5324,10 +5471,10 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
     var cp = document.getElementById('sd-copy'); if (cp) cp.onclick = function(){ var t = link(), ok = function(){ cp.textContent = '복사됨 ✓'; setTimeout(function(){ cp.textContent = '연결 링크 복사'; }, 1500); }, fb = function(){ var i = document.getElementById('sd-link'); if (i) { i.closest('details').open = true; i.select(); } };
       if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(ok, fb); else fb(); };
     var nw = document.getElementById('sd-now'); if (nw) nw.onclick = function(){ sync(); };
-    var of = document.getElementById('sd-off'); if (of) of.onclick = function(){ tok = null; sha = null; etag = null; err = ''; lastIn = lastOut = 0; try { localStorage.removeItem(TK); } catch(e) {} render(); body(); };
+    var of = document.getElementById('sd-off'); if (of) of.onclick = function(){ tok = null; sha = null; etag = null; err = ''; lastIn = lastOut = 0; lErr = ''; try { localStorage.removeItem(TK); } catch(e) {} render(); body(); };
   }
   document.addEventListener('click', function(e){ var o = e.target.closest && e.target.closest('.sync-open'); if (!o) return; e.preventDefault(); e.stopPropagation(); var d = document.getElementById('sync-dlg'); if (!d) return; body(); if (d.showModal) d.showModal(); else d.setAttribute('open', ''); }, true);
-  render(); setTimeout(sync, 600);
+  render(); setTimeout(sync, 600); setTimeout(function(){ if (window.__logKick) window.__logKick(); }, 15000);   // 지난번에 못 올린 기록이 있으면 올림
 })();
 
 </script>

@@ -225,6 +225,7 @@ def push_subs():
         sub = load(f, None)
         if sub and sub.get('endpoint') and (sub.get('keys') or {}).get('p256dh') and (sub.get('keys') or {}).get('auth'): out.append((f, sub))
     return out
+PUSH_RES = []   # 기기(구독 파일)별 푸시 서버 응답 — 201=접수. alerts.json 기록(push_res)·Actions 로그로 확인(2026-11-19 '로그 전부 추가')
 def webpush_all(title, msg, url, urgent=False, key=''):
     if not VAPID_PRIVATE: return 0
     from pywebpush import webpush, WebPushException
@@ -232,12 +233,13 @@ def webpush_all(title, msg, url, urgent=False, key=''):
     for f, sub in push_subs():
         if f in DEAD: continue
         try:
-            webpush(subscription_info={'endpoint': sub['endpoint'], 'keys': sub['keys']},
+            r = webpush(subscription_info={'endpoint': sub['endpoint'], 'keys': sub['keys']},
                     data=json.dumps({'title': title[:120], 'body': msg[:1000], 'url': url or SITE, 'key': key}, ensure_ascii=False),   # key: 알림 누르면 사이트 목록에서 확인 처리
                     vapid_private_key=VAPID_PRIVATE, vapid_claims={'sub': 'https://kimsangdeok.github.io'}, ttl=3 * 86400, headers={'Urgency': 'high' if urgent else 'normal'})
-            n += 1
+            n += 1; PUSH_RES.append(os.path.basename(f) + ':' + str(getattr(r, 'status_code', '?')))
         except WebPushException as e:
             code = getattr(getattr(e, 'response', None), 'status_code', None)
+            PUSH_RES.append(os.path.basename(f) + ':' + str(code))
             if code in (404, 410): DEAD.append(f)          # 구독 만료(앱 지움·브라우저 데이터 삭제 등) → 파일 지우고 기록
             else: raise
     return n
@@ -303,7 +305,7 @@ def main():
         cur = open(PUB_FILE, encoding='utf-8').read().strip() if os.path.exists(PUB_FILE) else ''
         if VAPID_PUBLIC and cur != VAPID_PUBLIC: print('주의: data/push/vapid_public.txt 가 지금 비밀값의 공개키와 다름 → update-notices 한 번 돌려 갱신하고 다시 구독해야 함')
         done, errs = notify('공공임대 공고 알림 테스트', '이 알림이 보이면 연결 끝. 새 모집공고가 잡히면(5분마다 게시판 확인) 이렇게 옵니다.', SITE + '#calendar', 3)
-        print('test', done, errs, 'subs', len(push_subs()), 'dead', [os.path.basename(f) for f in DEAD]); return
+        print('test', done, errs, 'subs', len(push_subs()), 'dead', [os.path.basename(f) for f in DEAD], 'push_res', PUSH_RES); return
     if not DRY and write_public(): print('vapid public key written')
     st = load(STATE, None)
     items = collect()
@@ -325,8 +327,9 @@ def main():
             done, errs = notify(it['title'] or it['src'], msg, it['url'], it['prio'], it['key'])
             it['pushed'] = ', '.join(done) if done else False
             if errs: it['err'] = ' / '.join(errs)[:240]
+            if PUSH_RES: it['push_res'] = ' '.join(PUSH_RES)[:240]; print('  push', it['key'], PUSH_RES); PUSH_RES.clear()
             if done: sent += 1
-        rec = {k: it.get(k) for k in ('at', 'key', 'src', 'title', 'url', 'posted', 'apply', 'fit', 'why', 'judge', 'send', 'pushed', 'err') if it.get(k) not in (None, '')}
+        rec = {k: it.get(k) for k in ('at', 'key', 'src', 'title', 'url', 'posted', 'apply', 'fit', 'why', 'judge', 'send', 'pushed', 'err', 'push_res') if it.get(k) not in (None, '')}
         st['log'].append(rec); it['_rec'] = rec
     # 보낸 새 공고를 Claude 요약으로 바로 넘김(한 번에 묶어 1세션) — 저녁 정기 요약은 claude='fired' 인 것은 다시 안 함
     fired = [it for it in new if it['send']][:8]
