@@ -1,6 +1,6 @@
 {
  "about": "알림 대상 공고의 공고문 사본(tools/notice_docs.py, GitHub 러너가 받음) — 매일 Claude 요약이 웹사이트를 열지 않고 이걸로 확인. [p.N] = 첨부 공고문 N쪽",
- "updated": "2026-11-23 08:08 KST",
+ "updated": "2026-11-23 09:09 KST",
  "items": {
   "lh:2015122300021098": {
    "file": "data/notice_docs/lh-2015122300021098.txt",
@@ -48,6 +48,21 @@
     }
    ],
    "chars": 49820,
+   "tries": 1,
+   "err": ""
+  },
+  "sh:313481": {
+   "file": "data/notice_docs/sh-313481.txt",
+   "title": "[청년형] 특화형 매입임대주택(서초구) 입주자 모집 공고(운영기관 : 마을과집 협동조합)",
+   "url": "https://www.i-sh.co.kr/app/lay2/program/S1T294C295/www/brd/m_241/view.do?multi_itm_seqs=1%2C2%2C4%2C8%2C16%2C32%2C64%2C128%2C256&seq=313481",
+   "fetched": "2026-11-23 09:09 KST",
+   "pdfs": [
+    {
+     "name": "[마을과집]SH특화형 매입임대주택(청년) 입주자 모집 공고문_20261123.pdf",
+     "pages": 18
+    }
+   ],
+   "chars": 24996,
    "tries": 1,
    "err": ""
   },
