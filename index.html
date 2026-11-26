@@ -344,11 +344,15 @@ table.stack tr.dim td{color:#8a94a3}
 .iw-r td{font-size:12px;line-height:1.35;padding-right:6px;word-break:keep-all}
 .iw-r tr:first-child th:first-child{width:24%}.iw-r tr:first-child th:nth-child(2),.iw-r tr:first-child th:nth-child(3){width:27%}
 .iw-r.k4 tr:first-child th:nth-child(2),.iw-r.k4 tr:first-child th:nth-child(3){width:25%}
-.iw-r td b{font-weight:700;color:#b71c1c}
+.iw-r td b{font-weight:800;color:var(--fg)}
 .iw-r td .calc{color:#5f6b7a}
 .iw-r th small{overflow-wrap:anywhere;word-break:break-all}
-.iw-r td.me{background:#fff7f7}
-.iw-r tr:first-child th.me{color:#b71c1c}
+/* 지난 경쟁률 표: 내 공급 열 = 내 공급 띠와 같은 색(초록 우선 1순위 · 파랑 일반 추첨 · 주황 예비) + '내 공급' 꼬리표 — 2026-11-26 '일반에 빨간색 표시한 건 무슨 의미' */
+.iw-r td.me{background:color-mix(in srgb,var(--sc,#1E5CA6) 10%,var(--surface))}
+.iw-r tr:first-child th.me{color:var(--sc,#1E5CA6);background:color-mix(in srgb,var(--sc,#1E5CA6) 10%,var(--surface))}
+.me-tag{display:inline-block;margin-top:3px;padding:0 7px;border-radius:999px;background:var(--sc,#1E5CA6);color:#fff;font-size:11px;font-weight:800;line-height:1.6}
+.rate-lg{margin:2px 0 8px;font-size:13px;line-height:1.55;color:var(--fg);word-break:keep-all}
+.rate-lg .me-sw{display:inline-block;width:14px;height:14px;margin-right:5px;border-radius:3px;border:1.5px solid var(--sc,#1E5CA6);background:color-mix(in srgb,var(--sc,#1E5CA6) 14%,var(--surface));vertical-align:-2px}
 .iw-r a{color:inherit;text-decoration:none;border-bottom:1px dotted #9aa4b2}
 .iw-r td.k,.iw-r td .k{color:#8a94a3}
 .nm-iw{max-height:calc(100dvh - 150px);overflow:auto;overflow-x:hidden;overscroll-behavior:contain;word-break:keep-all}
@@ -1819,7 +1823,7 @@ html.pano-open,html.pano-open body{overflow:hidden}
 // 스크립트 맨 앞에서 시작해 그 뒤 모든 오류를 잡음. 이 기기(localStorage 최근 80건)에 남기고, 기기 동기화가 켜져 있으면 같은 GitHub 'prefs' 가지
 // log/<기기 id>.json 에도 올려 Claude 가 gh 로 바로 읽음(아래 기기 동기화의 logPush, 읽는 쪽 tools/read_logs.py).
 // 올리는 건 기술 정보뿐 — 금액·7~8자리 숫자·따옴표 속 긴 글·토큰·바깥 사이트 주소의 경로는 errScrub 이 지우고, '내 조건'·'보증금·대출'·동기화·알림 등록 창 안에서 누른 것은 글자를 안 적음
-var SITE_BUILD = 'b1c44d6fb89a';
+var SITE_BUILD = '35a8354153f4';
 var ERRK = 'kkk-errlog', ERR_SID = Math.random().toString(36).slice(2, 8), ERR_Q = {}, ERR_RES = 0, CRK = 'kkk-alive';
 var ERR_PUB = /(^|\.)(i-sh\.co\.kr|seoul\.go\.kr|lh\.or\.kr|pstatic\.net|naver\.com|navercorp\.com|github\.com|githubusercontent\.com|github\.io|jsdelivr\.net)$/;   // 경로까지 적어도 되는 공개 사이트 — 그 밖(알림 서버 등)은 사이트 이름만
 function errUrl(u){ try { var x = new URL(u, location.href), p = x.pathname; try { p = decodeURI(p); } catch(z) {}
@@ -3585,9 +3589,11 @@ function happyRates(p){
     });
   });
   if (!trs.length) return '<div class="iw-sec"><div class="iw-sh">지난 공고 경쟁률 <small class="k">SH 결과 PDF ' + posts.length + '건 검색</small></div><small class="k">' + posts[0].label.slice(0, 4) + '~' + posts[posts.length - 1].label.slice(0, 4) + '년 SH 행복주택 결과 PDF에 이 단지가 안 나옴(첫 공급이거나 단지명 표기가 다름).</small></div>';
+  var sx = (window.mySup && mySup(p)) || { c: 'info', t: p.rank || '' }, tg = '<br><span class="me-tag">내 공급</span>';
   return '<div class="iw-sec"><div class="iw-sh">지난 공고 경쟁률 <small class="k">청년 계층 · ' + base + '형(전용 ' + p.m2 + '㎡ · ' + py(p.m2) + ') · 호수 → 신청자 → 경쟁률</small></div>' +
-    '<table class="iw-t iw-k iw-r"><tr><th>공고</th><th' + (mine === '우선' ? ' class="me"' : '') + '>우선공급</th><th' + (mine !== '우선' ? ' class="me"' : '') + '>일반공급</th><th>청년 전체</th></tr>' + trs.join('') + '</table>' +
-    '<small class="k">경쟁률 = 신청자 ÷ 호수. <b style="color:#b71c1c">굵은 값</b>은 SH PDF에 적힌 숫자, 가는 값은 PDF에 없어 나눠서 계산(2024년부터 일반공급 경쟁률은 PDF에 없음). "청년 전체"는 이 형·청년의 우선+일반 합(PDF의 단지 경쟁률). 연한 붉은 열 = 내 순위(' + p.rank + ')에 해당하는 구분. 공고 이름을 누르면 SH 결과 게시물(첨부 PDF)' + (window.RATES.updated ? ' · 수집 ' + window.RATES.updated.slice(0, 10) : '') + '</small></div>';
+    '<p class="rate-lg sup-' + sx.c + '"><span class="me-sw"></span>색칠한 열 = <b>내 공급(' + hesc(sx.t) + ')</b>에 해당하는 구분 · 굵은 숫자 = SH 결과 PDF에 적힌 경쟁률, 회색 숫자 = PDF에 없어 신청자 ÷ 호수로 계산</p>' +
+    '<table class="iw-t iw-k iw-r sup-' + sx.c + '"><tr><th>공고</th><th' + (mine === '우선' ? ' class="me"' : '') + '>우선공급' + (mine === '우선' ? tg : '') + '</th><th' + (mine !== '우선' ? ' class="me"' : '') + '>일반공급' + (mine !== '우선' ? tg : '') + '</th><th>청년 전체</th></tr>' + trs.join('') + '</table>' +
+    '<small class="k">경쟁률 = 신청자 ÷ 호수. <b>굵은 값</b>은 SH PDF에 적힌 숫자, 가는 값은 PDF에 없어 나눠서 계산(2024년부터 일반공급 경쟁률은 PDF에 없음). "청년 전체"는 이 형·청년의 우선+일반 합(PDF의 단지 경쟁률). 색칠한 열 = 내 공급(' + p.rank + ')에 해당하는 구분. 공고 이름을 누르면 SH 결과 게시물(첨부 PDF)' + (window.RATES.updated ? ' · 수집 ' + window.RATES.updated.slice(0, 10) : '') + '</small></div>';
 }
 function kookRates(p){
   var posts = ratePosts('kook'); if (!posts.length) return '';
