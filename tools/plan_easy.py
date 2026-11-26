@@ -4,9 +4,10 @@
 
 입력: data/plan_easy.json {items: {원본 평면도 URL: {ty, m2, name, src, grid: 원본 도면 치수 메모, rooms, doors, wins, notes}}}
   좌표는 원본 도면의 벽 중심선 치수(mm) — 왼쪽 위가 (0, 0), 오른쪽이 +x, 아래가 +y. 방 크기 글자(w·h)는 도면의 안목 치수가 있으면 그것.
-  rooms: [{t 이름, k 종류(live·kit·bed·bath·entry·balc·util·out), x, y, w, h, sz: [안목 가로, 세로](없으면 그림 크기), open: 위/아래 트임('T'·'B'·'L'·'R' — 그 변은 벽 대신 점선)}]
+  rooms: [{t 이름, k 종류(live·kit·bed·bath·entry·balc·util·out·fix 붙박이), x, y, w, h, sz: [안목 가로, 세로](없으면 그림 크기), open: 위/아래 트임('T'·'B'·'L'·'R' — 그 변은 벽 대신 점선)}]
+  opens: [[x1, y1, x2, y2], ...] — 벽 없이 트인 곳(벽을 지우고 점선)
   doors: [{x, y(경첩), dx, dy(닫힌 문짝 방향 단위 벡터 × 폭), sx, sy(열리는 쪽 단위 벡터)}] — 문짝이 열리는 호로 그림
-  wins: [[x1, y1, x2, y2], ...] — 벽 위 창(하늘색 두 줄)
+  wins: [[x1, y1, x2, y2], ...] — 벽 위 창(하늘색 두 줄) · slides: [[x1, y1, x2, y2], ...] — 미닫이문(엇갈린 두 줄)
 결과: data/plan_easy/<원본 URL 해시 16자>.svg + data/plan_easy/index.json {URL: 파일}
 화면(index.html)은 SH 단지 상세의 사진 띠에서 원본 평면도 앞에 '쉬운 평면도'로 넣음(원본도 그대로 있음)."""
 import hashlib, html, json, math, os
@@ -96,6 +97,10 @@ def svg(it):
                 o.append(f'<line x1="{a}" y1="{b}" x2="{c}" y2="{d}" stroke="#9AA2AC" stroke-width="28" stroke-dasharray="90 80"/>')
             else:
                 o.append(f'<line x1="{a}" y1="{b}" x2="{c}" y2="{d}" stroke="{WALL}" stroke-width="{70 if r["k"] in ("balc", "util") else 90}" stroke-linecap="square"/>')
+    # 트인 곳(벽 없이 이어진 곳): 벽을 바탕색으로 지우고 점선
+    for x1, y1, x2, y2 in it.get('opens') or []:
+        o.append(f'<line x1="{x1}" y1="{y1}" x2="{x2}" y2="{y2}" stroke="{FILL["live"]}" stroke-width="110"/>')
+        o.append(f'<line x1="{x1}" y1="{y1}" x2="{x2}" y2="{y2}" stroke="#9AA2AC" stroke-width="28" stroke-dasharray="90 80"/>')
     # 창(벽 위 하늘색 두 줄)
     for x1, y1, x2, y2 in it.get('wins') or []:
         o.append(f'<line x1="{x1}" y1="{y1}" x2="{x2}" y2="{y2}" stroke="#FFFFFF" stroke-width="150"/>')
@@ -111,6 +116,12 @@ def svg(it):
         cross = dx * sy - dy * sx
         o.append(f'<path d="M{ex:.0f} {ey:.0f} A{wdt:.0f} {wdt:.0f} 0 0 {1 if cross > 0 else 0} {ox:.0f} {oy:.0f}" fill="none" stroke="#7A8592" stroke-width="22" stroke-dasharray="50 35"/>')
         o.append(f'<line x1="{hx}" y1="{hy}" x2="{ox:.0f}" y2="{oy:.0f}" stroke="{WALL}" stroke-width="40"/>')
+    # 미닫이(옆으로 미는 문): 벽을 비우고 엇갈린 문짝 두 줄
+    for x1, y1, x2, y2 in it.get('slides') or []:
+        L = math.hypot(x2 - x1, y2 - y1) or 1; ux, uy = (x2 - x1) / L, (y2 - y1) / L; nx, ny = -uy * 35, ux * 35
+        o.append(f'<line x1="{x1}" y1="{y1}" x2="{x2}" y2="{y2}" stroke="#FFFFFF" stroke-width="120"/>')
+        o.append(f'<line x1="{x1 + nx:.0f}" y1="{y1 + ny:.0f}" x2="{x1 + ux * L * 0.58 + nx:.0f}" y2="{y1 + uy * L * 0.58 + ny:.0f}" stroke="{WALL}" stroke-width="34"/>')
+        o.append(f'<line x1="{x2 - nx:.0f}" y1="{y2 - ny:.0f}" x2="{x2 - ux * L * 0.58 - nx:.0f}" y2="{y2 - uy * L * 0.58 - ny:.0f}" stroke="{WALL}" stroke-width="34"/>')
     # 이름·크기 글자
     for r in rooms:
         x, y, w, h = r['x'], r['y'], r['w'], r['h']
