@@ -2,7 +2,7 @@
 제목: [민간임대] 청량리역 퀸즈W 청량리역 추가모집공고
 주소: https://soco.seoul.go.kr/youth/bbs/BMSR00015/view.do?boardId=6887&menuNo=400008
 출처: 청년안심 민간임대 · 게시 2026-11-26 · 접수 2026-12-01
-받은 시각: 2026-11-26 17:07 KST (GitHub 러너가 공고 사이트에서 받음 — tools/notice_docs.py)
+받은 시각: 2026-11-26 17:34 KST (GitHub 러너가 공고 사이트에서 받음 — tools/notice_docs.py)
 
 받기 실패: 민간_261126_청량리역_퀸즈W 청량리역_청년안심주택 추가모집공고문.pdf: Unexpected EOF
 (가구원수별 월평균소득 표의 금액은 ○,○○○,○○○ 로 가림 — 공고문 원문 참고)
