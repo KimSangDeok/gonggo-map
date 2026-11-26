@@ -1204,6 +1204,15 @@ td.k-fold.k-on > .k-tg{margin-bottom:2px}
 .n2-tg{min-height:40px;padding:0 14px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--accent);font:inherit;font-size:14px;font-weight:700;cursor:pointer;white-space:nowrap}
 .n2-tg:hover{background:var(--accent-soft)}
 .nc.fold .n2-tg{margin-left:auto}
+/* 내 공급(상세 맨 위 띠 · 목록 색 알약) — 2026-11-26 '우선인지 일반인지 청년인지 눈에 안 띄니까 바꿔' */
+.sup{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 10px;margin:0 0 12px;padding:12px 14px;border-radius:12px;border-left:6px solid var(--sc);background:color-mix(in srgb,var(--sc) 11%,var(--surface))}
+.sup .sup-k{font-size:12.5px;font-weight:800;color:var(--sc);letter-spacing:.02em}
+.sup > b{font-size:19px;font-weight:800;color:var(--fg);letter-spacing:-.01em;line-height:1.35}
+.sup small{flex-basis:100%;font-size:13px;line-height:1.5;color:var(--muted);word-break:keep-all}
+.sup .sup-d{flex-basis:100%;display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 10px;margin-top:8px;padding-top:8px;border-top:1px dashed color-mix(in srgb,var(--sc) 35%,var(--line))}
+.sup .sup-d > b{font-size:16px;font-weight:800;color:var(--fg)}
+.sup-ok{--sc:#12805A}.sup-info{--sc:#1E5CA6}.sup-warn{--sc:#C2410C}.sup-out{--sc:#6B7280}
+.sup-pill{display:inline-flex;align-items:center;padding:1px 9px;border-radius:999px;background:var(--sc);color:#fff;font-size:12px;font-weight:800;line-height:1.6;vertical-align:1px;white-space:nowrap}
 /* 칸 맨 아래 '조건 밖 n건' 접은 줄(2026-11-26 '곧 접수시작도 조건 아니면 더 접어') */
 .n2-grp .n2-on{font-size:13px;font-weight:700;color:var(--muted)}
 .n2-out{margin:0 0 10px}
@@ -1810,7 +1819,7 @@ html.pano-open,html.pano-open body{overflow:hidden}
 // 스크립트 맨 앞에서 시작해 그 뒤 모든 오류를 잡음. 이 기기(localStorage 최근 80건)에 남기고, 기기 동기화가 켜져 있으면 같은 GitHub 'prefs' 가지
 // log/<기기 id>.json 에도 올려 Claude 가 gh 로 바로 읽음(아래 기기 동기화의 logPush, 읽는 쪽 tools/read_logs.py).
 // 올리는 건 기술 정보뿐 — 금액·7~8자리 숫자·따옴표 속 긴 글·토큰·바깥 사이트 주소의 경로는 errScrub 이 지우고, '내 조건'·'보증금·대출'·동기화·알림 등록 창 안에서 누른 것은 글자를 안 적음
-var SITE_BUILD = '44c13b7ec9c7';
+var SITE_BUILD = 'b1c44d6fb89a';
 var ERRK = 'kkk-errlog', ERR_SID = Math.random().toString(36).slice(2, 8), ERR_Q = {}, ERR_RES = 0, CRK = 'kkk-alive';
 var ERR_PUB = /(^|\.)(i-sh\.co\.kr|seoul\.go\.kr|lh\.or\.kr|pstatic\.net|naver\.com|navercorp\.com|github\.com|githubusercontent\.com|github\.io|jsdelivr\.net)$/;   // 경로까지 적어도 되는 공개 사이트 — 그 밖(알림 서버 등)은 사이트 이름만
 function errUrl(u){ try { var x = new URL(u, location.href), p = x.pathname; try { p = decodeURI(p); } catch(z) {}
@@ -4303,13 +4312,39 @@ function nmSelect(mk){
   if (window.prLayout) setTimeout(prLayout, 0);
 }
 // 상세 맨 위 요약: 목록 줄과 같은 보증금/월세(공고 기본 조합) · 전용 평형 · 내 순위 — 핀을 누르면 폰 반 시트에 이것부터 보임
+// ===== 내 공급(2026-11-26 '내가 해당하는 공급 대상이 뭔지 — 우선인지 일반인지 청년인지 — 눈에 안 띄니까 바꿔') — 상세 맨 위 띠 + 단지 목록 색 알약 =====
+// 근거: 행복주택 우선공급 1순위 = 지도 '단지 종류'의 우선 지역(priLabel) 단지 · 청년안심 민간 특별공급 기준 · 매입임대 3순위(1순위 = 수급자·차상위·한부모) — 공고 카드 '내 순위'와 같은 기준
+var DONG = { '힐스테이트신촌': { d: '106동·114동 근처', w: 'SH 전자팸플릿(서울리츠 행복주택 힐스테이트신촌) 5쪽 단지배치도 — 37㎡형 32세대 색(분홍) 표시가 106동·114동 옆', u: 'https://www.i-sh.co.kr/app/com/file/innoFD.do?brdId=JI1901&seq=221031&fileTp=&fileSeq=1' } };
+function mySup(p){
+  if (!p) return null;
+  if (p.cat === 'na') return { t: '내 조건 밖', s: '', c: 'out', w: String(p.na || '청년 · 전용 8평 이상 형이 없음') };
+  var k = String(p.kind || ''), r = String(p.rank || ''), gu = p.gu ? guShort(guOf(p) || (p.gu + '구')) : '';
+  if (k === '행복주택') {
+    if (/우선 1순위/.test(r)) return { t: '청년 · 우선공급 1순위', s: '청년 우선 1순위', c: 'ok', w: '우선공급 1순위 지역(' + priLabel() + ') 단지 — 일반공급보다 먼저 뽑음' };
+    if (/예비/.test(r)) return { t: '청년 · 예비입주자만', s: '청년 예비만', c: 'warn', w: '이번 회차는 예비입주자로만 뽑음(빈집이 나면 순번대로)' };
+    return { t: '청년 · 일반공급(추첨)', s: '청년 일반 추첨', c: 'info', w: '우선공급 1순위는 ' + priLabel() + ' 단지만 — 이 단지' + (gu ? '(' + gu + ')' : '') + '는 일반공급 추첨' };
+  }
+  if (k === '국민임대') { var r0 = r.split(' (')[0] || '순위 확인'; return { t: '국민임대 · ' + r0, s: r0, c: /1순위/.test(r0) ? 'ok' : 'info', w: r || '공고문 확인' }; }
+  if (p.ya) return { t: '청년 · 민간 특별공급 자격 + 일반공급(추첨)', s: '청년 특공·일반', c: 'info', w: '민간임대 특별공급: 소득 120%·자산 2억 5,100만·차 4,542만 이하면 자격 → 소득·지역 순위 뒤 추첨 · 일반공급: 소득·지역 요건 없이 추첨 · 공공임대 몫은 3순위(1순위 = 수급자·한부모·차상위)' };
+  if (p.mi) { if (/특화형/.test(k)) return { t: '청년 · 순위 없음(운영기관 심사)', s: '운영기관 심사', c: 'info', w: '특화형 매입임대는 운영기관이 자체 심사로 뽑음' };
+    return { t: '청년 · 3순위', s: '청년 3순위', c: 'warn', w: '청년 매입임대 1순위 = 수급자·차상위·한부모 — 본인 소득·자산 기준 3순위' }; }
+  if (p.lh) return { t: '청년 · LH 공고문 확인', s: '청년 · 공고 확인', c: 'info', w: 'LH 행복주택·통합공공임대는 공고마다 청년 우선·일반 공급 몫이 달라 공고문 확인' };
+  return null;
+}
+function supHtml(p){ var x = mySup(p); if (!x) return ''; var dg = DONG[p.name];
+  return '<div class="sup sup-' + x.c + '"><span class="sup-k">내 공급</span><b>' + hesc(x.t) + '</b><small>' + hesc(x.w) + '</small>' +
+    (dg ? '<span class="sup-d"><span class="sup-k">임대 세대 동</span><b>' + hesc(dg.d) + '</b><small>' + hesc(dg.w) + ' <a href="' + dg.u + '" target="_blank" rel="noopener">팸플릿 ↗</a></small></span>' : '') + '</div>'; }
+function supTags(){ document.querySelectorAll('.lst .it').forEach(function(el){ var p = el.__mk && el.__mk.__p; if (!p || el.dataset.sup === '1') return; el.dataset.sup = '1';
+  var x = mySup(p), b = el.querySelector('div > b'); if (!x || !x.s || !b) return; var old = b.querySelector('.pill.rk'); if (old) old.remove();
+  var sp = document.createElement('span'); sp.className = 'sup-pill sup-' + x.c; sp.title = '내 공급 — ' + x.t + ' · ' + x.w; sp.textContent = x.s;
+  var g = b.querySelector('.ls-gu'); if (g && g.nextSibling) b.insertBefore(sp, g.nextSibling); else b.appendChild(sp); b.insertBefore(document.createTextNode(' '), sp); }); }
 function detHero(p){
   var it = null; document.querySelectorAll('#nm-list .it').forEach(function(x){ if (!it && x.__mk && x.__mk.__p === p) it = x; });
   if (!it || !it.dataset.pr || isNaN(+it.dataset.pr)) return '';
   var d = +it.dataset.pd || 0, r = Math.round(+it.dataset.pr * 10) / 10, m = it.dataset.pm;
   var sub = [];
   if (p.kind === '행복주택' && p.m2) sub.push('전용 ' + p.m2 + '㎡(' + String(p.py || '').replace(/^\s+|\s+$/g, '') + ')');
-  if (p.rank && typeof rankPill === 'function') sub.push(rankPill(p.rank));
+  if (p.rank && typeof rankPill === 'function' && !mySup(p)) sub.push(rankPill(p.rank));   // 내 공급 띠(맨 위)가 있으면 같은 말이라 뺌
   var bi = burdInfo(p); if (bi) { var bd = fmtMan(Math.round(bi.dep / 10000));   // 월부담 옆에 '어떤 보증금으로 셌는지'를 접지 않고 보여 줌 — 위 큰 숫자(공고 기본 조합)와 달라 헷갈리지 않게 (2026-11-05)
     sub.unshift('<span class="dh-b">월부담 <b>' + Math.round(bi.tot / 1000) / 10 + '만</b> <span class="dh-bs">' + (bi.nl ? '대출 안 됨 → 월세만 · 보증금 ' + bd + ' 전부 내 돈' : (bi.mx ? '보증금 ' + bd + '으로 올리면' : '공고 보증금 ' + bd + ' 그대로') + ' · ' + burdCalc(p, true)) + '</span> <small class="k">' +
       (bi.nl ? '공고문 1쪽: 시중은행 전세자금대출 대상 아님(운영기관이 전대하는 주택) → 이자 0, 기본 보증금 기준' : (bi.mx ? '공고문 전환 규정대로 월세를 보증금으로 최대한 돌린 조합(월세가 가장 낮음) · ' : '보증금 전환 자료가 없어 공고 금액 · ') + '대출 ' + fmtMan(bi.L / 10000) + ' = 보증금의 80% · 연 2.5%(청년 버팀목, 모든 공고 같음) · 내 돈 ' + fmtMan(Math.round((bi.dep - bi.L) / 10000)) + ' · 표는 아래 \'대출 쓰면\'') + '</small></span>'); }
@@ -4345,7 +4380,7 @@ function showDetail(p, approx){
   setTimeout(function(){ if (window.__lgSync) window.__lgSync(); }, 0);
   var d = document.getElementById('nm-detail'), l = document.getElementById('nm-list'); if (!d) return;
   document.getElementById('side').classList.add('show-detail');   // 폰: 상세를 열면 위쪽 범례·필터를 접어 설명이 시트 전체를 씀(← 목록으로 돌아오면 다시 보임)
-  document.getElementById('nm-detail-body').innerHTML = detHero(p) + expNote(p) + nmHtml(p, approx); document.getElementById('detail-title').innerHTML = p.name + ' <span class="pill info" style="font-size:11px;padding:0 7px;vertical-align:middle">' + p.kind + '</span>';
+  document.getElementById('nm-detail-body').innerHTML = supHtml(p) + detHero(p) + expNote(p) + nmHtml(p, approx); document.getElementById('detail-title').innerHTML = p.name + ' <span class="pill info" style="font-size:11px;padding:0 7px;vertical-align:middle">' + p.kind + '</span>';
   kFold(document.getElementById('nm-detail-body'));
   l.hidden = true; d.hidden = false; d.scrollTop = 0;
   // 섹션 바로가기: 상세 안 섹션 제목(임대조건·전환·사진·거주 조건·경쟁률·단지 정보 …)을 눌러 바로 그 자리로
@@ -4912,6 +4947,7 @@ function nmInit(){
     var bbSeen = {}, bb = []; nmMarkers.forEach(function(mk){ var p = mk.__p; if (!p || p.cat === 'na' || bbSeen[p.__mkid] || !inN(p)) return; if (p.planOnly && (!p.plan.st || p.plan.st.done)) return;
       if (!(on[p.cat] && guOk(p) && builtOk(p) && liveOk(p) && btOk(p) && pkOk(p) && rmOk(p))) return; bbSeen[p.__mkid] = 1; var bv = burdOf(p); if (bv != null) bb.push(bv); });
     window.__burdBase = bb.sort(function(x, y){ return x - y; }); if (window.__burdQ) window.__burdQ();
+    try { supTags(); } catch(e) {}
     lgSummary(); if (window.renderNoticePanel) window.renderNoticePanel();   // 공고 화면도 같은 필터로(필터 이름표는 lgSummary 뒤라 최신)
     if (window.prRefresh) prRefresh(); if (window.__burdDone) window.__burdDone();
   var lab = document.getElementById('lg-apply'), lsb = document.querySelector('#lg-sum-txt > b'); if (lab && lsb) lab.textContent = lsb.textContent + ' 보기';
