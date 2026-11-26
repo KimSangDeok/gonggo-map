@@ -98,8 +98,9 @@ def svg(it):
             else:
                 o.append(f'<line x1="{a}" y1="{b}" x2="{c}" y2="{d}" stroke="{WALL}" stroke-width="{70 if r["k"] in ("balc", "util") else 90}" stroke-linecap="square"/>')
     # 트인 곳(벽 없이 이어진 곳): 벽을 바탕색으로 지우고 점선
-    for x1, y1, x2, y2 in it.get('opens') or []:
-        o.append(f'<line x1="{x1}" y1="{y1}" x2="{x2}" y2="{y2}" stroke="{FILL["live"]}" stroke-width="110"/>')
+    for op in it.get('opens') or []:
+        x1, y1, x2, y2 = op[:4]
+        o.append(f'<line x1="{x1}" y1="{y1}" x2="{x2}" y2="{y2}" stroke="{FILL[op[4] if len(op) > 4 else "live"]}" stroke-width="110"/>')
         o.append(f'<line x1="{x1}" y1="{y1}" x2="{x2}" y2="{y2}" stroke="#9AA2AC" stroke-width="28" stroke-dasharray="90 80"/>')
     # 창(벽 위 하늘색 두 줄)
     for x1, y1, x2, y2 in it.get('wins') or []:
