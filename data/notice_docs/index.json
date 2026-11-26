@@ -1,6 +1,6 @@
 {
  "about": "알림 대상 공고의 공고문 사본(tools/notice_docs.py, GitHub 러너가 받음) — 매일 Claude 요약이 웹사이트를 열지 않고 이걸로 확인. [p.N] = 첨부 공고문 N쪽",
- "updated": "2026-11-26 09:27 KST",
+ "updated": "2026-11-26 16:12 KST",
  "items": {
   "lh:2015122300021098": {
    "file": "data/notice_docs/lh-2015122300021098.txt",
@@ -320,6 +320,91 @@
    "chars": 9753,
    "tries": 1,
    "err": ""
+  },
+  "ya:6881": {
+   "file": "data/notice_docs/ya-6881.txt",
+   "title": "[민간임대] 신대방삼거리역 골드타워 추가모집공고",
+   "url": "https://soco.seoul.go.kr/youth/bbs/BMSR00015/view.do?boardId=6881&menuNo=400008",
+   "fetched": "2026-11-26 16:12 KST",
+   "pdfs": [
+    {
+     "name": "민간_261126_신대방삼거리역_골드타워_청년안심주택 추가모집공고문.pdf",
+     "pages": 3
+    }
+   ],
+   "chars": 9605,
+   "tries": 1,
+   "err": ""
+  },
+  "ya:6883": {
+   "file": "data/notice_docs/ya-6883.txt",
+   "title": "[민간임대] 왕십리역 라봄성동 추가모집공고",
+   "url": "https://soco.seoul.go.kr/youth/bbs/BMSR00015/view.do?boardId=6883&menuNo=400008",
+   "fetched": "2026-11-26 16:12 KST",
+   "pdfs": [
+    {
+     "name": "민간_261126_왕십리역_라봄성동_청년안심주택 추가모집공고문.pdf",
+     "pages": 4
+    }
+   ],
+   "chars": 10817,
+   "tries": 1,
+   "err": ""
+  },
+  "ya:6884": {
+   "file": "data/notice_docs/ya-6884.txt",
+   "title": "[민간임대] 연신내역 루미노816 추가모집공고",
+   "url": "https://soco.seoul.go.kr/youth/bbs/BMSR00015/view.do?boardId=6884&menuNo=400008",
+   "fetched": "2026-11-26 16:12 KST",
+   "pdfs": [
+    {
+     "name": "민간_261126_연신내역_루미노816_청년안심주택 추가모집공고문.pdf",
+     "pages": 3
+    }
+   ],
+   "chars": 9620,
+   "tries": 1,
+   "err": ""
+  },
+  "ya:6885": {
+   "file": "data/notice_docs/ya-6885.txt",
+   "title": "[민간임대] 서울대벤처타운역 센터스퀘어 서울대점 추가모집공고",
+   "url": "https://soco.seoul.go.kr/youth/bbs/BMSR00015/view.do?boardId=6885&menuNo=400008",
+   "fetched": "2026-11-26 16:12 KST",
+   "pdfs": [
+    {
+     "name": "민간_261126_서울대벤처타운역_센터스퀘어 서울대점_청년안심주택 추가모집공고문.pdf",
+     "pages": 3
+    }
+   ],
+   "chars": 9280,
+   "tries": 1,
+   "err": ""
+  },
+  "ya:6886": {
+   "file": "data/notice_docs/ya-6886.txt",
+   "title": "[민간임대] 서울역 어반허브 서울스테이션 추가모집공고",
+   "url": "https://soco.seoul.go.kr/youth/bbs/BMSR00015/view.do?boardId=6886&menuNo=400008",
+   "fetched": "2026-11-26 16:12 KST",
+   "pdfs": [
+    {
+     "name": "민간_261126_서울역_어반허브서울스테이션_청년안심주택 추가모집공고문.pdf",
+     "pages": 3
+    }
+   ],
+   "chars": 9523,
+   "tries": 1,
+   "err": ""
+  },
+  "ya:6887": {
+   "file": "data/notice_docs/ya-6887.txt",
+   "title": "[민간임대] 청량리역 퀸즈W 청량리역 추가모집공고",
+   "url": "https://soco.seoul.go.kr/youth/bbs/BMSR00015/view.do?boardId=6887&menuNo=400008",
+   "fetched": "2026-11-26 16:12 KST",
+   "pdfs": [],
+   "chars": 950,
+   "tries": 1,
+   "err": "민간_261126_청량리역_퀸즈W 청량리역_청년안심주택 추가모집공고문.pdf: Unexpected EOF"
   }
  }
 }
