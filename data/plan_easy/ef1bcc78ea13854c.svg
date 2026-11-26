@@ -1,0 +1,131 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-520 -2580 6930 14440" width="693" height="1444">
+<rect x="-520" y="-2580" width="6930" height="14440" fill="#FFFFFF"/>
+<text x="-320" y="-2220" font-size="300" font-weight="800" fill="#1F2328" text-anchor="start" font-family="'Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR','Noto Sans CJK KR',sans-serif">DMCSK뷰 38A형 — 쉬운 평면도</text>
+<text x="-320" y="-1860" font-size="210" font-weight="600" fill="#69707A" text-anchor="start" font-family="'Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR','Noto Sans CJK KR',sans-serif">전용 38.74㎡(11.7평) · 방 2(침실 + 문 달린 거실) · 욕실 1(욕조)</text>
+<text x="-320" y="-1570" font-size="210" font-weight="600" fill="#69707A" text-anchor="start" font-family="'Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR','Noto Sans CJK KR',sans-serif">· 주방·식당 · 발코니 · 다용도</text>
+<rect x="0" y="-1000" width="5890" height="1000" fill="#F6F6F4" stroke="#B9BEC4" stroke-width="30" stroke-dasharray="60 50"/>
+<rect x="0" y="0" width="2410" height="4255" fill="#FCE9CC" stroke="none" stroke-width="30"/>
+<rect x="2410" y="1600" width="1680" height="2655" fill="#FCE9CC" stroke="none" stroke-width="30"/>
+<rect x="2410" y="0" width="1680" height="1600" fill="#E6E9ED" stroke="none" stroke-width="30"/>
+<rect x="4090" y="0" width="1800" height="2010" fill="#F1F1F1" stroke="none" stroke-width="30"/>
+<rect x="4090" y="2010" width="1800" height="2245" fill="#CFEFEA" stroke="none" stroke-width="30"/>
+<rect x="0" y="4255" width="2945" height="3405" fill="#FCE9CC" stroke="none" stroke-width="30"/>
+<rect x="2945" y="4255" width="2945" height="3405" fill="#D9E8F8" stroke="none" stroke-width="30"/>
+<rect x="0" y="7660" width="2945" height="1500" fill="#E3F2D9" stroke="none" stroke-width="30"/>
+<rect x="2945" y="7660" width="1455" height="1500" fill="#E3F2D9" stroke="none" stroke-width="30"/>
+<rect x="4400" y="7660" width="1490" height="1500" fill="#F1F1F1" stroke="none" stroke-width="30"/>
+<rect x="45" y="45" width="705" height="955" fill="#EEE6D8" stroke="#B8AA94" stroke-width="20"/>
+<rect x="45" y="1045" width="705" height="2055" fill="#EEE6D8" stroke="#B8AA94" stroke-width="20"/>
+<rect x="45" y="3245" width="705" height="855" fill="#EEE6D8" stroke="#B8AA94" stroke-width="20"/>
+<line x1="0" y1="0" x2="2410" y2="0" stroke="#2B3036" stroke-width="90" stroke-linecap="square"/>
+<line x1="0" y1="4255" x2="2410" y2="4255" stroke="#2B3036" stroke-width="90" stroke-linecap="square"/>
+<line x1="0" y1="0" x2="0" y2="4255" stroke="#2B3036" stroke-width="90" stroke-linecap="square"/>
+<line x1="2410" y1="0" x2="2410" y2="4255" stroke="#2B3036" stroke-width="90" stroke-linecap="square"/>
+<line x1="2410" y1="1600" x2="4090" y2="1600" stroke="#2B3036" stroke-width="90" stroke-linecap="square"/>
+<line x1="2410" y1="4255" x2="4090" y2="4255" stroke="#2B3036" stroke-width="90" stroke-linecap="square"/>
+<line x1="2410" y1="1600" x2="2410" y2="4255" stroke="#2B3036" stroke-width="90" stroke-linecap="square"/>
+<line x1="4090" y1="1600" x2="4090" y2="4255" stroke="#2B3036" stroke-width="90" stroke-linecap="square"/>
+<line x1="2410" y1="0" x2="4090" y2="0" stroke="#2B3036" stroke-width="90" stroke-linecap="square"/>
+<line x1="2410" y1="1600" x2="4090" y2="1600" stroke="#2B3036" stroke-width="90" stroke-linecap="square"/>
+<line x1="2410" y1="0" x2="2410" y2="1600" stroke="#2B3036" stroke-width="90" stroke-linecap="square"/>
+<line x1="4090" y1="0" x2="4090" y2="1600" stroke="#2B3036" stroke-width="90" stroke-linecap="square"/>
+<line x1="4090" y1="0" x2="5890" y2="0" stroke="#2B3036" stroke-width="70" stroke-linecap="square"/>
+<line x1="4090" y1="2010" x2="5890" y2="2010" stroke="#2B3036" stroke-width="70" stroke-linecap="square"/>
+<line x1="4090" y1="0" x2="4090" y2="2010" stroke="#2B3036" stroke-width="70" stroke-linecap="square"/>
+<line x1="5890" y1="0" x2="5890" y2="2010" stroke="#2B3036" stroke-width="70" stroke-linecap="square"/>
+<line x1="4090" y1="2010" x2="5890" y2="2010" stroke="#2B3036" stroke-width="90" stroke-linecap="square"/>
+<line x1="4090" y1="4255" x2="5890" y2="4255" stroke="#2B3036" stroke-width="90" stroke-linecap="square"/>
+<line x1="4090" y1="2010" x2="4090" y2="4255" stroke="#2B3036" stroke-width="90" stroke-linecap="square"/>
+<line x1="5890" y1="2010" x2="5890" y2="4255" stroke="#2B3036" stroke-width="90" stroke-linecap="square"/>
+<line x1="0" y1="4255" x2="2945" y2="4255" stroke="#2B3036" stroke-width="90" stroke-linecap="square"/>
+<line x1="0" y1="7660" x2="2945" y2="7660" stroke="#2B3036" stroke-width="90" stroke-linecap="square"/>
+<line x1="0" y1="4255" x2="0" y2="7660" stroke="#2B3036" stroke-width="90" stroke-linecap="square"/>
+<line x1="2945" y1="4255" x2="2945" y2="7660" stroke="#2B3036" stroke-width="90" stroke-linecap="square"/>
+<line x1="2945" y1="4255" x2="5890" y2="4255" stroke="#2B3036" stroke-width="90" stroke-linecap="square"/>
+<line x1="2945" y1="7660" x2="5890" y2="7660" stroke="#2B3036" stroke-width="90" stroke-linecap="square"/>
+<line x1="2945" y1="4255" x2="2945" y2="7660" stroke="#2B3036" stroke-width="90" stroke-linecap="square"/>
+<line x1="5890" y1="4255" x2="5890" y2="7660" stroke="#2B3036" stroke-width="90" stroke-linecap="square"/>
+<line x1="0" y1="7660" x2="2945" y2="7660" stroke="#2B3036" stroke-width="70" stroke-linecap="square"/>
+<line x1="0" y1="9160" x2="2945" y2="9160" stroke="#2B3036" stroke-width="70" stroke-linecap="square"/>
+<line x1="0" y1="7660" x2="0" y2="9160" stroke="#2B3036" stroke-width="70" stroke-linecap="square"/>
+<line x1="2945" y1="7660" x2="2945" y2="9160" stroke="#2B3036" stroke-width="70" stroke-linecap="square"/>
+<line x1="2945" y1="7660" x2="4400" y2="7660" stroke="#2B3036" stroke-width="70" stroke-linecap="square"/>
+<line x1="2945" y1="9160" x2="4400" y2="9160" stroke="#2B3036" stroke-width="70" stroke-linecap="square"/>
+<line x1="2945" y1="7660" x2="2945" y2="9160" stroke="#2B3036" stroke-width="70" stroke-linecap="square"/>
+<line x1="4400" y1="7660" x2="4400" y2="9160" stroke="#2B3036" stroke-width="70" stroke-linecap="square"/>
+<line x1="4400" y1="7660" x2="5890" y2="7660" stroke="#2B3036" stroke-width="70" stroke-linecap="square"/>
+<line x1="4400" y1="9160" x2="5890" y2="9160" stroke="#2B3036" stroke-width="70" stroke-linecap="square"/>
+<line x1="4400" y1="7660" x2="4400" y2="9160" stroke="#2B3036" stroke-width="70" stroke-linecap="square"/>
+<line x1="5890" y1="7660" x2="5890" y2="9160" stroke="#2B3036" stroke-width="70" stroke-linecap="square"/>
+<line x1="2410" y1="1600" x2="2410" y2="4255" stroke="#FCE9CC" stroke-width="110"/>
+<line x1="2410" y1="1600" x2="2410" y2="4255" stroke="#9AA2AC" stroke-width="28" stroke-dasharray="90 80"/>
+<line x1="2410" y1="1600" x2="4090" y2="1600" stroke="#E6E9ED" stroke-width="110"/>
+<line x1="2410" y1="1600" x2="4090" y2="1600" stroke="#9AA2AC" stroke-width="28" stroke-dasharray="90 80"/>
+<line x1="1200" y1="0" x2="1800" y2="0" stroke="#FFFFFF" stroke-width="150"/>
+<line x1="1200" y1="0" x2="1800" y2="0" stroke="#2E9BE6" stroke-width="130"/>
+<line x1="1200" y1="0" x2="1800" y2="0" stroke="#FFFFFF" stroke-width="40"/>
+<line x1="4600" y1="0" x2="5300" y2="0" stroke="#FFFFFF" stroke-width="150"/>
+<line x1="4600" y1="0" x2="5300" y2="0" stroke="#2E9BE6" stroke-width="130"/>
+<line x1="4600" y1="0" x2="5300" y2="0" stroke="#FFFFFF" stroke-width="40"/>
+<line x1="300" y1="7660" x2="2700" y2="7660" stroke="#FFFFFF" stroke-width="150"/>
+<line x1="300" y1="7660" x2="2700" y2="7660" stroke="#2E9BE6" stroke-width="130"/>
+<line x1="300" y1="7660" x2="2700" y2="7660" stroke="#FFFFFF" stroke-width="40"/>
+<line x1="3200" y1="7660" x2="4300" y2="7660" stroke="#FFFFFF" stroke-width="150"/>
+<line x1="3200" y1="7660" x2="4300" y2="7660" stroke="#2E9BE6" stroke-width="130"/>
+<line x1="3200" y1="7660" x2="4300" y2="7660" stroke="#FFFFFF" stroke-width="40"/>
+<line x1="1100" y1="9160" x2="1900" y2="9160" stroke="#FFFFFF" stroke-width="150"/>
+<line x1="1100" y1="9160" x2="1900" y2="9160" stroke="#2E9BE6" stroke-width="130"/>
+<line x1="1100" y1="9160" x2="1900" y2="9160" stroke="#FFFFFF" stroke-width="40"/>
+<line x1="3400" y1="9160" x2="3950" y2="9160" stroke="#FFFFFF" stroke-width="150"/>
+<line x1="3400" y1="9160" x2="3950" y2="9160" stroke="#2E9BE6" stroke-width="130"/>
+<line x1="3400" y1="9160" x2="3950" y2="9160" stroke="#FFFFFF" stroke-width="40"/>
+<line x1="2950" y1="0" x2="3850" y2="0" stroke="#FFFFFF" stroke-width="120"/>
+<path d="M3850 0 A900 900 0 0 0 2950 -900" fill="none" stroke="#7A8592" stroke-width="22" stroke-dasharray="50 35"/>
+<line x1="2950" y1="0" x2="2950" y2="-900" stroke="#2B3036" stroke-width="40"/>
+<line x1="4090" y1="2250" x2="4090" y2="2950" stroke="#FFFFFF" stroke-width="120"/>
+<path d="M4090 2950 A700 700 0 0 0 4790 2250" fill="none" stroke="#7A8592" stroke-width="22" stroke-dasharray="50 35"/>
+<line x1="4090" y1="2250" x2="4790" y2="2250" stroke="#2B3036" stroke-width="40"/>
+<line x1="1000" y1="4255" x2="1900" y2="4255" stroke="#FFFFFF" stroke-width="120"/>
+<path d="M1900 4255 A900 900 0 0 1 1000 5155" fill="none" stroke="#7A8592" stroke-width="22" stroke-dasharray="50 35"/>
+<line x1="1000" y1="4255" x2="1000" y2="5155" stroke="#2B3036" stroke-width="40"/>
+<line x1="3050" y1="4255" x2="3850" y2="4255" stroke="#FFFFFF" stroke-width="120"/>
+<path d="M3850 4255 A800 800 0 0 1 3050 5055" fill="none" stroke="#7A8592" stroke-width="22" stroke-dasharray="50 35"/>
+<line x1="3050" y1="4255" x2="3050" y2="5055" stroke="#2B3036" stroke-width="40"/>
+<text x="1245" y="-410" font-size="230" font-weight="800" fill="#1F2328" text-anchor="middle" font-family="'Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR','Noto Sans CJK KR',sans-serif">공용 복도</text>
+<text x="1555" y="2640" font-size="330" font-weight="800" fill="#1F2328" text-anchor="middle" font-family="'Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR','Noto Sans CJK KR',sans-serif">주방·식당</text>
+<text x="1555" y="3043" font-size="190" font-weight="600" fill="#69707A" text-anchor="middle" font-family="'Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR','Noto Sans CJK KR',sans-serif">식탁 자리</text>
+<text x="3250" y="3056" font-size="330" font-weight="800" fill="#1F2328" text-anchor="middle" font-family="'Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR','Noto Sans CJK KR',sans-serif"></text>
+<text x="375" y="555" font-size="150" font-weight="700" fill="#6B5E4A" text-anchor="middle" font-family="'Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR','Noto Sans CJK KR',sans-serif">배관</text>
+<text x="375" y="2105" font-size="150" font-weight="700" fill="#6B5E4A" text-anchor="middle" font-family="'Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR','Noto Sans CJK KR',sans-serif">조리대</text>
+<text x="375" y="3705" font-size="150" font-weight="700" fill="#6B5E4A" text-anchor="middle" font-family="'Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR','Noto Sans CJK KR',sans-serif">냉장고</text>
+<text x="3250" y="929" font-size="330" font-weight="800" fill="#1F2328" text-anchor="middle" font-family="'Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR','Noto Sans CJK KR',sans-serif">현관</text>
+<text x="4990" y="1018" font-size="330" font-weight="800" fill="#1F2328" text-anchor="middle" font-family="'Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR','Noto Sans CJK KR',sans-serif">다용도</text>
+<text x="4990" y="1420" font-size="190" font-weight="600" fill="#69707A" text-anchor="middle" font-family="'Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR','Noto Sans CJK KR',sans-serif">배관 포함</text>
+<text x="4990" y="2904" font-size="330" font-weight="800" fill="#1F2328" text-anchor="middle" font-family="'Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR','Noto Sans CJK KR',sans-serif">욕실</text>
+<text x="4990" y="3307" font-size="190" font-weight="600" fill="#69707A" text-anchor="middle" font-family="'Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR','Noto Sans CJK KR',sans-serif">욕조</text>
+<text x="4990" y="3539" font-size="205" font-weight="700" fill="#3B4350" text-anchor="middle" font-family="'Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR','Noto Sans CJK KR',sans-serif">1.7×2.1m</text>
+<text x="4990" y="3789" font-size="190" font-weight="600" fill="#69707A" text-anchor="middle" font-family="'Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR','Noto Sans CJK KR',sans-serif">3.6㎡·1.1평</text>
+<text x="1472" y="5729" font-size="330" font-weight="800" fill="#1F2328" text-anchor="middle" font-family="'Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR','Noto Sans CJK KR',sans-serif">거실</text>
+<text x="1472" y="6132" font-size="190" font-weight="600" fill="#69707A" text-anchor="middle" font-family="'Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR','Noto Sans CJK KR',sans-serif">주방 쪽에 문</text>
+<text x="1472" y="6364" font-size="205" font-weight="700" fill="#3B4350" text-anchor="middle" font-family="'Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR','Noto Sans CJK KR',sans-serif">2.7×3.1m</text>
+<text x="1472" y="6614" font-size="190" font-weight="600" fill="#69707A" text-anchor="middle" font-family="'Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR','Noto Sans CJK KR',sans-serif">8.5㎡·2.6평</text>
+<text x="4418" y="5845" font-size="330" font-weight="800" fill="#1F2328" text-anchor="middle" font-family="'Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR','Noto Sans CJK KR',sans-serif">침실</text>
+<text x="4418" y="6248" font-size="205" font-weight="700" fill="#3B4350" text-anchor="middle" font-family="'Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR','Noto Sans CJK KR',sans-serif">2.7×3.1m</text>
+<text x="4418" y="6498" font-size="190" font-weight="600" fill="#69707A" text-anchor="middle" font-family="'Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR','Noto Sans CJK KR',sans-serif">8.4㎡·2.5평</text>
+<text x="1472" y="8539" font-size="330" font-weight="800" fill="#1F2328" text-anchor="middle" font-family="'Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR','Noto Sans CJK KR',sans-serif">발코니</text>
+<text x="3672" y="8539" font-size="330" font-weight="800" fill="#1F2328" text-anchor="middle" font-family="'Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR','Noto Sans CJK KR',sans-serif">발코니</text>
+<text x="5145" y="8539" font-size="330" font-weight="800" fill="#1F2328" text-anchor="middle" font-family="'Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR','Noto Sans CJK KR',sans-serif">실외기</text>
+<line x1="0" y1="9580" x2="1000" y2="9580" stroke="#1F2328" stroke-width="40"/>
+<line x1="0" y1="9500" x2="0" y2="9660" stroke="#1F2328" stroke-width="30"/><line x1="1000" y1="9500" x2="1000" y2="9660" stroke="#1F2328" stroke-width="30"/>
+<text x="1150" y="9650" font-size="200" font-weight="700" fill="#1F2328" text-anchor="start" font-family="'Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR','Noto Sans CJK KR',sans-serif">1m</text>
+<line x1="1800" y1="9580" x2="2500" y2="9580" stroke="#FFFFFF" stroke-width="150"/><line x1="1800" y1="9580" x2="2500" y2="9580" stroke="#2E9BE6" stroke-width="130"/><line x1="1800" y1="9580" x2="2500" y2="9580" stroke="#FFFFFF" stroke-width="40"/>
+<text x="2620" y="9650" font-size="200" font-weight="700" fill="#1F2328" text-anchor="start" font-family="'Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR','Noto Sans CJK KR',sans-serif">창</text>
+<path d="M3300 9670 A350 350 0 0 1 3650 9320" fill="none" stroke="#7A8592" stroke-width="22" stroke-dasharray="50 35"/><line x1="3300" y1="9670" x2="3300" y2="9320" stroke="#2B3036" stroke-width="40"/>
+<text x="3780" y="9650" font-size="200" font-weight="700" fill="#1F2328" text-anchor="start" font-family="'Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR','Noto Sans CJK KR',sans-serif">문</text>
+<text x="-320" y="10010" font-size="175" font-weight="600" fill="#69707A" text-anchor="start" font-family="'Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR','Noto Sans CJK KR',sans-serif">원본: SH 주택정보 &#x27;U38A(확장형) 임대 단위세대평면도&#x27;(1/50) — 치수는 원본</text>
+<text x="-320" y="10280" font-size="175" font-weight="600" fill="#69707A" text-anchor="start" font-family="'Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR','Noto Sans CJK KR',sans-serif">숫자, 방 크기는 벽 안쪽(안목) 치수 · 원본 오른쪽 사선 부분은 공용</text>
+<text x="-320" y="10550" font-size="175" font-weight="600" fill="#69707A" text-anchor="start" font-family="'Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR','Noto Sans CJK KR',sans-serif">계단·엘리베이터</text>
+<text x="-320" y="10820" font-size="175" font-weight="600" fill="#69707A" text-anchor="start" font-family="'Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR','Noto Sans CJK KR',sans-serif">거실은 주방 쪽에 문이 있어 방으로도 쓸 수 있음 · 창: 주방·다용도는 공용 복도 쪽</text>
+<text x="-320" y="11090" font-size="175" font-weight="600" fill="#69707A" text-anchor="start" font-family="'Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR','Noto Sans CJK KR',sans-serif">작은 창, 거실·침실은 발코니 쪽 · 욕실은 창 없음</text>
+<text x="-320" y="11360" font-size="175" font-weight="600" fill="#69707A" text-anchor="start" font-family="'Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR','Noto Sans CJK KR',sans-serif">가구·벽 두께는 뺐음 — 정확한 모양은 원본 평면도로 확인</text>
+</svg>
